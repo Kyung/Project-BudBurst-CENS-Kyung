@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="category">
+		<item>Wild Flowers and Herbs</item>
+		<item>Grass</item>
+		<item>Deciduous Trees</item>
+		<item>Evergreen Trees</item>
+		<item>Conifer</item>
+		<item>Others</item>
+	</string-array>
+	<string-array name="recommend">
+		<item>"What's Blooming"</item>
+		<item>"What's Invasive"</item>
+		<item>"What's Native"</item>
+		<item>"What's Popular"</item>
+	</string-array>
+	<string-array name="myphoto">
+		<item>See Detail</item>
+		<item>Delete</item>
+	</string-array>
+</resources>

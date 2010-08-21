@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout  
+    	android:id="@+id/logo_layout"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="63px"
+	    android:gravity="center"
+	    android:background="@drawable/PBB_teel">
+	    <ImageView 
+	    	android:id="@+id/logo"
+	     	android:layout_width="wrap_content"
+		 	android:layout_height="wrap_content"
+	     	android:src="@drawable/logo_medium" 
+	     	android:layout_centerInParent="true"
+	     	android:layout_gravity="center" 
+	     	android:paddingLeft="0px" 
+	     	android:layout_centerVertical="true" 
+	     	android:paddingBottom="0px" 
+	     	android:paddingTop="8px"/>
+	</LinearLayout>        
+		
+	<LinearLayout 
+	   		android:id="@+id/two_button"
+	   	    android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	   		android:weightSum="1"
+	   		android:layout_below="@+id/logo_layout">
+	   		
+	    <cens.ucla.edu.budburst.helper.CustomButton
+	        android:id="@+id/myplant"
+			android:layout_width="fill_parent"
+	        android:layout_height="29dip"
+	        android:layout_alignParentTop="true" 
+	        android:layout_weight="0.5"
+	        android:text="My Plants"/>
+	
+	    <cens.ucla.edu.budburst.helper.CustomButton
+			android:id="@+id/sharedplant"
+			android:layout_width="fill_parent"
+	        android:layout_height="29dip"
+	        android:layout_alignParentTop="true" 
+	        android:layout_weight="0.5"
+	        android:text="Shared Plants"/>
+	</LinearLayout> 
+	
+	<TextView
+		android:id="@+id/instruction"
+		android:layout_below="@+id/two_button"
+		android:textSize="17dip"
+		android:text="@string/no_site_no_species_instruction"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_margin="10dip"
+		android:visibility="gone"		
+		>
+	</TextView>
+	
+	<ListView
+		android:id="@android:id/list"
+		android:layout_below="@+id/two_button"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"/>
+</RelativeLayout>
+
+
