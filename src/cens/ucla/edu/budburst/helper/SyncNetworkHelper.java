@@ -132,7 +132,6 @@ public class SyncNetworkHelper extends Activity{
 			return null;
 		}
 	}
-	
 
 	
 	static public String upload_new_obs(String username, String password, Context cont,

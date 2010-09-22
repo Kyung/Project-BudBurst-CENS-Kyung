@@ -1,7 +1,9 @@
 package cens.ucla.edu.budburst;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,9 +24,9 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 
 public class AddSite extends Activity{
-	
+
 	final String TAG = "AddSite.class"; 
-	
+
 	EditText latitude;
 	EditText longitude;
 	EditText sitename;
@@ -32,39 +34,49 @@ public class AddSite extends Activity{
 
 	ArrayAdapter<CharSequence> adspin;
 	String selectedState;
-	
+
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.addsite);
 
 	}
-	
+
 	public void onResume(){
 		super.onResume();
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 		LocationManager lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		String bestprovider = lmanager.getBestProvider(criteria, true);
-		
-		Location cur_location = lmanager.getLastKnownLocation(bestprovider);
-		
-		latitude = (EditText)this.findViewById(R.id.latitude);
-		latitude.setText(String.valueOf(cur_location.getLatitude()));
 
-		longitude = (EditText)this.findViewById(R.id.longitude);
-		longitude.setText(String.valueOf(cur_location.getLongitude()));
-		
+	     if (!(lmanager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+	    		 && lmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))){  
+	          createLocationServiceDisabledAlert();  
+	     }  
+
+
+	    if(bestprovider == null)
+	    	bestprovider = "gps";
+		Location cur_location = lmanager.getLastKnownLocation(bestprovider);
+
+		if(cur_location != null){
+			latitude = (EditText)this.findViewById(R.id.latitude);
+			latitude.setText(String.valueOf(cur_location.getLatitude()));
+
+			longitude = (EditText)this.findViewById(R.id.longitude);
+			longitude.setText(String.valueOf(cur_location.getLongitude()));
+		}		
+
 		sitename = (EditText)this.findViewById(R.id.sitename);
 		comment = (EditText)this.findViewById(R.id.comment);
-		
+
 		Spinner spinner = (Spinner)findViewById(R.id.state);
 		spinner.setPrompt("Choose your state.");
-		
+
 		adspin = ArrayAdapter.createFromResource(this, R.array.state, 
 				android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adspin);
 		spinner.setSelection(4);
-		
+
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
 				selectedState = adspin.getItem(position).toString();
@@ -74,10 +86,10 @@ public class AddSite extends Activity{
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		//Cancel button handler
 		Button cancelButton = (Button)this.findViewById(R.id.cancel);	
 		cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -90,21 +102,21 @@ public class AddSite extends Activity{
 				finish();
 			}
 		});
-		
-		
+
+
 		//Save button handler
 		Button saveButton = (Button)this.findViewById(R.id.save);	
 		saveButton.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 
 				SyncDBHelper syncDBHelper = new SyncDBHelper(AddSite.this);
 				SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
-								
+
 				try{
 					String usertype_stname = sitename.getText().toString();
-					
+
 					//Check site name is empty
 					if(usertype_stname.equals("")){
 						Toast.makeText(AddSite.this,"Please check your site name", Toast.LENGTH_SHORT).show();
@@ -112,7 +124,7 @@ public class AddSite extends Activity{
 						imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
 						return;
 					}
-	
+
 					//Check if site name is duplicated
 					String query = "SELECT site_id FROM my_sites WHERE site_name='" 
 						+ usertype_stname + "';";
@@ -125,7 +137,7 @@ public class AddSite extends Activity{
 						cursor.close();
 						return;
 					}
-					
+
 					//Insert user typed site name into database
 					//Calendar now = Calendar.getInstance();
 					long epoch = System.currentTimeMillis()/1000;
@@ -143,7 +155,7 @@ public class AddSite extends Activity{
 					SyncDBHelper.SYNCED_NO + ");";
 					syncWDB.execSQL(query);
 					cursor.close();
-					
+
 					Intent intent = new Intent(AddSite.this, PlantList.class);
 					startActivity(intent);
 					finish();
@@ -155,4 +167,32 @@ public class AddSite extends Activity{
 			}
 		});
 	}
+
+	private void createLocationServiceDisabledAlert(){  
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);  
+		builder.setMessage("Your location service is disabled. Please enable both wireless " +
+				"networks and GPS satelites to identify your location.")  
+		     .setCancelable(false)  
+		     .setPositiveButton("Enable",  
+		          new DialogInterface.OnClickListener(){  
+		          public void onClick(DialogInterface dialog, int id){  
+		               showLocationOptions();  
+		          }  
+		     });  
+		     builder.setNegativeButton("Cancel",  
+		          new DialogInterface.OnClickListener(){  
+		          public void onClick(DialogInterface dialog, int id){  
+		               dialog.cancel();  
+		          }  
+		     });  
+		AlertDialog alert = builder.create();  
+		alert.show();  
+		}  
+
+	private void showLocationOptions(){  
+	        Intent gpsOptionsIntent = new Intent(  
+	                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);  
+	        startActivity(gpsOptionsIntent);  
+	}  
+
 }

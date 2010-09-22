@@ -5,10 +5,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MyLocationOverlay;
 
 import cens.ucla.edu.budburst.PlantInfo;
 import cens.ucla.edu.budburst.R;
@@ -17,6 +23,7 @@ import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -25,6 +32,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Bitmap.CompressFormat;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,6 +42,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Images.Media;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -42,27 +53,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GetSpeciesInfo extends Activity {
+public class GetSpeciesInfo extends Activity{
 	
 	protected static final int PHOTO_CAPTURE_CODE = 0;
 	protected static final int GET_PHENOPHASE_CODE = 1;
+	protected static final int FINISH_CODE = 2;
 	public final String BASE_PATH = "/sdcard/pbudburst/";
 	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
-	protected long camera_image_id = 0;
-	private View take_photo = null;
-	private View replace_photo = null;
-	private ImageView image = null;
-	private Button phenophaseBtn = null;
-	private Button saveBtn = null;
+	private String camera_image_id 	= null;
+	private View take_photo		   	= null;
+	private View replace_photo 		= null;
+	private ImageView image 		= null;
+	private Button phenophaseBtn 	= null;
+	private Button saveBtn 			= null;
+	private String cname 			= null;
+	private String sname 			= null;
+	private Bitmap bitmap 			= null;
+	private File dict_tmp 			= null;
+	private EditText notes 			= null;
+	private double latitude 		= 0.0;
+	private double longitude 		= 0.0;
+	private TextView myLoc 			= null;
 	private int protocol_id;
 	private int p_id;
-	private String cname = null;
-	private String sname = null;
-	private Bitmap bitmap = null;
-	private File dict_tmp = null;
 	private OneTimeDBHelper otDBH;
+	private LocationManager lm		= null;
 	private String currentDateTimeString = null;
-	private EditText notes = null;
+	private static GpsListener gpsListener;
+
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -70,15 +88,22 @@ public class GetSpeciesInfo extends Activity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.getspeciesinfo);
 	    
+	    //myLoc = (TextView) findViewById(R.id.myLocation);
+	    //myLoc.setText("Current Location : " + latitude + " , " + longitude);
+	    
+	    gpsListener = new GpsListener();
+	    lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	    // set update the location data in 3secs or 30meters
+	    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 30, gpsListener);
+	    
 	    // call one-time database helper
 	    otDBH = new OneTimeDBHelper(GetSpeciesInfo.this);
 	    
+	    // get the data from previous activity
 	    Intent intent = getIntent();
 	    cname = intent.getExtras().getString("cname");
 	    sname = intent.getExtras().getString("sname");
 	    protocol_id = intent.getExtras().getInt("protocol_id");
-	    
-	    //Log.i("K", " protocol_id : " + protocol_id);
 	    
 	    notes = (EditText) findViewById(R.id.notes);
 	    
@@ -95,6 +120,8 @@ public class GetSpeciesInfo extends Activity {
 	    take_photo.setVisibility(View.VISIBLE);
 	    replace_photo.setVisibility(View.GONE);
 	    
+	    // make temp directory , temp directory will save user_photo data
+	    // if there no directory, make one
 	    dict_tmp = new File(Environment.getExternalStorageDirectory(), "pbudburst/tmp/");
 	    if(!dict_tmp.exists()) {
 	    	dict_tmp.mkdir();
@@ -122,8 +149,17 @@ public class GetSpeciesInfo extends Activity {
 						}
 					}
 					
+					try {
+						SecureRandom prng = SecureRandom.getInstance("SHA1PRNG");
+						String randomNum = new Integer(prng.nextInt()).toString();
+						MessageDigest sha = MessageDigest.getInstance("SHA-1");
+						byte[] result = sha.digest(randomNum.getBytes());
+						camera_image_id = hexEncode(result);
+					} catch (NoSuchAlgorithmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
 					
-					camera_image_id = new Date().getTime();
 					
 					Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 					mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
@@ -155,7 +191,16 @@ public class GetSpeciesInfo extends Activity {
 					}
 				}
 
-				camera_image_id = new Date().getTime();
+				try {
+					SecureRandom prng = SecureRandom.getInstance("SHA1PRNG");
+					String randomNum = new Integer(prng.nextInt()).toString();
+					MessageDigest sha = MessageDigest.getInstance("SHA-1");
+					byte[] result = sha.digest(randomNum.getBytes());
+					camera_image_id = hexEncode(result);
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
@@ -170,6 +215,7 @@ public class GetSpeciesInfo extends Activity {
 			
 			public void onClick(View v) {
 				Intent intent = new Intent(GetSpeciesInfo.this, GetPhenophase.class);
+				intent.putExtra("cname", cname);
 				intent.putExtra("protocol_id", protocol_id);
 				startActivityForResult(intent, GET_PHENOPHASE_CODE);
 			}
@@ -188,25 +234,33 @@ public class GetSpeciesInfo extends Activity {
 					getNote = "No Notes";
 				}
 				
-				// set db writable
-				db = otDBH.getWritableDatabase();
-				// set values which will be inserted in the table
-				// this is one way to do, there's another way also.
+				currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 				
-				db.execSQL("INSERT INTO onetimeob VALUES(" + p_id + "," 
-						+ "'" + cname + "',"
-						+ "'" + sname + "',"
-						+ "'" + currentDateTimeString + "',"
-						+ "'" + getNote + "',"
-						+ camera_image_id + ");");
+				Log.i("K", "info saved in the QUEUE.");
 				
-				// should close the databasehelper; otherwise, memory leaks
-				otDBH.close();
-				Log.i("K", "info saved in the table");
-				Toast.makeText(GetSpeciesInfo.this, "Your observation is in the Queue!", Toast.LENGTH_SHORT).show();
-				finish();
+				Intent intent = new Intent(GetSpeciesInfo.this, SummarySpecies.class);
+				intent.putExtra("cname", cname);
+				intent.putExtra("sname", sname);
+				intent.putExtra("lat", latitude);
+				intent.putExtra("lng", longitude);
+				intent.putExtra("image_id", p_id);
+				intent.putExtra("dt_taken", currentDateTimeString);
+				intent.putExtra("notes", getNote);
+				intent.putExtra("photo_name", camera_image_id);
+				startActivityForResult(intent, FINISH_CODE);
 			}
 		});
+	}
+	
+	static private String hexEncode( byte[] aInput){
+	   StringBuilder result = new StringBuilder();
+	   char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};
+	   for ( int idx = 0; idx < 5; ++idx) {
+		   byte b = aInput[idx];
+		   result.append( digits[ (b&0xf0) >> 4 ] );
+		   result.append( digits[ b&0x0f] );
+	   }
+	   return result.toString();
 	}
 	
 
@@ -222,50 +276,37 @@ public class GetSpeciesInfo extends Activity {
 			
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				
-				//Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-				
-				//int w = bitmap.getWidth();
-				//int h = bitmap.getHeight();
-				
-				//if (w < h) {
-				//	
-				//} 
-				//else {
-					
-				//}
-				
-				//((ImageView)findViewById(R.id.image)).setImageBitmap(bitmap);
-				//ContentValues values = new ContentValues();
-				
-				//values.put(Images.Media.TITLE, "title");
-				//values.put(Images.Media.BUCKET_ID, "test");
-				//values.put(Images.Media.DESCRIPTION, "test Image taken");
-				//values.put(Images.Media.MIME_TYPE, "image/jpeg");
-				
-				//Uri uri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);
-				
-				//OutputStream outstream;
-				
-				//File imagePath = new File(BASE_PATH + camera_image_id + ".jpg");
 				String imagePath = TEMP_PATH + camera_image_id + ".jpg";
-				//outstream = new FileOutputStream(imagePath);
-				bitmap = BitmapFactory.decodeFile(imagePath);
 				
-				//outstream = getContentResolver().openOutputStream(uri);
-				//bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
+				// we can put the option for the bitmap
+				BitmapFactory.Options options = new BitmapFactory.Options();
+				// use tempstorage
+				options.inTempStorage = new byte[16*1024];
+				// change the sampleSize to 4 (which will be resulted in 1/4 of original size)
+				options.inSampleSize = 4;
+				// put image Path and the options
+				bitmap = BitmapFactory.decodeFile(imagePath, options);
+				
+				try{
+					FileOutputStream out = new FileOutputStream(imagePath);
+					bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
+				}catch(Exception e){
+					Log.e("K", e.toString());
+				}
 				
 				image = (ImageView) findViewById(R.id.image);
 				image.setBackgroundResource(R.drawable.shapedrawable);
+				
 				image.setImageBitmap(bitmap);
 				
 				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
 				
 				currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
-				TextView time = (TextView) findViewById(R.id.timestamp_text);
-				time.setText(" " + currentDateTimeString + " ");
+				//TextView time = (TextView) findViewById(R.id.timestamp_text);
+				//time.setText(" " + currentDateTimeString + " ");
 				
-				TextView title = (TextView) findViewById(R.id.make_obs_text);
-				title.setText(" [ Set Your Observation ] ");
+				//TextView title = (TextView) findViewById(R.id.make_obs_text);
+				//title.setText(" [ Set Your Observation ] ");
 				
 				take_photo.setVisibility(View.GONE);
 			    replace_photo.setVisibility(View.VISIBLE);
@@ -282,6 +323,59 @@ public class GetSpeciesInfo extends Activity {
 				imgv.setVisibility(View.VISIBLE);
 				phenophaseBtn.setText("Change Phenophase");
 			}
+			
+			else if(requestCode == FINISH_CODE) {
+				finish();
+			}
 		}			
+	}
+	
+    @Override
+    public void onDestroy() {
+    	// when user finish this activity, turn off the gps
+    	lm.removeUpdates(gpsListener);
+        super.onDestroy();
+    }
+	
+    // or when user press back button
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			lm.removeUpdates(gpsListener);
+			finish();
+			return true;
+		}
+		return false;
+	}
+	
+	
+	private class GpsListener implements LocationListener {
+		
+		@Override
+		public void onLocationChanged(Location loc) {
+			// TODO Auto-generated method stub
+			if(loc != null) {
+				latitude = loc.getLatitude();
+				longitude = loc.getLongitude();
+				
+				//String strLoc = String.format("Current Location : %10.5f, %10.5f", latitude, longitude);
+			
+				//myLoc.setText(strLoc);
+			}
+		}
+		@Override
+		public void onProviderDisabled(String arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void onProviderEnabled(String arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+			// TODO Auto-generated method stub
+			
+		}	
 	}
 }

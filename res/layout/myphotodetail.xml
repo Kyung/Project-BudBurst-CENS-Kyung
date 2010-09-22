@@ -23,7 +23,7 @@
 			android:id="@+id/common_name"
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"
-			android:textSize="18dip" 
+			android:textSize="20dip" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="center"
 			android:textStyle="italic|bold" 
@@ -66,14 +66,37 @@
 				android:layout_gravity="left" />
 		</LinearLayout>
 		
+	
+		
 		<TextView
-			android:paddingTop="10dip"
+			android:paddingTop="20dip"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="GeoLocation"
+			android:textSize="17dip"
+			/>
+			<TextView
+				android:id="@+id/geolocation"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textSize="18dip" 
+				android:textColor="@drawable/black" 
+				android:textStyle="italic"
+			/>		
+		
+		<TextView
+			android:paddingTop="20dip"
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
 			android:text="Species Image"
+			android:textSize="17dip"
 			/>
 		
 		<ImageView 
@@ -88,13 +111,14 @@
 			/>		
 
 		<TextView
-			android:paddingTop="10dip"
+			android:paddingTop="20dip"
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
 			android:text="Phenophase"
+			android:textSize="17dip"
 			/>		
 		<ImageView
 			android:scaleType="fitCenter"
@@ -106,13 +130,14 @@
 		/>
 
 		<TextView
-			android:paddingTop="10dip"
+			android:paddingTop="20dip"
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
 			android:text="Notes"
+			android:textSize="17dip"
 			/>
 
 		<TextView
@@ -123,6 +148,7 @@
 			android:text=""
 			android:width="0dip"
 			android:gravity="top" 
+			android:textSize="17dip"
 		/>
 	</LinearLayout>
 	</ScrollView>

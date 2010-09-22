@@ -106,7 +106,7 @@ public class Sync extends Activity{
 		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(Sync.this,"Coming soon..!",Toast.LENGTH_SHORT).show();
+				Toast.makeText(Sync.this,"Please do sync first",Toast.LENGTH_SHORT).show();
 			}
 			}
 		);
@@ -344,7 +344,7 @@ public class Sync extends Activity{
 				startActivity(intent);
 				finish();
 				
-				Toast.makeText(Sync.this, "Sync done.", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(Sync.this, "Sync done.", Toast.LENGTH_SHORT).show();
 				
 				break;
 			}

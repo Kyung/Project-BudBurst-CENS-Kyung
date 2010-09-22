@@ -25,6 +25,7 @@ public class GetPhenophase extends ListActivity {
 	
 	private ArrayList<PlantItem> pItem;
 	private int protocol_id;
+	private String cname = null;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class GetPhenophase extends ListActivity {
 	    
 	    Intent intent = getIntent();
 	    protocol_id = intent.getExtras().getInt("protocol_id");
+	    cname = intent.getExtras().getString("cname");
 	    
 	    Log.i("K", protocol_id + "");
 	    
@@ -46,7 +48,14 @@ public class GetPhenophase extends ListActivity {
 		StaticDBHelper sDBHelper = new StaticDBHelper(GetPhenophase.this);
 		SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 	    
-	    String query = "SELECT _id, Phenophase_Icon, description FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_id + " ORDER BY Phenophase_Icon ASC";
+		String query = null;
+		if(cname.equals("Others")) {
+			query = "SELECT _id, Phenophase_Icon, description FROM Phenophase_Protocol_Icon ORDER BY Phenophase_Icon ASC";
+		}
+		else {
+			query = "SELECT _id, Phenophase_Icon, description FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_id + " ORDER BY Phenophase_Icon ASC";
+		}
+	    
 	    
 	    Cursor cursor = sDB.rawQuery(query, null);
 		
@@ -69,7 +78,7 @@ public class GetPhenophase extends ListActivity {
 	    myList.setAdapter(MyAdapter);
 	    
 	    // TODO Auto-generated method stub
-	    
+	    cursor.close();
 	    sDBHelper.close();
 		sDB.close();
 	}

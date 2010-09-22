@@ -39,7 +39,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"species_id NUMERIC," +
 				"site_id NUMERIC," +
 				"phenophase_id NUMERIC," +
-				"image_id NUMERIC," +
+				"image_id TEXT," +
 				"time TEXT," +
 				"note TEXT," +
 				"synced NUMERIC);");
@@ -83,6 +83,6 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 		db.execSQL("DELETE FROM my_observation;");
 		db.execSQL("DELETE FROM my_sites;");
 		
-		dbhelper.close();
-	}
+	 	dbhelper.close();
+ 	}
 }

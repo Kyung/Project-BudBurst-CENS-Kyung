@@ -47,7 +47,6 @@
 	        android:layout_weight="0.5"
 	        android:text="Shared Plants"/>
 	</LinearLayout> 
-	
 	<TextView
 		android:id="@+id/instruction"
 		android:layout_below="@+id/two_button"
@@ -59,12 +58,13 @@
 		android:visibility="gone"		
 		>
 	</TextView>
-	
+
 	<ListView
 		android:id="@android:id/list"
 		android:layout_below="@+id/two_button"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"/>
+
 </RelativeLayout>
 
 

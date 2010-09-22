@@ -3,8 +3,8 @@
 	<string-array name="category">
 		<item>Wild Flowers and Herbs</item>
 		<item>Grass</item>
-		<item>Deciduous Trees</item>
-		<item>Evergreen Trees</item>
+		<item>Deciduous Trees and Shrubs</item>
+		<item>Evergreen Trees and Shrubs</item>
 		<item>Conifer</item>
 		<item>Others</item>
 	</string-array>

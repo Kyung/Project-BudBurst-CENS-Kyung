@@ -1,6 +1,7 @@
 package cens.ucla.edu.budburst;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.SyncNetworkHelper;
 
@@ -69,6 +72,10 @@ public class Helloscr extends Activity{
 		//Call SyncNetworkHelper
 		sync = new SyncNetworkHelper();
 		
+		//
+		StaticDBHelper sDBHelper = new StaticDBHelper(Helloscr.this);
+		SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
+		
 		//Retrieve username and password
 		pref = getSharedPreferences("userinfo",0);
 		username = pref.getString("Username","");
@@ -77,6 +84,25 @@ public class Helloscr extends Activity{
 		//Display instruction message
 		TextView textViewHello = (TextView)findViewById(R.id.hello_textview);
 		textViewHello.setText("Hello " + username + ",\n" + getString(R.string.instruction));
+		
+		StaticDBHelper staticDBHelper = new StaticDBHelper(Helloscr.this);
+		
+		try {
+        	staticDBHelper.createDataBase();
+	 	} catch (IOException ioe) {
+	 		Log.e("K", "CREATE DATABASE : " + ioe.toString());
+	 		throw new Error("Unable to create database");
+	 	}
+ 
+	 	try {
+	 		staticDBHelper.openDataBase();
+	 	}catch(SQLException sqle){
+	 		Log.e("K", "OPEN DATABASE : " + sqle.toString());
+	 		throw sqle;
+	 	}
+	 	
+	 	staticDBHelper.close();
+
 		
 		//My plant button
 		Button buttonMyplant = (Button)findViewById(R.id.myplant);
@@ -93,7 +119,7 @@ public class Helloscr extends Activity{
 		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(Helloscr.this,"Coming soon..!",Toast.LENGTH_SHORT).show();
+				Toast.makeText(Helloscr.this,"Please do sync first",Toast.LENGTH_SHORT).show();
 			}
 			}
 		);
@@ -105,6 +131,9 @@ public class Helloscr extends Activity{
 			public void onClick(View v){
 				SharedPreferences.Editor edit = pref.edit();				
 				edit.putString("Synced","true");
+				
+				// 'First' is the flag for executing only one-time in 'PlantList' activity...
+				edit.putString("First", "true");
 				edit.commit();
 				
 				//Show progress
@@ -171,6 +200,7 @@ public class Helloscr extends Activity{
 			case MENU_SYNC:
 				SharedPreferences.Editor edit = pref.edit();				
 				edit.putString("Synced","true");
+				edit.putString("First", "true");
 				edit.commit();
 				
 				//Display pregress dialog
@@ -523,7 +553,7 @@ public class Helloscr extends Activity{
 				else{
 					Intent intent = new Intent(Helloscr.this, PlantList.class);
 					startActivity(intent);
-					Toast.makeText(Helloscr.this, "Sync done.",Toast.LENGTH_SHORT).show();
+					//Toast.makeText(Helloscr.this, "Sync done.",Toast.LENGTH_SHORT).show();
 					finish();
 				}
 				syncDBHelper.close();

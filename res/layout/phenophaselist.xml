@@ -4,6 +4,13 @@
   android:layout_width="fill_parent"
   android:layout_height="wrap_content"
   android:padding="10px">
+  <LinearLayout
+  	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:layout_gravity="left"
+  	android:orientation="vertical"
+  	android:id="@+id/left_part"
+  >
   <ImageView 
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
@@ -13,10 +20,33 @@
   <TextView
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
+  	android:id="@+id/yesorno_photo"
+  	android:textSize="9px"
+  	android:textStyle="bold"
+  	android:textColor="@drawable/black"
+  />
+  </LinearLayout>
+  <LinearLayout
+  	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:layout_toRightOf="@+id/left_part"
+  	android:layout_marginLeft="10px"
+  	android:orientation="vertical"
+  >
+  <TextView
+  	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:id="@+id/pheno_name"
+  	android:textSize="17px"
+  	android:textStyle="bold"
+  	android:textColor="@drawable/black"
+  />
+  <TextView
+  	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
   	android:id="@+id/pheno_text"
   	android:textSize="16px"
   	android:textColor="@drawable/black"
-  	android:layout_toRightOf="@id/pheno_img"
-  	android:layout_marginLeft="10px"
   />
+  </LinearLayout>
 </RelativeLayout>

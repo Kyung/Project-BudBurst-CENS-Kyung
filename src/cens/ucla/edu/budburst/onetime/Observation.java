@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import cens.ucla.edu.budburst.PlantInfo;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import android.app.Activity;
 import android.app.ListActivity;
@@ -26,16 +27,42 @@ import android.widget.TextView;
 
 public class Observation extends ListActivity {
 	private ArrayList<PlantItem> arPlantList;
+	private int WILD_FLOWERS = 0;
+	private int GRASSES = 1;
+	private int DECIDUOUS_TREES = 2;
+	private int EVERGREEN_TREES = 3;
+	private int CONIFERS = 4;
+	private int category;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.observation);
-	
+	    
 	    Intent intent = getIntent();
 	    String selectedItem = intent.getExtras().getString("SelectedList");
-	    	    
+	    
+	    Log.i("K", "selected : " + selectedItem);
+	    
+	    if(selectedItem.equals("Wildflowers and Herbs")) {
+	    	category = WILD_FLOWERS;
+	    }
+	    else if(selectedItem.equals("Grass")) {
+	    	category = GRASSES;
+	    }
+	    else if(selectedItem.equals("Deciduous Trees and Shrubs")) {
+	    	category = DECIDUOUS_TREES;
+	    }
+	    else if(selectedItem.equals("Evergreen Trees and Shrubs")) {
+	    	category = EVERGREEN_TREES;
+	    }
+	    else if(selectedItem.equals("Conifer")) {
+	    	category = CONIFERS;
+	    }
+	    
+	    Log.i("K", "CATEGORY : " + category);
+    
 		//Get all plant list
 		//Open plant list db from static db
 		StaticDBHelper staticDBHelper = new StaticDBHelper(this);
@@ -44,7 +71,7 @@ public class Observation extends ListActivity {
 		
 		//Rereive syncDB and add them to arUserPlatList arraylist
 		arPlantList = new ArrayList<PlantItem>();
-		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species ORDER BY common_name;",null);
+		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + category + " ORDER BY common_name;",null);
 		while(cursor.moveToNext()){
 			Integer id = cursor.getInt(0);
 			String species_name = cursor.getString(1);
@@ -65,6 +92,7 @@ public class Observation extends ListActivity {
 		
 		//Close DB and cursor
 		cursor.close();
+		staticDB.close();
 		staticDBHelper.close();
 
 	    // TODO Auto-generated method stub
@@ -76,7 +104,6 @@ public class Observation extends ListActivity {
 		intent.putExtra("cname", arPlantList.get(position).CommonName);
 		intent.putExtra("sname", arPlantList.get(position).SpeciesName);
 		intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
-		Log.i("K", "ddddd : " + arPlantList.get(position).protocolID);
 		startActivity(intent);
 	}
 	
@@ -142,7 +169,7 @@ public class Observation extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		menu.add(0,1,0,"Queue").setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0,1,0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
 			
 		return true;
 	}
