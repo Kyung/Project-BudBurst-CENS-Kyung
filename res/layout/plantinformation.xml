@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+ 
+ 	<TextView
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		android:text="Edit your observation"
+  		android:textSize="16px"
+  		android:textStyle="bold"
+  		android:gravity="center"
+  		android:layout_marginTop="10px"
+  		android:layout_marginBottom="5px"
+  		android:id="@+id/title_text"
+  	/>
+  	
+	<ScrollView
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/title_text">
+
+	<LinearLayout 
+		android:id="@+id/observation_linear_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/phenophase_bar"
+		android:gravity="center"
+		android:orientation="vertical">
+		<TextView
+			android:paddingTop="2dip"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="  Phenophase"
+			android:textSize="16dip"
+			android:focusableInTouchMode="true"
+			android:focusable="true"
+		/>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:paddingLeft="7dip"
+			android:paddingRight="7dip"
+			android:layout_marginBottom="15px">
+		<ImageView
+			android:paddingTop="1dip"
+			android:layout_width="60px" 
+			android:layout_height="60px" 
+			android:id="@+id/pheno_image" 
+			android:adjustViewBounds="true"
+		/>
+		<TextView
+			android:paddingTop="1dip"
+			android:paddingLeft="6dip"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/pheno_text"
+			android:adjustViewBounds="true"
+		/>
+		</LinearLayout>
+
+		<TextView
+			android:paddingTop="1dip"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="  Photo"
+			android:textSize="16dip"
+			android:background="@drawable/bg_line_top"
+			
+			/>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left"		
+			android:orientation="horizontal"
+			android:paddingLeft="7dip"
+			android:paddingRight="7dip"
+			android:layout_marginTop="7dip">
+		<ImageButton 
+			android:scaleType="fitCenter"
+			android:paddingTop="1dip"
+			android:paddingRight="13dip"
+			android:paddingLeft="13dip"
+			android:layout_width="60px" 
+			android:layout_height="60px" 
+			android:adjustViewBounds="true"
+			android:id="@+id/image" 
+			/>
+		<TextView
+			android:id="@+id/photo_description"
+			android:text="Tap the photo to enlarge."
+			android:paddingTop="1dip"
+			android:paddingLeft="2dip"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:adjustViewBounds="true"
+			android:textSize="16px"
+			android:textStyle="italic"
+			android:layout_marginLeft="3px"
+		/>
+		</LinearLayout>	
+		<LinearLayout 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:paddingTop="7dip"
+			android:layout_marginBottom="10px"
+			android:gravity="center"
+			android:orientation="horizontal">
+
+			<LinearLayout
+				android:id="@+id/take_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dip"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/take_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:layout_gravity="bottom"
+					android:text="Take Photo" 
+					/>
+					
+				<ImageView
+					android:layout_width="wrap_content"			
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_camera_icon" 
+				/>
+				
+			</LinearLayout>
+		
+			<LinearLayout
+				android:id="@+id/replace_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dip"
+				android:paddingTop="7dip"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/replace_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:layout_gravity="bottom"
+					android:text="Replace Photo" />
+					
+				<ImageView
+					android:layout_width="wrap_content" 
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_camera_icon" 
+					/>
+				
+			</LinearLayout>
+					
+		</LinearLayout>
+
+
+			
+
+		<TextView
+			android:paddingTop="1dip"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="  Notes"
+			android:textSize="16dip"
+			android:background="@drawable/bg_line_top"
+			/>
+
+		<EditText
+			android:id="@+id/notes"
+			android:paddingTop="15dip"
+			android:imeOptions="actionDone"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="15px"
+			android:width="0dip"
+			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
+			android:gravity="top" 
+			android:hint="Input note here"
+			android:lines="3"
+			/>
+			
+		<LinearLayout
+			android:paddingTop="3dip" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:paddingBottom="10dip">
+				
+			<Button
+				android:id="@+id/save_changes" 
+				android:textColor="@drawable/black"
+				android:layout_width="250px" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16dip"
+				android:text="Save Changes"
+				android:focusable="true"
+			/>
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>
+</RelativeLayout>
+

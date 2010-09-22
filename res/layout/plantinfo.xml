@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+	<include 
+		android:layout_centerInParent="true"
+		android:id="@+id/button_bar"
+		layout="@layout/button_bar3" />  
+			
+	<LinearLayout
+		android:id="@+id/phenophase_bar"
+   		android:layout_width="fill_parent"
+		android:layout_height="50dip"
+		android:orientation="horizontal" 
+		android:gravity="center"
+		android:layout_below="@+id/button_bar"
+		android:background="@drawable/btn_strip_normal"
+		android:padding="3px"
+		android:paddingBottom="3px"
+		>
+	</LinearLayout>		
+
+	<ScrollView
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/phenophase_bar">
+
+	<LinearLayout 
+		android:id="@+id/observation_linear_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/phenophase_bar"
+		android:gravity="center"
+		android:paddingLeft="7dip"
+		android:paddingRight="7dip"
+		android:orientation="vertical">
+	
+		<TextView
+			android:id="@+id/phenophase_text"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textSize="20dip"
+			android:textColor="@drawable/black"
+			android:text="" 
+			android:textStyle="bold"
+			android:gravity="center" 
+			android:focusable="true"
+			android:focusableInTouchMode="true"/>
+
+		<LinearLayout
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:gravity="center"
+		android:padding="0dip"
+		android:orientation="horizontal">
+		
+			<TextView
+				android:id="@+id/timestamp_label"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="18dip" 
+				android:textColor="@drawable/black" 
+				android:layout_gravity="left"
+				android:textStyle="italic" 
+				android:text="Observed "
+				/>
+				
+			<TextView
+				android:id="@+id/timestamp_text"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="18dip" 
+				android:textColor="@drawable/black" 
+				android:text="Some Date!"
+				android:textStyle="italic"
+				android:layout_gravity="left" />
+		</LinearLayout>
+	
+		<TextView
+			android:id="@+id/make_obs_text"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textSize="20dip"
+			android:textColor="@drawable/black"
+			android:text="Make an observation"
+			android:textStyle="italic" 
+			android:gravity="center" />
+		
+		<TextView
+			android:id="@+id/phenophase_desc_text"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="17dip"
+			android:paddingTop="8dip"
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left" />
+		
+		<ImageView 
+			android:scaleType="fitCenter"
+			android:paddingTop="10dip"
+			android:paddingLeft="13dip"
+			android:paddingRight="13dip"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:id="@+id/image" 
+			android:adjustViewBounds="true"
+			/>
+			
+		<LinearLayout 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:paddingTop="7dip"
+			android:gravity="center"
+			android:orientation="horizontal">
+
+			<LinearLayout
+				android:id="@+id/take_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dip"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/take_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:layout_gravity="bottom"
+					android:text="Add Photo" />
+					
+				<ImageView
+					android:layout_width="wrap_content" 
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_camera_icon" 
+					/>
+				
+			</LinearLayout>
+		
+			<LinearLayout
+				android:id="@+id/replace_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dip"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/replace_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:layout_gravity="bottom"
+					android:text="Replace Photo" />
+					
+				<ImageView
+					android:layout_width="wrap_content" 
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_camera_icon" 
+					/>
+				
+			</LinearLayout>
+			
+
+			
+			<LinearLayout
+				android:id="@+id/remove_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dip"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/remove_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:text=" Remove Photo" />
+					
+				<ImageView
+					android:layout_width="wrap_content" 
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_no_camera_icon" />
+				
+			</LinearLayout>
+
+					
+		</LinearLayout>
+		
+		<TextView
+			android:paddingTop="10dip"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="Notes"
+			/>
+			
+		
+		<EditText
+			android:id="@+id/notes"
+			android:imeOptions="actionDone"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:width="0dip"
+			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
+			android:gravity="top" 
+			android:hint="Input note here"
+			android:lines="3"
+			android:focusable="true"
+			/>
+			
+		<LinearLayout
+			android:paddingTop="3dip" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:paddingBottom="10dip">
+				
+			<Button
+				android:id="@+id/save" 
+				android:textColor="@drawable/black"
+				android:layout_width="wrap_content" 
+				android:layout_height="40dip"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16dip"
+				android:text="Submit an observation!"
+				android:focusable="true"
+				/>
+					
+		</LinearLayout>
+	</LinearLayout>
+	</ScrollView>
+</RelativeLayout>
+
