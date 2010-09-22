@@ -53,6 +53,7 @@ public class PlantSummary extends Activity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.plantsummary);
 	    
+	    // set database
 	    otDBH = new OneTimeDBHelper(PlantSummary.this);
 	    
 	    // get intent data from previous activity
