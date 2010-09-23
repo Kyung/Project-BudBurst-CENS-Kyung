@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -74,21 +75,39 @@ public class PlantSummary extends Activity {
 
 	    // setting up layout
 	    phone_image = (ImageButton) findViewById(R.id.phone_image);
+	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
+	    TextView pheno_title = (TextView) findViewById(R.id.pheno_title);
 	    TextView cnameTxt = (TextView) findViewById(R.id.common_name);
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);
 	    TextView dt_takenTxt = (TextView) findViewById(R.id.timestamp_text);
-	    TextView notesTxt = (TextView) findViewById(R.id.mynotes);
-	    TextView phenoTxt = (TextView) findViewById(R.id.pheno_name);
-	    TextView photo_description = (TextView) findViewById(R.id.photo_description);
+	    EditText notesTxt = (EditText) findViewById(R.id.mynotes);
 	    Button editBtn = (Button) findViewById(R.id.edit);
 	    phone_image.setVisibility(View.VISIBLE);
 	    
+	    String[] sname_split;
+	    sname_split = sname.split(" ");
+	    int sname_length = sname_split[0].length() + sname_split[1].length();
+	    
 	    // put cname and sname in the textView
-	    dt_takenTxt.setText("No Date Yet");
-	    cnameTxt.setText(cname + " ");
-	    snameTxt.setText(sname + " ");
-	    phone_image.setBackgroundResource(R.drawable.shapedrawable);
+	    pheno_title.setText("'" + pheno_name + "' Observed");
+	    dt_takenTxt.setText(dt_taken + " ");
+	    
+	    if(cname.length() < 16 && sname_length < 16) {
+	    	if(cname.length() < 16)
+	    		cnameTxt.setText("    " + cname + "    ");
+	    	if(sname_length < 16)
+	    		snameTxt.setText("    " + sname_split[0] + " " + sname_split[1] + "    ");
+	    }
+	    else {
+	    	cnameTxt.setText(" " + cname + " ");
+	    }
+	    
+	    
+	    snameTxt.setText(sname_split[0] + " " + sname_split[1] + " ");
+	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+	    species_image.setBackgroundResource(R.drawable.shapedrawable);
+	    phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 	    
 	    String imagePath = null;
 	    File file = new File(BASE_PATH + photo_name + ".jpg");
@@ -96,8 +115,8 @@ public class PlantSummary extends Activity {
 	    Bitmap resized_bitmap = null;
 	    
 	    // set new width and height of the phone_image
-	    int new_width = 60;
-	    int new_height = 60;
+	    int new_width = 110;
+	    int new_height = 110;
 	   
 	    if(file.exists()) {
 	    	imagePath = BASE_PATH + photo_name + ".jpg";
@@ -114,12 +133,10 @@ public class PlantSummary extends Activity {
 		   	
 	    	phone_image.setImageBitmap(resized_bitmap);
 	    	phone_image.setVisibility(View.VISIBLE);
-	    	photo_description.setText("Tap the photo to enlarge.");
 	    }
 	    else {
-	    	//phone_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo_small", null, null));
-	   	    phone_image.setVisibility(View.GONE);
-	   	    photo_description.setText("Add photo for this phenophase.");
+	    	phone_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+	   	    phone_image.setVisibility(View.VISIBLE);
 	   	}
 	    
 	    phone_image.setOnClickListener(new View.OnClickListener() {
@@ -156,7 +173,6 @@ public class PlantSummary extends Activity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						phone_image.setBackgroundResource(R.drawable.shapedrawable);
 					}
 				});
 		        dialog.setView(linear);
@@ -175,15 +191,11 @@ public class PlantSummary extends Activity {
 	    
 	    pheno_image.setBackgroundResource(R.drawable.shapedrawable);
 	    pheno_image.setVisibility(View.VISIBLE);
-	    phenoTxt.setText(pheno_text + " ");
+	    //phenoTxt.setText(pheno_text + " ");
+
 	    
-	    // if dt_taken and notes are not "", put the values in the textView
-	    if(dt_taken.length() != 0 && (!dt_taken.equals("null"))) {
-	    	dt_takenTxt.setText(" " + dt_taken + " ");
-	    }
-	    else {
-	    	dt_takenTxt.setText(" No Date & Time ");
-	    }
+	    notesTxt.setEnabled(false);
+	    notesTxt.setClickable(false);
 	    
 		if(notes.length() != 0) {
 			notesTxt.setText(notes);

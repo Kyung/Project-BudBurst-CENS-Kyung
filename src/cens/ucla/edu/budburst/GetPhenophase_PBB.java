@@ -158,19 +158,40 @@ public class GetPhenophase_PBB extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(GetPhenophase_PBB.this, PlantSummary.class);
-		intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
-		intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
-		intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
-		intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
-		intent.putExtra("photo_name", pItem.get(position).Image_id);
-		intent.putExtra("species_id", species_ids);
-		intent.putExtra("site_id", site_ids);
-		intent.putExtra("dt_taken", pItem.get(position).Time);
-		intent.putExtra("notes", pItem.get(position).Notes);
-		intent.putExtra("cname", common_name);
-		intent.putExtra("sname", science_name);
-		startActivityForResult(intent, RETURN_FROM_PLANT_INFORMATION);
+		String get_time = pItem.get(position).Time;
+		
+		if(get_time.length() > 0) {
+			Intent intent = new Intent(GetPhenophase_PBB.this, PlantSummary.class);
+			intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
+			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
+			intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
+			intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
+			intent.putExtra("photo_name", pItem.get(position).Image_id);
+			intent.putExtra("species_id", species_ids);
+			intent.putExtra("site_id", site_ids);
+			intent.putExtra("dt_taken", pItem.get(position).Time);
+			intent.putExtra("notes", pItem.get(position).Notes);
+			intent.putExtra("cname", common_name);
+			intent.putExtra("sname", science_name);
+			startActivityForResult(intent, RETURN_FROM_PLANT_INFORMATION);
+		}
+		else {
+			Intent intent = new Intent(GetPhenophase_PBB.this, PlantInformation_Direct.class);
+			intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
+			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
+			intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
+			intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
+			intent.putExtra("photo_name", pItem.get(position).Image_id);
+			intent.putExtra("species_id", species_ids);
+			intent.putExtra("site_id", site_ids);
+			intent.putExtra("dt_taken", pItem.get(position).Time);
+			intent.putExtra("notes", pItem.get(position).Notes);
+			intent.putExtra("cname", common_name);
+			intent.putExtra("sname", science_name);
+			intent.putExtra("direct", true);
+	
+			startActivityForResult(intent, RETURN_FROM_PLANT_INFORMATION);
+		}
 	}
 	
 	class PlantItem{

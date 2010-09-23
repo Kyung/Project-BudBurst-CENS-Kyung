@@ -61,7 +61,7 @@
 <activity android:name=".onetime.WPinfo" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
 <uses-library android:name="com.google.android.maps"></uses-library>
 
-<activity android:name=".onetime.Whatspopulars"></activity>
+<activity android:name=".onetime.Whatspopulars" android:process=":Whatspopulars"></activity>
 <activity android:name=".onetime.WPinformation"></activity>
 
 <activity android:name=".onetime.SummarySpecies" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
@@ -70,6 +70,7 @@
 <activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 
+<activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 

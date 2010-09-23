@@ -90,11 +90,17 @@ public class PlantInformation extends Activity {
 		
 		camera_image_id = photo_name;
 		
+		ImageView species_image = (ImageView) findViewById(R.id.species_image);
+	    TextView species_name = (TextView) findViewById(R.id.species_name);
+		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+	    species_image.setBackgroundResource(R.drawable.shapedrawable);
+	    species_name.setText(cname + " \n" + sname + " ");
+		
 		// set xml
 		notes = (EditText) findViewById(R.id.notes);
 		take_photo = this.findViewById(R.id.take_photo);
 		replace_photo = this.findViewById(R.id.replace_photo);
-		photo_des = (TextView) findViewById(R.id.photo_description);
+		
 		
 		// show pheno_image and pheno_text
 		ImageView phenoImg = (ImageView) findViewById(R.id.pheno_image);
@@ -126,7 +132,7 @@ public class PlantInformation extends Activity {
 	    }
 	    else {
 	    	photo_image.setVisibility(View.GONE);
-	    	photo_des.setText("Add photo for this phenophase.");
+	    	//photo_des.setText("Add photo for this phenophase.");
 	    	//photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo_small", null, null));
 	    }
 	    
@@ -282,7 +288,7 @@ public class PlantInformation extends Activity {
 					SQLiteDatabase db = syncDBHelper.getWritableDatabase();
 					String query;
 					
-					dt_taken = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
+					dt_taken = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 					
 					//INSERT INTO my_observation VALUES (null,56,3339,24,'3224193362','2010-09-16 04:08:35','ppp',9);
 					if(count == 0){
@@ -358,9 +364,7 @@ public class PlantInformation extends Activity {
 				ShowPhotoTaken(imagePath, photo_image);
 				
 				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
-				
-				
-				photo_des.setText("Tap the photo to enlarge.");
+
 				photo_image.setVisibility(View.VISIBLE);
 				take_photo.setVisibility(View.GONE);
 			    replace_photo.setVisibility(View.VISIBLE);
@@ -405,15 +409,15 @@ public class PlantInformation extends Activity {
 			Log.e("K", e.toString());
 		}
 		
-		image.setBackgroundResource(R.drawable.shapedrawable);
+		image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 		
 		int width = bitmap.getWidth();
 	   	int height = bitmap.getHeight();
 	   	
 	    Bitmap resized_bitmap = null;
 	    // set new width and height of the phone_image
-	    int new_width = 60;
-	    int new_height = 60;
+	    int new_width = 110;
+	    int new_height = 110;
 	   	
 	   	float scale_width = ((float) new_width) / width;
 	   	float scale_height = ((float) new_height) / height;
@@ -422,133 +426,6 @@ public class PlantInformation extends Activity {
 	   	resized_bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 		
 	   	photo_image.setImageBitmap(resized_bitmap);
-	}
-	
-	public Observation getObservation(Integer phenophase_id, int species_id, int site_id){
-
-		try{
-			SyncDBHelper syncDBHelper = new SyncDBHelper(PlantInformation.this);
-			SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase();
-
-			String query = "SELECT " +
-					"_id, image_id, time, note, synced FROM my_observation WHERE " +
-					"species_id=" + species_id + " AND " +
-					"site_id=" + site_id + " AND " +
-					"phenophase_id=" + phenophase_id +
-					" ORDER BY time DESC " +
-					" LIMIT 1";
-			Cursor cursor = syncDB.rawQuery(query, null);
-
-			if(cursor.getCount() == 0){
-				cursor.close();
-				syncDBHelper.close();
-				return null;
-			}
-
-			cursor.moveToNext();
-			Observation obs = new Observation(cursor.getInt(0), species_id, phenophase_id, site_id, cursor.getLong(1), 
-					cursor.getString(2), cursor.getString(3));
-
-			cursor.close();
-			syncDBHelper.close();
-
-			return obs;
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			Log.e("K", e.toString());
-			return null;
-		}
-
-	}
-	
-	class Observation{
-
-		public int observation_id = 0;
-		public int species_id = 0;
-		public int phenophase_id = 0;
-		public int site_id = 0;
-		public Long image_id = new Long(0);
-		public String time = "";
-		public String note = "";
-
-		public final String TAG = "PlantInfo";
-
-		public boolean img_replaced = false; //A flag to show if image has been replaced
-		public boolean img_removed = false; //A flag to show if image has been replaced
-		public boolean note_edited = false; //A flag to show if image has been replaced
-		public boolean saved = true; //A flag to show if it is saved or not
-		public Long unsaved_image_id; //temporarily saved image id
-		public String unsaved_note; //temporarily stored notes
-
-		public Observation(int aObservation_id, int aSpeciesID, int aPhenoID, int aSiteID, Long aImgID, 
-				String aTime, String aNote){
-
-			observation_id = aObservation_id;
-			species_id = aSpeciesID;
-			phenophase_id = aPhenoID;
-			site_id = aSiteID;
-			image_id = aImgID;
-			time = aTime;
-			note = aNote;
-		}	
-
-		public Observation(int aSpeciesID, int aPhenoID, int aSiteID, Long aImgID, 
-				String aTime, String aNote){
-
-			species_id = aSpeciesID;
-			phenophase_id = aPhenoID;
-			site_id = aSiteID;
-			image_id = aImgID;
-			time = aTime;
-			note = aNote;
-		}
-
-		public void copy(Observation o){
-			if(o != null){
-				this.image_id = o.image_id;
-				this.note = o.note;
-				this.observation_id = o.observation_id;
-				this.site_id = o.site_id;
-				this.phenophase_id = o.phenophase_id;
-				this.time = o.time;
-				this.species_id = o.species_id;
-			}
-		}
-
-		//obs_id denotes this observation is new or update.
-		public void put(Context cont, Integer obs_id){
-
-			try{
-				SyncDBHelper syncDBHelper = new SyncDBHelper(cont);
-				SQLiteDatabase db = syncDBHelper.getWritableDatabase();
-				String query;
-
-				if(obs_id == 0){
-					query = "INSERT INTO my_observation VALUES (" +
-							"null," +
-							species_id + "," +
-							site_id + "," +
-							phenophase_id +"," +
-							image_id + "," +
-							"'" + time + "'," +
-							"'" + note + "'," +
-							SyncDBHelper.SYNCED_NO + ");";
-				}else{
-					query = "UPDATE my_observation SET " +
-							"image_id=" + image_id + "," +
-							"time='" + time + "'" + "," +
-							"note='" + note + "'" + "," +
-							"synced=" + SyncDBHelper.SYNCED_NO + " " + 
-							"WHERE _id=" + obs_id + ";"; 
-				}
-				db.execSQL(query);
-				syncDBHelper.close();
-			}catch(Exception e){
-				Log.e(TAG, e.toString());
-			}
-
-		}
 	}
 }
 

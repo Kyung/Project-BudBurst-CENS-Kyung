@@ -4,15 +4,46 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
  
+   <LinearLayout
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:orientation="horizontal"
+  	android:paddingLeft="7dip"
+  	android:paddingTop="7dip"
+  	android:paddingBottom="15dip"
+  	android:background="@drawable/bg_line"
+  	android:id="@+id/header">
+  	<ImageView
+		android:paddingTop="3dip"
+		android:layout_width="60px" 
+		android:layout_height="60px"
+		android:id="@+id/species_image" 
+		android:adjustViewBounds="true"
+	/>
+	<TextView
+		android:paddingTop="1dip"
+		android:paddingLeft="2dip"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/species_name"
+		android:adjustViewBounds="true"
+		android:textSize="17px"
+		android:textStyle="italic|bold"
+		android:layout_marginLeft="3px"
+	/>
+	</LinearLayout> 
+
+ 
  	<TextView
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
   		android:text="Edit your observation"
-  		android:textSize="16px"
+  		android:textSize="18px"
   		android:textStyle="bold"
   		android:gravity="center"
   		android:layout_marginTop="10px"
   		android:layout_marginBottom="5px"
+  		android:layout_below="@+id/header"
   		android:id="@+id/title_text"
   	/>
   	
@@ -71,7 +102,7 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="  Photo"
+			android:text="  Observation"
 			android:textSize="16dip"
 			android:background="@drawable/bg_line_top"
 			
@@ -83,35 +114,24 @@
 			android:orientation="horizontal"
 			android:paddingLeft="7dip"
 			android:paddingRight="7dip"
-			android:layout_marginTop="7dip">
+			android:layout_marginBottom="5px">
 		<ImageButton 
 			android:scaleType="fitCenter"
 			android:paddingTop="1dip"
 			android:paddingRight="13dip"
 			android:paddingLeft="13dip"
-			android:layout_width="60px" 
-			android:layout_height="60px" 
+			android:layout_width="110px" 
+			android:layout_height="110px" 
 			android:adjustViewBounds="true"
 			android:id="@+id/image" 
 			/>
-		<TextView
-			android:id="@+id/photo_description"
-			android:text="Tap the photo to enlarge."
-			android:paddingTop="1dip"
-			android:paddingLeft="2dip"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:adjustViewBounds="true"
-			android:textSize="16px"
-			android:textStyle="italic"
-			android:layout_marginLeft="3px"
-		/>
-		</LinearLayout>	
-		<LinearLayout 
+
+			<LinearLayout 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
 			android:paddingTop="7dip"
-			android:layout_marginBottom="10px"
+			android:layout_marginTop="15px"
+			android:layout_marginBottom="5px"
 			android:gravity="center"
 			android:orientation="horizontal">
 
@@ -119,6 +139,7 @@
 				android:id="@+id/take_photo" 
 				android:layout_width="wrap_content" 
 				android:layout_height="40dip"
+				android:layout_marginTop="1px"
 				android:background="@layout/button_field"
 				android:clickable="true"
 				android:gravity="center"
@@ -145,6 +166,7 @@
 				android:id="@+id/replace_photo" 
 				android:layout_width="wrap_content" 
 				android:layout_height="40dip"
+				android:layout_marginTop="1px"
 				android:paddingTop="7dip"
 				android:background="@layout/button_field"
 				android:clickable="true"
@@ -165,12 +187,9 @@
 					android:src="@drawable/ic_menu_camera_icon" 
 					/>
 				
-			</LinearLayout>
-					
+			</LinearLayout>	
 		</LinearLayout>
-
-
-			
+		</LinearLayout>	
 
 		<TextView
 			android:paddingTop="1dip"
@@ -179,7 +198,7 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="  Notes"
+			android:text="  Note"
 			android:textSize="16dip"
 			android:background="@drawable/bg_line_top"
 			/>
@@ -194,7 +213,7 @@
 			android:width="0dip"
 			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
 			android:gravity="top" 
-			android:hint="Input note here"
+			android:hint="Add notes here"
 			android:lines="3"
 			/>
 			
