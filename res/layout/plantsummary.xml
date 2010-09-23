@@ -63,16 +63,24 @@
 		android:layout_weight="1"
 	/>			
 	</LinearLayout>
+	
+	<ScrollView
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:layout_below="@+id/header_part"
+		android:layout_marginLeft="5px"
+		android:layout_marginRight="5px"
+		android:id="@+id/scroll_view">
 
 	<LinearLayout 
 		android:layout_marginTop="10px"
 		android:id="@+id/observation_linear_layout"
-		android:layout_below="@+id/header_part"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:gravity="center"
 		android:orientation="vertical"
-		android:background="@drawable/shapedrawable_thick">
+		android:background="@drawable/shapedrawable_thick"
+		>
 
 		<TextView
 			android:layout_marginTop="15px"
@@ -82,7 +90,7 @@
 			android:gravity="center"
 			android:textStyle="bold|italic" 
 			android:id="@+id/pheno_title"
-			android:textSize="20dip"
+			android:textSize="21dip"
 			/>
 		<TextView
 			android:id="@+id/timestamp_text"
@@ -96,12 +104,13 @@
 			android:focusableInTouchMode="true"
 			android:paddingLeft="7dip"
 			android:paddingRight="7dip"
-			android:layout_marginTop="10dip"
-			android:layout_marginBottom="10dip" />
+			android:layout_marginTop="5dip"
+			android:layout_marginBottom="5dip" />
 			
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
+			android:layout_marginTop="15px"
 			android:gravity="left"		
 			android:orientation="horizontal"
 			android:paddingTop="2dip"
@@ -113,7 +122,7 @@
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:textSize="16dip"
-			android:text="Observation"
+			android:text="Image"
 			android:layout_gravity="center"
 			android:id="@+id/observation_text"
 			/>
@@ -137,7 +146,6 @@
 			android:paddingTop="4dip"
 			android:paddingLeft="7dip"
 			android:paddingRight="7dip"
-			android:layout_marginBottom="10dip"
 		>
 		<ImageButton
 			android:scaleType="fitCenter"
@@ -177,28 +185,20 @@
 			android:focusableInTouchMode="true"
 			
 			/>
-	</LinearLayout>
-	<LinearLayout
-		android:layout_marginTop="10px"
-		android:paddingTop="10dip" 
-		android:layout_below="@+id/observation_linear_layout"
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:gravity="center"
-		android:paddingBottom="5dip"
-		android:orientation="horizontal">
-			
 		<Button
 			android:id="@+id/edit" 
 			android:textColor="@drawable/black"
-			android:layout_width="wrap_content" 
+			android:layout_width="250px" 
 			android:layout_height="wrap_content"
+			android:layout_marginTop="10px"
+			android:layout_marginBottom="20px"
 			android:textStyle="bold"
 			android:textSize="16dip"
 			android:text="Edit Observation"
 			android:focusable="true"
 		/>
+	
 	</LinearLayout>
+	</ScrollView>
 </RelativeLayout>
 

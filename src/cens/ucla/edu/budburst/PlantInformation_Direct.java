@@ -103,8 +103,10 @@ public class PlantInformation_Direct extends Activity {
 		// show pheno_image and pheno_text
 		ImageView phenoImg = (ImageView) findViewById(R.id.pheno_image);
 		TextView phenoTxt = (TextView) findViewById(R.id.pheno_text);
+		TextView phenoName = (TextView) findViewById(R.id.pheno_name);
 		phenoImg.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + phenophase_id, null, null));
 		phenoImg.setBackgroundResource(R.drawable.shapedrawable);
+		phenoName.setText(pheno_name);
 		phenoTxt.setText(pheno_text);
 		notes.setText(note);
 		
@@ -129,8 +131,9 @@ public class PlantInformation_Direct extends Activity {
 		    replace_photo.setVisibility(View.VISIBLE);
 	    }
 	    else {
-	    	photo_image.setVisibility(View.GONE);
-	    	//photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo_small", null, null));
+	    	photo_image.setVisibility(View.VISIBLE);
+	    	photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+	    	photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
 	    }
 	    
 	    photo_image.setOnClickListener(new View.OnClickListener() {
@@ -159,8 +162,8 @@ public class PlantInformation_Direct extends Activity {
 			    }
 			    // if not, show 'no image' ImageButton
 			    else {
-			    	//image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
-			    	image_view.setVisibility(View.GONE);
+			    	image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			    	image_view.setVisibility(View.VISIBLE);
 			    }
 			    
 			    // when press 'Back', close the dialog

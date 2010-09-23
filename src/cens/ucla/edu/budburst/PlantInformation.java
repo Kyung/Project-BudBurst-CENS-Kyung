@@ -105,8 +105,10 @@ public class PlantInformation extends Activity {
 		// show pheno_image and pheno_text
 		ImageView phenoImg = (ImageView) findViewById(R.id.pheno_image);
 		TextView phenoTxt = (TextView) findViewById(R.id.pheno_text);
+		TextView phenoName = (TextView) findViewById(R.id.pheno_name);
 		phenoImg.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + phenophase_id, null, null));
 		phenoImg.setBackgroundResource(R.drawable.shapedrawable);
+		phenoName.setText(pheno_name);
 		phenoTxt.setText(pheno_text);
 		notes.setText(note);
 		

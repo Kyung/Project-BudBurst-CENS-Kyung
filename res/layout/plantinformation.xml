@@ -33,24 +33,10 @@
 	/>
 	</LinearLayout> 
 
- 
- 	<TextView
-  		android:layout_width="fill_parent"
-  		android:layout_height="wrap_content"
-  		android:text="Edit your observation"
-  		android:textSize="18px"
-  		android:textStyle="bold"
-  		android:gravity="center"
-  		android:layout_marginTop="10px"
-  		android:layout_marginBottom="5px"
-  		android:layout_below="@+id/header"
-  		android:id="@+id/title_text"
-  	/>
-  	
 	<ScrollView
 		android:layout_width="fill_parent" 
 		android:layout_height="fill_parent" 
-		android:layout_below="@+id/title_text">
+		android:layout_below="@+id/header">
 
 	<LinearLayout 
 		android:id="@+id/observation_linear_layout"
@@ -60,30 +46,49 @@
 		android:gravity="center"
 		android:orientation="vertical">
 		<TextView
-			android:paddingTop="2dip"
-			android:layout_width="fill_parent" 
-			android:layout_height="wrap_content" 
-			android:textColor="@drawable/black" 
-			android:layout_gravity="left"
-			android:textStyle="bold" 
-			android:text="  Phenophase"
-			android:textSize="16dip"
-			android:focusableInTouchMode="true"
-			android:focusable="true"
-		/>
+  			android:layout_width="fill_parent"
+  			android:layout_height="wrap_content"
+  			android:text="Edit your observation"
+  			android:textSize="18px"
+  			android:textStyle="bold"
+  			android:gravity="center"
+  			android:layout_marginTop="10px"
+  			android:layout_marginBottom="5px"
+  			android:id="@+id/title_text"
+  		/>
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
+			android:layout_marginTop="5px"
+			android:layout_marginBottom="15px"
 			android:orientation="horizontal"
+			android:paddingTop="10dip"
 			android:paddingLeft="7dip"
 			android:paddingRight="7dip"
-			android:layout_marginBottom="15px">
+			android:background="@drawable/bg_line_top">
 		<ImageView
-			android:paddingTop="1dip"
+			android:paddingTop="6dip"
 			android:layout_width="60px" 
 			android:layout_height="60px" 
 			android:id="@+id/pheno_image" 
 			android:adjustViewBounds="true"
+		/>
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+		>
+		<TextView
+			android:paddingLeft="6dip"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:layout_gravity="left" 
+			android:textColor="@drawable/black"
+			android:textSize="16dip" 
+			android:textStyle="bold" 
+			android:id="@+id/pheno_name"
+			android:focusableInTouchMode="true"
+			android:focusable="true"
 		/>
 		<TextView
 			android:paddingTop="1dip"
@@ -94,27 +99,28 @@
 			android:adjustViewBounds="true"
 		/>
 		</LinearLayout>
-
+		</LinearLayout>
 		<TextView
 			android:paddingTop="1dip"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
-			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="  Observation"
+			android:text="  Image"
 			android:textSize="16dip"
+			android:textColor="@drawable/black"
 			android:background="@drawable/bg_line_top"
 			
 			/>
 		<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:gravity="left"		
-			android:orientation="horizontal"
 			android:paddingLeft="7dip"
 			android:paddingRight="7dip"
-			android:layout_marginBottom="5px">
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="5px"
+			android:gravity="left"		
+			android:orientation="horizontal"
+			>
 		<ImageButton 
 			android:scaleType="fitCenter"
 			android:paddingTop="1dip"
@@ -205,9 +211,9 @@
 
 		<EditText
 			android:id="@+id/notes"
-			android:paddingTop="15dip"
+			android:paddingTop="1dip"
 			android:imeOptions="actionDone"
-			android:layout_width="fill_parent" 
+			android:layout_width="250px" 
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="15px"
 			android:width="0dip"
