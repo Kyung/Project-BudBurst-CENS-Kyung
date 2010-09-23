@@ -83,6 +83,7 @@ public class WIinfo extends Activity {
 		
 		edit.commit();
 		
+		cursor.close();
 		db.close();
 		otDBH.close();
 	    

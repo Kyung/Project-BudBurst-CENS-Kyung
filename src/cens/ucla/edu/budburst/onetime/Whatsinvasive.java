@@ -74,6 +74,8 @@ public class Whatsinvasive extends ListActivity {
 	private TextView areaTxt = null;
 	private TextView areaTxt2 = null;
 	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
+	protected static int GET_AREA_LIST = 1;
+	protected static int TO_WI_INFO = 2;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -87,9 +89,8 @@ public class Whatsinvasive extends ListActivity {
 	    areaTxt = (TextView) findViewById(R.id.area_name);
 	    areaTxt2 = (TextView) findViewById(R.id.title2);
 	   
-	    
 	    Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
-		startActivityForResult(intent, 1);
+		startActivityForResult(intent, GET_AREA_LIST);
 	    // TODO Auto-generated method stub
 	}
 	
@@ -101,13 +102,18 @@ public class Whatsinvasive extends ListActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if(resultCode == RESULT_OK) {
-			if(requestCode == 1) {
+			if(requestCode == GET_AREA_LIST) {
 				area_id = data.getStringExtra("selected_park");
 				area_name = data.getStringExtra("park_name");
+				boolean clicked = data.getBooleanExtra("clicked_me", false);
+				
+				if(!clicked) {
+					area_id = "9";
+				}
 				
 				boolean back = data.getBooleanExtra("back", false);
 				if(back) {
-					finish();
+					Whatsinvasive.this.finish();
 				}
 			
 				areaTxt.setText("Area : " + area_name);
@@ -130,13 +136,14 @@ public class Whatsinvasive extends ListActivity {
 				if(count == 0) {
 					arSpeciesList = null;
 					arSpeciesList = new ArrayList<species>();
+					//if(area_id)
 					new DoAsyncTask().execute(area_id);
 				}
 				else {
 					showExistedSpecies(data);
 				}
 			}
-			else if(requestCode == 2) {
+			else if(requestCode == TO_WI_INFO) {
 				
 				pref = getSharedPreferences("Onetime", MODE_WORLD_READABLE);
 				showExistedSpecies(data);
@@ -254,7 +261,7 @@ public class Whatsinvasive extends ListActivity {
 		Intent intent = new Intent(Whatsinvasive.this, WIinfo.class);
 		intent.putExtra("title", arSpeciesList.get(position).title);
 		intent.putExtra("area_id", area_id);
-		startActivityForResult(intent, 2);
+		startActivityForResult(intent, TO_WI_INFO);
 	}
 
 	class DoAsyncTask extends AsyncTask<String, Integer, Void> {
@@ -349,7 +356,6 @@ public class Whatsinvasive extends ListActivity {
 			MyList.setAdapter(mylistapdater);
 			
 			dialog.dismiss();
-
 		}
 	}
 	

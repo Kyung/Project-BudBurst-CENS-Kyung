@@ -156,8 +156,12 @@ public class AreaList extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		Intent intent = new Intent(this, PlantInfo.class);
+		
+		Log.i("K", " AREA IDIDIDID : " + arAreaList.get(position).id);
+		
 		intent.putExtra("selected_park", arAreaList.get(position).id);
 		intent.putExtra("park_name", arAreaList.get(position).title);
+		intent.putExtra("clicked_me", true);
 		setResult(RESULT_OK, intent);
 		finish();
 	}
