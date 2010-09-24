@@ -79,11 +79,17 @@ public class Whatspopulars extends MapActivity {
 	
 	
 	private void startSignalLevelListener() {
-    	TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
     	int events = PhoneStateListener.LISTEN_SIGNAL_STRENGTH; 
  
     	tm.listen(phoneStateListener, events);
     }
+	
+	private void stopListening(){
+		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		
+		tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+	}
 	
 	private final PhoneStateListener phoneStateListener = new PhoneStateListener() {
 		@Override
@@ -518,6 +524,9 @@ public class Whatspopulars extends MapActivity {
     	myLocOverlay.disableCompass();
     	myLocOverlay.disableMyLocation();
     	
+    	// terminate telephony
+    	stopListening();
+    	
         super.onDestroy();
     }
 
@@ -529,6 +538,10 @@ public class Whatspopulars extends MapActivity {
 	    	// if there's a overlay, should call disableCompass() explicitly!!!!
 			myLocOverlay.disableMyLocation();
 			myLocOverlay.disableCompass();
+			
+			// terminate telephony
+	    	stopListening();
+			
 			finish();
 			return true;
 		}

@@ -194,12 +194,21 @@ public class OneTimeMain extends Activity {
 	/////////////////////////////////////////////////////////////////////////////////
 	
     // or when user press back button
+	// when you hold the button for 3 sec, the app will be exited
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
-			Toast.makeText(OneTimeMain.this, "Thank you", Toast.LENGTH_SHORT).show();
-			finish();
-			return true;
+			boolean flag = false;
+			if(event.getRepeatCount() == 3) {
+				Toast.makeText(OneTimeMain.this, "Thank you.", Toast.LENGTH_SHORT).show();
+				finish();
+				return true;
+			}
+			else if(event.getRepeatCount() == 0 && flag == false){
+				Toast.makeText(OneTimeMain.this, "Hold the Back Button to exit.", Toast.LENGTH_SHORT).show();
+				flag = true;
+			}
 		}
+		
 		return false;
 	}
 }

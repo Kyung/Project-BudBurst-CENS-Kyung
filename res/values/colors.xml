@@ -23,4 +23,5 @@
 	<drawable name="transparent_background">#00000000</drawable>
 	<drawable name="transparent_white">#AFFFFFFF</drawable>
 	<drawable name="PBB_teel">#299a84</drawable>
+	<drawable name="Flora_Observer">#997f17</drawable>
 </resources>

@@ -17,6 +17,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -352,6 +353,25 @@ public class PlantList extends ListActivity {
 	};
 	//Menu option
 	/////////////////////////////////////////////////////////////
+	
+    // or when user press back button
+	// when you hold the button for 3 sec, the app will be exited
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == event.KEYCODE_BACK) {
+			boolean flag = false;
+			if(event.getRepeatCount() == 3) {
+				Toast.makeText(PlantList.this, "Thank you.", Toast.LENGTH_SHORT).show();
+				finish();
+				return true;
+			}
+			else if(event.getRepeatCount() == 0 && flag == false){
+				Toast.makeText(PlantList.this, "Hold the Back Button to exit.", Toast.LENGTH_SHORT).show();
+				flag = true;
+			}
+		}
+		
+		return false;
+	}
 }
 	
 class PlantItem{
@@ -443,6 +463,7 @@ class MyListAdapter extends BaseAdapter{
 
 		return convertView;
 	}
+
 }
 
 
