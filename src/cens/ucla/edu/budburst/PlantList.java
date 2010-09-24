@@ -112,12 +112,16 @@ public class PlantList extends ListActivity {
 		username = pref.getString("Username","");
 		password = pref.getString("Password","");
 		
+		/*
 		//My plant button
 		Button buttonMyplant = (Button)findViewById(R.id.myplant);
 		buttonMyplant.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {}
 		});
+		
+		*/
+		
 		
 		//Shared plant button
 		Button buttonSharedplant = (Button)findViewById(R.id.sharedplant);
@@ -129,7 +133,7 @@ public class PlantList extends ListActivity {
 				startActivity(intent);
 			}
 		});
-		buttonMyplant.setSelected(true);
+		//buttonMyplant.setSelected(true);
 		
 		arPlantItem = new ArrayList<PlantItem>();
 		syncDBHelper = new SyncDBHelper(PlantList.this);
@@ -428,9 +432,15 @@ class MyListAdapter extends BaseAdapter{
 		TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
 		textdesc.setText(arSrc.get(position).SpeciesName);
 		
-		TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
-		pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
 		
+		TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
+		if(arSrc.get(position).total_pheno != 0) {
+			pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
+		}
+		else {
+			pheno_stat.setVisibility(View.GONE);
+		}
+
 		return convertView;
 	}
 }

@@ -103,7 +103,7 @@ public class Helloscr extends Activity{
 	 	
 	 	staticDBHelper.close();
 
-		
+		/*
 		//My plant button
 		Button buttonMyplant = (Button)findViewById(R.id.myplant);
 		buttonMyplant.setOnClickListener(new View.OnClickListener(){
@@ -123,6 +123,7 @@ public class Helloscr extends Activity{
 			}
 			}
 		);
+		*/
 		
 		//Sync button
 		Button buttonSync = (Button)findViewById(R.id.sync);
@@ -149,7 +150,7 @@ public class Helloscr extends Activity{
 			}
 		);
 		
-		buttonMyplant.setSelected(true);
+		//buttonMyplant.setSelected(true);
 		syncDBHelper = new SyncDBHelper(Helloscr.this);
 		
 		Intent parent_intent = getIntent();

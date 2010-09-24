@@ -9,6 +9,7 @@
 	    android:layout_width="fill_parent" 
 	    android:layout_height="63px"
 	    android:gravity="center"
+	    android:orientation="horizontal"
 	    android:background="@drawable/PBB_teel">
 	    <ImageView 
 	    	android:id="@+id/logo"
@@ -21,8 +22,14 @@
 	     	android:layout_centerVertical="true" 
 	     	android:paddingBottom="0px" 
 	     	android:paddingTop="8px"/>
+		<cens.ucla.edu.budburst.helper.CustomButton
+			android:id="@+id/sharedplant"
+			android:layout_width="wrap_content"
+	        android:layout_height="29dip"
+	        android:layout_alignParentTop="true" 
+	        android:text="Shared Plants"/>	 
 	</LinearLayout>        
-		
+	<!-- 	
 	<LinearLayout 
 	   		android:id="@+id/two_button"
 	   	    android:layout_width="fill_parent"
@@ -47,9 +54,10 @@
 	        android:layout_weight="0.5"
 	        android:text="Shared Plants"/>
 	</LinearLayout> 
+	-->
 	<TextView
 		android:id="@+id/instruction"
-		android:layout_below="@+id/two_button"
+		android:layout_below="@+id/logo_layout"
 		android:textSize="17dip"
 		android:text="@string/no_site_no_species_instruction"
 		android:layout_width="fill_parent"
@@ -61,7 +69,7 @@
 
 	<ListView
 		android:id="@android:id/list"
-		android:layout_below="@+id/two_button"
+		android:layout_below="@+id/logo_layout"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"/>
 

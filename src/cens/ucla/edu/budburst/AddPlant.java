@@ -14,7 +14,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +32,11 @@ public class AddPlant extends ListActivity{
 	private Integer new_plant_species_id;
 	private Integer new_plant_site_id; 
 	private String new_plant_site_name;
+	
+	private StaticDBHelper staticDBHelper = null;
+	private SQLiteDatabase staticDB = null;
+	private MyListAdapter mylistapdater = null;
+	private ListView MyList = null;
 	
 	
 	CharSequence[] seqUserSite;
@@ -61,44 +69,103 @@ public class AddPlant extends ListActivity{
 			cursor.close();
 		}
 		
-		//Get all plant list
-		//Open plant list db from static db
-		StaticDBHelper staticDBHelper = new StaticDBHelper(this);
-		SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase(); 
-		
-		//Rereive syncDB and add them to arUserPlatList arraylist
+		staticDBHelper = new StaticDBHelper(AddPlant.this);
+		staticDB = staticDBHelper.getReadableDatabase();
+		 
 		arPlantList = new ArrayList<PlantItem>();
  		cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;",null);
-		while(cursor.moveToNext()){
+ 		while(cursor.moveToNext()){
 			Integer id = cursor.getInt(0);
-			String species_name = cursor.getString(1);
-			String common_name = cursor.getString(2);
-						
-			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
-			
-			PlantItem pi;
-			//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-			pi = new PlantItem(resID, common_name, species_name, id);
-			arPlantList.add(pi);
+			if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24) {
+				String species_name = cursor.getString(1);
+				String common_name = cursor.getString(2);
+							
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
+				
+				PlantItem pi;
+				//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+				pi = new PlantItem(resID, common_name, species_name, id);
+				arPlantList.add(pi);
+			}
 		}
 		
-		MyListAdapter mylistapdater = new MyListAdapter(this, R.layout.plantlist_item, arPlantList);
-		ListView MyList = getListView(); 
+		mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
+		MyList = getListView(); 
 		MyList.setAdapter(mylistapdater);
 		
 		//Close DB and cursor
+		staticDB.close();
 		cursor.close();
-		staticDBHelper.close();
+		
 		
 		
 		//Get User site name and id using Map.
-
 		mapUserSiteNameID = getUserSiteIDMap();
 		Iterator<String> itr = mapUserSiteNameID.keySet().iterator();
 		while(itr.hasNext()){
 			Log.d(TAG, itr.next());
 		}
 		
+		
+		//Dealing with the checkbox
+		CheckBox checkbox = (CheckBox) findViewById(R.id.header);
+		checkbox.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				//Get all plant list
+				//Open plant list db from static db
+				staticDBHelper = new StaticDBHelper(AddPlant.this);
+				staticDB = staticDBHelper.getReadableDatabase();
+				
+				if(((CheckBox)v).isChecked()) {
+					//Rereive syncDB and add them to arUserPlatList arraylist
+					arPlantList = new ArrayList<PlantItem>();
+			 		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;",null);
+					while(cursor.moveToNext()){
+						Integer id = cursor.getInt(0);
+					
+						String species_name = cursor.getString(1);
+						String common_name = cursor.getString(2);
+										
+						int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
+							
+						PlantItem pi;
+						//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+						pi = new PlantItem(resID, common_name, species_name, id);
+						arPlantList.add(pi);
+					}
+					
+					mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
+					MyList = getListView(); 
+					MyList.setAdapter(mylistapdater);
+					cursor.close();
+				}
+				else {
+					//Rereive syncDB and add them to arUserPlatList arraylist
+					arPlantList = new ArrayList<PlantItem>();
+			 		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;",null);
+					while(cursor.moveToNext()){
+						Integer id = cursor.getInt(0);
+						if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24) {
+							String species_name = cursor.getString(1);
+							String common_name = cursor.getString(2);
+										
+							int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
+							
+							PlantItem pi;
+							//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+							pi = new PlantItem(resID, common_name, species_name, id);
+							arPlantList.add(pi);
+						}
+					}
+					
+					mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
+					MyList = getListView(); 
+					MyList.setAdapter(mylistapdater);
+					cursor.close();
+				}
+				staticDBHelper.close();
+			}
+		});
 	}
 	
 	public String[] getUserSite(){

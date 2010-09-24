@@ -11,7 +11,8 @@
   	android:paddingTop="7dip"
   	android:paddingLeft="7dip"
   	android:paddingRight="7dip"
-  	android:paddingBottom="15dip"
+  	android:paddingBottom="12dip"
+  	android:background="@drawable/bg_line"
   	>
 	<ImageView
 		android:paddingTop="3dip"
@@ -64,16 +65,23 @@
 	/>			
 	</LinearLayout>
 	
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="15px"
+		android:background="@drawable/bg_line_top"
+		android:id="@+id/void_line"
+		android:layout_below="@+id/header_part"
+	/>
 	<ScrollView
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
-		android:layout_below="@+id/header_part"
+		android:layout_below="@+id/void_line"
 		android:layout_marginLeft="5px"
 		android:layout_marginRight="5px"
-		android:id="@+id/scroll_view">
+		android:id="@+id/scroll_view"
+		>
 
 	<LinearLayout 
-		android:layout_marginTop="10px"
 		android:id="@+id/observation_linear_layout"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
@@ -134,6 +142,8 @@
 			android:gravity="center"
 			android:text="Note"
 			android:textSize="16dip"
+			android:focusable="true"
+			android:focusableInTouchMode="true"
 			/>
 			
 		</LinearLayout>
@@ -173,24 +183,12 @@
 		/>
 		
 		</LinearLayout>
-		<TextView
-			android:paddingTop="1dip"
-			android:layout_width="fill_parent" 
-			android:layout_height="wrap_content" 
-			android:textColor="@drawable/black" 
-			android:textStyle="bold"
-			android:layout_gravity="left"
-			android:textSize="16dip"
-			android:focusable="true"
-			android:focusableInTouchMode="true"
-			
-			/>
 		<Button
 			android:id="@+id/edit" 
 			android:textColor="@drawable/black"
 			android:layout_width="250px" 
 			android:layout_height="wrap_content"
-			android:layout_marginTop="10px"
+			android:layout_marginTop="15px"
 			android:layout_marginBottom="20px"
 			android:textStyle="bold"
 			android:textSize="16dip"

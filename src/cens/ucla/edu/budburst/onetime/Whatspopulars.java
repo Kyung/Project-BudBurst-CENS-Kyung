@@ -44,6 +44,8 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -64,16 +66,70 @@ public class Whatspopulars extends MapActivity {
 	private MapController mc = null;
 	private String url = null;
 	private TextView geo = null;
+	private TextView signal = null;
 	private double latitude 		= 0.0;
 	private double longitude 		= 0.0;
 	private GeoPoint last_point = null;
+	private String signalLevelString = null;
+	
+	private static final int EXCELLENT_LEVEL = 75;
+	private static final int GOOD_LEVEL = 50;
+	private static final int MODERATE_LEVEL = 25;
+	private static final int WEAK_LEVEL = 0;
+	
+	
+	private void startSignalLevelListener() {
+    	TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+    	int events = PhoneStateListener.LISTEN_SIGNAL_STRENGTH; 
+ 
+    	tm.listen(phoneStateListener, events);
+    }
+	
+	private final PhoneStateListener phoneStateListener = new PhoneStateListener() {
+		@Override
+		public void onSignalStrengthChanged(int asu)
+		{
+			Log.i("K", "onSignalStrengthChanged " + asu);
+			
+			int level = (int) ((((float)asu)/31.0) * 100);
+			//setSignalLevel(info_ids[INFO_SIGNAL_LEVEL_INDEX],info_ids[INFO_SIGNAL_LEVEL_INFO_INDEX],asu);
+			
+			signalLevelString = "Weak";
+			
+			if(level > EXCELLENT_LEVEL)		signalLevelString = "Excellent";
+			else if(level > GOOD_LEVEL)		signalLevelString = "Good";
+			else if(level > MODERATE_LEVEL)	signalLevelString = "Moderate";
+			else if(level > WEAK_LEVEL)		signalLevelString = "Weak";
+			
+			signal.setText(" Signal Strength : " + signalLevelString);
+			
+			if(signalLevelString.equals("Weak")) {
+				Toast.makeText(Whatspopulars.this, "Your Signal Strength is quite low. You may not see the map well.", Toast.LENGTH_SHORT).show();
+			}
+			
+			super.onSignalStrengthChanged(asu);
+		}
+	};
+	
+	/*
+	private void setSignalLevel(int id,int infoid,int level){
+		int progress = (int) ((((float)level)/31.0) * 100);
+		String signalLevelString = getSignalLevelString(progress);
+		
+		Log.i("signalLevel ","" + signalLevelString);
+	}
+	*/
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.whatspopulars);
+	    setTitle("What's popular map mode");
+	    
+	    startSignalLevelListener();
 	    
 		geo = (TextView) findViewById(R.id.geodata);
+		signal = (TextView) findViewById(R.id.signal);
 	    
 		gpsListener = new GpsListener();
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -113,7 +169,7 @@ public class Whatspopulars extends MapActivity {
 		if(loca.getLatitude() != 0.0) {
 			latitude = loca.getLatitude();
 		    longitude = loca.getLongitude();
-		    String strLocs = String.format(" Current Location : %10.5f, %10.5f", latitude, longitude);
+		    String strLocs = String.format(" Current Location : %7.3f, %7.3f", latitude, longitude);
 				
 			geo.setText(strLocs);
 		}

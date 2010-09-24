@@ -91,6 +91,7 @@ public class Sync extends Activity{
 			}
 		);
 		
+		/*
 		//My plant button
 		Button buttonMyplant = (Button)findViewById(R.id.myplant);
 		buttonMyplant.setOnClickListener(new View.OnClickListener(){
@@ -110,8 +111,8 @@ public class Sync extends Activity{
 			}
 			}
 		);
-		
-		buttonMyplant.setSelected(true);
+		*/
+		//buttonMyplant.setSelected(true);
 
 		//If the previous activity is not plant list, then start sync instantly.  
 		Intent parent_intent = getIntent();

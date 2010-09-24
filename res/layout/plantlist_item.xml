@@ -57,6 +57,7 @@
         	android:textAppearance="?android:attr/textAppearanceSmall"
         	android:textColor="@drawable/black"
         	android:text=" phenophases observed"
+        	android:id="@+id/pheno_observed"
         />
         </LinearLayout>
     </LinearLayout>

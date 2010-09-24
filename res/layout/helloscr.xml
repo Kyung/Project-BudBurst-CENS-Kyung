@@ -8,6 +8,7 @@
 	    android:layout_width="fill_parent" 
 	    android:layout_height="63px"
 	    android:gravity="center"
+	    android:orientation="horizontal"
 	    android:background="@drawable/PBB_teel">
 	    <ImageView 
 	    	android:id="@+id/logo"
@@ -20,35 +21,25 @@
 	     	android:layout_centerVertical="true" 
 	     	android:paddingBottom="0px" 
 	     	android:paddingTop="8px"/>
-	</LinearLayout>        
-	
-	<LinearLayout 
-	   		android:id="@+id/two_button"
-	   	    android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	   		android:weightSum="1"
-	   		android:layout_below="@+id/logo_layout">
-	   		
+	    <!-- 
 	    <cens.ucla.edu.budburst.helper.CustomButton
 	        android:id="@+id/myplant"
-			android:layout_width="fill_parent"
+			android:layout_width="wrap_content"
 	        android:layout_height="29dip"
 	        android:layout_alignParentTop="true" 
-	        android:layout_weight="0.5"
 	        android:text="My Plants"/>
-	
-	    <cens.ucla.edu.budburst.helper.CustomButton
+		<cens.ucla.edu.budburst.helper.CustomButton
 			android:id="@+id/sharedplant"
-			android:layout_width="fill_parent"
+			android:layout_width="wrap_content"
 	        android:layout_height="29dip"
 	        android:layout_alignParentTop="true" 
-	        android:layout_weight="0.5"
-	        android:text="Shared Plants"/>
-	</LinearLayout>
+	        android:text="Shared Plants"/>	        
+	     -->   	
+	     
+	</LinearLayout>        
 	
 	<ScrollView
-		android:layout_below="@+id/two_button"
+		android:layout_below="@+id/logo_layout"
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:paddingTop="15dip"

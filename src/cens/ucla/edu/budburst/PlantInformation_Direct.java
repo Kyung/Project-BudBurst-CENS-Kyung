@@ -21,6 +21,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -322,6 +323,10 @@ public class PlantInformation_Direct extends Activity {
 					db.execSQL(query);
 					db.close();
 					syncDBHelper.close();
+					
+					// add vibration when done
+					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+					vibrator.vibrate(1000);
 				}catch(Exception e){
 					Log.e("K", e.toString());
 				}

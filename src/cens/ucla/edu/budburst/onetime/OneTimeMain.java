@@ -57,6 +57,7 @@ public class OneTimeMain extends Activity {
 			}
 		});
 		
+		/*
 		//Shared plant button
 		Button buttonSharedplant = (Button)findViewById(R.id.sharedplant);
 		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
@@ -66,7 +67,7 @@ public class OneTimeMain extends Activity {
 		});
 		
 		buttonSharedplant.setSelected(true);
-		
+		*/
 		
 		buttonBar.add((Button) this.findViewById(R.id.observation_btn));
 		buttonBar.get(0).setOnClickListener(new View.OnClickListener() {
