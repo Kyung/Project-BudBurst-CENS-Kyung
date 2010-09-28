@@ -28,6 +28,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -165,6 +166,9 @@ public class Queue extends ListActivity {
 					
 					oneDBH.close();
 					
+					new File("/sdcard/pbudburst/tmp/" + intent_photo_name + ".jpg").delete();
+					Log.i("K", "DELETE UPLOADED ITEM IN THE QUEUE");
+					
 					Intent intent = new Intent(Queue.this, Queue.class);
 					finish();
 					startActivity(intent);
@@ -234,24 +238,41 @@ public class Queue extends ListActivity {
 			//Log.i("K", "getPhoto : " + getPhoto);
 			String imagePath = null;
 			
-		    if(getPhoto.equals("0")) {
-		    	image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-		    	image.setBackgroundResource(R.drawable.shapedrawable);
-		    	image.setVisibility(View.VISIBLE);
+			File file = new File(TEMP_PATH + getPhoto + ".jpg");
+		    Bitmap bitmap = null;
+		    Bitmap resized_bitmap = null;
+		    
+		    // set new width and height of the phone_image
+		    int new_width = 110;
+		    int new_height = 110;
+		    
+		    if(file.exists()) {
+		    	imagePath = TEMP_PATH + getPhoto + ".jpg";
+		    	bitmap = BitmapFactory.decodeFile(imagePath);
+		    	
+			   	int width = bitmap.getWidth();
+			   	int height = bitmap.getHeight();
+			   	
+			   	float scale_width = ((float) new_width) / width;
+			   	float scale_height = ((float) new_height) / height;
+			   	Matrix matrix = new Matrix();
+			   	matrix.postScale(scale_width, scale_height);
+			   	resized_bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+			   	
+			   	image.setImageBitmap(resized_bitmap);
+			   	image.setVisibility(View.VISIBLE);
 		    }
 		    else {
-		    	imagePath = TEMP_PATH + getPhoto + ".jpg";
-		    	Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-		    	image.setBackgroundResource(R.drawable.shapedrawable);
-		    	image.setImageBitmap(bitmap);
-		    	
-		    }
+		    	image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+		    	image.setVisibility(View.VISIBLE);
+		    	image.setEnabled(false);
+		   	}
 			
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
 			textname.setText(arSrc.get(position).CommonName);
 			
 			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-			textdesc.setText(" " + arSrc.get(position).SpeciesName + " ");
+			textdesc.setText(arSrc.get(position).SpeciesName + " ");
 			
 			TextView dt_taken = (TextView)convertView.findViewById(R.id.dt_taken);
 			dt_taken.setText(arSrc.get(position).dt_taken);
@@ -372,6 +393,7 @@ public class Queue extends ListActivity {
 							new File("/sdcard/pbudburst/tmp/" + line_by_separator[7] + ".jpg").delete();
 							
 							Log.i("K", "DELETE UPLOADED ITEM IN THE QUEUE");
+							db.close();
 						}
 						else {
 							Log.e("K", "UPLOADED FAILED!!");

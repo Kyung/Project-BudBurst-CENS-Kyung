@@ -26,6 +26,8 @@ public class GetPhenophase extends ListActivity {
 	private ArrayList<PlantItem> pItem;
 	private int protocol_id;
 	private String cname = null;
+	private String sname = null;
+	private int species_id = 0;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,15 @@ public class GetPhenophase extends ListActivity {
 	    Intent intent = getIntent();
 	    protocol_id = intent.getExtras().getInt("protocol_id");
 	    cname = intent.getExtras().getString("cname");
+	    sname = intent.getExtras().getString("sname");
+	    species_id = intent.getExtras().getInt("species_id");
 	    
-	    Log.i("K", protocol_id + "");
+	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
+	    TextView species_name = (TextView) findViewById(R.id.species_name);
+	    
+	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));
+	    species_image.setBackgroundResource(R.drawable.shapedrawable);
+	    species_name.setText(cname + " \n" + sname + " ");
 	    
 	    pItem = new ArrayList<PlantItem>();
 	    PlantItem pi;
@@ -44,16 +53,17 @@ public class GetPhenophase extends ListActivity {
 	    ArrayList<Integer> id = new ArrayList<Integer>();
 	    ArrayList<Integer> phenophase = new ArrayList<Integer>();
 	    ArrayList<String> description = new ArrayList<String>();
+	    ArrayList<String> pheno_name = new ArrayList<String>();
 	    
 		StaticDBHelper sDBHelper = new StaticDBHelper(GetPhenophase.this);
 		SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 	    
 		String query = null;
 		if(cname.equals("Others")) {
-			query = "SELECT _id, Phenophase_Icon, description FROM Phenophase_Protocol_Icon ORDER BY Phenophase_Icon ASC";
+			query = "SELECT _id, Phenophase_Icon, description, Phenophase_Name FROM Phenophase_Protocol_Icon GROUP BY Phenophase_Icon ORDER BY Phenophase_Icon ASC";
 		}
 		else {
-			query = "SELECT _id, Phenophase_Icon, description FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_id + " ORDER BY Phenophase_Icon ASC";
+			query = "SELECT _id, Phenophase_Icon, description, Phenophase_Name FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_id + " ORDER BY Phenophase_Icon ASC";
 		}
 	    
 	    
@@ -63,12 +73,13 @@ public class GetPhenophase extends ListActivity {
 	    	id.add(cursor.getInt(0));
 	    	phenophase.add(cursor.getInt(1));
 	    	description.add(cursor.getString(2));
+	    	pheno_name.add(cursor.getString(3));
 	    }
 	     
 	    for(int i = 0 ; i < phenophase.size() ; i++) {
 	    	int _id = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + phenophase.get(i), null, null);
 	    	String des = description.get(i);
-	    	pi = new PlantItem(_id, des, phenophase.get(i));
+	    	pi = new PlantItem(_id, des, phenophase.get(i), pheno_name.get(i));
 	    	pItem.add(pi);
 	    }
 	    
@@ -87,19 +98,23 @@ public class GetPhenophase extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		Intent intent = new Intent(this, PlantInfo.class);
 		intent.putExtra("species_id", pItem.get(position).Pheno_image);
+		intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
+		intent.putExtra("pheno_text", pItem.get(position).Note);
 		setResult(RESULT_OK, intent);
 		finish();
 	}
 	
 	class PlantItem{
-		PlantItem(int aPicture, String aNote, int pheno_img_id){
+		PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name){
 			Picture = aPicture;
 			Note = aNote;
 			Pheno_image = pheno_img_id;
+			Pheno_name = aPheno_name;
 		}
 		int Picture;
 		String Note;
 		int Pheno_image;
+		String Pheno_name;
 	}
 	
 	class MyListAdapter extends BaseAdapter{
@@ -134,8 +149,13 @@ public class GetPhenophase extends ListActivity {
 			ImageView img = (ImageView)convertView.findViewById(R.id.pheno_img);
 			img.setImageResource(arSrc.get(position).Picture);
 			
+			TextView pheno_name = (TextView)convertView.findViewById(R.id.pheno_name);
+			pheno_name.setText(arSrc.get(position).Pheno_name);
+			
 			TextView textname = (TextView)convertView.findViewById(R.id.pheno_text);
 			textname.setText(arSrc.get(position).Note);
+			
+			
 		
 			return convertView;
 		}

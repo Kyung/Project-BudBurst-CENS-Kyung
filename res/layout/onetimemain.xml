@@ -64,6 +64,7 @@
 	        android:text="Shared Plants"/>
 	</LinearLayout> 
 	 -->
+	<!-- 
 	<LinearLayout
 			android:layout_below="@+id/logo_layout"
 	   	    android:layout_width="fill_parent"
@@ -106,6 +107,15 @@
 		android:layout_gravity="center"
 	/>
 	</LinearLayout>
+	-->
+
+	<ListView 
+		android:id="@android:id/list"
+		android:layout_below="@+id/logo_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent">
+	</ListView>
+	
 </RelativeLayout>
 
 

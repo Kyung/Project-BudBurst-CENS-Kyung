@@ -13,16 +13,32 @@
     	android:paddingLeft="7px"
     	android:paddingTop="7px"
     />
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@+id/header_text"
+    	android:orientation="horizontal"
+    	android:id="@+id/header_box"
+    >
 	<CheckBox
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_below="@+id/header_text"
 		android:id="@+id/header"
 		android:text="Show All Plants"
 	/>
+	<CheckBox
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="15px"
+		android:id="@+id/header2"
+		android:text="Show Category"
+		android:visibility="gone"
+		android:checked="false"
+	/>
+	</LinearLayout>
 	<ListView
 		android:id="@android:id/list"
-		android:layout_below="@+id/header"
+		android:layout_below="@+id/header_box"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"/>
 </RelativeLayout>

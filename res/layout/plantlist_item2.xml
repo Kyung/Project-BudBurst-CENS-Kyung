@@ -9,7 +9,15 @@
     android:paddingTop="5dip"
     android:paddingBottom="5dip"
     android:gravity="center_vertical" >
-
+    <TextView
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:id="@+id/list_header"
+    	android:background="#DDD"
+    	android:textSize="17px"
+    	android:textStyle="bold"
+    	android:visibility="gone"
+    />
     <ImageView android:id="@+id/icon"
         android:layout_width="60dip"
         android:layout_height="60dip"
@@ -29,7 +37,7 @@
             android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="marquee"
-            android:layout_marginTop="2dip"
+            android:layout_marginTop="5dip"
             android:layout_marginBottom="2dip" />
         <TextView android:id="@+id/speciesname"
             android:layout_marginTop="-4dip"
@@ -42,7 +50,8 @@
         <TextView android:id="@+id/pheno_stat"
         	android:layout_gravity="center_vertical"
         	android:layout_width="wrap_content"
-        	android:layout_height="-4dip"
+        	android:layout_height="wrap_content"
+        	android:layout_marginTop="-15px"
         	android:textAppearance="?android:attr/textAppearanceSmall"
         	android:textColor="@drawable/black"
         	android:textStyle="bold"

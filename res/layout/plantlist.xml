@@ -74,7 +74,6 @@
 		android:visibility="gone"		
 		>
 	</TextView>
-
 	<ListView
 		android:id="@android:id/list"
 		android:layout_below="@+id/logo_layout"

@@ -9,12 +9,12 @@
 	    android:layout_width="fill_parent" 
 	    android:layout_height="63px"
 	    android:gravity="center"
-	    android:background="@drawable/PBB_teel">
+	    android:background="@drawable/Flora_Observer">
 	    <ImageView 
 	    	android:id="@+id/logo"
 	     	android:layout_width="wrap_content"
 		 	android:layout_height="wrap_content"
-	     	android:src="@drawable/logo_medium" 
+	     	android:src="@drawable/flora_observer" 
 	     	android:layout_centerInParent="true"
 	     	android:layout_gravity="center" 
 	     	android:paddingLeft="0px" 
@@ -22,14 +22,23 @@
 	     	android:paddingBottom="0px" 
 	     	android:paddingTop="8px"/>
 	</LinearLayout>        
-		
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:background="#DDD"
+		android:id="@+id/header"
+		android:layout_below="@+id/logo_layout"
+		android:textSize="18px"
+		android:textStyle="bold"
+	/>  	
 	<LinearLayout 
 	   		android:id="@+id/two_button"
 	   	    android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:orientation="horizontal"
 	   		android:weightSum="1"
-	   		android:layout_below="@+id/logo_layout">
+	   		android:layout_below="@+id/header">
 	</LinearLayout> 
 	
 	<TextView

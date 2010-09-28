@@ -12,12 +12,15 @@
 	<LinearLayout 
 		android:id="@+id/observation_linear_layout"
 		android:layout_width="fill_parent" 
-		android:layout_height="fill_parent" 
+		android:layout_height="fill_parent"
+		android:layout_marginTop="5px"
+		android:layout_marginBottom="5px" 
 		android:layout_below="@+id/phenophase_bar"
 		android:gravity="center"
 		android:paddingLeft="7dip"
 		android:paddingRight="7dip"
-		android:orientation="vertical">
+		android:orientation="vertical"
+		android:background="@drawable/box_drawable_yellow">
 		
 		<TextView
 			android:id="@+id/common_name"
@@ -33,7 +36,7 @@
 			android:id="@+id/science_name"
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"
-			android:textSize="18dip" 
+			android:textSize="20dip" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="center"
 			android:textStyle="italic|bold" 
@@ -44,6 +47,7 @@
 		android:layout_height="fill_parent" 
 		android:gravity="center"
 		android:padding="0dip"
+		android:layout_marginBottom="5px"
 		android:orientation="horizontal">
 		
 			<TextView
@@ -67,80 +71,112 @@
 		</LinearLayout>
 		
 	
-		
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
 		<TextView
-			android:paddingTop="20dip"
-			android:layout_width="wrap_content" 
+			android:paddingTop="1dip"
+			android:layout_width="110px" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="GeoLocation"
-			android:textSize="17dip"
-			/>
-			<TextView
-				android:id="@+id/geolocation"
-				android:layout_width="wrap_content" 
-				android:layout_height="wrap_content"
-				android:layout_gravity="center"
-				android:textSize="18dip" 
-				android:textColor="@drawable/black" 
-				android:textStyle="italic"
+			android:text="Image"
+			android:textSize="16dip"
+			android:background="@drawable/bg_line_top"
 			/>		
-		
 		<TextView
-			android:paddingTop="20dip"
-			android:layout_width="wrap_content" 
+			android:paddingTop="1dip"
+			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="Species Image"
-			android:textSize="17dip"
+			android:text="Map View"
+			android:textSize="16dip"
+			android:background="@drawable/bg_line_top"
 			/>
-		
-		<ImageView 
+
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+
+		<ImageButton
 			android:scaleType="fitCenter"
 			android:paddingTop="1dip"
 			android:paddingLeft="13dip"
 			android:paddingRight="13dip"
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
+			android:layout_marginBottom="5dip"
+			android:layout_width="100px" 
+			android:layout_height="100px" 
 			android:id="@+id/phone_image" 
 			android:adjustViewBounds="true"
-			/>		
+			/>
+	
+		<com.google.android.maps.MapView 
+			android:id="@+id/simpleGM_map"
+			android:layout_width="fill_parent"
+			android:layout_height="100px"
+			android:apiKey="0s7Km0gbaIiJVJtsfbW3fd7IP0UBLh833HEAtYw"
+			android:clickable="true"
+			android:layout_marginBottom="5dip"
+			android:layout_marginLeft="5px"
+		/>
+					
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
 
 		<TextView
-			android:paddingTop="20dip"
-			android:layout_width="wrap_content" 
+			android:paddingTop="1dip"
+			android:layout_width="100px" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
 			android:text="Phenophase"
-			android:textSize="17dip"
-			/>		
-		<ImageView
-			android:scaleType="fitCenter"
-			android:paddingTop="1dip"
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
-			android:id="@+id/pheno_image" 
-			android:adjustViewBounds="true"
-		/>
+			android:textSize="16dip"
+			android:background="@drawable/bg_line_top"
+			android:focusable="true"
+			android:focusableInTouchMode="true"
+			/>	
 
 		<TextView
-			android:paddingTop="20dip"
-			android:layout_width="wrap_content" 
+			android:paddingTop="1dip"
+			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="Notes"
-			android:textSize="17dip"
-			/>
+			android:text="   Notes"
+			android:textSize="16dip"
+			android:background="@drawable/bg_line_top"
+			/>				
 
-		<TextView
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+		<ImageView
+			android:paddingTop="1dip"
+			android:layout_width="60px" 
+			android:layout_height="60px"
+			android:layout_marginLeft="17px" 
+			android:id="@+id/pheno_image" 
+			android:adjustViewBounds="true"
+			android:layout_marginBottom="5dip"
+		/>
+		<EditText
 			android:id="@+id/mynotes"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
@@ -149,7 +185,32 @@
 			android:width="0dip"
 			android:gravity="top" 
 			android:textSize="17dip"
+			android:layout_marginLeft="27px"
+			android:enabled="false"
+			android:lines="4"
 		/>
+		</LinearLayout>
+		<LinearLayout
+			android:paddingTop="10dip" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:paddingBottom="10dip"
+			android:orientation="horizontal"
+			android:background="@drawable/bg_line_top">
+				
+			<Button
+				android:id="@+id/okay" 
+				android:textColor="@drawable/black"
+				android:layout_width="120px" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16dip"
+				android:text="Okay"
+				android:focusable="true"
+				/>
+		</LinearLayout>
 	</LinearLayout>
 	</ScrollView>
 </RelativeLayout>

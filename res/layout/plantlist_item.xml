@@ -3,13 +3,27 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:paddingRight="6dip"
-    android:paddingLeft="6dip"
-    android:paddingTop="5dip"
-    android:paddingBottom="5dip"
+    android:orientation="vertical"
     android:gravity="center_vertical" >
-
+    <TextView
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:gravity="center"
+    	android:id="@+id/list_header"
+    	android:background="#DDD"
+    	android:textSize="17px"
+    	android:textStyle="bold"
+    	android:visibility="gone"
+    />
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:paddingTop="5dip"
+    	android:paddingBottom="5dip"
+    	android:paddingRight="6dip"
+    	android:paddingLeft="6dip"
+    >
     <ImageView android:id="@+id/icon"
         android:layout_width="60dip"
         android:layout_height="60dip"
@@ -61,5 +75,6 @@
         />
         </LinearLayout>
     </LinearLayout>
+  </LinearLayout>
 </LinearLayout>
 

@@ -1,5 +1,6 @@
 package cens.ucla.edu.budburst;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -49,6 +50,9 @@ public class PlantList extends ListActivity {
 	private ListView MyList;
 	private Button tempBtn;
 	private ArrayList<PlantItem> user_species_list;
+	private int first_site_id = 0;
+	private static boolean first_site_flag = true;
+	private Button buttonSharedplant = null;
 	
 	//MENU contants
 	final private int MENU_ADD_PLANT = 1;
@@ -123,9 +127,8 @@ public class PlantList extends ListActivity {
 		
 		*/
 		
-		
 		//Shared plant button
-		Button buttonSharedplant = (Button)findViewById(R.id.sharedplant);
+		buttonSharedplant = (Button)findViewById(R.id.sharedplant);
 		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -220,7 +223,7 @@ public class PlantList extends ListActivity {
 				//Retrieves plants from each site.
 				Cursor cursor2 = syncDB.rawQuery("SELECT species_id FROM my_plants " +
 						"WHERE site_name = '" + user_station_name.get(i) + "';", null);
-
+				int count = 0;
 				while(cursor2.moveToNext()){
 					String qry = "SELECT _id, species_name, common_name, protocol_id FROM species WHERE _id = " + cursor2.getInt(0) + ";";
 					
@@ -238,14 +241,23 @@ public class PlantList extends ListActivity {
 					String total_pheno = "SELECT Phenophase_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID = " + cursor3.getInt(3) + ";";
 					Cursor cursor5 = staticDB.rawQuery(total_pheno, null);
 					
+					if(count == 0) {
+						pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
+								, cursor3.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
+					}
+					else {
+						pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
+								, cursor3.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
+					}
 					//PlantItem structure = >int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int siteID)
-					pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-							, cursor3.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount());
+					
 					arPlantItem.add(pi);
 					
 					cursor3.close();
 					cursor4.close();
 					cursor5.close();
+					
+					count++;
 				}
 				cursor2.close();
 			}
@@ -259,6 +271,7 @@ public class PlantList extends ListActivity {
 			staticDBHelper.close();
 			syncDBHelper.close();
 		}
+		
 	}
 
 	@Override
@@ -327,6 +340,19 @@ public class PlantList extends ListActivity {
 	}
 	/////////////////////////////////////////////////////////////////////////////////
 	
+	void deleteContents(String path) {
+		File file = new File(path);
+		if(file.isDirectory()) {
+			String[] fileList = file.list();
+			
+			for(int i = 0 ; i < fileList.length ; i++) {
+				File newFile = new File(fileList[i]);
+				Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + fileList[i] + " IS DELETED.");
+				new File("/sdcard/pbudburst/tmp/" + fileList[i]).delete();
+			}
+		}
+	}
+	
 	//Dialog confirm message if user clicks logout button
 	DialogInterface.OnClickListener mClick =
 		new DialogInterface.OnClickListener(){
@@ -343,6 +369,8 @@ public class PlantList extends ListActivity {
 				SyncDBHelper dbhelper = new SyncDBHelper(PlantList.this);
 				dbhelper.clearAllTable(PlantList.this);
 				dbhelper.close();
+				
+				deleteContents("/sdcard/pbudburst/tmp/");
 				
 				Intent intent = new Intent(PlantList.this, Login.class);
 				startActivity(intent);
@@ -373,45 +401,6 @@ public class PlantList extends ListActivity {
 		return false;
 	}
 }
-	
-class PlantItem{
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-	}
-
-	
-	
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-		siteID = aSiteID;
-	}
-	
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-		siteID = aSiteID;
-		protocolID = aProtocolID;
-		current_pheno = aPheno_done;
-		total_pheno = aTotal_pheno;
-	}
-	
-	int Picture;
-	String CommonName;
-	String SpeciesName;
-	int SpeciesID;
-	int siteID;
-	int protocolID;
-	int current_pheno;
-	int total_pheno;
-}
 
 //Adapters:MyListAdapter and SeparatedAdapter
 class MyListAdapter extends BaseAdapter{
@@ -419,6 +408,7 @@ class MyListAdapter extends BaseAdapter{
 	LayoutInflater Inflater;
 	ArrayList<PlantItem> arSrc;
 	int layout;
+	int previous_site = 0;
 	
 	public MyListAdapter(Context context, int alayout, ArrayList<PlantItem> aarSrc){
 		maincon = context;
@@ -443,6 +433,31 @@ class MyListAdapter extends BaseAdapter{
 		if(convertView == null)
 			convertView = Inflater.inflate(layout, parent, false);
 		
+		TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
+		
+		Log.i("K", "POSITION : " + position + " TOPITEM : " + arSrc.get(position).TopItem);
+		
+		if(arSrc.get(position).TopItem) {
+			site_header.setVisibility(View.VISIBLE);
+			site_header.setText("  " + arSrc.get(position).Site);
+			
+		}
+		else {
+			site_header.setVisibility(View.GONE);
+		}
+		
+		/*
+		if(first_site_flag) {
+			
+			first_site_flag = false;
+		}
+		else {
+			if(arSrc.get(position).siteID != first_site_id) {
+				site_header.setText(arSrc.get(position).Site);
+				first_site_id = arSrc.get(position).siteID;
+			}
+		}
+		*/
 		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
 		img.setImageResource(arSrc.get(position).Picture);
 		
@@ -450,7 +465,8 @@ class MyListAdapter extends BaseAdapter{
 		textname.setText(arSrc.get(position).CommonName);
 		
 		TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-		textdesc.setText(arSrc.get(position).SpeciesName);
+		String [] splits = arSrc.get(position).SpeciesName.split(" ");
+		textdesc.setText(splits[0] + " " + splits[1]);
 		
 		
 		TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
@@ -465,100 +481,44 @@ class MyListAdapter extends BaseAdapter{
 	}
 
 }
-
-
-class SeparatedListAdapter extends BaseAdapter {
-
-	public Map<String,Adapter> sections = new LinkedHashMap<String,Adapter>();
-	public final ArrayAdapter<String> headers;
-	public final static int TYPE_SECTION_HEADER = 0;
-
-	public SeparatedListAdapter(Context context) {
-		headers = new ArrayAdapter<String>(context, R.layout.list_section_header);
+	
+class PlantItem{
+	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		SpeciesID = aSpeciesID;
 	}
 
-	public void addSection(String section, Adapter adapter) {
-		this.headers.add(section);
-		this.sections.put(section, adapter);
-		Log.d("SeparatedListAdapter",sections.toString());
+	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		SpeciesID = aSpeciesID;
+		siteID = aSiteID;
 	}
-
-	public Object getItem(int position) {
-		for(Object section : this.sections.keySet()) {
-			Adapter adapter = sections.get(section);
-			int size = adapter.getCount() + 1;
-
-			// check if position inside this section
-			if(position == 0) return section;
-			if(position < size) return adapter.getItem(position - 1);
-
-			// otherwise jump into next section
-			position -= size;
-		}
-		return null;
+	
+	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		Site = aSiteName;
+		SpeciesID = aSpeciesID;
+		siteID = aSiteID;
+		protocolID = aProtocolID;
+		current_pheno = aPheno_done;
+		total_pheno = aTotal_pheno;
+		TopItem = aTopItem;
 	}
-
-	public int getCount() {
-		// total together all sections, plus one for each section header
-		int total = 0;
-		for(Adapter adapter : this.sections.values())
-			total += adapter.getCount() + 1;
-		return total;
-	}
-
-	public int getViewTypeCount() {
-		// assume that headers count as one, then total all sections
-		int total = 1;
-		for(Adapter adapter : this.sections.values())
-			total += adapter.getViewTypeCount();
-		return total;
-	}
-
-	public int getItemViewType(int position) {
-		int type = 1;
-		for(Object section : this.sections.keySet()) {
-			Adapter adapter = sections.get(section);
-			int size = adapter.getCount() + 1;
-
-			// check if position inside this section
-			if(position == 0) return TYPE_SECTION_HEADER;
-			if(position < size) return type + adapter.getItemViewType(position - 1);
-
-			// otherwise jump into next section
-			position -= size;
-			type += adapter.getViewTypeCount();
-		}
-		return -1;
-	}
-
-	public boolean areAllItemsSelectable() {
-		return false;
-	}
-
-	public boolean isEnabled(int position) {
-		return (getItemViewType(position) != TYPE_SECTION_HEADER);
-	}
-
-	public View getView(int position, View convertView, ViewGroup parent) {
-		int sectionnum = 0;
-		for(Object section : this.sections.keySet()) {
-			Adapter adapter = sections.get(section);
-			
-			int size = adapter.getCount() + 1;
-
-			// check if position inside this section
-			if(position == 0) return headers.getView(sectionnum, convertView, parent);
-			if(position < size) return adapter.getView(position - 1, convertView, parent);
-
-			// otherwise jump into next section
-			position -= size;
-			sectionnum++;
-		}
-		return null;
-	}
-
-	public long getItemId(int position) {
-		return position;
-	}
-
+	
+	int Picture;
+	String CommonName;
+	String SpeciesName;
+	int SpeciesID;
+	int siteID;
+	int protocolID;
+	int current_pheno;
+	int total_pheno;
+	String Site;
+	boolean TopItem;
 }

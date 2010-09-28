@@ -17,6 +17,7 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MyLocationOverlay;
 
 import cens.ucla.edu.budburst.PlantInfo;
+import cens.ucla.edu.budburst.PlantInformation;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
@@ -49,7 +50,9 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,9 +66,10 @@ public class GetSpeciesInfo extends Activity{
 	private String camera_image_id 	= null;
 	private View take_photo		   	= null;
 	private View replace_photo 		= null;
-	private ImageView image 		= null;
+	private ImageButton image 		= null;
 	private Button phenophaseBtn 	= null;
 	private Button saveBtn 			= null;
+	private int species_id			= 0;
 	private String cname 			= null;
 	private String sname 			= null;
 	private Bitmap bitmap 			= null;
@@ -80,6 +84,7 @@ public class GetSpeciesInfo extends Activity{
 	private LocationManager lm		= null;
 	private String currentDateTimeString = null;
 	private static GpsListener gpsListener;
+	private LinearLayout phenoBox = null;
 
 	
 	/** Called when the activity is first created. */
@@ -101,16 +106,24 @@ public class GetSpeciesInfo extends Activity{
 	    
 	    // get the data from previous activity
 	    Intent intent = getIntent();
+	    species_id = intent.getExtras().getInt("species_id");
 	    cname = intent.getExtras().getString("cname");
 	    sname = intent.getExtras().getString("sname");
 	    protocol_id = intent.getExtras().getInt("protocol_id");
 	    
 	    notes = (EditText) findViewById(R.id.notes);
 	    
-	    TextView common_name = (TextView) findViewById(R.id.common_name);
-	    TextView science_name = (TextView) findViewById(R.id.science_name);
-	    common_name.setText(" " + cname + " ");
-	    science_name.setText(" (" + sname + ") ");
+	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
+	    TextView species_name = (TextView) findViewById(R.id.species_name);
+	    
+	    phenoBox = (LinearLayout) findViewById(R.id.pheno_box);
+	    phenoBox.setVisibility(View.GONE);
+	    
+	    Log.i("K", " SPECIES ID : " + species_id);
+	   
+	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));
+	    species_image.setBackgroundResource(R.drawable.shapedrawable);
+	    species_name.setText(cname + " \n" + sname + " ");
 	    
 	    // TODO Auto-generated method stub
 	    
@@ -216,7 +229,9 @@ public class GetSpeciesInfo extends Activity{
 			public void onClick(View v) {
 				Intent intent = new Intent(GetSpeciesInfo.this, GetPhenophase.class);
 				intent.putExtra("cname", cname);
+				intent.putExtra("sname", sname);
 				intent.putExtra("protocol_id", protocol_id);
+				intent.putExtra("species_id", species_id);
 				startActivityForResult(intent, GET_PHENOPHASE_CODE);
 			}
 		});
@@ -250,6 +265,54 @@ public class GetSpeciesInfo extends Activity{
 				startActivityForResult(intent, FINISH_CODE);
 			}
 		});
+		
+		image = (ImageButton) findViewById(R.id.image);
+		image.setVisibility(View.GONE);
+		
+		image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+				// TODO Auto-generated method stub
+				final LinearLayout linear = (LinearLayout) View.inflate(GetSpeciesInfo.this, R.layout.image_popup, null);
+				
+				// TODO Auto-generated method stub
+				AlertDialog.Builder dialog = new AlertDialog.Builder(GetSpeciesInfo.this);
+				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
+				
+			    String imagePath = "/sdcard/pbudburst/tmp/" + camera_image_id + ".jpg";
+
+			    File file = new File(imagePath);
+			    Bitmap bitmap = null;
+			    
+			    // if file exists show the photo on the ImageButton
+			    if(file.exists()) {
+			    	imagePath = "/sdcard/pbudburst/tmp/" + camera_image_id + ".jpg";
+				   	bitmap = BitmapFactory.decodeFile(imagePath);
+				   	image_view.setImageBitmap(bitmap);
+			    }
+			    // if not, show 'no image' ImageButton
+			    else {
+			    	//image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			    	image_view.setVisibility(View.GONE);
+			    }
+			    
+			    // when press 'Back', close the dialog
+				dialog.setPositiveButton("Back", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub	
+						image.setBackgroundResource(R.drawable.shapedrawable);
+					}
+				});
+		        dialog.setView(linear);
+		        dialog.show();
+			}
+		});
+		
 	}
 	
 	static private String hexEncode( byte[] aInput){
@@ -263,7 +326,55 @@ public class GetSpeciesInfo extends Activity{
 	   return result.toString();
 	}
 	
+	public void ShowPhotoTaken(String imagePath) {
+		
+		Log.i("K", "IMAGE PATH : " + imagePath);
+		
+		// we can put the option for the bitmap
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		File file = new File(imagePath);
+		
+		Log.i("K", "FILE LENGTH : " + file.length());
 
+		// change the sampleSize to 4 (which will be resulted in 1/4 of original size)
+		if (file.length() > 1000000)
+			options.inSampleSize = 8;
+		else if (file.length() > 500000)
+			options.inSampleSize = 4;
+		else
+			options.inSampleSize = 2;
+		
+		// use tempstorage
+		options.inTempStorage = new byte[16*1024];
+		
+		// put image Path and the options
+		bitmap = BitmapFactory.decodeFile(imagePath, options);
+		
+		try{
+			FileOutputStream out = new FileOutputStream(imagePath);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
+		}catch(Exception e){
+			Log.e("K", e.toString());
+		}
+		
+		image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+		
+		int width = bitmap.getWidth();
+	   	int height = bitmap.getHeight();
+	   	
+	    Bitmap resized_bitmap = null;
+	    // set new width and height of the phone_image
+	    int new_width = 110;
+	    int new_height = 110;
+	   	
+	   	float scale_width = ((float) new_width) / width;
+	   	float scale_height = ((float) new_height) / height;
+	   	Matrix matrix = new Matrix();
+	   	matrix.postScale(scale_width, scale_height);
+	   	resized_bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+		
+	   	image.setImageBitmap(resized_bitmap);
+	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -276,28 +387,10 @@ public class GetSpeciesInfo extends Activity{
 			
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				
+				image.setVisibility(View.VISIBLE);
 				String imagePath = TEMP_PATH + camera_image_id + ".jpg";
 				
-				// we can put the option for the bitmap
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				// use tempstorage
-				options.inTempStorage = new byte[16*1024];
-				// change the sampleSize to 4 (which will be resulted in 1/4 of original size)
-				options.inSampleSize = 4;
-				// put image Path and the options
-				bitmap = BitmapFactory.decodeFile(imagePath, options);
-				
-				try{
-					FileOutputStream out = new FileOutputStream(imagePath);
-					bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
-				}catch(Exception e){
-					Log.e("K", e.toString());
-				}
-				
-				image = (ImageView) findViewById(R.id.image);
-				image.setBackgroundResource(R.drawable.shapedrawable);
-				
-				image.setImageBitmap(bitmap);
+				ShowPhotoTaken(imagePath);
 				
 				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
 				
@@ -314,13 +407,24 @@ public class GetSpeciesInfo extends Activity{
 			
 			// requestCode == GET_PHENOPHASE_CODE
 			else if(requestCode == GET_PHENOPHASE_CODE){
+				
+				phenoBox.setVisibility(View.VISIBLE);
+				
 				p_id = data.getIntExtra("species_id", 0);
+				String phenoName = data.getStringExtra("pheno_name");
+				String phenoText = data.getStringExtra("pheno_text");
 				
 				ImageView imgv = (ImageView) findViewById(R.id.pheno_image);
 				Log.i("K", "id : " + p_id);
 				imgv.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + p_id, null, null));
 				imgv.setBackgroundResource(R.drawable.shapedrawable);
 				imgv.setVisibility(View.VISIBLE);
+				
+				TextView pheno_name = (TextView) findViewById(R.id.pheno_name);
+				pheno_name.setText(phenoName);
+				//TextView pheno_text = (TextView) findViewById(R.id.pheno_text);
+				//pheno_text.setText(phenoText);
+				
 				phenophaseBtn.setText("Change Phenophase");
 			}
 			

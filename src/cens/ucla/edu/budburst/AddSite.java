@@ -97,8 +97,6 @@ public class AddSite extends Activity{
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(AddSite.this, Sync.class);
-				startActivity(intent);
 				finish();
 			}
 		});

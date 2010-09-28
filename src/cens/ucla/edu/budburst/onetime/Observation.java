@@ -40,10 +40,14 @@ public class Observation extends ListActivity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.observation);
 	    
+	  
 	    Intent intent = getIntent();
 	    String selectedItem = intent.getExtras().getString("SelectedList");
 	    
 	    Log.i("K", "selected : " + selectedItem);
+	    
+	    TextView header = (TextView)findViewById(R.id.header);
+	    header.setText(selectedItem);
 	    
 	    if(selectedItem.equals("Wildflowers and Herbs")) {
 	    	category = WILD_FLOWERS;
@@ -59,6 +63,8 @@ public class Observation extends ListActivity {
 	    }
 	    else if(selectedItem.equals("Conifer")) {
 	    	category = CONIFERS;
+	    }
+	    else {
 	    }
 	    
 	    Log.i("K", "CATEGORY : " + category);
@@ -78,15 +84,15 @@ public class Observation extends ListActivity {
 			String common_name = cursor.getString(2);
 			Integer protocol_id = cursor.getInt(3);
 						
-			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
-			
 			PlantItem pi;
 			//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-			pi = new PlantItem(resID, common_name, species_name, protocol_id);
+			pi = new PlantItem(id, common_name, species_name, protocol_id);
 			arPlantList.add(pi);
 		}
+		PlantItem pi = new PlantItem(999, "Others", "Others", 999);
+		arPlantList.add(pi);
 		
-		MyListAdapter mylistapdater = new MyListAdapter(this, R.layout.plantlist_item, arPlantList);
+		MyListAdapter mylistapdater = new MyListAdapter(this, R.layout.plantlist_item2, arPlantList);
 		ListView MyList = getListView(); 
 		MyList.setAdapter(mylistapdater);
 		
@@ -100,22 +106,27 @@ public class Observation extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
+		
+		Log.i("K", "PIC ID : " + arPlantList.get(position).Species_id);
+		Log.i("K", "PROTOCOL ID : " + arPlantList.get(position).protocolID);
+		
 		Intent intent = new Intent(Observation.this, GetSpeciesInfo.class);
 		intent.putExtra("cname", arPlantList.get(position).CommonName);
 		intent.putExtra("sname", arPlantList.get(position).SpeciesName);
 		intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
+		intent.putExtra("species_id", arPlantList.get(position).Species_id);
 		startActivity(intent);
 	}
 	
 	class PlantItem{	
-		PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aProtocolID){
-			Picture = aPicture;
+		PlantItem(int aSpecies_id, String aCommonName, String aSpeciesName, int aProtocolID){
+			Species_id = aSpecies_id;
 			CommonName = aCommonName;
 			SpeciesName = aSpeciesName;
 			protocolID = aProtocolID;
 		}
 		
-		int Picture;
+		int Species_id;
 		String CommonName;
 		String SpeciesName;
 		int protocolID;
@@ -152,8 +163,15 @@ public class Observation extends ListActivity {
 				convertView = Inflater.inflate(layout, parent, false);
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-			img.setImageResource(arSrc.get(position).Picture);
-			
+			if(arSrc.get(position).Species_id == 999) {
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null);
+				img.setImageResource(resID);
+			}
+			else {
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+arSrc.get(position).Species_id, null, null);
+				img.setImageResource(resID);
+			}
+
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
 			textname.setText(arSrc.get(position).CommonName);
 			

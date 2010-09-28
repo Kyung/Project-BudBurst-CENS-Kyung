@@ -6,7 +6,6 @@
 		<item>Deciduous Trees and Shrubs</item>
 		<item>Evergreen Trees and Shrubs</item>
 		<item>Conifer</item>
-		<item>Others</item>
 	</string-array>
 	<string-array name="recommend">
 		<item>"What's Blooming"</item>
