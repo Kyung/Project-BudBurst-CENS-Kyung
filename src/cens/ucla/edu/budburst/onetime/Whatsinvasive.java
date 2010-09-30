@@ -355,7 +355,9 @@ public class Whatsinvasive extends ListActivity {
 			ListView MyList = getListView();
 			MyList.setAdapter(mylistapdater);
 			
-			dialog.dismiss();
+			if(dialog.isShowing()) {
+				dialog.dismiss();
+			}
 		}
 	}
 	

@@ -45,17 +45,7 @@
 		android:layout_below="@+id/phenophase_bar"
 		android:gravity="center"
 		android:orientation="vertical">
-		<TextView
-  			android:layout_width="fill_parent"
-  			android:layout_height="wrap_content"
-  			android:text="Edit your observation"
-  			android:textSize="18px"
-  			android:textStyle="bold"
-  			android:gravity="center"
-  			android:layout_marginTop="10px"
-  			android:layout_marginBottom="5px"
-  			android:id="@+id/title_text"
-  		/>
+		
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"

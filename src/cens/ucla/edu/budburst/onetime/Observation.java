@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -38,16 +39,27 @@ public class Observation extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.observation);
-	    
-	  
-	    Intent intent = getIntent();
+	   
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.observation);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		Intent intent = getIntent();
 	    String selectedItem = intent.getExtras().getString("SelectedList");
+		
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(" OTB > " + selectedItem);
+	  
+	    
 	    
 	    Log.i("K", "selected : " + selectedItem);
 	    
-	    TextView header = (TextView)findViewById(R.id.header);
-	    header.setText(selectedItem);
+	    //TextView header = (TextView)findViewById(R.id.header);
+	    //header.setText(selectedItem);
 	    
 	    if(selectedItem.equals("Wildflowers and Herbs")) {
 	    	category = WILD_FLOWERS;

@@ -5,4 +5,10 @@
 		<item name="android:windowIsFloating">false</item>
 		<item name="android:windowNoTitle">true</item>
 	</style>
+	<style name="PBBTitleBackground">     
+        <item name="android:background">@color/pbb_title_background</item>                   
+    </style>
+    <style name="FloraTitleBackground">     
+        <item name="android:background">@color/flora_title_background</item>                   
+    </style>
 </resources>

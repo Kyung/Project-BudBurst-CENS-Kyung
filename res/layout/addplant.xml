@@ -3,38 +3,76 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <TextView
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:id="@+id/header_text"
-    	android:text="The list includes 10 most wanted species in America. Check 'Show All Plants' to show all the plants."
-    	android:textSize="18px"
-    	android:textColor="@drawable/black"
-    	android:paddingLeft="7px"
-    	android:paddingTop="7px"
-    />
     <LinearLayout
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_below="@+id/header_text"
-    	android:orientation="horizontal"
+    	android:orientation="vertical"
+    	android:paddingLeft="7dip"
+  		android:paddingBottom="7dip"
     	android:id="@+id/header_box"
+    	android:layout_marginTop="10px"
+    	android:background="@drawable/bg_line"
     >
-	<CheckBox
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/header"
-		android:text="Show All Plants"
-	/>
-	<CheckBox
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginLeft="15px"
-		android:id="@+id/header2"
-		android:text="Show Category"
-		android:visibility="gone"
-		android:checked="false"
-	/>
+    <RadioGroup
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:gravity="center"
+    	android:id="@+id/radio_group"
+    	android:weightSum="1"
+    >
+    	<RadioButton
+    		android:checked="true"
+    		android:id="@+id/option1"
+    		android:layout_weight="0.3"
+    	/>
+    	<RadioButton
+    		android:checked="false"
+    		android:id="@+id/option2"
+    		android:layout_weight="0.3"
+    	/>
+    	<RadioButton
+    		android:checked="false"
+    		android:id="@+id/option3"
+    		android:layout_weight="0.1"
+    	/>    	
+    </RadioGroup>
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@+id/radio_group"
+    	android:layout_marginTop="-10px"
+    	android:layout_marginBottom="5px"
+    	android:paddingLeft="10px"
+    	android:orientation="horizontal"
+    	android:gravity="center"
+    	android:weightSum="1">
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.3"
+    		android:text="TOP 10"
+    		android:textColor="@drawable/black"
+    	/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.3"
+    		android:paddingLeft="18px"
+    		android:text="ALL"
+    		android:textColor="@drawable/black"
+    	/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.2"
+    		android:paddingLeft="18px"
+    		android:text="GROUP"
+    		android:textColor="@drawable/black"
+    	/>
+    
+    </LinearLayout>
 	</LinearLayout>
 	<ListView
 		android:id="@android:id/list"

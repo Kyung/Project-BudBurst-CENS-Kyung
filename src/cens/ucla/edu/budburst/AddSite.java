@@ -13,12 +13,15 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -37,12 +40,25 @@ public class AddSite extends Activity{
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.addsite);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Add Site");
+
 
 	}
 
 	public void onResume(){
 		super.onResume();
+		
+		
+		
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 		LocationManager lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -155,6 +171,7 @@ public class AddSite extends Activity{
 					cursor.close();
 
 					Intent intent = new Intent(AddSite.this, PlantList.class);
+					Toast.makeText(AddSite.this, "New Site Added!", Toast.LENGTH_SHORT).show();
 					startActivity(intent);
 					finish();
 				}catch(Exception e){

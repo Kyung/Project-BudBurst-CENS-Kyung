@@ -38,41 +38,41 @@
     		android:configChanges="orientation|keyboardHidden">
     		
     	</activity>
-<activity android:label="Helloscr" android:name=".Helloscr" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:label="Helloscr" android:name=".Helloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantList" android:label="PlantList" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantInfo" android:theme="@android:style/Theme.Light" android:label="PlantInfo" android:configChanges="keyboardHidden|orientation"></activity>
-<activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddSite" android:theme="@android:style/Theme.Light" android:label="AddSite" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 
-<activity android:name=".onetime.Observation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.Recommendation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.GetSpeciesInfo" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.Observation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.Recommendation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.GetSpeciesInfo" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
-<activity android:name=".onetime.GetPhenophase" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
-<activity android:name=".onetime.Queue" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
-<activity android:name=".onetime.MyPhotoDetail" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
+<activity android:name=".onetime.GetPhenophase" android:theme="@android:style/Theme.Light" ></activity>
+<activity android:name=".onetime.Queue" android:theme="@android:style/Theme.Light"></activity>
+<activity android:name=".onetime.MyPhotoDetail" android:theme="@android:style/Theme.Light"></activity>
 
-<activity android:name=".onetime.Whatsinvasive" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
-<activity android:name=".onetime.Whatspopular" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
-<activity android:name=".onetime.AreaList" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
+<activity android:name=".onetime.Whatsinvasive" android:theme="@android:style/Theme.Light"></activity>
+<activity android:name=".onetime.Whatspopular" android:theme="@android:style/Theme.Light"></activity>
+<activity android:name=".onetime.AreaList" android:theme="@android:style/Theme.Light"></activity>
 
-<activity android:name=".onetime.WIinfo" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
-<activity android:name=".onetime.WPinfo" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
+<activity android:name=".onetime.WIinfo" android:theme="@android:style/Theme.Light"></activity>
+<activity android:name=".onetime.WPinfo" android:theme="@android:style/Theme.Light"></activity>
 <uses-library android:name="com.google.android.maps"></uses-library>
 
 <activity android:name=".onetime.Whatspopulars" android:process=":Whatspopulars"></activity>
 <activity android:name=".onetime.WPinformation"></activity>
 
-<activity android:name=".onetime.SummarySpecies" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
+<activity android:name=".onetime.SummarySpecies" android:theme="@android:style/Theme.Light"></activity>
 
-<activity android:name="PlantInformation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantInformation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
-<activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.Flora_Observer" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.Flora_Observer" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

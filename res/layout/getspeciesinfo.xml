@@ -4,50 +4,82 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     
-	<LinearLayout
-	android:id="@+id/header"
+  <LinearLayout
+    android:id="@+id/header_part"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   	android:orientation="horizontal"
-  	android:paddingLeft="7dip"
   	android:paddingTop="7dip"
-  	android:paddingBottom="15dip"
-  	android:background="@drawable/bg_line">
-  	<ImageView
+  	android:paddingLeft="7dip"
+  	android:paddingRight="7dip"
+  	android:paddingBottom="12dip"
+  	android:background="@drawable/bg_line"
+  	android:weightSum="1"
+  	>
+	<ImageView
 		android:paddingTop="3dip"
 		android:layout_width="60px" 
 		android:layout_height="60px"
 		android:id="@+id/species_image" 
 		android:adjustViewBounds="true"
+		android:layout_weight="0.005"
 	/>
-	<TextView
-		android:paddingTop="1dip"
-		android:paddingLeft="2dip"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/species_name"
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:paddingTop="3dip"
+			android:paddingLeft="3dip"
+			android:orientation="vertical"
+			android:gravity="center"
+			android:layout_gravity="center"
+			android:id="@+id/text_description"
+			android:layout_weight="0.99"
+			>
+			<TextView
+				android:id="@+id/common_name"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="17dip" 
+				android:gravity="center"
+				android:layout_gravity="center"
+				android:textColor="@drawable/black" 
+				android:textStyle="italic|bold" 
+				/>
+			<TextView
+				android:id="@+id/science_name"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="17dip"
+				android:gravity="center"
+				android:layout_gravity="center"  
+				android:textColor="@drawable/black" 
+				android:textStyle="italic|bold"
+				/>
+		</LinearLayout>
+	<ImageView
+		android:paddingTop="3dip"
+		android:paddingLeft="7dip"
+		android:layout_width="60px" 
+		android:layout_height="60px"
+		android:id="@+id/pheno_image" 
 		android:adjustViewBounds="true"
-		android:textSize="17px"
-		android:textStyle="italic|bold"
-		android:layout_marginLeft="3px"
-		android:focusable="true"
-		android:focusableInTouchMode="true"
-	/>
-	</LinearLayout>    
+		android:layout_weight="0.005"
+	/>			
+	</LinearLayout>
  
 	<ScrollView
 		android:layout_width="fill_parent" 
-		android:layout_height="fill_parent"
+		android:layout_height="wrap_content"
 		android:layout_marginTop="5px"
 		android:layout_marginLeft="5px"
 		android:layout_marginRight="5px" 
-		android:layout_below="@+id/header">
+		android:layout_below="@+id/header_part">
 
 	<LinearLayout 
 		android:id="@+id/observation_linear_layout"
 		android:layout_width="fill_parent" 
 		android:layout_height="fill_parent" 
-		android:layout_below="@+id/phenophase_bar"
+		android:layout_below="@+id/header_part"
 		android:gravity="center"
 		android:paddingLeft="7dip"
 		android:paddingRight="7dip"
@@ -74,7 +106,7 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="Step 1. Take a Photo"
+			android:text=" Take a Photo"
 			android:background="@drawable/bg_line_top"
 			android:textSize="16dip"
 			/>
@@ -151,6 +183,7 @@
 					
 		</LinearLayout>
 
+		<!-- 
 		<TextView
 			android:paddingTop="1dip"
 			android:layout_width="fill_parent" 
@@ -168,6 +201,7 @@
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
 			android:id="@+id/pheno_box"
+			android:gravity="center"
 		>			
 			<ImageView
 				android:scaleType="fitCenter"
@@ -194,7 +228,6 @@
 			android:focusableInTouchMode="true"
 			android:focusable="true"
 			/>
-			<!-- 
 			<TextView
 			android:paddingTop="1dip"
 			android:paddingLeft="6dip"
@@ -203,7 +236,7 @@
 			android:id="@+id/pheno_text"
 			android:adjustViewBounds="true"
 			/>
-			 -->
+			 
 			</LinearLayout>
 		</LinearLayout>
 		<Button
@@ -220,7 +253,7 @@
 			android:text="Select Phenophase"
 			android:focusable="true"
 			/>
-			
+		-->	
 		
 		<TextView
 			android:paddingTop="3dip"
@@ -229,7 +262,7 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="Step 3. Add Notes"
+			android:text=" Add Notes"
 			android:textSize="16dip"
 			android:background="@drawable/bg_line_top"
 			/>	

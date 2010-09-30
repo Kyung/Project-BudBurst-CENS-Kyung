@@ -48,6 +48,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -77,7 +79,7 @@ public class GetSpeciesInfo extends Activity{
 	private EditText notes 			= null;
 	private double latitude 		= 0.0;
 	private double longitude 		= 0.0;
-	private TextView myLoc 			= null;
+	private int pheno_id;
 	private int protocol_id;
 	private int p_id;
 	private OneTimeDBHelper otDBH;
@@ -91,10 +93,17 @@ public class GetSpeciesInfo extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 	    setContentView(R.layout.getspeciesinfo);
-	    
-	    //myLoc = (TextView) findViewById(R.id.myLocation);
-	    //myLoc.setText("Current Location : " + latitude + " , " + longitude);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Make Observation");
 	    
 	    gpsListener = new GpsListener();
 	    lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -110,22 +119,24 @@ public class GetSpeciesInfo extends Activity{
 	    cname = intent.getExtras().getString("cname");
 	    sname = intent.getExtras().getString("sname");
 	    protocol_id = intent.getExtras().getInt("protocol_id");
+	    pheno_id = intent.getExtras().getInt("pheno_id");
 	    
 	    notes = (EditText) findViewById(R.id.notes);
 	    
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
-	    TextView species_name = (TextView) findViewById(R.id.species_name);
-	    
-	    phenoBox = (LinearLayout) findViewById(R.id.pheno_box);
-	    phenoBox.setVisibility(View.GONE);
-	    
+	    ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
+	    TextView common_name = (TextView) findViewById(R.id.common_name);
+	    TextView science_name = (TextView) findViewById(R.id.science_name);
 	    Log.i("K", " SPECIES ID : " + species_id);
 	   
 	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));
 	    species_image.setBackgroundResource(R.drawable.shapedrawable);
-	    species_name.setText(cname + " \n" + sname + " ");
 	    
+	    pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pheno_id, null, null));
+	    pheno_image.setBackgroundResource(R.drawable.shapedrawable);
 	    // TODO Auto-generated method stub
+	    common_name.setText(cname + " ");
+	    science_name.setText(sname + " ");	    
 	    
 	    take_photo = this.findViewById(R.id.take_photo);
 	    replace_photo = this.findViewById(R.id.replace_photo);
@@ -140,7 +151,6 @@ public class GetSpeciesInfo extends Activity{
 	    	dict_tmp.mkdir();
 	    }
 
-	    
 	    take_photo.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -222,20 +232,6 @@ public class GetSpeciesInfo extends Activity{
 			}
 		});
 		
-		phenophaseBtn = (Button) findViewById(R.id.phenophase);
-		
-		phenophaseBtn.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				Intent intent = new Intent(GetSpeciesInfo.this, GetPhenophase.class);
-				intent.putExtra("cname", cname);
-				intent.putExtra("sname", sname);
-				intent.putExtra("protocol_id", protocol_id);
-				intent.putExtra("species_id", species_id);
-				startActivityForResult(intent, GET_PHENOPHASE_CODE);
-			}
-		});
-		
 		saveBtn = (Button) findViewById(R.id.save);
 		
 		saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -258,7 +254,7 @@ public class GetSpeciesInfo extends Activity{
 				intent.putExtra("sname", sname);
 				intent.putExtra("lat", latitude);
 				intent.putExtra("lng", longitude);
-				intent.putExtra("image_id", p_id);
+				intent.putExtra("image_id", pheno_id);
 				intent.putExtra("dt_taken", currentDateTimeString);
 				intent.putExtra("notes", getNote);
 				intent.putExtra("photo_name", camera_image_id);
@@ -305,7 +301,6 @@ public class GetSpeciesInfo extends Activity{
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub	
-						image.setBackgroundResource(R.drawable.shapedrawable);
 					}
 				});
 		        dialog.setView(linear);
@@ -395,39 +390,11 @@ public class GetSpeciesInfo extends Activity{
 				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
 				
 				currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
-				//TextView time = (TextView) findViewById(R.id.timestamp_text);
-				//time.setText(" " + currentDateTimeString + " ");
-				
-				//TextView title = (TextView) findViewById(R.id.make_obs_text);
-				//title.setText(" [ Set Your Observation ] ");
 				
 				take_photo.setVisibility(View.GONE);
 			    replace_photo.setVisibility(View.VISIBLE);
 			}
-			
-			// requestCode == GET_PHENOPHASE_CODE
-			else if(requestCode == GET_PHENOPHASE_CODE){
-				
-				phenoBox.setVisibility(View.VISIBLE);
-				
-				p_id = data.getIntExtra("species_id", 0);
-				String phenoName = data.getStringExtra("pheno_name");
-				String phenoText = data.getStringExtra("pheno_text");
-				
-				ImageView imgv = (ImageView) findViewById(R.id.pheno_image);
-				Log.i("K", "id : " + p_id);
-				imgv.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + p_id, null, null));
-				imgv.setBackgroundResource(R.drawable.shapedrawable);
-				imgv.setVisibility(View.VISIBLE);
-				
-				TextView pheno_name = (TextView) findViewById(R.id.pheno_name);
-				pheno_name.setText(phenoName);
-				//TextView pheno_text = (TextView) findViewById(R.id.pheno_text);
-				//pheno_text.setText(phenoText);
-				
-				phenophaseBtn.setText("Change Phenophase");
-			}
-			
+
 			else if(requestCode == FINISH_CODE) {
 				finish();
 			}
@@ -444,8 +411,8 @@ public class GetSpeciesInfo extends Activity{
     // or when user press back button
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			lm.removeUpdates(gpsListener);
 			finish();
+			lm.removeUpdates(gpsListener);
 			return true;
 		}
 		return false;

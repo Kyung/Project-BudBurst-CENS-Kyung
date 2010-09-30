@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -32,7 +33,17 @@ public class GetPhenophase extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+	    
+	    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 	    setContentView(R.layout.getphenophase);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+		
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(" Select Phenophase");
 	    
 	    Intent intent = getIntent();
 	    protocol_id = intent.getExtras().getInt("protocol_id");
@@ -96,12 +107,14 @@ public class GetPhenophase extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(this, PlantInfo.class);
-		intent.putExtra("species_id", pItem.get(position).Pheno_image);
+		Intent intent = new Intent(this, GetSpeciesInfo.class);
+		intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
 		intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
 		intent.putExtra("pheno_text", pItem.get(position).Note);
-		setResult(RESULT_OK, intent);
-		finish();
+		intent.putExtra("cname", cname);
+		intent.putExtra("sname", sname);
+		intent.putExtra("species_id", species_id);
+		startActivity(intent);
 	}
 	
 	class PlantItem{

@@ -80,10 +80,10 @@ public class OneTimeMain extends ListActivity {
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
-		otime = new oneTime("Flora Observer", "One Time Observation", "");
+		otime = new oneTime("none", "One Time Observation", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("Recommendation", "What's Blooming", "");
+		otime = new oneTime("none", "What's Blooming", "");
 		onetime_title.add(otime);
 		otime = new oneTime("none", "What's Invasive", "");
 		onetime_title.add(otime);

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-
+<!-- 
     <LinearLayout  
     	android:id="@+id/logo_layout"
 	    android:layout_width="fill_parent" 
@@ -31,7 +31,8 @@
 		android:layout_below="@+id/logo_layout"
 		android:textSize="18px"
 		android:textStyle="bold"
-	/>  	
+	/> 
+ -->
 	<LinearLayout 
 	   		android:id="@+id/two_button"
 	   	    android:layout_width="fill_parent"

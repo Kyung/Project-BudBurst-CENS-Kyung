@@ -122,7 +122,7 @@
 			android:id="@+id/simpleGM_map"
 			android:layout_width="fill_parent"
 			android:layout_height="100px"
-			android:apiKey="0s7Km0gbaIiJVJtsfbW3fd7IP0UBLh833HEAtYw"
+			android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ"
 			android:clickable="true"
 			android:layout_marginBottom="5dip"
 			android:layout_marginLeft="5px"
