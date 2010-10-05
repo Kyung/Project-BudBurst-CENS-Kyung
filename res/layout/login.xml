@@ -37,11 +37,10 @@
 				<EditText android:id="@+id/username_text"
 					android:hint="Username"
 					android:background="@layout/text_edit_field"
-					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_horizontal"
 					android:layout_marginBottom="5dp"
-					android:focusable="true">
+					android:focusable="true" android:layout_width="200px">
 				</EditText>
 				<EditText android:id="@+id/password_text"
 					android:hint="Password"
