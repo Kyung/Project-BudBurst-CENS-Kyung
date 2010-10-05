@@ -53,7 +53,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.Login;
-import cens.ucla.edu.budburst.PlantInfo;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;

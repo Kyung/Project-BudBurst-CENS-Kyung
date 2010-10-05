@@ -41,7 +41,6 @@
 <activity android:label="Helloscr" android:name=".Helloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantList" android:label="PlantList" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="PlantInfo" android:theme="@android:style/Theme.Light" android:label="PlantInfo" android:configChanges="keyboardHidden|orientation"></activity>
 <activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddSite" android:theme="@android:style/Theme.Light" android:label="AddSite" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>

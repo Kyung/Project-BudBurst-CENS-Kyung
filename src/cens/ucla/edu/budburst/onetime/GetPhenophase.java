@@ -2,7 +2,6 @@ package cens.ucla.edu.budburst.onetime;
 
 import java.util.ArrayList;
 
-import cens.ucla.edu.budburst.PlantInfo;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import android.app.Activity;

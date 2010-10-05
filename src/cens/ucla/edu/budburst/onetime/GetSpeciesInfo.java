@@ -16,7 +16,6 @@ import java.util.Date;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MyLocationOverlay;
 
-import cens.ucla.edu.budburst.PlantInfo;
 import cens.ucla.edu.budburst.PlantInformation;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;

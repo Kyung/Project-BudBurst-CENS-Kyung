@@ -12,7 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import cens.ucla.edu.budburst.PlantInfo;
+import cens.ucla.edu.budburst.PlantInformation;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import android.app.Activity;
@@ -144,7 +144,7 @@ public class AreaList extends ListActivity {
     // or when user press back button
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
-			Intent intent = new Intent(this, PlantInfo.class);
+			Intent intent = new Intent(this, PlantInformation.class);
 			intent.putExtra("back", true);
 			setResult(RESULT_OK, intent);
 			finish();
@@ -155,7 +155,7 @@ public class AreaList extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(this, PlantInfo.class);
+		Intent intent = new Intent(this, PlantInformation.class);
 		
 		Log.i("K", " AREA IDIDIDID : " + arAreaList.get(position).id);
 		
