@@ -3,8 +3,8 @@
     <string name="app_name">Project Budburst</string>
     <string name="signupURL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/register_mobile</string>
     <string name="instruction_old">You have no plants yet, or you need to syncronize your phone.\n\n (1) Start by adding a plant to an existing site (MENU &gt; Add Plant). \n\n (2) Please synchronize your phone with the database (Menu &gt; Sync).  If this fails, you may have connectivity problems.</string>
-    <string name="instruction">You need to synchronize your phone with Project Budburst database.\n\n 
-     (1) Please click Sync button. You can find Sync button at any page by clicking MENU button.\n\n
+    <string name="instruction">You need to synchronize your phone with the Project Budburst database.\n\n 
+     (1) Please click the Sync button. You can find Sync button at any page by clicking the MENU button.\n\n
     
      (2) Add a plant to an existing site. (MENU &gt; ADD &gt; Add Plant). Click one of plants in plant list and submit your observation. 
      </string>
@@ -22,11 +22,11 @@
     </string>
     
     <string name="no_site_no_species_instruction">
-    \nNo site and plant has been found. If this is your first login, please follow instruction below to add sites and plants.\n
+    \nNo site or plants have been found. If this is your first login, please follow the instructions below to add sites and plants.\n
     \n
-    (1) Add your site. \nClick MENU->ADD->ADD SITE \n\n
-    (2) Add your plant. \nClick MENU->ADD->ADD PLANT \n\n
-    (3) You will see your plant list in this page.\n
+    (1) Add your site. \nClick MENU-&gt;ADD-&gt;ADD SITE \n\n
+    (2) Add a plant. \nClick MENU-&gt;ADD-&gt;ADD PLANT \n\n
+    (3) You will see your plants listed on this page.\n
     
     </string>
     
@@ -42,10 +42,10 @@
     </string>
     
     
-       <string name="button_bar1"> Leaves</string>
-    <string name="button_bar2"> Flowers</string>
-    <string name="button_bar3"> Fruits</string>
-    <string name="submit_question">You have unsubmitted data. Do you want to submit it?</string>
+       
+    
+    
+    <string name="submit_question">You have unsubmitted data. Do you want to submit them?</string>
     <string-array name="state">
        <item>AL</item> 
        <item>AK</item> 
