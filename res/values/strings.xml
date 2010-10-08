@@ -3,32 +3,13 @@
     <string name="app_name">Project Budburst</string>
     <string name="signupURL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/register_mobile</string>
     <string name="instruction_old">You have no plants yet, or you need to syncronize your phone.\n\n (1) Start by adding a plant to an existing site (MENU &gt; Add Plant). \n\n (2) Please synchronize your phone with the database (Menu &gt; Sync).  If this fails, you may have connectivity problems.</string>
-    <string name="instruction">You need to synchronize your phone with the Project Budburst database.\n\n 
-     (1) Please click the Sync button. You can find Sync button at any page by clicking the MENU button.\n\n
+    <string name="instruction">\n\nYou have just logged in and now need to synchronize your phone with the Project Budburst database.\n\nPlease click the Sync button if you have connectivity.\n\nYou can find Sync button at any page by clicking the MENU button.</string>
+    <string name="get_my_species_in_my_station_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_species_in_my_station</string>
+    <string name="get_my_sites_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_sites</string>
+    <string name="get_observation_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_obs</string>
+    <string name="authentication_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?authentication</string>
     
-     (2) Add a plant to an existing site. (MENU &gt; ADD &gt; Add Plant). Click one of plants in plant list and submit your observation. 
-     </string>
-    <string name="get_my_species_in_my_station_URL">
-    http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_species_in_my_station
-    </string>
-    <string name="get_my_sites_URL">
-    http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_sites
-    </string>
-    <string name="get_observation_URL">
-    http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_obs
-    </string>
-    <string name="authentication_URL">
-    http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?authentication
-    </string>
-    
-    <string name="no_site_no_species_instruction">
-    \nNo site or plants have been found. If this is your first login, please follow the instructions below to add sites and plants.\n
-    \n
-    (1) Add your site. \nClick MENU-&gt;ADD-&gt;ADD SITE \n\n
-    (2) Add a plant. \nClick MENU-&gt;ADD-&gt;ADD PLANT \n\n
-    (3) You will see your plants listed on this page.\n
-    
-    </string>
+    <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below to first add a site, then add plants.\n \n (1) Add your site. \nClick MENU-&gt;ADD-&gt;ADD SITE \n\n (2) Add a plant. \nClick MENU-&gt;ADD-&gt;ADD PLANT \n\n</string>
     
     <string name="get_user_spcies_URL">http://www.google.com</string>
     <string name="upload_observation_URL">http://www.naver.com</string>
@@ -100,4 +81,11 @@
     </string-array>
     
     
+<string name="Title_text">A National Phenology and\nClimate Change Campaign\nfor Citizen Scientists!</string>
+<string name="sign_up">Sign Up!</string>
+<string name="preview_mode">Preview Mode</string>
+<string name="login">Log In</string>
+<string name="hello">Hello</string>
+<string name="budburst_arrow">Bud\nBurst</string>
+<string name="Flora_arrow">Flora\nObs</string>
 </resources>

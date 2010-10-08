@@ -83,7 +83,7 @@ public class Helloscr extends Activity{
 		
 		//Display instruction message
 		TextView textViewHello = (TextView)findViewById(R.id.hello_textview);
-		textViewHello.setText("Hello " + username + ",\n" + getString(R.string.instruction));
+		textViewHello.setText(getString(R.string.hello) + username + "!" + getString(R.string.instruction));
 		
 		StaticDBHelper staticDBHelper = new StaticDBHelper(Helloscr.this);
 		

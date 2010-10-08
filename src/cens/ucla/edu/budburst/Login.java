@@ -67,8 +67,8 @@ public class Login extends Activity{
 
 				//Set id/pwd as test/test
 				SharedPreferences.Editor edit = pref.edit();				
-				edit.putString("Username","test");
-				edit.putString("Password","test");
+				edit.putString("Username","mbbtest");
+				edit.putString("Password","mbbtest");
 				edit.commit();
 				
 				Intent intent = new Intent(Login.this, Sync.class);
