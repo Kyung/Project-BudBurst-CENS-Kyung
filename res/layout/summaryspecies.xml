@@ -181,7 +181,7 @@
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="15dip"
-			android:text=""
+			android:textColor="@color/black"
 			android:width="0dip"
 			android:gravity="top" 
 			android:textSize="17dip"

@@ -43,8 +43,6 @@ import android.widget.Toast;
 public class OneTimeMain extends ListActivity {
 
 	ArrayList<Button> buttonBar = new ArrayList<Button>();
-	private Button observationBtn;
-	private Button recommendationBtn;
 	private MyListAdapter mylistapdater;
 	private SharedPreferences pref;
 
@@ -80,81 +78,26 @@ public class OneTimeMain extends ListActivity {
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
-		otime = new oneTime("none", "One Time Observation", "");
+		otime = new oneTime("none", "One Time Observation", "pbbicon", "Project Budburst");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "What's Blooming", "");
+		otime = new oneTime("none", "What's Invasive", "invasive_plant", "Help locate invasive plants");
 		onetime_title.add(otime);
-		otime = new oneTime("none", "What's Invasive", "");
+		
+		otime = new oneTime("none", "What's Blooming", "whatsblooming", "Local plants in flower now");
 		onetime_title.add(otime);
-		otime = new oneTime("none", "What's Native", "");
-		onetime_title.add(otime);
-		otime = new oneTime("none", "What's Popular", "");
+		
+		otime = new oneTime("none", "What's Native", "whatsnative", "Native and cultural plants");
 		onetime_title.add(otime);
 
-		
+		// What's popular is currently not available
+		//otime = new oneTime("none", "What's Popular", "");
+		//onetime_title.add(otime);
+
 		mylistapdater = new MyListAdapter(OneTimeMain.this, R.layout.onetime_list ,onetime_title);
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
-		/*
-		buttonBar.add((Button) this.findViewById(R.id.observation_btn));
-		buttonBar.get(0).setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				new AlertDialog.Builder(OneTimeMain.this)
-					.setTitle("Select Category")
-					.setIcon(android.R.drawable.ic_menu_more)
-					.setItems(R.array.category, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							String[] category = getResources().getStringArray(R.array.category);
-							
-							if(category[which].equals("Others")) {
-								Intent intent = new Intent(OneTimeMain.this, GetSpeciesInfo.class);
-								intent.putExtra("cname", "Others");
-							    intent.putExtra("sname", "Others");
-							    intent.putExtra("protocol_id", 0);
-								startActivity(intent);
-							}
-							else {
-								Intent intent = new Intent(OneTimeMain.this, Observation.class);
-								intent.putExtra("SelectedList", category[which]);
-								startActivity(intent);
-							}
-						}
-					})
-					.setNegativeButton("Back", null)
-					.show();
-			}		
-		});
-		*/
-		
-		/*
-		buttonBar.add((Button) this.findViewById(R.id.recommend_btn));
-		buttonBar.get(1).setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				new AlertDialog.Builder(OneTimeMain.this)
-				.setTitle("Select Category")
-				.setIcon(android.R.drawable.ic_menu_more)
-				.setItems(R.array.recommend, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						String[] category = getResources().getStringArray(R.array.recommend);
-						
-						Intent intent = new Intent(OneTimeMain.this, Recommendation.class);
-						intent.putExtra("SelectedList", category[which]);
-						startActivity(intent);
-					}
-				})
-				.setNegativeButton("Back", null)
-				.show();
-	
-			}		
-		});
-		*/
 	}
 	
 	class MyListAdapter extends BaseAdapter{
@@ -185,25 +128,16 @@ public class OneTimeMain extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent){
 			if(convertView == null)
 				convertView = Inflater.inflate(layout, parent, false);
-			/*
-			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-
-			String imagePath = TEMP_PATH + arSrc.get(position).image_url + ".jpg";
-			Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
 			
-			try{
-				FileOutputStream out = new FileOutputStream(imagePath);
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
-			}catch(Exception e){
-				Log.e("K", e.toString());
-			}
-		
-			img.setBackgroundResource(R.drawable.shapedrawable);
-			img.setImageBitmap(bitmap);
-			*/
+			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
+			
+			img.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/"+arSrc.get(position).image_url, null, null));
+			//img.setBackgroundResource(R.drawable.shapedrawable);
+			
 			
 			TextView header_view = (TextView) convertView.findViewById(R.id.list_header);
 			TextView title_view = (TextView) convertView.findViewById(R.id.list_name);
+			TextView title_desc = (TextView) convertView.findViewById(R.id.list_name_detail);
 			
 			
 			if(!arSrc.get(position).header.equals("none")) {
@@ -216,27 +150,29 @@ public class OneTimeMain extends ListActivity {
 			
 			Log.i("K", "TITLE : " + arSrc.get(position).title);
 			
-			title_view.setText(" " + arSrc.get(position).title);
+			title_view.setText(arSrc.get(position).title);
+			title_desc.setText(arSrc.get(position).description + " ");
 	
 			return convertView;
 		}
 	}
 	
 	class oneTime{	
-		oneTime(String aHeader, String aTitle, String aImage_url){
+		oneTime(String aHeader, String aTitle, String aImage_url, String aDescription){
 			header = aHeader;
 			title = aTitle;
 			image_url = aImage_url;
+			description = aDescription;
 		}
 		
 		String header;
 		String title;
 		String image_url;
+		String description;
 	}
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		String[] category = getResources().getStringArray(R.array.recommend);
 	
 		if(position == 0) {
 			Intent intent = new Intent(OneTimeMain.this, Flora_Observer.class);

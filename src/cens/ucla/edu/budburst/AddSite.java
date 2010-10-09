@@ -1,5 +1,9 @@
 package cens.ucla.edu.budburst;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -7,11 +11,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -29,14 +37,17 @@ import cens.ucla.edu.budburst.helper.SyncDBHelper;
 public class AddSite extends Activity{
 
 	final String TAG = "AddSite.class"; 
-
-	EditText latitude;
-	EditText longitude;
-	EditText sitename;
-	EditText comment;
-
+	private EditText latitude;
+	private EditText longitude;
+	private EditText sitename;
+	private EditText comment;
+	private Location cur_location = null;
+	private LocationManager lmanager = null;
 	ArrayAdapter<CharSequence> adspin;
-	String selectedState;
+	private String selectedState;
+	private static GpsListener gpsListener;
+	private double lat = 0.0;
+	private double lon = 0.0;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -49,62 +60,38 @@ public class AddSite extends Activity{
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		latitude = (EditText)this.findViewById(R.id.latitude);
+		longitude = (EditText)this.findViewById(R.id.longitude);
 		myTitleText.setText("  Add Site");
+		
+		lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
+		if (!(lmanager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+		    	 && lmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))){  
+		         createLocationServiceDisabledAlert();  
+		}
+		
+		gpsListener = new GpsListener();
+	    // set update the location data in 3secs or 30meters
+		lmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
+		
+		
+		
+		// start GPS
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+	    
+		String bestprovider = lmanager.getBestProvider(criteria, true);
 
+	    if(bestprovider == null)
+	    	bestprovider = "gps";
 	}
 
 	public void onResume(){
 		super.onResume();
 		
-		
-		
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-		LocationManager lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		String bestprovider = lmanager.getBestProvider(criteria, true);
-
-	     if (!(lmanager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-	    		 && lmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))){  
-	          createLocationServiceDisabledAlert();  
-	     }  
-
-
-	    if(bestprovider == null)
-	    	bestprovider = "gps";
-		Location cur_location = lmanager.getLastKnownLocation(bestprovider);
-
-		if(cur_location != null){
-			latitude = (EditText)this.findViewById(R.id.latitude);
-			latitude.setText(String.valueOf(cur_location.getLatitude()));
-
-			longitude = (EditText)this.findViewById(R.id.longitude);
-			longitude.setText(String.valueOf(cur_location.getLongitude()));
-		}		
-
 		sitename = (EditText)this.findViewById(R.id.sitename);
 		comment = (EditText)this.findViewById(R.id.comment);
-
-		Spinner spinner = (Spinner)findViewById(R.id.state);
-		spinner.setPrompt("Choose your state.");
-
-		adspin = ArrayAdapter.createFromResource(this, R.array.state, 
-				android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adspin);
-		spinner.setSelection(4);
-
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
-				selectedState = adspin.getItem(position).toString();
-				//Toast.makeText(AddSite.this, adspin.getItem(position), Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-
-			}
-		});
 
 		//Cancel button handler
 		Button cancelButton = (Button)this.findViewById(R.id.cancel);	
@@ -209,5 +196,74 @@ public class AddSite extends Activity{
 	                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);  
 	        startActivity(gpsOptionsIntent);  
 	}  
-
+	
+	private class GpsListener implements LocationListener {
+		
+		@Override
+		public void onLocationChanged(Location loc) {
+			
+			Log.i("K", "LOCATION CHANGED@@@ ");
+			// TODO Auto-generated method stub
+			if(loc != null) {
+				Log.i("K", "LOCATION CHANGED!! ");
+				// get current location value
+				lat = loc.getLatitude();
+				lon = loc.getLongitude();
+				String strLoc = String.format("%10.6f / %10.6f", lat, lon);
+				
+				Geocoder gc = new Geocoder(AddSite.this, Locale.getDefault());
+				try {
+					List<Address> addr = gc.getFromLocation(lat, lon, 1);
+					StringBuilder sb = new StringBuilder();
+					
+					if(addr.size() > 0) {
+						Address address = addr.get(0);
+						
+						sb.append(address.getLocality()).append(", ").append(address.getAdminArea()).append("\n");
+						sb.append(address.getCountryName()).append(", ").append(address.getPostalCode());
+						
+						longitude.setText(sb.toString());
+						
+						// when get the data, stop GPS
+						lmanager.removeUpdates(gpsListener);
+						Toast.makeText(AddSite.this, "Get your location. \nTurning GPS off", Toast.LENGTH_SHORT).show();
+					}
+					else {
+						longitude.setText("Still getting location...");
+					}
+		
+				}
+				catch(IOException e) {
+					
+				}
+				
+				latitude.setText("" + strLoc);
+			}
+		}
+		@Override
+		public void onProviderDisabled(String arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void onProviderEnabled(String arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+			// TODO Auto-generated method stub
+			
+		}	
+	}
+	
+    // or when user press back button
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			finish();
+			lmanager.removeUpdates(gpsListener);
+			return true;
+		}
+		return false;
+	}
 }

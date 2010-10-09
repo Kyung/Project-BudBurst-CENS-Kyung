@@ -88,7 +88,7 @@
 		android:layout_height="wrap_content" 
 		android:gravity="center"
 		android:orientation="vertical"
-		android:background="@drawable/shapedrawable_thick"
+		android:background="@drawable/box_drawable_green"
 		>
 
 		<TextView
@@ -177,10 +177,10 @@
 			android:paddingRight="7dip"
 			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
 			android:lines="5"
-			android:text="Leave a note for this phenophase."
 			android:gravity="top" 
 			android:textSize="16dip"
 			android:textStyle="italic"
+			android:textColor="@color/black"
 		/>
 		
 		</LinearLayout>

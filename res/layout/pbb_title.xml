@@ -9,9 +9,9 @@
  	 android:id="@+id/my_title"
   	 android:layout_width="fill_parent"
   	 android:layout_height="fill_parent"
-  	 android:background="#299a84"
+  	 android:background="@color/pbb_title_background"
   	 android:textSize="15px"
   	 android:textStyle="bold"
-  	 android:textColor="#e2fbe8"
+  	 android:textColor="@color/pbb_text_color"
 />
 </RelativeLayout>

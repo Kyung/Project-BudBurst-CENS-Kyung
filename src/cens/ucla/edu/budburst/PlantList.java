@@ -328,7 +328,7 @@ public class PlantList extends ListActivity {
 				return true;
 			case MENU_LOGOUT:
 				new AlertDialog.Builder(PlantList.this)
-					.setTitle("Question")
+					.setTitle("Log out")
 					.setIcon(R.drawable.pbbicon_small)
 					.setMessage("You might lose your unsynced data if you log out. Do you want to log out?")
 					.setPositiveButton("Yes",mClick)
