@@ -12,6 +12,8 @@ import com.google.android.maps.OverlayItem;
 
 import cens.ucla.edu.budburst.R;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,9 +22,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MyPhotoDetail extends MapActivity {
@@ -30,12 +35,24 @@ public class MyPhotoDetail extends MapActivity {
 	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
 	private HelloItemizedOverlay itemizedOverlay = null;
 	private List<Overlay> mapOverlays = null;
-	private ImageButton phone_image = null;
+	private ImageView phone_image = null;
+	private String photo_name = null;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.myphotodetail);
+
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.myphotodetail);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Species in the queue");
 	    
 	    // get intent data from previous activity
 	    Intent intent = getIntent();
@@ -46,10 +63,10 @@ public class MyPhotoDetail extends MapActivity {
 	    int image_id = intent.getExtras().getInt("image_id");
 	    String dt_taken = intent.getExtras().getString("dt_taken");
 	    String notes = intent.getExtras().getString("notes");
-	    String photo_name = intent.getExtras().getString("photo_name");
+	    photo_name = intent.getExtras().getString("photo_name");
 	    
 	    // setting up layout
-	    ImageView phone_image = (ImageView) findViewById(R.id.phone_image);
+	    phone_image = (ImageView) findViewById(R.id.phone_image);
 	    ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
 	    TextView cnameTxt = (TextView) findViewById(R.id.common_name);
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);
@@ -97,6 +114,48 @@ public class MyPhotoDetail extends MapActivity {
 	   	    phone_image.setVisibility(View.VISIBLE);
 	   	    phone_image.setEnabled(false);
 	   	}
+	    
+	    phone_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+				// TODO Auto-generated method stub
+				final LinearLayout linear = (LinearLayout) View.inflate(MyPhotoDetail.this, R.layout.image_popup, null);
+				
+				// TODO Auto-generated method stub
+				AlertDialog.Builder dialog = new AlertDialog.Builder(MyPhotoDetail.this);
+				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
+				
+			    String imagePath = TEMP_PATH + photo_name + ".jpg";
+
+			    File file = new File(imagePath);
+			    Bitmap bitmap = null;
+			    
+			    // if file exists show the photo on the ImageButton
+			    if(file.exists()) {
+			    	imagePath = TEMP_PATH + photo_name + ".jpg";
+				   	bitmap = BitmapFactory.decodeFile(imagePath);
+				   	image_view.setImageBitmap(bitmap);
+			    }
+			    // if not, show 'no image' ImageButton
+			    else {
+			    	image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			    }
+			    
+			    // when press 'Back', close the dialog
+				dialog.setPositiveButton("Back", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub	
+					}
+				});
+		        dialog.setView(linear);
+		        dialog.show();
+			}
+		});
 	    
 	    if(image_id == 0) {
 	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));

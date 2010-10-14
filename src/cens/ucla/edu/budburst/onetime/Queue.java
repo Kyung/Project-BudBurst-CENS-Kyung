@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -63,7 +64,19 @@ public class Queue extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.observation);
+
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.observation);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  What's Invasive");
+	    
 	    
 		//Get all plant list
 		//Open plant list db from static db

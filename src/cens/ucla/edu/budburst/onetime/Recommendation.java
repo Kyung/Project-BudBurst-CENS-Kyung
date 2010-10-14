@@ -3,6 +3,7 @@ package cens.ucla.edu.budburst.onetime;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class Recommendation extends Activity {
@@ -15,16 +16,19 @@ public class Recommendation extends Activity {
 	    Intent intent = getIntent();
 	    String selectedItem = intent.getExtras().getString("SelectedList");
 	    
+	    Log.i("K", selectedItem);
+	    
+	    
 	    if(selectedItem.equals("What's Blooming")) {
 	    	finish();
 	    	Toast.makeText(Recommendation.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
 	    	//Intent ints = new Intent(Recommendation.this, )
 	    }
 	    else if(selectedItem.equals("What's Invasive")) {
-	    	//Intent ints = new Intent(Recommendation.this, Whatsinvasive.class);
+	    	Intent ints = new Intent(Recommendation.this, Whatsinvasive.class);
 	    	finish();
-	    	Toast.makeText(Recommendation.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
-	    	//startActivity(ints);
+	    	//Toast.makeText(Recommendation.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+	    	startActivity(ints);
 	    }
 	    else if(selectedItem.equals("What's Native")) {
 	    	finish();

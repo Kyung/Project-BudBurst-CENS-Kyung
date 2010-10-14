@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -34,7 +36,19 @@ public class WIinfo extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.wiinfo);
+	    
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.wiinfo);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Species Info");
+	    
 	    
 	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
 	    
@@ -104,9 +118,9 @@ public class WIinfo extends Activity {
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-	        Intent intent = getIntent();
-	        intent.putExtra("selected_park", area_id);
-	        setResult(RESULT_OK, intent);
+	        //Intent intent = getIntent();
+	        //intent.putExtra("selected_park", area_id);
+	        //setResult(RESULT_OK, intent);
 	        finish();
 	        return true;
 	    }

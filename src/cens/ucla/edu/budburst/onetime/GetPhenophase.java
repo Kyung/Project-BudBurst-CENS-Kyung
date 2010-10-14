@@ -13,6 +13,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -172,4 +174,25 @@ public class GetPhenophase extends ListActivity {
 			return convertView;
 		}
 	}
+	
+	public boolean onCreateOptionsMenu(Menu menu){
+		super.onCreateOptionsMenu(menu);
+
+		menu.add(0, 1, 0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
+			
+		return true;
+	}
+	
+	//Menu option selection handling
+	public boolean onOptionsItemSelected(MenuItem item){
+		Intent intent;
+		switch(item.getItemId()){
+			case 1:
+				intent = new Intent(GetPhenophase.this, Queue.class);
+				startActivity(intent);
+				return true;
+		}
+		return false;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
 }

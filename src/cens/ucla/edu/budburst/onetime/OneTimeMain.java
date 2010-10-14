@@ -183,10 +183,10 @@ public class OneTimeMain extends ListActivity {
 			
 			switch(position) {
 			case 1:
-				intent.putExtra("SelectedList", "What's Blooming");
+				intent.putExtra("SelectedList", "What's Invasive");
 				break;
 			case 2:
-				intent.putExtra("SelectedList", "What's Invasive");
+				intent.putExtra("SelectedList", "What's Blooming");
 				break;
 			case 3:
 				intent.putExtra("SelectedList", "What's Native");

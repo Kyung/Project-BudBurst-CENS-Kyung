@@ -51,7 +51,7 @@ public class SummarySpecies extends MapActivity {
 	private String photo_name = null;
 	private HelloItemizedOverlay itemizedOverlay = null;
 	private List<Overlay> mapOverlays = null;
-	private ImageButton phone_image = null;
+	private ImageView phone_image = null;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,7 +105,7 @@ public class SummarySpecies extends MapActivity {
 		// end the mapView
 		
 	    // setting up layout
-	    phone_image = (ImageButton) findViewById(R.id.phone_image);
+	    phone_image = (ImageView) findViewById(R.id.phone_image);
 	    ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
 	    TextView cnameTxt = (TextView) findViewById(R.id.common_name);
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);

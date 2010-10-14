@@ -28,8 +28,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,8 +45,20 @@ public class AreaList extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.arealist);
-	
+	  
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.arealist);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Select the area");
+	    
+	    
 	    getData();
 
 	    // TODO Auto-generated method stub
@@ -75,7 +90,7 @@ public class AreaList extends ListActivity {
 			}
 		}
 
-		String url = new String("http://sm.whatsinvasive.com/phone/getareas.php?lat=" + latitude + "&lon=" + longitude + "&r=7");
+		String url = new String("http://sm.whatsinvasive.com/phone/getareas.php?lat=" + latitude + "&lon=" + longitude + "&r=10");
 		Log.i("K", "url : " + url);
 
 		new DoAsyncTask().execute(url);
@@ -227,5 +242,26 @@ public class AreaList extends ListActivity {
 			dialog.dismiss();
 		}
 	}
+	
+	public boolean onCreateOptionsMenu(Menu menu){
+		super.onCreateOptionsMenu(menu);
+
+		menu.add(0, 1, 0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
+			
+		return true;
+	}
+	
+	//Menu option selection handling
+	public boolean onOptionsItemSelected(MenuItem item){
+		Intent intent;
+		switch(item.getItemId()){
+			case 1:
+				intent = new Intent(AreaList.this, Queue.class);
+				startActivity(intent);
+				return true;
+		}
+		return false;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
 
 }

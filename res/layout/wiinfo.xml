@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ViewFlipper
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_margin="6dip"
 	android:id="@+id/layoutswitcher"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
@@ -29,7 +28,7 @@
 			android:scaleType="fitCenter"
 			android:paddingLeft="5dip"
 			android:paddingRight="5dip"
-			android:layout_width="300px" 
+			android:layout_width="fill_parent" 
 			android:layout_height="300px" 
 			android:id="@+id/species_image" 
 			android:adjustViewBounds="true"

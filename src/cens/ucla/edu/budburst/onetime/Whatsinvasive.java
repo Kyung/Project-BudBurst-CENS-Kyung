@@ -1,8 +1,10 @@
 package cens.ucla.edu.budburst.onetime;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,11 +36,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -46,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -53,6 +59,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.Login;
+import cens.ucla.edu.budburst.PlantInformation;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
@@ -62,15 +69,16 @@ import cens.ucla.edu.budburst.onetime.Queue.MyListAdapter;
 import cens.ucla.edu.budburst.onetime.Queue.myItem;
 
 public class Whatsinvasive extends ListActivity {
-	
 	private SharedPreferences pref;
 	private ArrayList<species> arSpeciesList;
 	private MyListAdapter mylistapdater;
 	private OneTimeDBHelper otDBH;
 	private String area_id;
 	private String area_name;
-	private Button areaBtn = null;
-	private TextView areaTxt = null;
+	private String cname;
+	private String sname;
+	private String image_path;
+	private int c_position = 0;
 	private TextView areaTxt2 = null;
 	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
 	protected static int GET_AREA_LIST = 1;
@@ -80,12 +88,22 @@ public class Whatsinvasive extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.whatsinvasive);
+
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.whatsinvasive);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Select the species");
+		
 	    arSpeciesList = new ArrayList<species>();
-	    
 	    otDBH = new OneTimeDBHelper(Whatsinvasive.this);
 	    
-	    areaTxt = (TextView) findViewById(R.id.area_name);
 	    areaTxt2 = (TextView) findViewById(R.id.title2);
 	   
 	    Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
@@ -115,9 +133,7 @@ public class Whatsinvasive extends ListActivity {
 					Whatsinvasive.this.finish();
 				}
 			
-				areaTxt.setText("Area : " + area_name);
-				areaTxt2.setText("Please select the species");
-				//areaBtn.setText("Change Area!");
+				areaTxt2.setText(area_name);
 				
 				SQLiteDatabase db;
 				db = otDBH.getWritableDatabase();
@@ -174,7 +190,7 @@ public class Whatsinvasive extends ListActivity {
 			arSpeciesList.add(pi);
 		}
 		
-		mylistapdater = new MyListAdapter(Whatsinvasive.this, R.layout.plantlist_item ,arSpeciesList);
+		mylistapdater = new MyListAdapter(Whatsinvasive.this, R.layout.plantlist_item2 ,arSpeciesList);
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
 		
@@ -232,17 +248,22 @@ public class Whatsinvasive extends ListActivity {
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
 
 			String imagePath = TEMP_PATH + arSrc.get(position).image_url + ".jpg";
-			Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-			
+			//Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+	
 			try{
-				FileOutputStream out = new FileOutputStream(imagePath);
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
+				//FileOutputStream out = new FileOutputStream(imagePath);
+				//bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
 			}catch(Exception e){
 				Log.e("K", e.toString());
 			}
-		
+			image_path = imagePath;
+			
+			cname = arSrc.get(position).common_name;
+			sname = arSrc.get(position).science_name;
+			
 			img.setBackgroundResource(R.drawable.shapedrawable);
-			img.setImageBitmap(bitmap);
+			//img.setImageBitmap(bitmap);
+			img.setImageBitmap(resizeImage(imagePath));
 			
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
 			textname.setText(arSrc.get(position).common_name);
@@ -254,20 +275,67 @@ public class Whatsinvasive extends ListActivity {
 		}
 	}
 	
+	private Bitmap resizeImage(String path){
+    	BufferedInputStream buf = null;
+		
+		try {
+			FileInputStream fin = new FileInputStream(path);
+			buf = new BufferedInputStream(fin);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Bitmap bitmap = BitmapFactory.decodeStream(buf);
+		
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		int newWidth = 60;
+		int newHeight = 60;
+		
+		//Bitmap thumb = BitmapFactory.decodeFile(path, options);
+		
+		float scaleWidth = ((float) newWidth) / width;
+		float scaleHeight = ((float) newHeight) / height;
+		
+		Log.i("K", "SCALE WIDTH : " + scaleWidth);
+		Log.i("K", "SCALE HEIGHT : " + scaleHeight);
+		
+		Matrix matrix = new Matrix();
+		matrix.postScale(scaleWidth, scaleHeight);
+		
+		Bitmap resized = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 	
+    	return resized;
+    }
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
+		
+		String imagePath = TEMP_PATH + arSpeciesList.get(position).image_url + ".jpg";
+		
+		Intent intent = new Intent(Whatsinvasive.this, WI_observation.class);
+		intent.putExtra("sname", arSpeciesList.get(position).science_name);
+		intent.putExtra("cname", arSpeciesList.get(position).common_name);
+		intent.putExtra("image_path", imagePath);
+		intent.putExtra("title", arSpeciesList.get(position).title);
+		intent.putExtra("area_id", area_id);
+		startActivity(intent);
+		
+		/*
 		Intent intent = new Intent(Whatsinvasive.this, WIinfo.class);
 		intent.putExtra("title", arSpeciesList.get(position).title);
 		intent.putExtra("area_id", area_id);
 		startActivityForResult(intent, TO_WI_INFO);
+		*/
 	}
 
 	class DoAsyncTask extends AsyncTask<String, Integer, Void> {
 		ProgressDialog dialog;
 		
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(Whatsinvasive.this, "Loading...", "Getting Species...", true);
+			dialog = ProgressDialog.show(Whatsinvasive.this, "Loading...", "Getting species from the server...", true);
 		}
 		@Override
 		protected Void doInBackground(String... area_id) {
@@ -310,7 +378,7 @@ public class Whatsinvasive extends ListActivity {
 							String randomNum = new Integer(prng.nextInt()).toString();
 							MessageDigest sha = MessageDigest.getInstance("SHA-1");
 							byte[] result = sha.digest(randomNum.getBytes());
-							image_name = hexEncode(result);
+							image_name = area_id[0] + "_" + hexEncode(result);
 						} catch (NoSuchAlgorithmException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -350,7 +418,7 @@ public class Whatsinvasive extends ListActivity {
 		}
 		
 		protected void onPostExecute(Void unused) {
-			mylistapdater = new MyListAdapter(Whatsinvasive.this, R.layout.plantlist_item ,arSpeciesList);
+			mylistapdater = new MyListAdapter(Whatsinvasive.this, R.layout.plantlist_item2 ,arSpeciesList);
 			ListView MyList = getListView();
 			MyList.setAdapter(mylistapdater);
 			
@@ -370,6 +438,11 @@ public class Whatsinvasive extends ListActivity {
 			Log.i("K", "IMAGE URL : " + imageURL);
 			HttpURLConnection conn = (HttpURLConnection)imageURL.openConnection();
 			conn.connect();
+			
+			File f = new File(TEMP_PATH);
+			if(!f.exists()) {
+				f.mkdir();
+			}
 			
 			int len = conn.getContentLength();
 			byte[] buffer = new byte[len];
@@ -391,23 +464,69 @@ public class Whatsinvasive extends ListActivity {
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
-		
-		menu.add(0, 1, 0,"Change Area").setIcon(android.R.drawable.ic_menu_sort_by_size);
-			
+		menu.add(0, 2, 0, "Update Species List").setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0, 3, 0, "Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);		
 		return true;
 	}
 	
 	//Menu option selection handling
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			case 1:
-				Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
-				startActivityForResult(intent, 1);
+			case 2:
+				deleteContents("/sdcard/pbudburst/tmp/");
+				new DoAsyncTask().execute(area_id);
+				return true;
+			case 3:
+				Intent intent = new Intent(Whatsinvasive.this, Queue.class);
+				startActivity(intent);
 				return true;
 		}
 		return false;
 	}
 	/////////////////////////////////////////////////////////////////////////////////
+	
+	void deleteContents(String path) {
+		File file = new File(path);
+		if(file.isDirectory()) {
+			String[] fileList = file.list();
+			
+			arSpeciesList = new ArrayList<species>();
+			
+			for(int i = 0 ; i < fileList.length ; i++) {
+				//File newFile = new File(fileList[i]);
+				String delete_file_name = fileList[i];
+				//Downloaded names of plantlists are starting with area_id
+				//to prevent the duplication, we delete the species images on the park
+				String[] split_delete_file_name = delete_file_name.split("_");
+				Log.i("K", "SPLIT : " + split_delete_file_name[0]);
+				Log.i("K", "AREA ID: " + area_id);
+				SQLiteDatabase db;
+				db = otDBH.getWritableDatabase();
+				if(split_delete_file_name[0].equals(area_id)) {
+					Log.i("K", "FILE_NAME : " + delete_file_name);
+					delete_file_name = delete_file_name.replace(".jpg", "");
+					Log.i("K", "IMAGE_NAME_IN_TABLE " + delete_file_name);
+					//delete speciesList						
+					db.execSQL("DELETE FROM speciesLists WHERE image_url='" + delete_file_name + "';");
+					Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + delete_file_name + " IS DELETED FROM THE TABLE.");
+					
+					new File("/sdcard/pbudburst/tmp/" + fileList[i]).delete();
+					Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + fileList[i] + " IS DELETED.");
+				}
+				db.close();
+			}
+		}
+	}
+	
+    // or when user press back button
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == event.KEYCODE_BACK) {
+			Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
+			startActivityForResult(intent, 1);
+			return true;
+		}
+		return false;
+	}
 
 	static private String hexEncode( byte[] aInput){
 		   StringBuilder result = new StringBuilder();
