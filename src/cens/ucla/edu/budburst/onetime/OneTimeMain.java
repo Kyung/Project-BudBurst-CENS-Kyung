@@ -236,6 +236,7 @@ public class OneTimeMain extends ListActivity {
 						edit.putString("Username","");
 						edit.putString("Password","");
 						edit.putString("synced", "false");
+						edit.putBoolean("Update", false);
 						edit.commit();
 						
 						//Drop user table in database
@@ -261,6 +262,7 @@ public class OneTimeMain extends ListActivity {
 						
 					}
 				})
+				.setIcon(R.drawable.pbbicon_small)
 				.show();
 				return true;
 		}

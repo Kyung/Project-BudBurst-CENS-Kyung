@@ -78,11 +78,11 @@ public class Whatsinvasive extends ListActivity {
 	private String cname;
 	private String sname;
 	private String image_path;
-	private int c_position = 0;
 	private TextView areaTxt2 = null;
 	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
 	protected static int GET_AREA_LIST = 1;
 	protected static int TO_WI_INFO = 2;
+	private ProgressDialog dialog = null;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -106,66 +106,55 @@ public class Whatsinvasive extends ListActivity {
 	    
 	    areaTxt2 = (TextView) findViewById(R.id.title2);
 	   
-	    Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
-		startActivityForResult(intent, GET_AREA_LIST);
+	    //Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
+		//startActivityForResult(intent, GET_AREA_LIST);
 	    // TODO Auto-generated method stub
 	}
 	
 	public void onResume() {
 		super.onResume();
-	}
-	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
 		
-		if(resultCode == RESULT_OK) {
-			if(requestCode == GET_AREA_LIST) {
-				area_id = data.getStringExtra("selected_park");
-				area_name = data.getStringExtra("park_name");
-				boolean clicked = data.getBooleanExtra("clicked_me", false);
-				
-				if(!clicked) {
-					area_id = "9";
-				}
-				
-				boolean back = data.getBooleanExtra("back", false);
-				if(back) {
-					Whatsinvasive.this.finish();
-				}
-			
-				areaTxt2.setText(area_name);
-				
-				SQLiteDatabase db;
-				db = otDBH.getWritableDatabase();
-				
-				Cursor cursor;
-				cursor = db.rawQuery("SELECT * FROM speciesLists WHERE id=" + area_id +";", null);
-				int count = cursor.getCount();
-				
-				Log.i("K", "AREA : " + area_id);
-				Log.i("K", "count : " + cursor.getCount());
-				cursor.close();
-				db.close();
-				otDBH.close();
-				
-				if(count == 0) {
-					arSpeciesList = null;
-					arSpeciesList = new ArrayList<species>();
-					//if(area_id)
-					new DoAsyncTask().execute(area_id);
-				}
-				else {
-					showExistedSpecies(data);
-				}
-			}
-			else if(requestCode == TO_WI_INFO) {
-				
-				pref = getSharedPreferences("Onetime", MODE_WORLD_READABLE);
-				showExistedSpecies(data);
-			}
+		Intent intent = getIntent();
+		
+		area_id = intent.getExtras().getString("selected_park");
+		area_name = intent.getExtras().getString("park_name");
+		boolean clicked = intent.getExtras().getBoolean("clicked_me", false);
+		
+		if(!clicked) {
+			area_id = "9";
+		}
+		
+		boolean back = intent.getExtras().getBoolean("back", false);
+		if(back) {
+			Whatsinvasive.this.finish();
+		}
+	
+		areaTxt2.setText(area_name);
+		
+		SQLiteDatabase db;
+		db = otDBH.getWritableDatabase();
+		
+		Cursor cursor;
+		cursor = db.rawQuery("SELECT * FROM speciesLists WHERE id=" + area_id +";", null);
+		int count = cursor.getCount();
+		
+		Log.i("K", "AREA : " + area_id);
+		Log.i("K", "count : " + cursor.getCount());
+		cursor.close();
+		db.close();
+		otDBH.close();
+		
+		if(count == 0) {
+			arSpeciesList = null;
+			arSpeciesList = new ArrayList<species>();
+			//if(area_id)
+			new DoAsyncTask().execute(area_id);
+		}
+		else {
+			showExistedSpecies(intent);
 		}
 	}
-	
+
 	public void showExistedSpecies(Intent data) {
 		arSpeciesList = null;
 		arSpeciesList = new ArrayList<species>();
@@ -263,6 +252,7 @@ public class Whatsinvasive extends ListActivity {
 			
 			img.setBackgroundResource(R.drawable.shapedrawable);
 			//img.setImageBitmap(bitmap);
+			Log.i("K", "IMAGE PATH : " + imagePath);
 			img.setImageBitmap(resizeImage(imagePath));
 			
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
@@ -276,10 +266,16 @@ public class Whatsinvasive extends ListActivity {
 	}
 	
 	private Bitmap resizeImage(String path){
-    	BufferedInputStream buf = null;
+		FileInputStream fin = null;
+		BufferedInputStream buf = null;
 		
+    	Log.i("K", "PATH : " + path);
+    	
 		try {
-			FileInputStream fin = new FileInputStream(path);
+			fin = new FileInputStream(path);
+			Log.i("K", "FILE INPUT : " + fin);
+			
+			
 			buf = new BufferedInputStream(fin);
 			
 		} catch (FileNotFoundException e) {
@@ -288,6 +284,8 @@ public class Whatsinvasive extends ListActivity {
 		}
 		
 		Bitmap bitmap = BitmapFactory.decodeStream(buf);
+		
+		Log.i("K", "" + bitmap);
 		
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
@@ -332,7 +330,6 @@ public class Whatsinvasive extends ListActivity {
 	}
 
 	class DoAsyncTask extends AsyncTask<String, Integer, Void> {
-		ProgressDialog dialog;
 		
 		protected void onPreExecute() {
 			dialog = ProgressDialog.show(Whatsinvasive.this, "Loading...", "Getting species from the server...", true);
@@ -422,9 +419,7 @@ public class Whatsinvasive extends ListActivity {
 			ListView MyList = getListView();
 			MyList.setAdapter(mylistapdater);
 			
-			if(dialog.isShowing()) {
-				dialog.dismiss();
-			}
+			dialog.dismiss();
 		}
 	}
 	
@@ -518,16 +513,6 @@ public class Whatsinvasive extends ListActivity {
 		}
 	}
 	
-    // or when user press back button
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == event.KEYCODE_BACK) {
-			Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
-			startActivityForResult(intent, 1);
-			return true;
-		}
-		return false;
-	}
-
 	static private String hexEncode( byte[] aInput){
 		   StringBuilder result = new StringBuilder();
 		   char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};

@@ -20,12 +20,14 @@ public class Recommendation extends Activity {
 	    
 	    
 	    if(selectedItem.equals("What's Blooming")) {
+	    	Intent ints = new Intent(Recommendation.this, Whatsblooming.class);
 	    	finish();
-	    	Toast.makeText(Recommendation.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+	    	startActivity(ints);
+	    	//Toast.makeText(Recommendation.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
 	    	//Intent ints = new Intent(Recommendation.this, )
 	    }
 	    else if(selectedItem.equals("What's Invasive")) {
-	    	Intent ints = new Intent(Recommendation.this, Whatsinvasive.class);
+	    	Intent ints = new Intent(Recommendation.this, AreaList.class);
 	    	finish();
 	    	//Toast.makeText(Recommendation.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
 	    	startActivity(ints);

@@ -135,7 +135,7 @@ public class Whatspopulars extends MapActivity {
 	    startSignalLevelListener();
 	    
 		geo = (TextView) findViewById(R.id.geodata);
-		signal = (TextView) findViewById(R.id.signal);
+		signal = (TextView) findViewById(R.id.distance);
 	    
 		gpsListener = new GpsListener();
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -401,7 +401,7 @@ public class Whatspopulars extends MapActivity {
 		
 		    List<Overlay> mapOverlays = myMap.getOverlays();
 			Drawable marker = getResources().getDrawable(R.drawable.marker);
-			HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(marker, Whatspopulars.this);
+			HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(marker, Whatspopulars.this, myMap);
 			
 			Cursor cursor = db.rawQuery(query, null);
 			

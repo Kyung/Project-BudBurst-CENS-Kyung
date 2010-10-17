@@ -101,7 +101,7 @@ public class GetPhenophase_PBB extends ListActivity {
 		String query = null;
 		query = "SELECT Phenophase_Icon, description, Phenophase_ID, Phenophase_Name, Protocol_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_ids + " ORDER BY Chrono_Order ASC";
 		
-		Log.i("K", query);
+		//Log.i("K", query);
 		
 	    Cursor cursor = sDB.rawQuery(query, null);
 		
@@ -123,8 +123,8 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	if(cursor2.getCount() > 0) {
 	    		Log.i("K", "IN THE TABLE!!!");
 	    		phenophase.add(cursor.getInt(0));
-	    		protocol_id.add(cursor.getInt(2));
 	    		description.add(cursor.getString(1));
+	    		protocol_id.add(cursor.getInt(2));
 	    		pheno_name.add(cursor.getString(3));
 	    		species_id.add(cursor2.getInt(0));
 	    		site_id.add(cursor2.getInt(1));
@@ -135,8 +135,8 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	}
 	    	else {
 		    	phenophase.add(cursor.getInt(0));
-		    	protocol_id.add(cursor.getInt(2));
 		    	description.add(cursor.getString(1));
+		    	protocol_id.add(cursor.getInt(2));
 		    	pheno_name.add(cursor.getString(3));
 		    	species_id.add(0);
 	    		site_id.add(0);
@@ -147,6 +147,8 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	}
 	    	cursor2.close();
 	    }
+	    
+	    Log.i("K", "SIZE : " + phenophase.size());
 	     
 	    for(int i = 0 ; i < phenophase.size() ; i++) {
 
@@ -262,25 +264,20 @@ public class GetPhenophase_PBB extends ListActivity {
 			if(convertView == null)
 				convertView = Inflater.inflate(layout, parent, false);
 			
-			
-			InputStream asst = null;
-			try{
-				 asst = GetPhenophase_PBB.this.getAssets().open("phenophase_images/p" + arSrc.get(position).Pheno_id + ".png");
-
-			}catch(Exception e){
-				Log.e("K", e.toString());
-			}
-			
 			String yes_or_no = "";
 			
-			Bitmap icon = overlay(BitmapFactory.decodeStream(asst));
+			Log.i("K","ID : " + getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).Pheno_id, null, null));
+			Log.i("K",arSrc.get(position).Pheno_Name + " , " + arSrc.get(position).Pheno_id);
+			
+			int resId = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).Pheno_id, null, null);
+		
+			Bitmap icon = overlay(BitmapFactory.decodeResource(getResources(), resId));
 			if(arSrc.get(position).Flag == true) {
 				
-				Log.i("K", "IMAGE_ID : " + arSrc.get(position).Image_id);
+				//Log.i("K", "IMAGE_ID : " + arSrc.get(position).Image_id);
 				
 				File file_size = new File(CALL_IMAGE_PATH + arSrc.get(position).Image_id + ".jpg");
 				
-			    
 			    // if there's a photo in the table show that with replace_photo_button
 			    if(file_size.length() != 0) {
 			    	icon = overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.check_mark));
@@ -298,7 +295,6 @@ public class GetPhenophase_PBB extends ListActivity {
 			}
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.pheno_img);
-		
 			img.setImageBitmap(icon);
 			
 			TextView yesorno_photo = (TextView)convertView.findViewById(R.id.yesorno_photo);
@@ -314,10 +310,12 @@ public class GetPhenophase_PBB extends ListActivity {
 	}
 	
 	private Bitmap overlay(Bitmap... bitmaps) {
-		if (bitmaps.length == 0)
+		Log.i("K", " " + bitmaps);
+		
+		if (bitmaps[0].equals(null))
 			return null;
 
-		Bitmap bmOverlay = Bitmap.createBitmap(bitmaps[0].getWidth(), bitmaps[0].getHeight(), bitmaps[0].getConfig());
+		Bitmap bmOverlay = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_4444);
 
 		Canvas canvas = new Canvas(bmOverlay);
 		for (int i = 0; i < bitmaps.length; i++)

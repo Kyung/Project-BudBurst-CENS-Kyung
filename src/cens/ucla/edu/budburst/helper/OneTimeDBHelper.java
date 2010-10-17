@@ -43,6 +43,17 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"dt_taken TEXT, " +
 				"c_count TEXT, " +
 				"comments TEXT );");
+		
+		db.execSQL("CREATE TABLE flickrLists (" +
+				"id NUMERIC, " +
+				"secret TEXT, " +
+				"farm TEXT, " +
+				"title TEXT, " + 
+				"dt_taken TEXT, " +
+				"lat TEXT, " + 
+				"lon TEXT, " + 
+				"owner TEXT, " +
+				"server TEXT );");
 	}
 
 	@Override
@@ -58,6 +69,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		db.execSQL("DELETE FROM onetimeob;");
 		db.execSQL("DELETE FROM speciesLists;");
 		db.execSQL("DELETE FROM popularLists;");
+		db.execSQL("DELETE FROM flickrLists;");
 		
 	 	dbhelper.close();
  	}
@@ -67,6 +79,15 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
 		db.execSQL("DELETE FROM popularLists;");
+		
+	 	dbhelper.close();
+	}
+	
+	public void clearFlickr(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		
+		db.execSQL("DELETE FROM flickrLists;");
 		
 	 	dbhelper.close();
 	}

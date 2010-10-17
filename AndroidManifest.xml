@@ -41,7 +41,7 @@
 <activity android:label="Helloscr" android:name=".Helloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantList" android:label="PlantList" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddSite" android:theme="@android:style/Theme.Light" android:label="AddSite" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 
@@ -55,6 +55,7 @@
 
 <activity android:name=".onetime.Whatsinvasive" android:theme="@android:style/Theme.Light"></activity>
 <activity android:name=".onetime.Whatspopular" android:theme="@android:style/Theme.Light"></activity>
+<activity android:name=".onetime.Whatsblooming" android:theme="@android:style/Theme.Light" android:process=":Whatsblooming"></activity>
 <activity android:name=".onetime.AreaList" android:theme="@android:style/Theme.Light"></activity>
 
 <activity android:name=".onetime.WIinfo" android:theme="@android:style/Theme.Light"></activity>
@@ -73,8 +74,12 @@
 <activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.Flora_Observer" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.WI_observation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="DeletePlant"></activity>
+<activity android:name="DeleteSite"></activity>
+
 </application>
     <uses-sdk android:minSdkVersion="3" />
+
 
 
 </manifest> 

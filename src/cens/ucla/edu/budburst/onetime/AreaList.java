@@ -58,9 +58,7 @@ public class AreaList extends ListActivity {
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText("  Select the area");
 	    
-	    
 	    getData();
-
 	    // TODO Auto-generated method stub
 	}
 	
@@ -156,29 +154,16 @@ public class AreaList extends ListActivity {
 		}
 	}
 	
-    // or when user press back button
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == event.KEYCODE_BACK) {
-			Intent intent = new Intent(this, PlantInformation.class);
-			intent.putExtra("back", true);
-			setResult(RESULT_OK, intent);
-			finish();
-			return true;
-		}
-		return false;
-	}
-	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(this, PlantInformation.class);
-		
-		Log.i("K", " AREA IDIDIDID : " + arAreaList.get(position).id);
-		
+		Intent intent = new Intent(this, Whatsinvasive.class);
+
 		intent.putExtra("selected_park", arAreaList.get(position).id);
 		intent.putExtra("park_name", arAreaList.get(position).title);
 		intent.putExtra("clicked_me", true);
-		setResult(RESULT_OK, intent);
-		finish();
+		//setResult(RESULT_OK, intent);
+		startActivity(intent);
+		//finish();
 	}
 	
 

@@ -37,11 +37,53 @@ public class JSONHelper {
 		return getJSON;
 	}
 	
+	public String getFlickrTags(String string) throws Exception {
+		
+		Log.i("K", "STRING : " + string);
+		JSONObject json = new JSONObject(string);
+		
+		JSONObject menuObject = json.getJSONObject("photos");
+		JSONArray photoInfo = menuObject.getJSONArray("photo");
+		
+		String getJSON = "";
+		
+		for(int i = 0 ; i < photoInfo.length() ; i++) {
+			JSONObject obj = photoInfo.getJSONObject(i);
+			
+			getJSON += obj.getString("id");
+			getJSON += ";;";
+			//getJSON += obj.getString("owner");
+			//getJSON += ";;";
+			getJSON += obj.getString("secret");
+			getJSON += ";;";
+			getJSON += obj.getString("farm");
+			getJSON += ";;";
+			if(obj.getString("title").equals("")) {
+				getJSON += "no title";
+			}
+			else {
+				getJSON += obj.getString("title");
+			}
+			getJSON += ";;";
+			getJSON += obj.getString("datetaken");
+			getJSON += ";;";
+			getJSON += obj.getString("latitude");
+			getJSON += ";;";
+			getJSON += obj.getString("longitude");
+			getJSON += ";;";
+			getJSON += obj.getString("ownername");
+			getJSON += ";;";
+			getJSON += obj.getString("server");
+			getJSON += "\n\n";
+		}
+		
+		Log.i("K", "JSON : " + getJSON);
+		return getJSON;
+	}
+	
 	public String getCommentTags(String string) throws Exception {
 		JSONObject json = new JSONObject(new JSONTokener(string));
 		JSONArray jarray = json.getJSONArray("comment");
-		
-		
 		
 		String getJSON = "";
 		

@@ -94,7 +94,7 @@ public class SummarySpecies extends MapActivity {
 		
 		mapOverlays = myMap.getOverlays();
 		Drawable marker = getResources().getDrawable(R.drawable.marker);
-		itemizedOverlay = new HelloItemizedOverlay(marker, this);
+		itemizedOverlay = new HelloItemizedOverlay(marker, this, myMap);
 		
 		OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found!");
 		itemizedOverlay.addOverlay(overlayitem);

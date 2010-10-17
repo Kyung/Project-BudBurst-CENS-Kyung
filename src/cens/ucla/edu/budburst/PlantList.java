@@ -26,6 +26,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -51,15 +52,16 @@ public class PlantList extends ListActivity {
 	private Button tempBtn;
 	private ArrayList<PlantItem> user_species_list;
 	private int first_site_id = 0;
+	private int pos = 0;
 	private static boolean first_site_flag = true;
 	private Button buttonSharedplant = null;
 	
 	//MENU contants
 	final private int MENU_ADD_PLANT = 1;
 	final private int MENU_ADD_SITE = 2;
-	final private int MENU_LOGOUT = 3;
-	final private int MENU_SYNC = 4;
-	final private int MENU_HELP = 5;
+	final private int MENU_LOGOUT = 5;
+	final private int MENU_SYNC = 6;
+	final private int MENU_HELP = 7;
 	
 	ArrayList<PlantItem> arPlantItem;
 	
@@ -96,7 +98,6 @@ public class PlantList extends ListActivity {
 					edit.commit();
 
 					startActivity(intent);
-				
 				}
 			})
 			.show();
@@ -108,6 +109,27 @@ public class PlantList extends ListActivity {
 
 		//tempBtn.setV
 		MyList = getListView();
+		
+		MyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				// TODO Auto-generated method stub
+				onListItemClick(arg1, arg2, arg3);
+			}
+		});
+		
+		MyList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				return onLongListItemClick(arg1, arg2, arg3);
+			}
+			
+		});
 		
 		//Initiate ArrayList
 		user_species_list = new ArrayList<PlantItem>();
@@ -274,9 +296,9 @@ public class PlantList extends ListActivity {
 		
 	}
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id){
+	protected void onListItemClick(View v, int position, long id){
 		//Intent intent = new Intent(this, PlantInfo.class);
+		
 		Intent intent = new Intent(this, GetPhenophase_PBB.class);
 		intent.putExtra("species_id", arPlantItem.get(position).SpeciesID);
 		intent.putExtra("site_id", arPlantItem.get(position).siteID);
@@ -285,16 +307,56 @@ public class PlantList extends ListActivity {
 		intent.putExtra("sname", arPlantItem.get(position).SpeciesName);
 		startActivity(intent);
 	}
+	
+	protected boolean onLongListItemClick(View v, int position, long id) {
+		pos = position;
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Delete Species")
+		.setMessage("Delete " + arPlantItem.get(position).CommonName + " ? \nIt cannot be undone.")
+		.setIcon(R.drawable.pbbicon_small)
+		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				try{
+					SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
+					SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
+					
+					syncDB.execSQL("DELETE FROM my_plants WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
+									+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
+					syncDBHelper.close();
+					
+					Toast.makeText(PlantList.this, "Item delete.", Toast.LENGTH_SHORT).show();
+					
+					Intent intent = new Intent(PlantList.this, PlantList.class);
+					finish();
+					startActivity(intent);
+				}
+				catch(Exception e){
+					Log.e(TAG,e.toString());
+				}
+			}
+		})
+		.setNegativeButton("No", new DialogInterface.OnClickListener(){
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+			}
+		}).show();
+		
+		return true;
+	}
 		
 	/////////////////////////////////////////////////////////////
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		SubMenu addButton = menu.addSubMenu("Add")
-			.setIcon(android.R.drawable.ic_menu_add);
+		SubMenu addButton = menu.addSubMenu("Manage")
+			.setIcon(android.R.drawable.ic_menu_manage);
 		addButton.add(0,MENU_ADD_SITE,0,"Add Site");
-		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");				
+		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");
 		
 		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0,MENU_LOGOUT,0,"Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
@@ -346,7 +408,6 @@ public class PlantList extends ListActivity {
 			String[] fileList = file.list();
 			
 			for(int i = 0 ; i < fileList.length ; i++) {
-				File newFile = new File(fileList[i]);
 				Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + fileList[i] + " IS DELETED.");
 				new File("/sdcard/pbudburst/tmp/" + fileList[i]).delete();
 			}
@@ -446,18 +507,6 @@ class MyListAdapter extends BaseAdapter{
 			site_header.setVisibility(View.GONE);
 		}
 		
-		/*
-		if(first_site_flag) {
-			
-			first_site_flag = false;
-		}
-		else {
-			if(arSrc.get(position).siteID != first_site_id) {
-				site_header.setText(arSrc.get(position).Site);
-				first_site_id = arSrc.get(position).siteID;
-			}
-		}
-		*/
 		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
 		img.setImageResource(arSrc.get(position).Picture);
 		

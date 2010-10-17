@@ -345,7 +345,7 @@ public class Sync extends Activity{
 				startActivity(intent);
 				finish();
 				
-				//Toast.makeText(Sync.this, "Sync done.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(Sync.this, "Sync done.", Toast.LENGTH_SHORT).show();
 				
 				break;
 			}

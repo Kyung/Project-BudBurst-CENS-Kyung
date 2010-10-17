@@ -1,31 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:orientation="vertical">
-  <TextView
-  	android:layout_width="fill_parent"
-  	android:layout_height="wrap_content"
-  	android:background="@android:color/white"
-  	android:textColor="@android:color/black"
-  	android:id="@+id/geodata"
-  	android:text=" Getting my location...."
-  />
-  <TextView
-  	android:layout_width="fill_parent"
-  	android:layout_height="wrap_content"
-  	android:background="@android:color/white"
-  	android:textColor="@android:color/black"
-  	android:id="@+id/signal"
-  	android:text=" Getting Signal Strength...."
-  /> 
-  	<com.google.android.maps.MapView 
-		android:id="@+id/simpleGM_map"
-		android:layout_below="@+id/geodata"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<com.google.android.maps.MapView android:id="@+id/map"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ"
-		android:clickable="true"
-	/>	
-</LinearLayout>
+		android:apiKey="0s7Km0gbaIiJVJtsfbW3fd7IP0UBLh833HEAtYw"
+		android:clickable="true" />
+</RelativeLayout>
+

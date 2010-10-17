@@ -76,7 +76,7 @@ public class AddSite extends Activity{
 		lmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
 		
 		
-		
+		/*
 		// start GPS
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -85,6 +85,7 @@ public class AddSite extends Activity{
 
 	    if(bestprovider == null)
 	    	bestprovider = "gps";
+	    */
 	}
 
 	public void onResume(){
@@ -157,10 +158,24 @@ public class AddSite extends Activity{
 					syncWDB.execSQL(query);
 					cursor.close();
 
-					Intent intent = new Intent(AddSite.this, PlantList.class);
-					Toast.makeText(AddSite.this, "New Site Added!", Toast.LENGTH_SHORT).show();
-					startActivity(intent);
-					finish();
+					
+					
+					new AlertDialog.Builder(AddSite.this)
+					.setTitle("New Site Added!")
+					.setIcon(R.drawable.pbbicon_small)
+					.setMessage("Please note that the new site will be shown on the list after you add a plant.")
+					.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							Intent intent = new Intent(AddSite.this, PlantList.class);
+							startActivity(intent);
+							finish();
+						}
+					})
+					.show();
+					
 				}catch(Exception e){
 					Log.e(TAG, e.toString());
 				}finally{
@@ -243,12 +258,13 @@ public class AddSite extends Activity{
 		@Override
 		public void onProviderDisabled(String arg0) {
 			// TODO Auto-generated method stub
+			Toast.makeText(AddSite.this, "GPS disabled", Toast.LENGTH_SHORT).show();
 			
 		}
 		@Override
 		public void onProviderEnabled(String arg0) {
 			// TODO Auto-generated method stub
-			
+			Toast.makeText(AddSite.this, "GPS enabled", Toast.LENGTH_SHORT).show();
 		}
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
