@@ -1,5 +1,6 @@
 package cens.ucla.edu.budburst.onetime;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +23,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.ByteArrayBuffer;
 
 import com.google.android.maps.Overlay;
 
@@ -41,9 +43,11 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -56,35 +60,44 @@ import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 
 public class Whatspopular extends ListActivity {
 	
-	private SharedPreferences pref;
 	private ArrayList<species> arSpeciesList;
 	private MyListAdapter mylistapdater;
 	private OneTimeDBHelper otDBH;
-	private String area_id;
-	private String area_name;
-	private Button areaBtn = null;
-	private TextView areaTxt = null;
-	private TextView areaTxt2 = null;
-	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
+
+	public final String WB_PATH = "/sdcard/pbudburst/wb/";
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.whatspopular);
+
+		  // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.whatspopular);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText("  Species lists");
+	    
 	    arSpeciesList = new ArrayList<species>();
 	    
-		pref = getSharedPreferences("userinfo",0);
-		String username = pref.getString("Username","");
-		String password = pref.getString("Password","");
-	    
-	    
-	    new DoAsyncTask().execute();
 	    // TODO Auto-generated method stub
+		
+		// if there is no folder, create it
+		File file = new File(WB_PATH);
+		if(!file.exists()) {
+			file.mkdir();
+		}
 	}
-	
+
 	public void onResume() {
 		super.onResume();
+		
+		new DoAsyncTask().execute();
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -97,30 +110,31 @@ public class Whatspopular extends ListActivity {
 		}
 	}
 	
-	
+	//query = "SELECT id, secret, farm, title, dt_taken, lat, lon, owner, server FROM flickrLists";
 	class species{	
-		species(String aPheno, String aCommon_name, String aScience_name, String aLatitude, String aLongitude, String aDt_taken, int aCount, String aComment) {
-			pheno = aPheno;
-			common_name = aCommon_name;
-			science_name = aScience_name;
-			latitude = aLatitude;
-			longitude = aLongitude;
-			dt_taken = aDt_taken;
-			comment_count = aCount;
-			comment = aComment;
-			//image_url = aImage_url;
+		species(int _id, String _secret, String _farm, String _title, String _dt_taken, String _lat, String _lon, String _owner, String _server, double _distance) {
+			id = _id;
+			secret = _secret;
+			farm = _farm;
+			title = _title;
+			dt_taken = _dt_taken;
+			lat = _lat;
+			lon = _lon;
+			owner = _owner;
+			server = _server;
+			distance = _distance;
 		}
 		
-		String pheno;
-		String common_name;
-		String science_name;
-		String latitude;
-		String longitude;
+		int id;
+		String secret;
+		String farm;
+		String title;
 		String dt_taken;
-		int comment_count;
-		String comment;
-		//String text;
-		//String image_url;
+		String lat;
+		String lon;
+		String owner;
+		String server;
+		double distance;
 	}
 	
 	class MyListAdapter extends BaseAdapter{
@@ -141,7 +155,7 @@ public class Whatspopular extends ListActivity {
 		}
 		
 		public String getItem(int position){
-			return arSrc.get(position).science_name;
+			return arSrc.get(position).title;
 		}
 		
 		public long getItemId(int position){
@@ -149,37 +163,32 @@ public class Whatspopular extends ListActivity {
 		}
 		
 		public View getView(int position, View convertView, ViewGroup parent){
-			if(convertView == null)
+			if(convertView == null) {
 				convertView = Inflater.inflate(layout, parent, false);
+			}
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-/*
-			String imagePath = TEMP_PATH + arSrc.get(position).image_url + ".jpg";
+
+			String imagePath = WB_PATH + arSrc.get(position).id + ".jpg";
 			Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-			
-			try{
-				FileOutputStream out = new FileOutputStream(imagePath);
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
-			}catch(Exception e){
-				Log.e("K", e.toString());
-			}
 		
-			img.setBackgroundResource(R.drawable.shapedrawable);
+			//img.setBackgroundResource(R.drawable.shapedrawable);
 			img.setImageBitmap(bitmap);
-*/			
+	
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
-			textname.setText(arSrc.get(position).common_name);
+			textname.setText(arSrc.get(position).title);
 			
 			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-			textdesc.setText(arSrc.get(position).science_name);
+			textdesc.setText("By " + arSrc.get(position).owner + "\n" + arSrc.get(position).distance + " miles away");
 
 			return convertView;
 		}
 	}
-	
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(Whatspopular.this, WPinfo.class);
+		//Intent intent = new Intent(Whatspopular.this, WPinfo.class);
+		/*
 		intent.putExtra("common_name", arSpeciesList.get(position).common_name);
 		intent.putExtra("science_name", arSpeciesList.get(position).science_name);
 		intent.putExtra("comment", arSpeciesList.get(position).comment);
@@ -188,14 +197,15 @@ public class Whatspopular extends ListActivity {
 		intent.putExtra("longitude", arSpeciesList.get(position).longitude);
 		intent.putExtra("dt_taken", arSpeciesList.get(position).dt_taken);
 		intent.putExtra("pheno", arSpeciesList.get(position).pheno);
-		startActivityForResult(intent, 1);
+		*/
+		//startActivityForResult(intent, 1);
 	}
 
 	class DoAsyncTask extends AsyncTask<Void, Integer, Void> {
 		ProgressDialog dialog;
 		
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(Whatspopular.this, "Loading...", "Getting Species...", true);
+			dialog = ProgressDialog.show(Whatspopular.this, "Loading...", "Loading species information...", true);
 		}
 		@Override
 		protected Void doInBackground(Void... unused) {
@@ -206,74 +216,85 @@ public class Whatspopular extends ListActivity {
 			db = otDBH.getReadableDatabase();
 
 			String query = null;
-			query = "SELECT pheno, cname, sname, lat, lng, dt_taken, c_count, comments FROM popularLists ORDER BY c_count LIMIT 10";
+			//query = "SELECT pheno, cname, sname, lat, lng, dt_taken, c_count, comments FROM popularLists ORDER BY c_count LIMIT 20";
+			query = "SELECT id, secret, farm, title, dt_taken, lat, lon, owner, server, distance FROM flickrLists ORDER BY distance ASC LIMIT 20";
 			
 			Cursor cursor = db.rawQuery(query, null);
 
 		    while(cursor.moveToNext()) {
 		  
 				species pi;
-				// pheno, cname, sname, latitude, longitude, dt_taken, comment_count, comment
-				pi = new species(cursor.getString(0), cursor.getString(1), cursor.getString(2), 
+				// SELECT id, secret, farm, title, dt_taken, lat, lon, owner, server FROM flickrLists LIMIT 10
+				pi = new species(cursor.getInt(0), cursor.getString(1), cursor.getString(2), 
 							cursor.getString(3), cursor.getString(4), cursor.getString(5), 
-							Integer.parseInt(cursor.getString(6)), cursor.getString(7));
+							cursor.getString(6), cursor.getString(7), cursor.getString(8), cursor.getDouble(9));
 				arSpeciesList.add(pi);
-		
-			}
+			
+				String imageURL = "http://farm" + cursor.getString(2) 
+							+ ".static.flickr.com/" + cursor.getString(8) 
+							+ "/" + cursor.getString(0) + "_" 
+							+ cursor.getString(1) + "_s.jpg";
+				
+				Log.i("K", "URL : " + imageURL);
+				
+				try {
+					URL getURL = new URL(imageURL);
+					File file = new File(cursor.getInt(0) + "");
+					HttpURLConnection conn = (HttpURLConnection) getURL.openConnection();
+					conn.setDoInput(true);
+					conn.connect();
+					
+					InputStream is = conn.getInputStream();
+					BufferedInputStream bis = new BufferedInputStream(is);
+					ByteArrayBuffer baf = new ByteArrayBuffer(50);
+					int current = 0;
+					while((current = bis.read()) != -1) {
+						baf.append((byte) current);
+					}
+					
+					FileOutputStream fos = new FileOutputStream(WB_PATH + file + ".jpg");
+					fos.write(baf.toByteArray());
+					fos.close();
+				}
+				catch(Exception io) {
+				}
+		    }
 		    
 		    cursor.close();
 		    db.close();
 			otDBH.close();
-
+	
 			// TODO Auto-generated method stub
 			return null;
 		}
 		
 		protected void onPostExecute(Void unused) {
-			mylistapdater = new MyListAdapter(Whatspopular.this, R.layout.plantlist_item ,arSpeciesList);
+			mylistapdater = new MyListAdapter(Whatspopular.this, R.layout.plantlist_item2 ,arSpeciesList);
 			ListView MyList = getListView();
 			MyList.setAdapter(mylistapdater);
-			
 			dialog.dismiss();
-
 		}
 	}
 	
-	private void download_image(String url, String fileName) {
-		
-		URL imageURL;
-		int read;
-		
-		try {
-			imageURL = new URL(url);
-			Log.i("K", "IMAGE URL : " + imageURL);
-			HttpURLConnection conn = (HttpURLConnection)imageURL.openConnection();
-			conn.connect();
+	void deleteContents(String path) {
+		File file = new File(path);
+		if(file.isDirectory()) {
+			String[] fileList = file.list();
 			
-			int len = conn.getContentLength();
-			byte[] buffer = new byte[len];
-			InputStream is = conn.getInputStream();
-			FileOutputStream fos = new FileOutputStream(TEMP_PATH + fileName + ".jpg");
-			
-			while ((read = is.read(buffer)) > 0) {
-				fos.write(buffer, 0, read);
+			for(int i = 0 ; i < fileList.length ; i++) {
+				Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/wb/" + fileList[i] + " IS DELETED.");
+				new File("/sdcard/pbudburst/wb/" + fileList[i]).delete();
 			}
-			fos.close();
-			is.close();
-		}
-		catch(Exception e) {
-			
 		}
 	}
 	
-	static private String hexEncode( byte[] aInput){
-		   StringBuilder result = new StringBuilder();
-		   char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};
-		   for ( int idx = 0; idx < 4; ++idx) {
-			   byte b = aInput[idx];
-			   result.append( digits[ (b&0xf0) >> 4 ] );
-			   result.append( digits[ b&0x0f] );
-		   }
-		   return result.toString();
+	// or when user press back button
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			deleteContents(WB_PATH);
+			finish();
+			return true;
 		}
+		return false;
+	}
 }

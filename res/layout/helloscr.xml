@@ -9,7 +9,7 @@
 	    android:layout_height="63px"
 	    android:gravity="center"
 	    android:orientation="horizontal"
-	    android:background="@drawable/PBB_teel">
+	    android:background="@drawable/PBB_teel2">
 	    <ImageView 
 	    	android:id="@+id/logo"
 	     	android:layout_width="wrap_content"

@@ -341,7 +341,7 @@ public class Sync extends Activity{
 				removeDialog(0);
 				
 				//Move to plant list screen
-				Intent intent = new Intent(Sync.this, PlantList.class);
+				Intent intent = new Intent(Sync.this, MainPage.class);
 				startActivity(intent);
 				finish();
 				

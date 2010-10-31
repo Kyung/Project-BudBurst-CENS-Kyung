@@ -111,15 +111,11 @@ public class WI_observation extends Activity {
 	    notes = (EditText) findViewById(R.id.notes);
 	    
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
-	    ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
 	    TextView common_name = (TextView) findViewById(R.id.common_name);
 	    TextView science_name = (TextView) findViewById(R.id.science_name);
 	   
 		species_image.setImageBitmap(resizeImage(image_path));
-	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    
-	    //pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pheno_id, null, null));
-	    //pheno_image.setBackgroundResource(R.drawable.shapedrawable);
 	    // TODO Auto-generated method stub
 	    common_name.setText(cname + " ");
 	    science_name.setText(sname + " ");	    
@@ -294,7 +290,8 @@ public class WI_observation extends Activity {
 			}
 		});
 		
-		pheno_image.setOnClickListener(new View.OnClickListener() {
+		species_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+		species_image.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {

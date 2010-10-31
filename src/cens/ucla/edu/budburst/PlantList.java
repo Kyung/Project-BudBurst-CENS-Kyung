@@ -359,7 +359,6 @@ public class PlantList extends ListActivity {
 		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");
 		
 		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
-		menu.add(0,MENU_LOGOUT,0,"Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		menu.add(0, MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
 			
 		return true;
@@ -388,79 +387,12 @@ public class PlantList extends ListActivity {
 			case MENU_HELP:
 				Toast.makeText(PlantList.this, "Coming soon", Toast.LENGTH_SHORT).show();
 				return true;
-			case MENU_LOGOUT:
-				new AlertDialog.Builder(PlantList.this)
-					.setTitle("Log out")
-					.setIcon(R.drawable.pbbicon_small)
-					.setMessage("You might lose your unsynced data if you log out. Do you want to log out?")
-					.setPositiveButton("Yes",mClick)
-					.setNegativeButton("no",mClick)
-					.show();
-				return true;
 		}
 		return false;
 	}
-	/////////////////////////////////////////////////////////////////////////////////
-	
-	void deleteContents(String path) {
-		File file = new File(path);
-		if(file.isDirectory()) {
-			String[] fileList = file.list();
-			
-			for(int i = 0 ; i < fileList.length ; i++) {
-				Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + fileList[i] + " IS DELETED.");
-				new File("/sdcard/pbudburst/tmp/" + fileList[i]).delete();
-			}
-		}
-	}
-	
-	//Dialog confirm message if user clicks logout button
-	DialogInterface.OnClickListener mClick =
-		new DialogInterface.OnClickListener(){
-		public void onClick(DialogInterface dialog, int whichButton){
-			if(whichButton == DialogInterface.BUTTON1){
-				
-				SharedPreferences.Editor edit = pref.edit();				
-				edit.putString("Username","");
-				edit.putString("Password","");
-				edit.putString("synced", "false");
-				edit.commit();
-				
-				//Drop user table in database
-				SyncDBHelper dbhelper = new SyncDBHelper(PlantList.this);
-				dbhelper.clearAllTable(PlantList.this);
-				dbhelper.close();
-				
-				deleteContents("/sdcard/pbudburst/tmp/");
-				
-				Intent intent = new Intent(PlantList.this, Login.class);
-				startActivity(intent);
-				finish();
-			}else{
-			}
-		}
-	};
 	//Menu option
 	/////////////////////////////////////////////////////////////
 	
-    // or when user press back button
-	// when you hold the button for 3 sec, the app will be exited
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == event.KEYCODE_BACK) {
-			boolean flag = false;
-			if(event.getRepeatCount() == 3) {
-				Toast.makeText(PlantList.this, "Thank you.", Toast.LENGTH_SHORT).show();
-				finish();
-				return true;
-			}
-			else if(event.getRepeatCount() == 0 && flag == false){
-				Toast.makeText(PlantList.this, "Hold the Back Button to exit.", Toast.LENGTH_SHORT).show();
-				flag = true;
-			}
-		}
-		
-		return false;
-	}
 }
 
 //Adapters:MyListAdapter and SeparatedAdapter

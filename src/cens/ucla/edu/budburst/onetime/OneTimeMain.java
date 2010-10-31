@@ -78,7 +78,10 @@ public class OneTimeMain extends ListActivity {
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
-		otime = new oneTime("none", "One Time Observation", "pbbicon", "Project Budburst");
+		otime = new oneTime("Map", "My Nearest Plants", "map", "");
+		onetime_title.add(otime);
+		
+		otime = new oneTime("Recommendation List", "One Time Observation", "pbbicon", "Project Budburst");
 		onetime_title.add(otime);
 		
 		otime = new oneTime("none", "What's Invasive", "invasive_plant", "Help locate invasive plants");
@@ -173,8 +176,12 @@ public class OneTimeMain extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-	
+		
 		if(position == 0) {
+			Intent intent = new Intent(OneTimeMain.this, MyNearestPlants.class);
+			startActivity(intent);
+		}
+		else if(position == 1) {
 			Intent intent = new Intent(OneTimeMain.this, Flora_Observer.class);
 			startActivity(intent);
 		}
@@ -182,22 +189,21 @@ public class OneTimeMain extends ListActivity {
 			Intent intent = new Intent(OneTimeMain.this, Recommendation.class);
 			
 			switch(position) {
-			case 1:
+			case 2:
 				intent.putExtra("SelectedList", "What's Invasive");
 				break;
-			case 2:
+			case 3:
 				intent.putExtra("SelectedList", "What's Blooming");
 				break;
-			case 3:
+			case 4:
 				intent.putExtra("SelectedList", "What's Native");
 				break;
-			case 4:
+			case 5:
 				intent.putExtra("SelectedList", "What's Popular");
 				break;
 			}
 			startActivity(intent);
 		}
-
 	}
 
 	///////////////////////////////////////////////////////////
@@ -207,7 +213,6 @@ public class OneTimeMain extends ListActivity {
 		
 		menu.add(0, 1, 0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
 		menu.add(0, 2, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
-		menu.add(0, 3, 0, "Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 			
 		return true;
 	}
@@ -222,84 +227,8 @@ public class OneTimeMain extends ListActivity {
 				return true;
 			case 2:
 				return true;
-			case 3:
-				new AlertDialog.Builder(OneTimeMain.this)
-				.setTitle("Logout")
-				.setMessage("You might lose your unsynced data if you log out. Do you want to log out?")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						pref = getSharedPreferences("userinfo",0);
-						SharedPreferences.Editor edit = pref.edit();				
-						edit.putString("Username","");
-						edit.putString("Password","");
-						edit.putString("synced", "false");
-						edit.putBoolean("Update", false);
-						edit.commit();
-						
-						//Drop user table in database
-						SyncDBHelper dbhelper = new SyncDBHelper(OneTimeMain.this);
-						OneTimeDBHelper onehelper = new OneTimeDBHelper(OneTimeMain.this);
-						dbhelper.clearAllTable(OneTimeMain.this);
-						onehelper.clearAllTable(OneTimeMain.this);
-						dbhelper.close();
-						onehelper.close();
-						
-						deleteContents("/sdcard/pbudburst/tmp/");
-						
-						Intent intent = new Intent(OneTimeMain.this, Login.class);
-						startActivity(intent);
-						finish();
-					}
-				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						
-					}
-				})
-				.setIcon(R.drawable.pbbicon_small)
-				.show();
-				return true;
 		}
 		return false;
-	}
-	/////////////////////////////////////////////////////////////////////////////////
-	
-    // or when user press back button
-	// when you hold the button for 3 sec, the app will be exited
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == event.KEYCODE_BACK) {
-			boolean flag = false;
-			if(event.getRepeatCount() == 3) {
-				Toast.makeText(OneTimeMain.this, "Thank you.", Toast.LENGTH_SHORT).show();
-				finish();
-				return true;
-			}
-			else if(event.getRepeatCount() == 0 && flag == false){
-				Toast.makeText(OneTimeMain.this, "Hold the Back Button to exit.", Toast.LENGTH_SHORT).show();
-				flag = true;
-			}
-		}
-		
-		return false;
-	}
-	
-	void deleteContents(String path) {
-		File file = new File(path);
-		if(file.isDirectory()) {
-			String[] fileList = file.list();
-			
-			for(int i = 0 ; i < fileList.length ; i++) {
-				File newFile = new File(fileList[i]);
-				Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + fileList[i] + " IS DELETED.");
-				new File("/sdcard/pbudburst/tmp/" + fileList[i]).delete();
-			}
-		}
 	}
 }
 

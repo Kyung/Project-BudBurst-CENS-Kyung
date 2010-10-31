@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -55,9 +58,48 @@ public class GetPhenophase extends ListActivity {
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    TextView species_name = (TextView) findViewById(R.id.species_name);
 	    
-	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));
+	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));	    
 	    species_image.setBackgroundResource(R.drawable.shapedrawable);
+	    
+	    
+	    species_image.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				
+				final LinearLayout linear = (LinearLayout) View.inflate(GetPhenophase.this, R.layout.image_popup, null);
+				
+				// TODO Auto-generated method stub
+				AlertDialog.Builder dialog = new AlertDialog.Builder(GetPhenophase.this);
+				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
+				
+				image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+			   
+				TextView species_info = (TextView) linear.findViewById(R.id.species_info);
+				species_info.setText(cname + "\n" + sname);
+			    
+			    // when press 'Back', close the dialog
+				dialog.setPositiveButton("Back", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub	
+					}
+				});
+		        dialog.setView(linear);
+		        dialog.show();
+			}
+		});
+	    
+	    
+	    
+	    
 	    species_name.setText(cname + " \n" + sname + " ");
+	    
+	    
+	    
 	    
 	    pItem = new ArrayList<PlantItem>();
 	    PlantItem pi;

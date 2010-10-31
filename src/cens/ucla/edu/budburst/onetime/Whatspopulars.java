@@ -401,7 +401,7 @@ public class Whatspopulars extends MapActivity {
 		
 		    List<Overlay> mapOverlays = myMap.getOverlays();
 			Drawable marker = getResources().getDrawable(R.drawable.marker);
-			HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(marker, Whatspopulars.this, myMap);
+			//HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(marker, Whatspopulars.this, myMap);
 			
 			Cursor cursor = db.rawQuery(query, null);
 			
@@ -420,7 +420,7 @@ public class Whatspopulars extends MapActivity {
 		    	
 		    	last_point = new GeoPoint((int)(Double.parseDouble(cursor.getString(3)) * 1000000), (int)(Double.parseDouble(cursor.getString(4)) * 1000000));
 		    	OverlayItem overlayitem = new OverlayItem(last_point, cursor.getString(1), real_info_title);
-		    	itemizedOverlay.addOverlay(overlayitem);
+		    	//itemizedOverlay.addOverlay(overlayitem);
 		    }
 		    
 			db.close();
@@ -435,7 +435,7 @@ public class Whatspopulars extends MapActivity {
 			
 			
 			// need to multiply 1000000 to get the proper data
-		    mapOverlays.add(itemizedOverlay);
+		    //mapOverlays.add(itemizedOverlay);
 			// end read and add to the map
 			
 			// get current location

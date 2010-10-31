@@ -8,4 +8,10 @@
   	android:layout_height="fill_parent"
   	android:id="@+id/image_btn"
   />
+  <TextView
+  	android:layout_marginTop="10px"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:id="@+id/species_info"
+  />
 </LinearLayout>

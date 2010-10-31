@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Timer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -64,6 +65,7 @@ import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.onetime.AreaList.DoAsyncTask;
 import cens.ucla.edu.budburst.onetime.AreaList.area;
 import cens.ucla.edu.budburst.onetime.Queue.MyListAdapter;
 import cens.ucla.edu.budburst.onetime.Queue.myItem;
@@ -109,26 +111,127 @@ public class Whatsinvasive extends ListActivity {
 	    //Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
 		//startActivityForResult(intent, GET_AREA_LIST);
 	    // TODO Auto-generated method stub
+	    getData();
 	}
 	
-	public void onResume() {
-		super.onResume();
+	public void getData() {
 		
-		Intent intent = getIntent();
+		LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		double latitude = 0.0;
+		double longitude = 0.0;
 		
-		area_id = intent.getExtras().getString("selected_park");
-		area_name = intent.getExtras().getString("park_name");
-		boolean clicked = intent.getExtras().getBoolean("clicked_me", false);
+		if(!(manager.isProviderEnabled("gps") || manager.isProviderEnabled("network"))) {
+			Toast.makeText(Whatsinvasive.this, "Network problem. Cannot get the list from WI Server", Toast.LENGTH_SHORT).show();
+		}
+		else {
+			Location location = null;
+			
+			if(manager.isProviderEnabled("gps")) {
+				location = manager.getLastKnownLocation("gps");
+			}
+			else if(manager.isProviderEnabled("network")) {
+				location = manager.getLastKnownLocation("network");
+			}
+			
+			if(location != null) {
+				latitude = location.getLatitude();
+				longitude = location.getLongitude();
+			}
+		}
+
+		String url = new String("http://sm.whatsinvasive.com/phone/getareas.php?lat=" + latitude + "&lon=" + longitude + "&r=1");
 		
-		if(!clicked) {
-			area_id = "9";
+		HttpPost httpPost = new HttpPost(url);
+		try {
+			
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				
+				BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			
+				String line = "{'area':";
+				String[] str = null;
+		
+				line += br.readLine();
+				line += "}";
+				Log.i("K", "Line : " + line);
+					
+				JSONHelper jHelper = new JSONHelper();
+				String getAreaByJSON = jHelper.getArea(line);
+				str = getAreaByJSON.split("\n");
+
+				for(int i = 0 ; i < str.length ; i++) {
+					String[] split = str[i].split(";");
+					area_id = split[0];
+					area_name = split[1];
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		boolean back = intent.getExtras().getBoolean("back", false);
-		if(back) {
-			Whatsinvasive.this.finish();
+		getSpecies();
+	}
+	/*
+	class getAreaId extends AsyncTask<String, Integer, Void> {
+		ProgressDialog dialog;
+		
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(Whatsinvasive.this, "Loading...", "Loading registered area based on your location", true);
 		}
-	
+		@Override
+		protected Void doInBackground(String... url) {
+			
+			HttpPost httpPost = new HttpPost(url[0]);
+			try {
+				
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpResponse response = httpClient.execute(httpPost);
+				
+				if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+					
+					BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				
+					String line = "{'area':";
+					String[] str = null;
+			
+					line += br.readLine();
+					line += "}";
+					Log.i("K", "Line : " + line);
+						
+					JSONHelper jHelper = new JSONHelper();
+					String getAreaByJSON = jHelper.getArea(line);
+					str = getAreaByJSON.split("\n");
+
+					for(int i = 0 ; i < str.length ; i++) {
+						String[] split = str[i].split(";");
+						area_id = split[0];
+						area_name = split[1];
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		protected void onPostExecute(Void unused) {
+			dialog.dismiss();
+		}
+	}
+	*/
+	public void getSpecies(){
 		areaTxt2.setText(area_name);
 		
 		SQLiteDatabase db;
@@ -144,6 +247,7 @@ public class Whatsinvasive extends ListActivity {
 		db.close();
 		otDBH.close();
 		
+		// if count is 0, it means there are no data related to the selected park
 		if(count == 0) {
 			arSpeciesList = null;
 			arSpeciesList = new ArrayList<species>();
@@ -151,19 +255,16 @@ public class Whatsinvasive extends ListActivity {
 			new DoAsyncTask().execute(area_id);
 		}
 		else {
-			showExistedSpecies(intent);
+			showExistedSpecies(area_id);
 		}
 	}
 
-	public void showExistedSpecies(Intent data) {
+	public void showExistedSpecies(String area_id) {
 		arSpeciesList = null;
 		arSpeciesList = new ArrayList<species>();
 		
-		Log.i("K", "I am here");
-	
 		SQLiteDatabase db;
 		
-		area_id = data.getStringExtra("selected_park");
 		OneTimeDBHelper otDBH = new OneTimeDBHelper(Whatsinvasive.this);
 		
 		db = otDBH.getReadableDatabase();
@@ -269,6 +370,12 @@ public class Whatsinvasive extends ListActivity {
 		FileInputStream fin = null;
 		BufferedInputStream buf = null;
 		
+		File existFile = new File(path);
+		if(!existFile.exists()) {
+			Toast.makeText(Whatsinvasive.this, "Error occurs while processing the species list. ", Toast.LENGTH_SHORT).show();
+			finish();
+		}
+		
     	Log.i("K", "PATH : " + path);
     	
 		try {
@@ -304,9 +411,21 @@ public class Whatsinvasive extends ListActivity {
 		matrix.postScale(scaleWidth, scaleHeight);
 		
 		Bitmap resized = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-	
+
     	return resized;
     }
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == GET_AREA_LIST) {
+			if(resultCode == RESULT_OK) {
+				area_id = data.getExtras().getString("selected_park");
+				area_name = data.getExtras().getString("park_name");
+				//clicked_me = data.getExtras().getString("clicked_me");
+				Log.i("K","AREAID " + area_id + " AREANAME : " + area_name );
+				getSpecies();
+			}
+		}
+	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
@@ -459,7 +578,8 @@ public class Whatsinvasive extends ListActivity {
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
-		menu.add(0, 2, 0, "Update Species List").setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0, 1, 0, "Change Area").setIcon(android.R.drawable.ic_menu_search);
+		menu.add(0, 2, 0, "Update Lists").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0, 3, 0, "Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);		
 		return true;
 	}
@@ -467,6 +587,10 @@ public class Whatsinvasive extends ListActivity {
 	//Menu option selection handling
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
+			case 1:
+				Intent intents = new Intent(Whatsinvasive.this, AreaList.class);
+				startActivityForResult(intents, GET_AREA_LIST);
+				return true;
 			case 2:
 				deleteContents("/sdcard/pbudburst/tmp/");
 				new DoAsyncTask().execute(area_id);

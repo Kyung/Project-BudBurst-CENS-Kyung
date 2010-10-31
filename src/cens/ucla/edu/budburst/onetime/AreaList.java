@@ -88,7 +88,7 @@ public class AreaList extends ListActivity {
 			}
 		}
 
-		String url = new String("http://sm.whatsinvasive.com/phone/getareas.php?lat=" + latitude + "&lon=" + longitude + "&r=10");
+		String url = new String("http://sm.whatsinvasive.com/phone/getareas.php?lat=" + latitude + "&lon=" + longitude + "&r=7");
 		Log.i("K", "url : " + url);
 
 		new DoAsyncTask().execute(url);
@@ -161,9 +161,9 @@ public class AreaList extends ListActivity {
 		intent.putExtra("selected_park", arAreaList.get(position).id);
 		intent.putExtra("park_name", arAreaList.get(position).title);
 		intent.putExtra("clicked_me", true);
-		//setResult(RESULT_OK, intent);
-		startActivity(intent);
-		//finish();
+		setResult(RESULT_OK, intent);
+		finish();
+		//startActivity(intent);
 	}
 	
 

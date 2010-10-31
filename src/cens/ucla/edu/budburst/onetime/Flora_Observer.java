@@ -1,5 +1,6 @@
 package cens.ucla.edu.budburst.onetime;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,6 +12,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +34,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.PlantInformation;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -57,6 +61,8 @@ public class Flora_Observer extends ListActivity{
 	
 	//private TextView header = null;
 	private TextView myTitleText = null;
+	
+	private int current_position = 0;
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -318,9 +324,11 @@ public class Flora_Observer extends ListActivity{
 			if(convertView == null)
 				convertView = Inflater.inflate(layout, parent, false);
 		
+			//current_position = arSrc.get(position).SpeciesID;
+			
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
 			img.setImageResource(arSrc.get(position).Picture);
-			
+
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
 			textname.setText(arSrc.get(position).CommonName);
 			

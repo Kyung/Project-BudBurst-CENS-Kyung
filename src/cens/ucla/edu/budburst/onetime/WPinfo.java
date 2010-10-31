@@ -71,7 +71,7 @@ public class WPinfo extends MapActivity {
 		
 		mapOverlays = myMap.getOverlays();
 		Drawable marker = getResources().getDrawable(R.drawable.marker);
-		itemizedOverlay = new HelloItemizedOverlay(marker, this, myMap);
+		itemizedOverlay = new HelloItemizedOverlay(marker, this);
 		
 		OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found!");
 		itemizedOverlay.addOverlay(overlayitem);

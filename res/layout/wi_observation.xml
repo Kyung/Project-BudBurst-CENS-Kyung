@@ -22,26 +22,20 @@
 		android:layout_height="60px"
 		android:id="@+id/species_image" 
 		android:adjustViewBounds="true"
-		android:layout_weight="0.005"
 	/>
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:paddingTop="3dip"
-			android:paddingLeft="3dip"
+			android:paddingLeft="6dip"
 			android:orientation="vertical"
-			android:gravity="center"
-			android:layout_gravity="center"
 			android:id="@+id/text_description"
-			android:layout_weight="0.99"
 			>
 			<TextView
 				android:id="@+id/common_name"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
 				android:textSize="17dip" 
-				android:gravity="center"
-				android:layout_gravity="center"
 				android:textColor="@drawable/black" 
 				android:textStyle="italic|bold" 
 				/>
@@ -50,23 +44,10 @@
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
 				android:textSize="17dip"
-				android:gravity="center"
-				android:layout_gravity="center"  
 				android:textColor="@drawable/black" 
 				android:textStyle="italic|bold"
 				/>
 		</LinearLayout>
-	<ImageView
-		android:paddingTop="3dip"
-		android:paddingRight="7dip"
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"
-		android:id="@+id/pheno_image" 
-		android:adjustViewBounds="true"
-		android:background="@drawable/information"
-		android:layout_weight="0.005"
-		
-	/>			
 	</LinearLayout>
  
 	<ScrollView

@@ -552,7 +552,7 @@ public class Helloscr extends Activity{
 					//Toast.makeText(Helloscr.this, "Sync canceled.", Toast.LENGTH_SHORT).show();
 				}
 				else{
-					Intent intent = new Intent(Helloscr.this, PlantList.class);
+					Intent intent = new Intent(Helloscr.this, MainPage.class);
 					startActivity(intent);
 					//Toast.makeText(Helloscr.this, "Sync done.",Toast.LENGTH_SHORT).show();
 					finish();

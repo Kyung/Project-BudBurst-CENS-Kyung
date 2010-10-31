@@ -30,7 +30,7 @@
   	<TextView
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
-		android:text="The ten nearest parks from you"
+		android:text="The seven nearest parks from you"
 		android:textSize="16dip"
 		android:textColor="@drawable/gray"
 		android:paddingLeft="5dip"

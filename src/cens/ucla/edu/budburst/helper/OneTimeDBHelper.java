@@ -53,7 +53,18 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"lat TEXT, " + 
 				"lon TEXT, " + 
 				"owner TEXT, " +
-				"server TEXT );");
+				"server TEXT, " +
+				"distance NUMERIC, " +
+				"category NUMERIC);");
+		
+		db.execSQL("CREATE TABLE pbbFlickrLists (" +
+				"common_name TEXT, " +
+				"science_name TEXT, " +
+				"phenophase TEXT, " + 
+				"dt_taken TEXT, " +
+				"lat TEXT, " + 
+				"lon TEXT, " + 
+				"distance NUMERIC);");
 	}
 
 	@Override
