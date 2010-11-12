@@ -8,7 +8,9 @@
     android:paddingLeft="6dip"
     android:paddingTop="5dip"
     android:paddingBottom="5dip"
-    android:gravity="center_vertical" >
+    android:gravity="center_vertical"
+    android:weightSum="1"
+    >
 
     <ImageView android:id="@+id/myimage"
         android:layout_width="60dip"
@@ -16,12 +18,15 @@
         android:layout_marginLeft="5dip"
         android:layout_marginRight="11dip"
         android:layout_gravity="center_vertical"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter"
+        android:layout_weight="0.1"/>
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_weight="0.8" >
+        
         <TextView android:id="@+id/commonname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -50,12 +55,12 @@
     </LinearLayout>
     <ImageView
    		android:id="@+id/pheno"
-        android:layout_width="40dip"
-        android:layout_height="40dip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="5dip"
         android:layout_marginRight="11dip"
-        android:layout_gravity="center_vertical"
-        android:scaleType="fitCenter"/>
+        android:paddingBottom="15px"
+        android:layout_weight="0.1"
     />
 </LinearLayout>
 

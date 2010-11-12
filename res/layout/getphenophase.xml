@@ -4,32 +4,73 @@
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:orientation="vertical">
-  <LinearLayout
-  	android:layout_width="fill_parent"
-  	android:layout_height="wrap_content"
-  	android:orientation="horizontal"
-  	android:paddingLeft="7dip"
-  	android:paddingTop="7dip"
-  	android:paddingBottom="15dip"
-  	android:background="@drawable/bg_line">
-  	<ImageView
-		android:paddingTop="3dip"
-		android:layout_width="60px" 
-		android:layout_height="60px"
-		android:id="@+id/species_image" 
-		android:adjustViewBounds="true"
-	/>
-	<TextView
-		android:paddingTop="1dip"
-		android:paddingLeft="2dip"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/species_name"
-		android:adjustViewBounds="true"
-		android:textSize="17px"
-		android:textStyle="italic|bold"
-		android:layout_marginLeft="3px"
-	/>
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"
+    	android:id="@+id/header_box"
+    	android:layout_marginTop="10px"
+		android:background="@drawable/bg_line"
+    >
+    <RadioGroup
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:gravity="center"
+    	android:id="@+id/radio_group"
+    	android:weightSum="1"
+    >
+    	<RadioButton
+    		android:checked="true"
+    		android:id="@+id/option1"
+    		android:layout_weight="0.3"
+    	/>
+    	<RadioButton
+    		android:checked="false"
+    		android:id="@+id/option2"
+    		android:layout_weight="0.3"
+    	/>
+    	<RadioButton
+    		android:checked="false"
+    		android:id="@+id/option3"
+    		android:layout_weight="0.1"
+    	/>    	
+    </RadioGroup>
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@+id/radio_group"
+    	android:paddingLeft="10px"
+    	android:paddingBottom="8px"
+    	android:orientation="horizontal"
+    	android:gravity="center"
+    	android:layout_marginTop="-10px"
+    	android:weightSum="1">
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.2"
+    		android:text=" LEAVES"
+    		android:textColor="@drawable/black"
+    	/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.3"
+    		android:paddingLeft="18px"
+    		android:text="  FLOWERS"
+    		android:textColor="@drawable/black"
+    	/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.3"
+    		android:paddingLeft="10px"
+    		android:text="FRUITS"
+    		android:textColor="@drawable/black"
+    	/>
+    
+    </LinearLayout>
 	</LinearLayout>
   	<ListView
 		android:id="@android:id/list"

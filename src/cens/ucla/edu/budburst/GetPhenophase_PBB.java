@@ -38,6 +38,7 @@ public class GetPhenophase_PBB extends ListActivity {
 	private int site_ids 	= 0;
 	private String common_name = null;
 	private String science_name = null;
+	private ImageView img = null;
 	protected static final int RETURN_FROM_PLANT_INFORMATION = 0;
 	public final String BASE_PATH = "/sdcard/pbudburst/pbb/";
 	public final String CALL_IMAGE_PATH = "/sdcard/pbudburst/";
@@ -47,7 +48,7 @@ public class GetPhenophase_PBB extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.getphenophase);
+		setContentView(R.layout.getphenophase_pbb);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
@@ -173,6 +174,17 @@ public class GetPhenophase_PBB extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		String get_time = pItem.get(position).Time;
 		
+		Log.i("K", "POSITION_CLICKED : " + position);
+		
+		img.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Log.i("K", "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+			}
+		});
+		
 		if(get_time.length() > 0) {
 			Intent intent = new Intent(GetPhenophase_PBB.this, PlantSummary.class);
 			intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
@@ -266,6 +278,7 @@ public class GetPhenophase_PBB extends ListActivity {
 			
 			String yes_or_no = "";
 			
+			Log.i("K","POSITION_PHENO : " + position);
 			Log.i("K","ID : " + getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).Pheno_id, null, null));
 			Log.i("K",arSrc.get(position).Pheno_Name + " , " + arSrc.get(position).Pheno_id);
 			
@@ -294,7 +307,7 @@ public class GetPhenophase_PBB extends ListActivity {
 			    }
 			}
 			
-			ImageView img = (ImageView)convertView.findViewById(R.id.pheno_img);
+			img = (ImageView)convertView.findViewById(R.id.pheno_img);
 			img.setImageBitmap(icon);
 			
 			TextView yesorno_photo = (TextView)convertView.findViewById(R.id.yesorno_photo);

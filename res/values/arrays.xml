@@ -17,4 +17,8 @@
 		<item>See Detail</item>
 		<item>Delete</item>
 	</string-array>
+	<string-array name="plantlist">
+		<item>Move to o.o</item>
+		<item>Delete item</item>
+	</string-array>
 </resources>

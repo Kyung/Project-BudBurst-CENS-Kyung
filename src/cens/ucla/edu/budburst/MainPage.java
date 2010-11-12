@@ -1,8 +1,10 @@
 package cens.ucla.edu.budburst;
 
 import java.io.File;
+import java.io.IOException;
 
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
 import cens.ucla.edu.budburst.onetime.Queue;
@@ -11,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,6 +32,7 @@ public class MainPage extends Activity {
 	private Button newsBtn = null;
 	private Button weeklyBtn = null;
 	private SharedPreferences pref;
+	private StaticDBHelper staticDBHelper = null;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,22 @@ public class MainPage extends Activity {
 	    SharedPreferences.Editor edit = pref.edit();				
 		edit.putString("visited","false");
 		edit.commit();
+		
+		staticDBHelper = new StaticDBHelper(MainPage.this);
+
+		try {
+        	staticDBHelper.createDataBase();
+	 	} catch (IOException ioe) {
+	 		Log.e("K", "CREATE DATABASE : " + ioe.toString());
+	 		throw new Error("Unable to create database");
+	 	}
+ 
+	 	try {
+	 		staticDBHelper.openDataBase();
+	 	}catch(SQLException sqle){
+	 		Log.e("K", "OPEN DATABASE : " + sqle.toString());
+	 		throw sqle;
+	 	}
 	    
 	    myPlantBtn = (Button)findViewById(R.id.my_plant);
 	    

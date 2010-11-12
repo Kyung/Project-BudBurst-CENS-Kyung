@@ -31,12 +31,14 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.Helloscr.UpdateThread;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.onetime.Flora_Observer;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
 
 public class PlantList extends ListActivity {
@@ -53,6 +55,7 @@ public class PlantList extends ListActivity {
 	private ArrayList<PlantItem> user_species_list;
 	private int first_site_id = 0;
 	private int pos = 0;
+	private LinearLayout lout = null;
 	private static boolean first_site_flag = true;
 	private Button buttonSharedplant = null;
 	
@@ -299,6 +302,8 @@ public class PlantList extends ListActivity {
 	protected void onListItemClick(View v, int position, long id){
 		//Intent intent = new Intent(this, PlantInfo.class);
 		
+		Log.i("K", "POSITION : " + position);
+			
 		Intent intent = new Intent(this, GetPhenophase_PBB.class);
 		intent.putExtra("species_id", arPlantItem.get(position).SpeciesID);
 		intent.putExtra("site_id", arPlantItem.get(position).siteID);
@@ -311,39 +316,43 @@ public class PlantList extends ListActivity {
 	protected boolean onLongListItemClick(View v, int position, long id) {
 		pos = position;
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Delete Species")
-		.setMessage("Delete " + arPlantItem.get(position).CommonName + " ? \nIt cannot be undone.")
+		Log.i("K","LONG POSITION SELECTED");
+		
+		new AlertDialog.Builder(PlantList.this)
+		.setTitle("Select one")
 		.setIcon(R.drawable.pbbicon_small)
-		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		.setNegativeButton("Back", null)
+		.setItems(R.array.plantlist, new DialogInterface.OnClickListener() {
+			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
-				try{
-					SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
-					SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
-					
-					syncDB.execSQL("DELETE FROM my_plants WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
-									+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
-					syncDBHelper.close();
-					
-					Toast.makeText(PlantList.this, "Item delete.", Toast.LENGTH_SHORT).show();
-					
-					Intent intent = new Intent(PlantList.this, PlantList.class);
-					finish();
-					startActivity(intent);
+				String[] category = getResources().getStringArray(R.array.category);
+				if(category[which].equals("Delete")) {
+					try{
+						SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
+						SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
+						
+						syncDB.execSQL("DELETE FROM my_plants WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
+										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
+						syncDBHelper.close();
+						
+						Toast.makeText(PlantList.this, "Item delete.", Toast.LENGTH_SHORT).show();
+						
+						Intent intent = new Intent(PlantList.this, PlantList.class);
+						finish();
+						startActivity(intent);
+					}
+					catch(Exception e){
+						Log.e(TAG,e.toString());
+					}
 				}
-				catch(Exception e){
-					Log.e(TAG,e.toString());
+				else {
+					Toast.makeText(PlantList.this, "Coming soon!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		})
-		.setNegativeButton("No", new DialogInterface.OnClickListener(){
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-			}
-		}).show();
+		.show();
 		
 		return true;
 	}
@@ -393,75 +402,94 @@ public class PlantList extends ListActivity {
 	//Menu option
 	/////////////////////////////////////////////////////////////
 	
-}
+	
 
-//Adapters:MyListAdapter and SeparatedAdapter
-class MyListAdapter extends BaseAdapter{
-	Context maincon;
-	LayoutInflater Inflater;
-	ArrayList<PlantItem> arSrc;
-	int layout;
-	int previous_site = 0;
-	
-	public MyListAdapter(Context context, int alayout, ArrayList<PlantItem> aarSrc){
-		maincon = context;
-		Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		arSrc = aarSrc;
-		layout = alayout;
-	}
-	
-	public int getCount(){
-		return arSrc.size();
-	}
-	
-	public String getItem(int position){
-		return arSrc.get(position).CommonName;
-	}
-	
-	public long getItemId(int position){
-		return position;
-	}
-	
-	public View getView(int position, View convertView, ViewGroup parent){
-		if(convertView == null)
-			convertView = Inflater.inflate(layout, parent, false);
+	//Adapters:MyListAdapter and SeparatedAdapter
+	class MyListAdapter extends BaseAdapter{
+		Context maincon;
+		LayoutInflater Inflater;
+		ArrayList<PlantItem> arSrc;
+		int layout;
+		int previous_site = 0;
 		
-		TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
+		public MyListAdapter(Context context, int alayout, ArrayList<PlantItem> aarSrc){
+			maincon = context;
+			Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			arSrc = aarSrc;
+			layout = alayout;
+		}
 		
-		Log.i("K", "POSITION : " + position + " TOPITEM : " + arSrc.get(position).TopItem);
+		public int getCount(){
+			return arSrc.size();
+		}
 		
-		if(arSrc.get(position).TopItem) {
-			site_header.setVisibility(View.VISIBLE);
-			site_header.setText("  " + arSrc.get(position).Site);
+		public String getItem(int position){
+			return arSrc.get(position).CommonName;
+		}
+		
+		public long getItemId(int position){
+			return position;
+		}
+		
+		public View getView(int position, View convertView, ViewGroup parent){
+			if(convertView == null)
+				convertView = Inflater.inflate(layout, parent, false);
 			
-		}
-		else {
-			site_header.setVisibility(View.GONE);
-		}
-		
-		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-		img.setImageResource(arSrc.get(position).Picture);
-		
-		TextView textname = (TextView)convertView.findViewById(R.id.commonname);
-		textname.setText(arSrc.get(position).CommonName);
-		
-		TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-		String [] splits = arSrc.get(position).SpeciesName.split(" ");
-		textdesc.setText(splits[0] + " " + splits[1]);
-		
-		
-		TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
-		if(arSrc.get(position).total_pheno != 0) {
-			pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
-		}
-		else {
-			pheno_stat.setVisibility(View.GONE);
-		}
+			TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
+			
+			Log.i("K", "POSITION : " + position + " TOPITEM : " + arSrc.get(position).TopItem);
+			
+			if(arSrc.get(position).TopItem) {
+				//site_header.setVisibility(View.VISIBLE);
+				//site_header.setText("  " + arSrc.get(position).Site);
+				
+				site_header.setVisibility(View.GONE);
+			}
+			else {
+				site_header.setVisibility(View.GONE);
+			}
+			
+			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
+			img.setImageResource(arSrc.get(position).Picture);
+			
+			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
+			textname.setText(arSrc.get(position).CommonName);
+			
+			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
+			textdesc.setText(arSrc.get(position).Site);
+			//String [] splits = arSrc.get(position).SpeciesName.split(" ");
+			//textdesc.setText(splits[0] + " " + splits[1]);
+			
+			// call View from the xml and link the view to current position.
+			View thumbnail = convertView.findViewById(R.id.wrap_icon);
+			thumbnail.setTag(arSrc.get(position));
+			thumbnail.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					PlantItem pi = (PlantItem)v.getTag();
+					
+					Intent intent = new Intent(PlantList.this, SpeciesDetail.class);
+					intent.putExtra("id", pi.SpeciesID);
+					intent.putExtra("site_id", pi.siteID);
+					startActivity(intent);
+				}
+			});
+			
+			TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
+			if(arSrc.get(position).total_pheno != 0) {
+				pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
+			}
+			else {
+				pheno_stat.setVisibility(View.GONE);
+			}
 
-		return convertView;
+			return convertView;
+		}
 	}
-
 }
+
 	
 class PlantItem{
 	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){

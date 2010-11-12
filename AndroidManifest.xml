@@ -77,6 +77,9 @@
 <activity android:name=".onetime.MyNearestPlants" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="MainPage" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PBB_map" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+<activity android:name="SpeciesDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="Help"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

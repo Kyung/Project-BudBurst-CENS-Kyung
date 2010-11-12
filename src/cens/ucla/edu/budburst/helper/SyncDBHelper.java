@@ -26,7 +26,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"protocol_id NUMERIC," +
 				"synced NUMERIC);");
 				
-	//INSERT INTO onetimeob(photo_name, dt_taken, notes, sname, cname, image_id) VALUES(?, ?, ?, ?, ?, ?);
+		//INSERT INTO onetimeob(photo_name, dt_taken, notes, sname, cname, image_id) VALUES(?, ?, ?, ?, ?, ?);
 				
 				
 				

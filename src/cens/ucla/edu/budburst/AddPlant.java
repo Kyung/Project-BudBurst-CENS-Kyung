@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,12 +15,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -359,6 +363,76 @@ public class AddPlant extends ListActivity{
 	    }
 		return super.onKeyDown(keyCode, event);
 	}
+	
+	
+	//Adapters:MyListAdapter and SeparatedAdapter
+	class MyListAdapter extends BaseAdapter{
+		Context maincon;
+		LayoutInflater Inflater;
+		ArrayList<PlantItem> arSrc;
+		int layout;
+		int previous_site = 0;
+		
+		public MyListAdapter(Context context, int alayout, ArrayList<PlantItem> aarSrc){
+			maincon = context;
+			Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			arSrc = aarSrc;
+			layout = alayout;
+		}
+		
+		public int getCount(){
+			return arSrc.size();
+		}
+		
+		public String getItem(int position){
+			return arSrc.get(position).CommonName;
+		}
+		
+		public long getItemId(int position){
+			return position;
+		}
+		
+		public View getView(int position, View convertView, ViewGroup parent){
+			if(convertView == null)
+				convertView = Inflater.inflate(layout, parent, false);
+			
+			TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
+			
+			Log.i("K", "POSITION : " + position + " TOPITEM : " + arSrc.get(position).TopItem);
+			
+			if(arSrc.get(position).TopItem) {
+				site_header.setVisibility(View.VISIBLE);
+				site_header.setText("  " + arSrc.get(position).Site);
+				
+			}
+			else {
+				site_header.setVisibility(View.GONE);
+			}
+			
+			ImageView img = (ImageView) convertView.findViewById(R.id.icon);
+			img.setImageResource(arSrc.get(position).Picture);
+			
+			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
+			textname.setText(arSrc.get(position).CommonName);
+			
+			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
+			String [] splits = arSrc.get(position).SpeciesName.split(" ");
+			textdesc.setText(splits[0] + " " + splits[1]);
+			
+			
+			TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
+			if(arSrc.get(position).total_pheno != 0) {
+				pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
+			}
+			else {
+				pheno_stat.setVisibility(View.GONE);
+			}
+
+			return convertView;
+		}
+	}
+	
+	
 	
 	public boolean checkIfNewPlantAlreadyExists(int speciesid, int siteid){
 

@@ -175,6 +175,11 @@ public class Flora_Observer extends ListActivity{
 					arPlantList.add(pi);
 				}
 				
+				// add Others
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+999, null, null);
+				PlantItem pi = new PlantItem(resID, "Others", "Others", 999, 0);
+				arPlantList.add(pi);
+				
 				mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
 				MyList = getListView(); 
 				MyList.setAdapter(mylistapdater);

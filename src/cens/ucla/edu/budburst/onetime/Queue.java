@@ -89,7 +89,7 @@ public class Queue extends ListActivity {
 
 		//Rereive syncDB and add them to arUserPlatList arraylist
 		arPlantList = new ArrayList<myItem>();
-		Cursor cursor = db.rawQuery("select image_id, cname, sname, lat, lng, dt_taken, notes, photo_name FROM onetimeob ORDER BY rowid DESC;",null);
+		Cursor cursor = db.rawQuery("select image_id, cname, sname, lat, lng, dt_taken, notes, photo_name, uploaded FROM onetimeob ORDER BY rowid DESC;",null);
 		if(cursor.getCount() > 0) {
 			while(cursor.moveToNext()){
 				Integer image_id = cursor.getInt(0);
@@ -98,6 +98,7 @@ public class Queue extends ListActivity {
 				Double latitude = cursor.getDouble(3);
 				Double longitude = cursor.getDouble(4);
 				String dt_taken = cursor.getString(5);
+				String uploaded = cursor.getString(8);
 				if(dt_taken == null) {
 					dt_taken = "No Photo";
 				}
@@ -110,7 +111,7 @@ public class Queue extends ListActivity {
 				//Log.i("K", "current_image_id : " + image_id);
 				
 				myItem pi;
-				pi = new myItem(image_id, common_name, species_name, latitude, longitude, dt_taken, notes, photo_name);
+				pi = new myItem(image_id, common_name, species_name, latitude, longitude, dt_taken, notes, photo_name, uploaded);
 				arPlantList.add(pi);
 			}
 			
@@ -195,7 +196,7 @@ public class Queue extends ListActivity {
 	
 	
 	class myItem{	
-		myItem(int aPicture, String aCommonName, String aSpeciesName, Double aLatitude, Double aLongitude, String aDt_taken, String aNotes, String aPhoto_name){
+		myItem(int aPicture, String aCommonName, String aSpeciesName, Double aLatitude, Double aLongitude, String aDt_taken, String aNotes, String aPhoto_name, String aUploaded){
 			Picture = aPicture;
 			CommonName = aCommonName;
 			SpeciesName = aSpeciesName;
@@ -204,6 +205,7 @@ public class Queue extends ListActivity {
 			dt_taken = aDt_taken;
 			notes = aNotes;
 			photo_name = aPhoto_name;
+			uploaded = aUploaded;
 		}
 		
 		int Picture;
@@ -214,6 +216,7 @@ public class Queue extends ListActivity {
 		String dt_taken;
 		String notes;
 		String photo_name;
+		String uploaded;
 	}
 	
 	//Adapters:MyListAdapter and SeparatedAdapter
@@ -290,6 +293,15 @@ public class Queue extends ListActivity {
 			TextView dt_taken = (TextView)convertView.findViewById(R.id.dt_taken);
 			dt_taken.setText(arSrc.get(position).dt_taken);
 			
+			
+			String uploaded = arSrc.get(position).uploaded;
+			Log.i("K", "UPLOADED TAG : " + uploaded);
+			if(uploaded.equals("1")) {
+				ImageView p_image = (ImageView)convertView.findViewById(R.id.pheno);
+				p_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/check_mark", null, null));
+			}
+			
+			
 			return convertView;
 		}
 	}
@@ -313,7 +325,7 @@ public class Queue extends ListActivity {
 				SQLiteDatabase db = oneDBH.getReadableDatabase();
 				Cursor cursor;
 				
-				cursor = db.rawQuery("SELECT image_id, cname, sname, lat, lng, dt_taken, notes, photo_name from onetimeob", null);
+				cursor = db.rawQuery("SELECT image_id, cname, sname, lat, lng, dt_taken, notes, photo_name, uploaded from onetimeob", null);
 				String result = "";
 				
 				while(cursor.moveToNext()) {
@@ -323,8 +335,9 @@ public class Queue extends ListActivity {
 							  cursor.getDouble(3) + "," +
 							  cursor.getDouble(4) + "," +
 							  cursor.getString(5) + "," + 
-							  cursor.getString(6) + "," + 
-							  cursor.getString(7) + "\n"; 
+							  cursor.getString(6) + "," +
+							  cursor.getString(7) + "," + 
+							  cursor.getString(8) + "\n"; 
 				}
 				oneDBH.close();
 				
@@ -359,6 +372,10 @@ public class Queue extends ListActivity {
 			for(int i = 0 ; i < split_by_line.length ; i++) {
 				Log.i("K", "attempt to upload the file : #" + i);
 				String []line_by_separator = split_by_line[i].split(",");
+				
+				// if uploaded attribute is equal to 1
+				if(line_by_separator[8].equals("1"))
+					continue;
 			
 				try {
 					MultipartEntity entity = new MultipartEntity();
@@ -400,12 +417,13 @@ public class Queue extends ListActivity {
 							
 
 							SQLiteDatabase db = oneDBH.getWritableDatabase();
-							db.execSQL("DELETE FROM onetimeob WHERE dt_taken = '" + line_by_separator[5] + "';");
-							Log.i("K", " : " + line_by_separator[7]);
+							//db.execSQL("DELETE FROM onetimeob WHERE dt_taken = '" + line_by_separator[5] + "';");
+							//Log.i("K", " : " + line_by_separator[7]);
+							db.execSQL("UPDATE onetimeob SET uploaded = 1 WHERE dt_taken = '" + line_by_separator[5] + "' AND image_id = '" + line_by_separator[0] +"';");
+							Log.i("K", "UPDATE THE UPLOADED FLAG IN THE QUEUE");
+							//new File("/sdcard/pbudburst/tmp/" + line_by_separator[7] + ".jpg").delete();
 							
-							new File("/sdcard/pbudburst/tmp/" + line_by_separator[7] + ".jpg").delete();
-							
-							Log.i("K", "DELETE UPLOADED ITEM IN THE QUEUE");
+							//Log.i("K", "DELETE UPLOADED ITEM IN THE QUEUE");
 							db.close();
 						}
 						else {

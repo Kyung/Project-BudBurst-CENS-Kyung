@@ -229,7 +229,8 @@ public class SummarySpecies extends MapActivity {
 						+ lng + ","
 						+ "'" + dt_taken + "',"
 						+ "'" + notes + "',"
-						+ "'" + photo_name + "');");
+						+ "'" + photo_name + "',"
+						+ "'0');");
 				
 				// should close the databasehelper; otherwise, memory leaks
 				otDBH.close();

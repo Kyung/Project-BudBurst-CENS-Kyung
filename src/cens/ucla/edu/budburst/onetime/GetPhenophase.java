@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
+import cens.ucla.edu.budburst.onetime.Flora_Observer.MyListAdapter;
+import cens.ucla.edu.budburst.onetime.Flora_Observer.PlantItem;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -20,10 +22,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 public class GetPhenophase extends ListActivity {
@@ -33,6 +37,13 @@ public class GetPhenophase extends ListActivity {
 	private String cname = null;
 	private String sname = null;
 	private int species_id = 0;
+	private RadioButton rb1 = null;
+	private RadioButton rb2 = null;
+	private RadioButton rb3 = null;
+	private TextView myTitleText = null;
+	private MyListAdapter MyAdapter = null;
+	private ListView myList = null;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,22 +57,30 @@ public class GetPhenophase extends ListActivity {
 		v = (ViewGroup)v.getChildAt(0);
 		v.setPadding(0, 0, 0, 0);
 		
-		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" Select Phenophase");
-	    
 	    Intent intent = getIntent();
 	    protocol_id = intent.getExtras().getInt("protocol_id");
 	    cname = intent.getExtras().getString("cname");
 	    sname = intent.getExtras().getString("sname");
 	    species_id = intent.getExtras().getInt("species_id");
 	    
-	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
-	    TextView species_name = (TextView) findViewById(R.id.species_name);
+	    myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(cname + " > Phenophase");
 	    
-	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));	    
-	    species_image.setBackgroundResource(R.drawable.shapedrawable);
+		rb1 = (RadioButton)findViewById(R.id.option1);
+		rb2 = (RadioButton)findViewById(R.id.option2);
+		rb3 = (RadioButton)findViewById(R.id.option3);
+		
+		rb1.setOnClickListener(radio_listener);
+		rb2.setOnClickListener(radio_listener);
+		rb3.setOnClickListener(radio_listener);
 	    
+	    //ImageView species_image = (ImageView) findViewById(R.id.species_image);
+	    //TextView species_name = (TextView) findViewById(R.id.species_name);
 	    
+	    //species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));	    
+	    //species_image.setBackgroundResource(R.drawable.shapedrawable);
+	    
+	    /*
 	    species_image.setOnClickListener(new View.OnClickListener(){
 
 			@Override
@@ -92,61 +111,143 @@ public class GetPhenophase extends ListActivity {
 		        dialog.show();
 			}
 		});
-	    
-	    
-	    
-	    
-	    species_name.setText(cname + " \n" + sname + " ");
-	    
-	    
-	    
-	    
+		*/
+	    //species_name.setText(cname + " \n" + sname + " ");
+
 	    pItem = new ArrayList<PlantItem>();
-	    PlantItem pi;
 	    
-	    ArrayList<Integer> id = new ArrayList<Integer>();
-	    ArrayList<Integer> phenophase = new ArrayList<Integer>();
-	    ArrayList<String> description = new ArrayList<String>();
-	    ArrayList<String> pheno_name = new ArrayList<String>();
-	    
-		StaticDBHelper sDBHelper = new StaticDBHelper(GetPhenophase.this);
-		SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
-	    
-		String query = null;
-		if(cname.equals("Others")) {
-			query = "SELECT _id, Phenophase_Icon, description, Phenophase_Name FROM Phenophase_Protocol_Icon GROUP BY Phenophase_Icon ORDER BY Phenophase_Icon ASC";
-		}
-		else {
-			query = "SELECT _id, Phenophase_Icon, description, Phenophase_Name FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_id + " ORDER BY Phenophase_Icon ASC";
-		}
-	    
-	    
-	    Cursor cursor = sDB.rawQuery(query, null);
+		myTitleText.setText(" " + cname + " > Leaves");
 		
-	    while(cursor.moveToNext()) {
-	    	id.add(cursor.getInt(0));
-	    	phenophase.add(cursor.getInt(1));
-	    	description.add(cursor.getString(2));
-	    	pheno_name.add(cursor.getString(3));
-	    }
-	     
-	    for(int i = 0 ; i < phenophase.size() ; i++) {
-	    	int _id = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + phenophase.get(i), null, null);
-	    	String des = description.get(i);
-	    	pi = new PlantItem(_id, des, phenophase.get(i), pheno_name.get(i));
-	    	pItem.add(pi);
-	    }
-	    
-	    MyListAdapter MyAdapter = new MyListAdapter(this, R.layout.phenophaselist, pItem);
-	    
-	    ListView myList = getListView();
-	    myList.setAdapter(MyAdapter);
-	    
-	    // TODO Auto-generated method stub
-	    cursor.close();
-	    sDBHelper.close();
-		sDB.close();
+		//PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name)
+		int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p18", null, null);
+		Log.i("K","RESID : " + resID);
+		PlantItem pi = new PlantItem(resID, "10% budburst", 18, "10% budburst");
+		pItem.add(pi);
+		
+		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p19", null, null);
+		pi = new PlantItem(resID, "full leaf", 19, "full leaf");
+		pItem.add(pi);
+		
+		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p20", null, null);
+		pi = new PlantItem(resID, "10% leaf color", 20, "10% leaf color");
+		pItem.add(pi);
+		
+		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p19", null, null);
+		pi = new PlantItem(resID, "full leaf color", 19, "full leaf color");
+		pItem.add(pi);
+		
+		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p22", null, null);
+		pi = new PlantItem(resID, "90% leaf drop", 22, "90% leaf drop");
+		pItem.add(pi);
+		
+		MyAdapter = new MyListAdapter(GetPhenophase.this, R.layout.phenophaselist, pItem);
+		myList = getListView(); 
+		myList.setAdapter(MyAdapter);
 	}
+	
+	private OnClickListener radio_listener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			
+			
+			if(v == rb1) {
+				//header.setText("'TOP 10' list of the plants.");
+				pItem = new ArrayList<PlantItem>();
+				
+				myTitleText.setText(" " + cname + " > Leaves");
+				
+				//PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name)
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+18, null, null);
+				Log.i("K","RESID : " + resID);
+				PlantItem pi = new PlantItem(resID, "10% budburst", 18, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+19, null, null);
+				pi = new PlantItem(resID, "full leaf", 19, "full leaf");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+20, null, null);
+				pi = new PlantItem(resID, "10% leaf color", 20, "10% leaf color");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+19, null, null);
+				pi = new PlantItem(resID, "full leaf color", 19, "full leaf color");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+22, null, null);
+				pi = new PlantItem(resID, "90% leaf drop", 22, "90% leaf drop");
+				pItem.add(pi);
+				
+				MyAdapter = new MyListAdapter(GetPhenophase.this, R.layout.phenophaselist, pItem);
+				myList = getListView(); 
+				myList.setAdapter(MyAdapter);
+
+			}
+			else if (v == rb2) {
+				//header.setText("'ALL' list of the plants.");
+				pItem = new ArrayList<PlantItem>();
+				
+				myTitleText.setText(" " + cname + " > Flowers");
+				
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				PlantItem pi = new PlantItem(resID, "10% flowers", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				MyAdapter = new MyListAdapter(GetPhenophase.this, R.layout.phenophaselist, pItem);
+				myList = getListView(); 
+				myList.setAdapter(MyAdapter);
+			}
+			else {
+				pItem = new ArrayList<PlantItem>();
+				
+				myTitleText.setText(" " + cname + " > Fruits");
+				
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				PlantItem pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);
+				
+				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+1, null, null);
+				pi = new PlantItem(resID, "10% budburst", 1, "10% budburst");
+				pItem.add(pi);	
+				
+				MyAdapter = new MyListAdapter(GetPhenophase.this, R.layout.phenophaselist, pItem);
+				myList = getListView(); 
+				myList.setAdapter(MyAdapter);
+			}
+		}
+	};
+	
+	
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
