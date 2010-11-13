@@ -88,4 +88,6 @@
 <string name="hello">Hello</string>
 <string name="budburst_arrow">Bud\nBurst</string>
 <string name="Flora_arrow">Flora\nObs</string>
+<string name="splash_text">Collect Climate Change Data While Sharing Your Plant Observations</string>
+<string name="spalsh_text_2">Timing is Everything!</string>
 </resources>
