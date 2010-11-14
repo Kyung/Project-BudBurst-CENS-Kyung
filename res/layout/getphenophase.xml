@@ -50,25 +50,22 @@
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.2"
-    		android:text=" LEAVES"
     		android:textColor="@drawable/black"
-    	/>
+    	android:text="@string/BBList_leaves"/>
     	<TextView
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.3"
     		android:paddingLeft="18px"
-    		android:text="  FLOWERS"
     		android:textColor="@drawable/black"
-    	/>
+    	android:text="@string/BBList_flowers"/>
     	<TextView
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.3"
     		android:paddingLeft="10px"
-    		android:text="FRUITS"
     		android:textColor="@drawable/black"
-    	/>
+    	android:text="@string/BBList_fruits"/>
     
     </LinearLayout>
 	</LinearLayout>

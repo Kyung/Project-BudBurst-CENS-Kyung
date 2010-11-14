@@ -242,7 +242,7 @@ public class AddSite extends Activity{
 						Toast.makeText(AddSite.this, getString(R.string.AddSite_gotGPS), Toast.LENGTH_SHORT).show();
 					}
 					else {
-						longitude.setText(getString(R.string.AddSite_gettingGPS));
+						longitude.setText(getString(R.string.Alert_gettingGPS));
 					}
 		
 				}

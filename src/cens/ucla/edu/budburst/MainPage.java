@@ -90,7 +90,7 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainPage.this, "Coming Soon", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			}
 	    	
 	    });
@@ -113,7 +113,7 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainPage.this, "Coming Soon", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			}
 	    	
 	    });
@@ -124,7 +124,7 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainPage.this, "Coming Soon", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			}
 	    	
 	    });
@@ -139,12 +139,12 @@ public class MainPage extends Activity {
 		if(keyCode == event.KEYCODE_BACK) {
 			boolean flag = false;
 			if(event.getRepeatCount() == 3) {
-				Toast.makeText(MainPage.this, "Thank you.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainPage.this, getString(R.string.Alert_thanks), Toast.LENGTH_SHORT).show();
 				finish();
 				return true;
 			}
 			else if(event.getRepeatCount() == 0 && flag == false){
-				Toast.makeText(MainPage.this, "Hold the Back Button to exit.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainPage.this, getString(R.string.Alert_holdBackExit), Toast.LENGTH_SHORT).show();
 				flag = true;
 			}
 		}
@@ -157,8 +157,8 @@ public class MainPage extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		menu.add(0, 1, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
-		menu.add(0, 2, 0, "Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(0, 1, 0, getString(R.string.Menu_help)).setIcon(android.R.drawable.ic_menu_help);
+		menu.add(0, 2, 0, getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 			
 		return true;
 	}
@@ -171,9 +171,9 @@ public class MainPage extends Activity {
 				return true;
 			case 2:
 				new AlertDialog.Builder(MainPage.this)
-				.setTitle("Logout")
-				.setMessage("You might lose your unsynced data if you log out. Do you want to log out?")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+				.setTitle(getString(R.string.Menu_logout))
+				.setMessage(getString(R.string.Alert_logout))
+				.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -202,7 +202,7 @@ public class MainPage extends Activity {
 						finish();
 					}
 				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {

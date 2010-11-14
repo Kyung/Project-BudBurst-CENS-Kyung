@@ -61,10 +61,9 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="My Plants"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
-				/>
+				android:text="@string/Main_myPlants"/>
 			</LinearLayout>
 			<LinearLayout
 				android:layout_width="fill_parent"
@@ -98,10 +97,9 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="One Time Observation"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
-				/>
+				android:text="@string/Main_quickCapture"/>
 			</LinearLayout>
 		</LinearLayout>
 		<LinearLayout
@@ -137,10 +135,9 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="My Results"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
-				/>
+				android:text="@string/Main_plantLists"/>
 			</LinearLayout>
 			<LinearLayout
 				android:layout_width="fill_parent"
@@ -169,10 +166,9 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="Map"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
-				/>
+				android:text="@string/Main_plantMaps"/>
 			</LinearLayout>
 		</LinearLayout>
 			
@@ -210,10 +206,9 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="News"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
-				/>
+				android:text="@string/Main_news"/>
 			</LinearLayout>
 			<LinearLayout
 				android:layout_width="fill_parent"
@@ -242,10 +237,9 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="Weekly Plant"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
-				/>
+				android:text="@string/Main_weekly"/>
 			</LinearLayout>
 		</LinearLayout>
 

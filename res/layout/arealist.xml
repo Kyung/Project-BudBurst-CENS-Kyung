@@ -20,21 +20,19 @@
   	<TextView
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
-		android:text="Select the area and get Invasives!"
 		android:textSize="20dip"
 		android:textColor="#000000"
 		android:paddingTop="5dip"
 		android:paddingLeft="5dip"
 		android:id="@+id/title"
-  	/>
+  	android:text="@string/WI_Area"/>
   	<TextView
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
-		android:text="The seven nearest parks from you"
 		android:textSize="16dip"
 		android:textColor="@drawable/gray"
 		android:paddingLeft="5dip"
-  	/>
+  	android:text="@string/WI_parks"/>
   </LinearLayout>
   
   	<ListView

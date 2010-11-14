@@ -57,14 +57,12 @@
 	<Button
 		android:id="@+id/sync"
 		android:textColor="@drawable/black"
-		android:layout_width="130dip"
 		android:layout_height="wrap_content"
 		android:layout_margin="13dip"
 		android:layout_centerHorizontal="true"
 		android:layout_alignParentBottom="true"
 		android:textSize="20dip"
-		android:text="Sync"
 		android:focusable="true"
-	/>
+	android:text="@string/Button_synchronize" android:layout_width="wrap_content"/>
 	
 </RelativeLayout>

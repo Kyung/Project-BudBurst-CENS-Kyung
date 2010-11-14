@@ -154,7 +154,7 @@ public class AddPlant extends ListActivity{
 			staticDB = staticDBHelper.getReadableDatabase();
 			
 			if(v == rb1) {
-				myTitleText.setText("  " + getString(R.string.AddPlant_top10));
+				myTitleText.setText(getString(R.string.AddPlant_top10));
 				//header.setText("'TOP 10' list of the plants.");
 				arPlantList = new ArrayList<PlantItem>();
 		 		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
@@ -180,7 +180,7 @@ public class AddPlant extends ListActivity{
 				
 			}
 			else if (v == rb2) {
-				myTitleText.setText("  " + getString(R.string.AddPlant_all));
+				myTitleText.setText(getString(R.string.AddPlant_all));
 				//header.setText("'ALL' list of the plants.");
 				//Rereive syncDB and add them to arUserPlatList arraylist
 				arPlantList = new ArrayList<PlantItem>();
@@ -221,23 +221,23 @@ public class AddPlant extends ListActivity{
 
 						if(category[which].equals("Wild Flowers and Herbs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + WILD_FLOWERS + " ORDER BY common_name;",null);
-							myTitleText.setText("  " + getString(R.string.AddPlant_addFlowers));
+							myTitleText.setText(getString(R.string.AddPlant_addFlowers));
 						}
 						else if(category[which].equals("Grass")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + GRASSES + " ORDER BY common_name;",null);
-							myTitleText.setText("  " + getString(R.string.AddPlant_addGrass));
+							myTitleText.setText(getString(R.string.AddPlant_addGrass));
 						}
 						else if(category[which].equals("Deciduous Trees and Shrubs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + DECIDUOUS_TREES + " ORDER BY common_name;",null);
-							myTitleText.setText("  " + getString(R.string.AddPlant_addDecid));
+							myTitleText.setText(getString(R.string.AddPlant_addDecid));
 						}
 						else if(category[which].equals("Evergreen Trees and Shrubs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + EVERGREEN_TREES + " ORDER BY common_name;",null);
-							myTitleText.setText("  " + getString(R.string.AddPlant_addEvergreen));
+							myTitleText.setText(getString(R.string.AddPlant_addEvergreen));
 						}
 						else if(category[which].equals("Conifer")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + CONIFERS + " ORDER BY common_name;",null);
-							myTitleText.setText("  " + getString(R.string.AddPlant_addConifer));
+							myTitleText.setText(getString(R.string.AddPlant_addConifer));
 						}
 						else {
 						}
@@ -331,7 +331,7 @@ public class AddPlant extends ListActivity{
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				if(new_plant_site_id == null){
-					Toast.makeText(AddPlant.this, " " + getString(R.string.AddPlant_pleaseSelectSite), Toast.LENGTH_SHORT).show();
+					Toast.makeText(AddPlant.this, getString(R.string.AddPlant_pleaseSelectSite), Toast.LENGTH_SHORT).show();
 				}
 				else{
 					if(checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id)){
@@ -343,7 +343,7 @@ public class AddPlant extends ListActivity{
 							startActivity(intent);
 							finish();
 						}else{
-							Toast.makeText(AddPlant.this, getString(R.string.Toast_dbError), Toast.LENGTH_SHORT).show();
+							Toast.makeText(AddPlant.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
 						}
 					}
 				}

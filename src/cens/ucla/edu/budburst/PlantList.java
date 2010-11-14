@@ -84,10 +84,10 @@ public class PlantList extends ListActivity {
 		
 		if(first.equals("true")) {
 			new AlertDialog.Builder(PlantList.this)
-			.setTitle("Sync Done")
+			.setTitle(getString(R.string.Alert_synchronized))
 			.setIcon(R.drawable.pbbicon_small)
-			.setMessage("Database updated.")
-			.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+			.setMessage(getString(R.string.Alert_dbUpdated))
+			.setPositiveButton(getString(R.string.Button_OK),new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -175,7 +175,7 @@ public class PlantList extends ListActivity {
         	staticDBHelper.createDataBase();
 	 	} catch (IOException ioe) {
 	 		Log.e("K", "CREATE DATABASE : " + ioe.toString());
-	 		throw new Error("Unable to create database");
+	 		throw new Error(getString(R.string.Alert_dbError));
 	 	}
  
 	 	try {
@@ -348,7 +348,7 @@ public class PlantList extends ListActivity {
 					}
 				}
 				else {
-					Toast.makeText(PlantList.this, "Coming soon!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				}
 			}
 		})
@@ -362,10 +362,10 @@ public class PlantList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		SubMenu addButton = menu.addSubMenu("Manage")
+		SubMenu addButton = menu.addSubMenu(getString(R.string.Menu_manage))
 			.setIcon(android.R.drawable.ic_menu_manage);
-		addButton.add(0,MENU_ADD_SITE,0,"Add Site");
-		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");
+		addButton.add(0,MENU_ADD_SITE,0,getString(R.string.AddSite_addSite));
+		addButton.add(0,MENU_ADD_PLANT,0,getString(R.string.AddPlant_addPlant));
 		
 		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0, MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
@@ -394,7 +394,7 @@ public class PlantList extends ListActivity {
 				finish();
 				return true;
 			case MENU_HELP:
-				Toast.makeText(PlantList.this, "Coming soon", Toast.LENGTH_SHORT).show();
+				Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				return true;
 		}
 		return false;

@@ -49,25 +49,22 @@
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.3"
-    		android:text="TOP 10"
     		android:textColor="@drawable/black"
-    	/>
+    	android:text="@string/BBList_top10"/>
     	<TextView
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.3"
     		android:paddingLeft="18px"
-    		android:text="ALL"
     		android:textColor="@drawable/black"
-    	/>
+    	android:text="@string/BBList_all"/>
     	<TextView
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.2"
     		android:paddingLeft="18px"
-    		android:text="GROUP"
     		android:textColor="@drawable/black"
-    	/>
+    	android:text="@string/BBList_group"/>
     
     </LinearLayout>
 	</LinearLayout>

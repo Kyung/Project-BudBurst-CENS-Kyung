@@ -51,17 +51,15 @@
 		android:layout_marginTop="5dip"
 		android:layout_width="120px"
 		android:layout_height="wrap_content"
-		android:text="More"
 		android:id="@+id/detailBtn"
-	 />
+	 android:text="@string/Button_more"/>
 	
 	<Button
 		android:layout_marginLeft="5dip"
 		android:layout_marginTop="5dip"
 		android:layout_width="120px"
 		android:layout_height="wrap_content"
-		android:text="Okay"
 		android:id="@+id/okayBtn"
-	 />
+	 android:text="@string/Button_OK"/>
 	 </LinearLayout>
 </LinearLayout>

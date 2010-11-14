@@ -44,7 +44,7 @@ public class Login extends Activity{
 				String Password = textPassword.getText().toString();
 				
 				if(Username.equals("") || Password.equals("")){
-					Toast.makeText(Login.this,"Please check username and password",Toast.LENGTH_SHORT).show();	
+					Toast.makeText(Login.this, getString(R.string.Alert_wrongUserPass),Toast.LENGTH_SHORT).show();	
 				}else{
 
 					SharedPreferences.Editor edit = pref.edit();				

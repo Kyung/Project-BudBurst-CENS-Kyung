@@ -78,7 +78,7 @@ public class PlantInformation_Direct extends Activity {
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" Make Observation");
+		myTitleText.setText(getString(R.string.PlantInfo_makeObs));
 	    
 	    Intent p_intent = getIntent();
 		phenophase_id = p_intent.getExtras().getInt("pheno_id",0);
@@ -179,7 +179,7 @@ public class PlantInformation_Direct extends Activity {
 			    }
 			    
 			    // when press 'Back', close the dialog
-				dialog.setPositiveButton("Back", new DialogInterface.OnClickListener() {
+				dialog.setPositiveButton(getString(R.string.Button_back), new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -201,13 +201,13 @@ public class PlantInformation_Direct extends Activity {
 					File file = new File(BASE_PATH);
 					if (file.exists()) {
 						if(!file.isDirectory()) {
-							Toast.makeText(PlantInformation_Direct.this, "Error: Please check your sdcard", Toast.LENGTH_SHORT).show();
+							Toast.makeText(PlantInformation_Direct.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
 							finish();
 						}
 					}
 					else {
 						if (!file.mkdir()) {
-							Toast.makeText(PlantInformation_Direct.this, "Error: Please check your sdcard", Toast.LENGTH_SHORT).show();
+							Toast.makeText(PlantInformation_Direct.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
 							finish();
 						}
 					}
@@ -245,12 +245,12 @@ public class PlantInformation_Direct extends Activity {
 				if (ld.exists()) {
 					if (!ld.isDirectory()) {
 						// Should probably inform user ... hmm!
-						Toast.makeText(PlantInformation_Direct.this, "Error: Please check your sdcard.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(PlantInformation_Direct.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
 						PlantInformation_Direct.this.finish();
 					}
 				} else {
 					if (!ld.mkdir()) {
-						Toast.makeText(PlantInformation_Direct.this, "Error: Please check your sdcard.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(PlantInformation_Direct.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
 						PlantInformation_Direct.this.finish();
 					}
 				}
@@ -275,7 +275,7 @@ public class PlantInformation_Direct extends Activity {
 		
 		saveBtn = (Button) findViewById(R.id.save_changes);
 		if(direct) {
-			saveBtn.setText("Make Observation");
+			saveBtn.setText(getString(R.string.PlantInfo_makeObs));
 		}
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			
@@ -315,7 +315,7 @@ public class PlantInformation_Direct extends Activity {
 								"'" + dt_taken + "'," +
 								"'" + notes.getText().toString() + "'," +
 								SyncDBHelper.SYNCED_NO + ");";
-						Toast.makeText(PlantInformation_Direct.this, "Successfully Added", Toast.LENGTH_SHORT).show();
+						Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
 					}else{
 						int c_id = cursor.getInt(0);
 						Log.i("K", "C_ID : " + c_id);
@@ -327,7 +327,7 @@ public class PlantInformation_Direct extends Activity {
 								"synced=" + SyncDBHelper.SYNCED_NO + " " + 
 								"WHERE _id=" + c_id + ";"; 
 						
-						Toast.makeText(PlantInformation_Direct.this, "Successfully Updated", Toast.LENGTH_SHORT).show();
+						Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
 					}
 					cursor.close();
 					Log.i("K", "QUERY : " + query);
@@ -381,7 +381,7 @@ public class PlantInformation_Direct extends Activity {
 				
 				ShowPhotoTaken(imagePath, photo_image);
 				
-				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.PlantInfo_photoAdded), Toast.LENGTH_SHORT).show();
 				
 				photo_image.setVisibility(View.VISIBLE);
 				take_photo.setVisibility(View.GONE);
