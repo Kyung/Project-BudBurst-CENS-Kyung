@@ -141,7 +141,7 @@ public class PBB_map extends MapActivity {
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText("  Project Budburst Map View");
+		myTitleText.setText(getString(R.string.PBBMap_title));
 		
 		startSignalLevelListener();
 		
@@ -159,14 +159,14 @@ public class PBB_map extends MapActivity {
 		   	
 		 new AlertDialog.Builder(PBB_map.this)
 		   		.setTitle("Turn On GPS")
-		   		.setMessage("To get your current location, you need to turn on GPS. Would you like to go to the setting page?")
+		   		.setMessage(getString(R.string.Message_locationDisabledTurnOn))
 		   		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		   			public void onClick(DialogInterface dialog, int whichButton) {
 		   				Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
 		   				startActivityForResult(intent, 1);
 		   			}
 		   		})
-		   		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		   		.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
 		   			public void onClick(DialogInterface dialog, int whichButton) {
 		    				
 		   			}
@@ -219,9 +219,9 @@ public class PBB_map extends MapActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		menu.add(0, 1, 0, "My Location").setIcon(android.R.drawable.ic_menu_mylocation);
-		menu.add(0, 2, 0, "Change View").setIcon(android.R.drawable.ic_menu_revert);
-		menu.add(0, 3, 0, "Refresh").setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0, 1, 0, getString(R.string.PBBMapMenu_myLocation)).setIcon(android.R.drawable.ic_menu_mylocation);
+		menu.add(0, 2, 0, getString(R.string.PBBMapMenu_changeView)).setIcon(android.R.drawable.ic_menu_revert);
+		menu.add(0, 3, 0, getString(R.string.PBBMapMenu_refresh)).setIcon(android.R.drawable.ic_menu_rotate);
 			
 		return true;
 	}
@@ -232,7 +232,7 @@ public class PBB_map extends MapActivity {
 			case 1:
 				GeoPoint current_point = null;
 				if(latitude == 0.0) {
-					Toast.makeText(PBB_map.this, "Getting your location. Please wait...", Toast.LENGTH_SHORT).show();
+					Toast.makeText(PBB_map.this, getString(R.string.Alert_gettingGPS), Toast.LENGTH_SHORT).show();
 				}
 				else {
 					current_point = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
@@ -300,7 +300,7 @@ public class PBB_map extends MapActivity {
 		ProgressDialog dialog;
 		
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(PBB_map.this, "Loading...", "Loading map components...", true);
+			dialog = ProgressDialog.show(PBB_map.this, getString(R.string.Alert_loading), getString(R.string.PBBMap_loadingComponents), true);
 		}
 		@Override
 		protected Void doInBackground(String... get_url) {
@@ -397,7 +397,7 @@ public class PBB_map extends MapActivity {
 		    int y = 10;
 		  
 		    TextView et1 = new TextView(getApplicationContext());
-		    et1.setText("Touch the marker to see the details.");
+		    et1.setText(getString(R.string.PBBMap_touchMarker));
 		    et1.setTextColor(Color.BLACK);
 		    
 		    MapView.LayoutParams screenLP;
@@ -602,9 +602,9 @@ public class PBB_map extends MapActivity {
 			((TextView)view.findViewById(R.id.title))
 			.setText("" + item.getTitle() + "\n" + split_temp[0]);
 			((TextView)view.findViewById(R.id.geodata))
-			.setText("Phenophase : " + split_temp[1]);
+			.setText(getString(R.string.PBBMap_phenophase) + split_temp[1]);
 			((TextView)view.findViewById(R.id.dt_taken))
-			.setText("Date : " + split_temp[2]);
+			.setText(getString(R.string.PBBMap_date) + split_temp[2]);
 			Button okayBtn = (Button)view.findViewById(R.id.okayBtn);
 			okayBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -623,7 +623,7 @@ public class PBB_map extends MapActivity {
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					Toast.makeText(PBB_map.this, "Coming soon", Toast.LENGTH_SHORT).show();
+					Toast.makeText(PBB_map.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				}
 			});
 			
@@ -704,7 +704,7 @@ public class PBB_map extends MapActivity {
 			if(loc != null) {
 				latitude = loc.getLatitude();
 				longitude = loc.getLongitude();
-				String strLoc = String.format(" Current Location : %10.5f, %10.5f", latitude, longitude);
+				String strLoc = String.format(getString(R.string.PBBMap_currentLocation) + "%10.5f, %10.5f", latitude, longitude);
 				
 				//geo.setText(strLoc);
 			}

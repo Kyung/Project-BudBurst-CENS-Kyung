@@ -74,7 +74,7 @@ public class AddPlant extends ListActivity{
 		v.setPadding(0, 0, 0, 0);
 
 		myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText("  Add Plant > Top 10");
+		myTitleText.setText("  " + getString(R.string.AddPlant_top10));
 		
 		rb1 = (RadioButton)findViewById(R.id.option1);
 		rb2 = (RadioButton)findViewById(R.id.option2);
@@ -154,7 +154,7 @@ public class AddPlant extends ListActivity{
 			staticDB = staticDBHelper.getReadableDatabase();
 			
 			if(v == rb1) {
-				myTitleText.setText("  Add Plant > Top 10");
+				myTitleText.setText(getString(R.string.AddPlant_top10));
 				//header.setText("'TOP 10' list of the plants.");
 				arPlantList = new ArrayList<PlantItem>();
 		 		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
@@ -180,7 +180,7 @@ public class AddPlant extends ListActivity{
 				
 			}
 			else if (v == rb2) {
-				myTitleText.setText("  Add Plant > All");
+				myTitleText.setText(getString(R.string.AddPlant_all));
 				//header.setText("'ALL' list of the plants.");
 				//Rereive syncDB and add them to arUserPlatList arraylist
 				arPlantList = new ArrayList<PlantItem>();
@@ -208,7 +208,7 @@ public class AddPlant extends ListActivity{
 				
 				//header.setText("By Group.");
 				new AlertDialog.Builder(AddPlant.this)
-				.setTitle("Select Category")
+				.setTitle(getString(R.string.AddPlant_SelectCategory))
 				.setIcon(android.R.drawable.ic_menu_more)
 				.setItems(R.array.category, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -221,23 +221,23 @@ public class AddPlant extends ListActivity{
 
 						if(category[which].equals("Wild Flowers and Herbs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + WILD_FLOWERS + " ORDER BY common_name;",null);
-							myTitleText.setText("  Add Plant > Flowers");
+							myTitleText.setText(getString(R.string.AddPlant_addFlowers));
 						}
 						else if(category[which].equals("Grass")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + GRASSES + " ORDER BY common_name;",null);
-							myTitleText.setText("  Add Plant > Grass");
+							myTitleText.setText(getString(R.string.AddPlant_addGrass));
 						}
 						else if(category[which].equals("Deciduous Trees and Shrubs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + DECIDUOUS_TREES + " ORDER BY common_name;",null);
-							myTitleText.setText("  Add Plant > Deciduous");
+							myTitleText.setText(getString(R.string.AddPlant_addDecid));
 						}
 						else if(category[which].equals("Evergreen Trees and Shrubs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + EVERGREEN_TREES + " ORDER BY common_name;",null);
-							myTitleText.setText("  Add Plant > Evergreen");
+							myTitleText.setText(getString(R.string.AddPlant_addEvergreen));
 						}
 						else if(category[which].equals("Conifer")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + CONIFERS + " ORDER BY common_name;",null);
-							myTitleText.setText("  Add Plant > Conifer");
+							myTitleText.setText(getString(R.string.AddPlant_addConifer));
 						}
 						else {
 						}
@@ -268,7 +268,7 @@ public class AddPlant extends ListActivity{
 						
 					}
 				})
-				.setNegativeButton("Back", null)
+				.setNegativeButton(getString(R.string.Button_back), null)
 				.show();
 				
 			}
@@ -316,7 +316,7 @@ public class AddPlant extends ListActivity{
 		
 		//Pop up choose site dialog box
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose site")
+		builder.setTitle(getString(R.string.AddPlant_chooseSite))
 		.setSingleChoiceItems(seqUserSite, -1, new DialogInterface.OnClickListener() {
 			
 			@Override
@@ -327,29 +327,29 @@ public class AddPlant extends ListActivity{
 				new_plant_site_name = seqUserSite[mSelect].toString();
 			}
 		})
-		.setPositiveButton("Select", new DialogInterface.OnClickListener() {
+		.setPositiveButton(getString(R.string.Button_select), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				if(new_plant_site_id == null){
-					Toast.makeText(AddPlant.this, " Please select site.", Toast.LENGTH_SHORT).show();
+					Toast.makeText(AddPlant.this, getString(R.string.AddPlant_pleaseSelectSite), Toast.LENGTH_SHORT).show();
 				}
 				else{
 					if(checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id)){
-						Toast.makeText(AddPlant.this, "The selected plant already exists in the site.", Toast.LENGTH_LONG).show();
+						Toast.makeText(AddPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
 						if(insertNewPlantToDB(new_plant_species_id, new_plant_site_id, new_plant_site_name)){
 							Intent intent = new Intent(AddPlant.this, PlantList.class);
-							Toast.makeText(AddPlant.this, "New Plant Added!", Toast.LENGTH_SHORT).show();
+							Toast.makeText(AddPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							startActivity(intent);
 							finish();
 						}else{
-							Toast.makeText(AddPlant.this, "Database error.", Toast.LENGTH_SHORT).show();
+							Toast.makeText(AddPlant.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
 			}
 		})
-		.setNegativeButton("Cancel", null)
+		.setNegativeButton(getString(R.string.Button_cancel), null)
 		.show();
 	}
 	

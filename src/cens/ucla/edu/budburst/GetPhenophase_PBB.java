@@ -56,7 +56,7 @@ public class GetPhenophase_PBB extends ListActivity {
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" Choose PhenoPhase");
+		myTitleText.setText(getString(R.string.GetPhenophase_choose));
 	    
 	    
 	    Intent intent = getIntent();
@@ -302,7 +302,7 @@ public class GetPhenophase_PBB extends ListActivity {
 			    	}
 			    	else {
 			    		icon = overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.check_mark));
-			    		yes_or_no = "(No Photo)";
+			    		yes_or_no = getString(R.string.GetPhenophase_noPhoto);
 			    	}
 			    }
 			}

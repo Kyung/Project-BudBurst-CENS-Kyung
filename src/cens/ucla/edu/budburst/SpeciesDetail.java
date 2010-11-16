@@ -50,7 +50,7 @@ public class SpeciesDetail extends Activity {
 		v.setPadding(0, 0, 0, 0);
 		
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText("  Species Information");
+		myTitleText.setText(getString(R.string.SpeciesDetail_info));
 	    
 		Intent intent = getIntent();
 	    species_id = intent.getExtras().getInt("id");

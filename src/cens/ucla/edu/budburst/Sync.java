@@ -149,8 +149,8 @@ public class Sync extends Activity{
 //		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");
 //		addButton.add(0,MENU_ADD_SITE,0,"Add Site");		
 		
-		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
-		menu.add(0,MENU_LOGOUT,0,"Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(0,MENU_SYNC,0,getString(R.string.Menu_sync)).setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0,MENU_LOGOUT,0,getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 			
 		return true;
 	}
@@ -178,10 +178,10 @@ public class Sync extends Activity{
 				return true;
 			case MENU_LOGOUT:
 				new AlertDialog.Builder(Sync.this)
-					.setTitle("Question")
-					.setMessage("You might lose your unsynced data if you log out. Do you want to log out?")
-					.setPositiveButton("Yes",mClick)
-					.setNegativeButton("no",mClick)
+					.setTitle(getString(R.string.Alert_titleQuestion))
+					.setMessage(getString(R.string.Alert_logout))
+					.setPositiveButton(getString(R.string.Button_yes),mClick)
+					.setNegativeButton(getString(R.string.Button_no),mClick)
 					.show();
 				return true;
 		}
@@ -196,10 +196,10 @@ public class Sync extends Activity{
 		case 0:
 			mProgress = new ProgressDialog(this);
 			mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			mProgress.setTitle("Syncing...");
-			mProgress.setMessage("Wait...");
+			mProgress.setTitle(getString(R.string.Alert_synchronizing));
+			mProgress.setMessage(getString(R.string.Alert_pleaseWait));
 			mProgress.setCancelable(false);
-			mProgress.setButton("Cancel", new DialogInterface.OnClickListener() {
+			mProgress.setButton(getString(R.string.Button_cancel), new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -231,14 +231,14 @@ public class Sync extends Activity{
 			
 			if(msg.what == SERVER_ERROR){
 				String error_message = (String)msg.obj;
-				if(error_message.equals("Wrong username and password"))
+				if(error_message.equals(getString(R.string.Alert_wrongUserPass)))
 				{
 					SharedPreferences.Editor edit = pref.edit();				
 					edit.putString("Username","");
 					edit.putString("Password","");
 					edit.commit();
 					
-					Toast.makeText(Sync.this, "Message from server:\n" 
+					Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) 
 							+ error_message, Toast.LENGTH_LONG).show();
 					
 					Intent intent = new Intent(Sync.this,Login.class);
@@ -248,20 +248,19 @@ public class Sync extends Activity{
 				}
 				dismissDialog(0);
 				removeDialog(0);
-				Toast.makeText(Sync.this, "Message from server:\n" 
+				Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) 
 						+ error_message, Toast.LENGTH_LONG).show();
 			}else if(msg.what < NETWORK_ERROR){
 				dismissDialog(0);
 				removeDialog(0);
-				Toast.makeText(Sync.this, "Network error occurs. Please " +
-						"check your network status and try again.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(Sync.this, getString(R.string.Alert_errorDownload), Toast.LENGTH_SHORT).show();
 			}
 		
 			//Each step would be reached whenever doSyncThread transfer data with server
 			switch(msg.what){
 			case SYNC_START:
 				mProgress.setProgress(0);
-				mProgress.setMessage("Uploading new sites");
+				mProgress.setMessage(getString(R.string.Alert_uploadingSites));
 				
 				//Start Next Step
 				msgToThread.what = UPLOAD_ADDED_SITE;
@@ -269,7 +268,7 @@ public class Sync extends Activity{
 				break;
 			case UPLOAD_ADDED_SITE:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Uploading new sites");
+				mProgress.setMessage(getString(R.string.Alert_uploadingSites));
 				
 				//Start Next Step
 				msgToThread.what = UPLOAD_ADDED_PLANT;
@@ -277,7 +276,7 @@ public class Sync extends Activity{
 				break;
 			case UPLOAD_ADDED_PLANT:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Uploading new plants");
+				mProgress.setMessage(getString(R.string.Alert_uploadingPlants));
 				
 				//Trigger Next Step
 				msgToThread.what = UPLOAD_OBSERVATION;
@@ -285,7 +284,7 @@ public class Sync extends Activity{
 				break;
 			case UPLOAD_OBSERVATION:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Uploading your observation");
+				mProgress.setMessage(getString(R.string.Alert_uploadingObs));
 				
 				//Trigger Next Step
 				//Check if this is done, then go next stage
@@ -300,7 +299,7 @@ public class Sync extends Activity{
 				break;
 			case DOWNLOAD_USER_STATION:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Downloading your site");
+				mProgress.setMessage(getString(R.string.Alert_downloadingSites));
 				
 				//Trigger Next Step
 				msgToThread.what = DOWNLOAD_USER_PLANTS;
@@ -309,7 +308,7 @@ public class Sync extends Activity{
 				break;
 			case DOWNLOAD_USER_PLANTS:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Downloading your plant");
+				mProgress.setMessage(getString(R.string.Alert_downloadingPlants));
 				
 				//Trigger Next Step
 				msgToThread.what = DOWNLOAD_OBSERVATION;
@@ -317,7 +316,7 @@ public class Sync extends Activity{
 				break;
 			case DOWNLOAD_OBSERVATION:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Downloading observation");
+				mProgress.setMessage(getString(R.string.Alert_downloadingObs));
 				
 				//Trigger Next Step
 				msgToThread.what = DOWNLOAD_OBSERVATION_IMG;
@@ -325,7 +324,7 @@ public class Sync extends Activity{
 				break;
 			case DOWNLOAD_OBSERVATION_IMG:
 				mProgress.setProgress(mProgressVal);
-				mProgress.setMessage("Downloading image files");
+				mProgress.setMessage(getString(R.string.Alert_downloadingImages));
 				
 				if(finish == 0){
 					msgToThread.what = DOWNLOAD_OBSERVATION_IMG;
@@ -345,7 +344,7 @@ public class Sync extends Activity{
 				startActivity(intent);
 				finish();
 				
-				Toast.makeText(Sync.this, "Sync done.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(Sync.this, getString(R.string.Alert_synchronized), Toast.LENGTH_SHORT).show();
 				
 				break;
 			}

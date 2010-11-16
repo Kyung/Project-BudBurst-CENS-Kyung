@@ -86,9 +86,8 @@
         	android:layout_height="wrap_content"
         	android:textAppearance="?android:attr/textAppearanceSmall"
         	android:textColor="@drawable/black"
-        	android:text=" phenophases observed"
         	android:id="@+id/pheno_observed"
-        />
+        android:text="@string/PlantList_phenosObserved"/>
         </LinearLayout>
     </LinearLayout>
   </LinearLayout>

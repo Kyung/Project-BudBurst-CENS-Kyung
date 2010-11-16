@@ -62,7 +62,7 @@ public class AddSite extends Activity{
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		latitude = (EditText)this.findViewById(R.id.latitude);
 		longitude = (EditText)this.findViewById(R.id.longitude);
-		myTitleText.setText("  Add Site");
+		myTitleText.setText("  " + getString(R.string.AddSite_addSite));
 		
 		lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
@@ -121,7 +121,7 @@ public class AddSite extends Activity{
 
 					//Check site name is empty
 					if(usertype_stname.equals("")){
-						Toast.makeText(AddSite.this,"Please check your site name", Toast.LENGTH_SHORT).show();
+						Toast.makeText(AddSite.this,getString(R.string.AddSite_checkSiteName), Toast.LENGTH_SHORT).show();
 						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
 						return;
@@ -132,8 +132,7 @@ public class AddSite extends Activity{
 						+ usertype_stname + "';";
 					Cursor cursor = syncWDB.rawQuery(query, null);
 					if(cursor.getCount() != 0){
-						Toast.makeText(AddSite.this,"The site name is already in your site list. Please " +
-								"type another name.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(AddSite.this,getString(R.string.AddSite_alreadyExists), Toast.LENGTH_SHORT).show();
 						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
 						cursor.close();
@@ -161,10 +160,10 @@ public class AddSite extends Activity{
 					
 					
 					new AlertDialog.Builder(AddSite.this)
-					.setTitle("New Site Added!")
+					.setTitle(getString(R.string.AddSite_newAdded))
 					.setIcon(R.drawable.pbbicon_small)
-					.setMessage("Please note that the new site will be shown on the list after you add a plant.")
-					.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+					.setMessage(getString(R.string.AddSite_note1))
+					.setPositiveButton(getString(R.string.Button_OK), new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -187,16 +186,15 @@ public class AddSite extends Activity{
 
 	private void createLocationServiceDisabledAlert(){  
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);  
-		builder.setMessage("Your location service is disabled. Please enable both wireless " +
-				"networks and GPS satelites to identify your location.")  
+		builder.setMessage(getString(R.string.Message_locationDisabled))  
 		     .setCancelable(false)  
-		     .setPositiveButton("Enable",  
+		     .setPositiveButton(getString(R.string.Button_enable),  
 		          new DialogInterface.OnClickListener(){  
 		          public void onClick(DialogInterface dialog, int id){  
 		               showLocationOptions();  
 		          }  
 		     });  
-		     builder.setNegativeButton("Cancel",  
+		     builder.setNegativeButton(getString(R.string.Button_cancel),  
 		          new DialogInterface.OnClickListener(){  
 		          public void onClick(DialogInterface dialog, int id){  
 		               dialog.cancel();  
@@ -241,10 +239,10 @@ public class AddSite extends Activity{
 						
 						// when get the data, stop GPS
 						lmanager.removeUpdates(gpsListener);
-						Toast.makeText(AddSite.this, "Get your location. \nTurning GPS off", Toast.LENGTH_SHORT).show();
+						Toast.makeText(AddSite.this, getString(R.string.AddSite_gotGPS), Toast.LENGTH_SHORT).show();
 					}
 					else {
-						longitude.setText("Still getting location...");
+						longitude.setText(getString(R.string.Alert_gettingGPS));
 					}
 		
 				}
@@ -258,13 +256,13 @@ public class AddSite extends Activity{
 		@Override
 		public void onProviderDisabled(String arg0) {
 			// TODO Auto-generated method stub
-			Toast.makeText(AddSite.this, "GPS disabled", Toast.LENGTH_SHORT).show();
+			Toast.makeText(AddSite.this, getString(R.string.AddSite_disabledGPS), Toast.LENGTH_SHORT).show();
 			
 		}
 		@Override
 		public void onProviderEnabled(String arg0) {
 			// TODO Auto-generated method stub
-			Toast.makeText(AddSite.this, "GPS enabled", Toast.LENGTH_SHORT).show();
+			Toast.makeText(AddSite.this, getString(R.string.AddSite_enabledGPS), Toast.LENGTH_SHORT).show();
 		}
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {

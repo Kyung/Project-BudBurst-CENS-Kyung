@@ -125,27 +125,8 @@
 			android:paddingTop="2dip"
 			>
 		
-		<TextView
-			android:scaleType="fitCenter"
-			android:layout_width="110px"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:textSize="16dip"
-			android:text="Image"
-			android:layout_gravity="center"
-			android:id="@+id/observation_text"
-			/>
-		<TextView
-			android:scaleType="fitCenter"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:left="@+id/observation_text"
-			android:gravity="center"
-			android:text="Note"
-			android:textSize="16dip"
-			android:focusable="true"
-			android:focusableInTouchMode="true"
-			/>
+		
+		
 			
 		</LinearLayout>
 
@@ -180,8 +161,7 @@
 			android:gravity="top" 
 			android:textSize="16dip"
 			android:textStyle="italic"
-			android:textColor="@color/black"
-		/>
+			android:textColor="@color/black" android:hint="@string/PlantInfo_addNotes"/>
 		
 		</LinearLayout>
 		<Button
@@ -193,9 +173,8 @@
 			android:layout_marginBottom="20px"
 			android:textStyle="bold"
 			android:textSize="16dip"
-			android:text="Edit Observation"
 			android:focusable="true"
-		/>
+		android:text="@string/Button_editObs"/>
 	
 	</LinearLayout>
 	</ScrollView>

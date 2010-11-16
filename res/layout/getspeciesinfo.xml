@@ -90,7 +90,6 @@
 		<TextView
   			android:layout_width="fill_parent"
   			android:layout_height="wrap_content"
-  			android:text="Make your observation"
   			android:textSize="18px"
   			android:textStyle="bold"
   			android:gravity="center"
@@ -99,7 +98,7 @@
   			android:focusable="true"
   			android:focusableInTouchMode="true"
   			android:id="@+id/title_text"
-  		/>
+  		android:text="@string/PlantInfo_makeObs"/>
 
 		<TextView
 			android:paddingTop="1dip"
@@ -108,10 +107,9 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text=" Take a Photo"
 			android:background="@drawable/bg_line_top"
 			android:textSize="16dip"
-			/>
+			android:text="@string/PlantInfo_addPhoto"/>
 			
 		<ImageButton 
 			android:scaleType="fitCenter"
@@ -146,9 +144,7 @@
 					android:textColor="@drawable/black"
 					android:layout_width="fill_parent" 
 					android:layout_height="fill_parent"
-					android:layout_gravity="bottom"
-					android:text="Take Photo" 
-					/>
+					android:layout_gravity="bottom" android:text="@string/Button_addPhoto"/>
 					
 				<ImageView
 					android:layout_width="wrap_content"			
@@ -172,8 +168,7 @@
 					android:textColor="@drawable/black"
 					android:layout_width="fill_parent" 
 					android:layout_height="fill_parent"
-					android:layout_gravity="bottom"
-					android:text="Replace Photo" />
+					android:layout_gravity="bottom" android:text="@string/Button_replacePhoto"/>
 					
 				<ImageView
 					android:layout_width="wrap_content" 
@@ -192,10 +187,9 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text=" Add Notes"
 			android:textSize="16dip"
 			android:background="@drawable/bg_line_top"
-			/>	
+			android:text="@string/PlantInfo_addNotes"/>	
 
 		<EditText
 			android:id="@+id/notes"
@@ -206,10 +200,9 @@
 			android:width="0dip"
 			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
 			android:gravity="top" 
-			android:hint="Input note here"
 			android:lines="4"
 			android:paddingBottom="10dip"
-			/>
+			android:hint="@string/PlantInfo_addNotes"/>
 			
 		<LinearLayout
 			android:paddingTop="3dip" 
@@ -226,9 +219,8 @@
 				android:layout_gravity="center"
 				android:textStyle="bold"
 				android:textSize="16dip"
-				android:text="See Summary"
 				android:focusable="true"
-			/>
+			android:text="@string/Button_save"/>
 		</LinearLayout>
 	</LinearLayout>
 </ScrollView>

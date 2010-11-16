@@ -31,4 +31,6 @@
 	<color name="flora_title_background">#edcb3f</color>
 	<color name="black">#000000</color>
 	<color name="main_text">#395a04</color>
+<color name="BudBurstBackground">#5e855a</color>
+<color name="White">#ffffff</color>
 </resources>

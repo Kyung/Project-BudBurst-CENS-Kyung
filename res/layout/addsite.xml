@@ -19,10 +19,9 @@
 	android:layout_marginLeft="5dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip"
-	android:text="You can add new site here. Latitude and longitude below are your current location."
 	android:focusableInTouchMode="true"
 	android:focusable="true"
-	>
+	android:text="@string/AddSite_intro" android:gravity="center_horizontal">
 	</TextView>
 	
 	<TextView
@@ -34,19 +33,16 @@
 	android:layout_marginTop="10dip"
 	android:layout_marginLeft="30dip"
 	android:layout_marginRight="5dip"
-	android:textSize="17dip"
-	android:text="Site name"
-	>
+	android:textSize="17dip" android:text="@string/AddSite_siteName">
 	</TextView>
 	<EditText 
 	android:id="@+id/sitename"
 	android:layout_below="@+id/sitename_lable"
-	android:hint="sitename"
 	android:layout_marginLeft="30dip"
 	android:layout_marginRight="30dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
-	>
+	android:hint="@string/AddSite_siteName">
 	</EditText>
 	
 	<TextView
@@ -59,16 +55,14 @@
 	android:layout_marginRight="5dip"
 	android:textStyle="bold"
 	android:textSize="17dip"
-	android:text="Latitude/Longitude"
 	android:focusableInTouchMode="true"
 	android:focusable="true"
-	>
+	android:text="@string/AddSite_latlong">
 	</TextView>
 	
 	<EditText 
 	android:id="@+id/latitude"
 	android:layout_below="@+id/latitude_label"
-	android:hint="Getting Latitude / Longitude..."
 	android:layout_marginLeft="30dip"
 	android:layout_marginRight="30dip"	
 	android:layout_height="wrap_content"
@@ -76,7 +70,7 @@
 	android:enabled="false"
 	android:textColor="@color/black"
 	android:textSize="16px"
-	>
+	android:hint="@string/AddSite_gettingLatLong">
 	</EditText>
 
 	<TextView
@@ -88,14 +82,11 @@
 	android:layout_marginTop="10dip"
 	android:layout_marginLeft="30dip"
 	android:layout_marginRight="5dip"
-	android:textSize="17dip"
-	android:text="Address"
-	>
+	android:textSize="17dip" android:text="@string/AddSite_address">
 	</TextView>
 	<EditText 
 	android:id="@+id/longitude"
 	android:layout_below="@+id/longitude_label"
-	android:hint="Getting location..."
 	android:textSize="16px"
 	android:layout_marginLeft="30dip"
 	android:layout_marginRight="30dip"	
@@ -103,7 +94,7 @@
 	android:layout_width="fill_parent"
 	android:enabled="false"
 	android:textColor="@color/black"
-	>
+	android:hint="@string/AddSite_lookingAddress">
 	</EditText>
 
 	<TextView
@@ -115,20 +106,17 @@
 	android:layout_marginRight="5dip"
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
-	android:textSize="17dip"
-	android:text="Comment"
-	>
+	android:textSize="17dip" android:text="@string/AddSite_description">
 	</TextView>
 	<EditText 
 	android:id="@+id/comment"
 	android:layout_below="@+id/comment_lable"
-	android:hint="Comment(option)"
 	android:gravity="top"
 	android:layout_marginLeft="30dip"
 	android:layout_marginRight="30dip"	
 	android:layout_height="100dip"
 	android:layout_width="fill_parent"
-	>
+	android:hint="@string/AddSite_optional">
 	</EditText>
 
 	<LinearLayout
@@ -146,9 +134,8 @@
 	android:layout_margin="10dip"
 	android:gravity="center" 
 	android:textSize="20dip"
-	android:text="Save"
 	android:focusable="true"
-	/>
+	android:text="@string/Button_save"/>
 	
 	<Button
 	android:id="@+id/cancel"
@@ -159,9 +146,8 @@
 	android:layout_centerHorizontal="true"
 	android:gravity="center" 
 	android:textSize="20dip"
-	android:text="Cancel"
 	android:focusable="true"
-	/>
+	android:text="@string/Button_cancel"/>
 	</LinearLayout>
 </RelativeLayout>
 </ScrollView>

@@ -29,28 +29,26 @@
 				android:layout_gravity = "center"
 				android:layout_marginBottom = "8dip" android:padding="7dp">
 				<EditText android:id="@+id/username_text"
-					android:hint="Username"
 					android:background="@layout/text_edit_field"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_horizontal"
 					android:layout_marginBottom="5dp"
-					android:focusable="true" android:layout_width="200px">
+					android:focusable="true" android:layout_width="200px" android:hint="@string/username">
 				</EditText>
 				<EditText android:id="@+id/password_text"
-					android:hint="Password"
 					android:password="true"
 					android:background="@layout/text_edit_field"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_horizontal"
 					android:layout_marginBottom="5dp"
-					android:focusable="true">
+					android:focusable="true" android:hint="@string/password">
 				</EditText>
 				<Button android:id="@+id/login_button" 
 					android:background="@layout/button_field"
 					android:textColor="@drawable/app_gray"
 					android:layout_height="wrap_content" 
-					android:focusable="true" android:layout_width="wrap_content" android:layout_gravity="left" android:layout_marginTop="5dp" android:text="@string/login" android:typeface="normal" android:textStyle="bold">
+					android:focusable="true" android:layout_width="wrap_content" android:layout_gravity="left" android:layout_marginTop="5dp" android:typeface="normal" android:textStyle="bold" android:text="@string/login">
 				</Button>
 				
 				

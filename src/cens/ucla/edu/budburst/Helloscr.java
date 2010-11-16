@@ -174,8 +174,8 @@ public class Helloscr extends Activity{
 		
 		SubMenu addButton = menu.addSubMenu("Add")
 			.setIcon(android.R.drawable.ic_menu_add);
-		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");
-		addButton.add(0,MENU_ADD_SITE,0,"Add Site");		
+		addButton.add(0,MENU_ADD_PLANT,0,getString(R.string.Menu_addPlant));
+		addButton.add(0,MENU_ADD_SITE,0,getString(R.string.Menu_addSite));		
 		
 		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0,MENU_LOGOUT,0,"Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
@@ -217,10 +217,10 @@ public class Helloscr extends Activity{
 	
 			case MENU_LOGOUT:
 				new AlertDialog.Builder(Helloscr.this)
-					.setTitle("Question")
-					.setMessage("You might lose your unsynced data if you log out. Do you want to log out?")
-					.setPositiveButton("Yes",mClick)
-					.setNegativeButton("no",mClick)
+					.setTitle(getString(R.string.Alert_titleQuestion))
+					.setMessage(getString(R.string.Alert_logout))
+					.setPositiveButton(getString(R.string.Button_yes),mClick)
+					.setNegativeButton(getString(R.string.Button_no),mClick)
 					.show();
 				return true;
 		}
@@ -336,7 +336,7 @@ public class Helloscr extends Activity{
 			}else{
 				Message msg = mHandler.obtainMessage();
 				msg.arg1 = -1;
-				msg.obj = new String("Error occurs while downloading my speices.");
+				msg.obj = new String(getString(R.string.Alert_errorSpecies));
 				mHandler.sendMessage(msg);
 				continueFlag = false;
 				return;
@@ -360,7 +360,7 @@ public class Helloscr extends Activity{
 			}else{
 				Message msg = mHandler.obtainMessage();
 				msg.arg1 = -1;
-				msg.obj = new String("Error occurs while downloading my observation.");
+				msg.obj = new String(getString(R.string.Alert_errorDownload));
 				mHandler.sendMessage(msg);
 				try{Thread.sleep(80);}catch(Exception e){;}
 				continueFlag = false;
@@ -417,8 +417,8 @@ public class Helloscr extends Activity{
 				}catch(Exception e){
 					Log.e(TAG, e.toString());
 				}
-				Toast.makeText(Helloscr.this,msg.obj + 
-						" Please check your network connectivity and try again.",Toast.LENGTH_SHORT).show();
+				Toast.makeText(Helloscr.this,msg.obj + " " + 
+						getString(R.string.Alert_checkConnectivity),Toast.LENGTH_SHORT).show();
 				progressValue = 0;
 			}
 			else if(progressValue < 100){
@@ -435,14 +435,14 @@ public class Helloscr extends Activity{
 						case UPLOAD_ADDED_SITE:
 							break;
 						case UPLOAD_ADDED_PLANT:
-							mProgress.setMessage("Uploading newly added plants..");
+							mProgress.setMessage(getString(R.string.Alert_uploadingPlants));
 							break;
 						case UPLOAD_OBSERVATION:
-							mProgress.setMessage("Uploading obseravtions..");
+							mProgress.setMessage(getString(R.string.Alert_uploadingObs));
 
 							break;
 						case DOWNLOAD_MY_SPECIES_IN_MY_STATION:
-							mProgress.setMessage("Downloading my plants..");
+							mProgress.setMessage(getString(R.string.Alert_downloadingPlants));
 							try{
 								jsonobj = new JSONObject((String)msg.obj);
 								JSONArray jsonresult = new JSONArray(jsonobj.getString("results"));
@@ -467,7 +467,7 @@ public class Helloscr extends Activity{
 							}
 							break;
 						case DOWNLOAD_OBSERVATION:
-							mProgress.setMessage("Downloading my observation..");
+							mProgress.setMessage(getString(R.string.Alert_downloadingObs));
 							try{
 								jsonobj = new JSONObject((String)msg.obj);
 								JSONArray jsonresult = new JSONArray(jsonobj.getString("results"));
@@ -495,7 +495,7 @@ public class Helloscr extends Activity{
 							}							
 							break;
 						case DOWNLOAD_OBSERVATION_IMG:
-							mProgress.setMessage("Downloading observation image..");
+							mProgress.setMessage(getString(R.string.Alert_downloadingImages));
 							try{
 								Log.d(TAG, "DOWNLOAD_OBS_IMAGE: success to store into db");
 							}catch(Exception e){
@@ -518,7 +518,7 @@ public class Helloscr extends Activity{
 						}
 						
 						//Error message handling
-						if(error_message.equals("Wrong username and password"))
+						if(error_message.equals(getString(R.string.Alert_wrongUserPass)))
 						{
 							SharedPreferences.Editor edit = pref.edit();				
 							edit.putString("Username","");
@@ -531,7 +531,7 @@ public class Helloscr extends Activity{
 							finish();
 							return;
 						}
-						Toast.makeText(Helloscr.this, "Message from server:\n" + error_message, Toast.LENGTH_LONG).show();
+						Toast.makeText(Helloscr.this, getString(R.string.Alert_messageServer) + error_message, Toast.LENGTH_LONG).show();
 					}
 
 				}
@@ -540,7 +540,7 @@ public class Helloscr extends Activity{
 				}
 			}
 			else{ //Download completed.
-				mProgress.setMessage("Download completed.");
+				mProgress.setMessage(getString(R.string.Alert_downloadComplete));
 				mProgress.setProgress(100);
 				mQuit = true;
 				try{
@@ -568,10 +568,10 @@ public class Helloscr extends Activity{
 		case 0:
 			mProgress = new ProgressDialog(this);
 			mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			mProgress.setTitle("Syncing");
-			mProgress.setMessage("Wait...");
+			mProgress.setTitle(getString(R.string.Alert_synchronizing));
+			mProgress.setMessage(getString(R.string.Alert_pleaseWait));
 			mProgress.setCancelable(false);
-			mProgress.setButton("Cancel",new DialogInterface.OnClickListener(){
+			mProgress.setButton(getString(R.string.Button_cancel), new DialogInterface.OnClickListener(){
 				public void onClick(DialogInterface dialog, int wchihButton){
 					mQuit = true;
 					cancelBtnClickedFlag = true;
