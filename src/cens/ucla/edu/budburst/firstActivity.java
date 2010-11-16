@@ -10,26 +10,23 @@ public class firstActivity extends Activity{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//Retrieve username and password
-		SharedPreferences pref = getSharedPreferences("userinfo",0);
-		String synced = pref.getString("Synced", "false");
-		
-		//Check login
-		if(	!(pref.getString("Username","").equals("")) && !(pref.getString("Password","").equals(""))){
-			if(synced.equals("true")){
-				Intent intent = new Intent(firstActivity.this, MainPage.class);
-				startActivity(intent);
-				finish();
-			}
-			else{
-				Intent intent = new Intent(firstActivity.this, Sync.class);
-				startActivity(intent);
-				finish();
-			}
-		}
-		else{
-			Intent intent = new Intent(firstActivity.this, Login.class);
-			firstActivity.this.startActivity(intent);
+	    setContentView(R.layout.splash);
+	    // TODO Auto-generated method stub
+	    
+	    try {
+			Thread.sleep(2500);
+			
+			Intent intent = new Intent(firstActivity.this, Splash.class);
 			finish();
-		}
+			startActivity(intent);
+
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}   
+		
+		
+
 	}
 }

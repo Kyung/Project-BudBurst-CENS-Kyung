@@ -85,11 +85,12 @@
 					android:layout_height="fill_parent"
 					android:gravity="center"
 					android:layout_weight="0.3"
+
 				>	
 				<Button
 					android:layout_width="70px"
 					android:layout_height="70px"
-					android:background="@drawable/magnifiner"
+					android:background="@drawable/camera"
 					android:id="@+id/onetimeobservation"
 				/>
 				</LinearLayout>
@@ -98,7 +99,7 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="One Time Observation"
+					android:text="Quick Capture"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
 				/>
@@ -137,7 +138,7 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="My Results"
+					android:text="Local Lists"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
 				/>
@@ -161,7 +162,7 @@
 					android:layout_width="70px"
 					android:layout_height="70px"
 					android:id="@+id/map"
-					android:background="@drawable/world"
+					android:background="@drawable/main_icon_pressed"
 				/>
 				</LinearLayout>
 				<TextView
@@ -169,7 +170,7 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="Map"
+					android:text="Plant Maps"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
 				/>
@@ -210,7 +211,7 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="News"
+					android:text="Plant News"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
 				/>

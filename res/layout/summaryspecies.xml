@@ -94,7 +94,7 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
 			android:textStyle="bold" 
-			android:text="Map View"
+			android:text="Location"
 			android:textSize="16dip"
 			android:background="@drawable/bg_line_top"
 			/>
@@ -183,7 +183,6 @@
 			android:gravity="top" 
 			android:textSize="17dip"
 			android:layout_marginLeft="27px"
-			android:enabled="false"
 			android:lines="4"
 		/>
 		</LinearLayout>
@@ -195,7 +194,7 @@
 			android:paddingBottom="10dip"
 			android:orientation="horizontal"
 			android:background="@drawable/bg_line_top">
-				
+			<!-- 	
 			<Button
 				android:id="@+id/edit" 
 				android:textColor="@drawable/black"
@@ -207,10 +206,11 @@
 				android:text="Edit"
 				android:focusable="true"
 				/>
+			 -->
 			<Button
 				android:id="@+id/save" 
 				android:textColor="@drawable/black"
-				android:layout_width="120px" 
+				android:layout_width="200px" 
 				android:layout_height="wrap_content"
 				android:layout_gravity="center"
 				android:textStyle="bold"

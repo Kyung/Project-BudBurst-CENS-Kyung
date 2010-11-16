@@ -43,6 +43,10 @@ public class GetPhenophase extends ListActivity {
 	private TextView myTitleText = null;
 	private MyListAdapter MyAdapter = null;
 	private ListView myList = null;
+	private String imagePath = null;
+	private double latitude = 0.0;
+	private double longitude = 0.0;
+	private String dt_taken = null;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -62,6 +66,10 @@ public class GetPhenophase extends ListActivity {
 	    cname = intent.getExtras().getString("cname");
 	    sname = intent.getExtras().getString("sname");
 	    species_id = intent.getExtras().getInt("species_id");
+		imagePath = intent.getExtras().getString("imagePath");
+		latitude = intent.getExtras().getDouble("latitude");
+		longitude = intent.getExtras().getDouble("longitude");
+		dt_taken = intent.getExtras().getString("dt_taken");
 	    
 	    myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(cname + " > Phenophase");
@@ -251,13 +259,20 @@ public class GetPhenophase extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(this, GetSpeciesInfo.class);
+		Intent intent = new Intent(this, SummarySpecies.class);
+		//intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
+		//intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
+		//intent.putExtra("pheno_text", pItem.get(position).Note);
+
 		intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
-		intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
-		intent.putExtra("pheno_text", pItem.get(position).Note);
 		intent.putExtra("cname", cname);
 		intent.putExtra("sname", sname);
+		intent.putExtra("lat", latitude);
+		intent.putExtra("lng", longitude);
 		intent.putExtra("species_id", species_id);
+		intent.putExtra("imagePath", imagePath);
+		intent.putExtra("dt_taken", dt_taken);
+		intent.putExtra("notes", "");
 		startActivity(intent);
 	}
 	

@@ -63,6 +63,10 @@ public class Flora_Observer extends ListActivity{
 	private TextView myTitleText = null;
 	
 	private int current_position = 0;
+	private String imagePath = null;
+	private double latitude = 0.0;
+	private double longitude = 0.0;
+	private String dt_taken = null;
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -76,6 +80,13 @@ public class Flora_Observer extends ListActivity{
 
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" One Time Observation > Top 10");
+		
+		Intent p_intent = getIntent();
+		
+		imagePath = p_intent.getExtras().getString("imagePath");
+		latitude = p_intent.getExtras().getDouble("latitude");
+		longitude = p_intent.getExtras().getDouble("longitude");
+		dt_taken = p_intent.getExtras().getString("dt_taken");
 		
 		rb1 = (RadioButton)findViewById(R.id.option1);
 		rb2 = (RadioButton)findViewById(R.id.option2);
@@ -291,8 +302,13 @@ public class Flora_Observer extends ListActivity{
 		Intent intent = new Intent(Flora_Observer.this, GetPhenophase.class);
 		intent.putExtra("cname", arPlantList.get(position).CommonName);
 		intent.putExtra("sname", arPlantList.get(position).SpeciesName);
+		intent.putExtra("dt_taken", dt_taken);
 		intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
 		intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
+		intent.putExtra("imagePath", imagePath);
+		intent.putExtra("latitude", latitude);
+		intent.putExtra("longitude", longitude);
+		
 		startActivity(intent);
 
 	}

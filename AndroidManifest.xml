@@ -20,10 +20,9 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"></uses-permission>
       
-    <application android:label="@string/app_name"
-    android:debuggable="true" android:icon="@drawable/pbbicon">
+    <application android:label="@string/app_name" android:debuggable="true" android:icon="@drawable/pbbicon">
  
- <activity android:name="firstActivity" android:label="@string/app_name">
+ <activity android:name="firstActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar">
  <intent-filter>
     			<action android:name="android.intent.action.MAIN"/>
     			<category android:name="android.intent.category.LAUNCHER"/>
@@ -46,7 +45,7 @@
 <activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 
 <activity android:name=".onetime.Observation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.Recommendation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
 <activity android:name=".onetime.GetSpeciesInfo" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
 <activity android:name=".onetime.GetPhenophase" android:theme="@android:style/Theme.Light" ></activity>
@@ -79,10 +78,11 @@
 <activity android:name="PBB_map" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
 <activity android:name="SpeciesDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="Help"></activity>
+<activity android:name="Help" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="Splash" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.QuickCapture" ></activity>
+
+<activity android:name=".onetime.SelectPlantName" android:theme="@android:style/Theme.Light"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
-
-
-
 </manifest> 

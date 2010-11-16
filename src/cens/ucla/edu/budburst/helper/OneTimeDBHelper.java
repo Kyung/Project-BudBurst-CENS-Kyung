@@ -17,7 +17,6 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		Log.i("K", "make a onetimeob table");
 		// TODO Auto-generated method stub
 		db.execSQL("CREATE TABLE onetimeob (" +
-				"image_id NUMERIC," +
 				"cname TEXT," +
 				"sname TEXT," +
 				"lat NUMERIC," +

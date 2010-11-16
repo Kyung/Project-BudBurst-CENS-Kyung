@@ -236,7 +236,6 @@ public class GetSpeciesInfo extends Activity{
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
-				SQLiteDatabase db;
 				//ContentValues row;
 				
 				String getNote = notes.getText().toString();

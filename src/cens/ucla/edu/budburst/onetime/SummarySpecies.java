@@ -45,10 +45,11 @@ public class SummarySpecies extends MapActivity {
 	private String sname = null;
 	private double lat = 0.0;
 	private double lng = 0.0;
-	private int image_id = 0;
+	private int pheno_id = 0;
 	private String dt_taken = null;
 	private String notes = null;
 	private String photo_name = null;
+	private String imagePath = null;
 	private HelloItemizedOverlay itemizedOverlay = null;
 	private List<Overlay> mapOverlays = null;
 	private ImageView phone_image = null;
@@ -77,10 +78,12 @@ public class SummarySpecies extends MapActivity {
 	    sname = intent.getExtras().getString("sname");
 	    lat = intent.getExtras().getDouble("lat");
 	    lng = intent.getExtras().getDouble("lng");
-	    image_id = intent.getExtras().getInt("image_id");
+	    pheno_id = intent.getExtras().getInt("pheno_id");
 	    dt_taken = intent.getExtras().getString("dt_taken");
 	    notes = intent.getExtras().getString("notes");
-	    photo_name = intent.getExtras().getString("photo_name");
+	    //photo_name = intent.getExtras().getString("photo_name");
+	    imagePath = intent.getExtras().getString("imagePath");
+	    
 	    
 	    // Start mapView
 	    MapView myMap = (MapView) findViewById(R.id.simpleGM_map);
@@ -113,10 +116,9 @@ public class SummarySpecies extends MapActivity {
 	    EditText notesTxt = (EditText) findViewById(R.id.mynotes);
 	    //TextView geoTxt = (TextView) findViewById(R.id.geolocation);
 	    Button saveBtn = (Button) findViewById(R.id.save);
-	    Button editBtn = (Button) findViewById(R.id.edit);
+	    //Button editBtn = (Button) findViewById(R.id.edit);
 	    
-	    String imagePath = null;
-	    File file = new File(TEMP_PATH + photo_name + ".jpg");
+	    File file = new File(imagePath);
 	    Bitmap bitmap = null;
 	    Bitmap resized_bitmap = null;
 	    
@@ -125,7 +127,7 @@ public class SummarySpecies extends MapActivity {
 	    int new_height = 110;
 	   
 	    if(file.exists()) {
-	    	imagePath = TEMP_PATH + photo_name + ".jpg";
+	    	//imagePath = TEMP_PATH + photo_name + ".jpg";
 	    	bitmap = BitmapFactory.decodeFile(imagePath);
 	    	
 		   	int width = bitmap.getWidth();
@@ -190,11 +192,11 @@ public class SummarySpecies extends MapActivity {
 		});
 	    
 	    
-	    if(image_id == 0) {
+	    if(pheno_id == 0) {
 	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 	    }
 	    else {
-	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + image_id, null, null));
+	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pheno_id, null, null));
 	    }
 		
 	    
@@ -222,8 +224,7 @@ public class SummarySpecies extends MapActivity {
 				// this is one way to do, there's another way also.
 
 				// insert data into onetimeob table
-				db.execSQL("INSERT INTO onetimeob VALUES(" + image_id + "," 
-						+ "'" + cname + "',"
+				db.execSQL("INSERT INTO onetimeob VALUES('" + cname + "',"
 						+ "'" + sname + "',"
 						+ lat + ","
 						+ lng + ","
@@ -247,6 +248,7 @@ public class SummarySpecies extends MapActivity {
 			}
 		});
 		
+		/*
 		editBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -255,7 +257,7 @@ public class SummarySpecies extends MapActivity {
 				finish();
 			}
 		});
-	    
+	    */
 	    // TODO Auto-generated method stub
 	}
 	@Override

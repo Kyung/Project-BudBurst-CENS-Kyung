@@ -8,6 +8,7 @@ import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
 import cens.ucla.edu.budburst.onetime.Queue;
+import cens.ucla.edu.budburst.onetime.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -78,7 +79,7 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(MainPage.this, OneTimeMain.class);
+				Intent intent = new Intent(MainPage.this, QuickCapture.class);
 				startActivity(intent);
 			}
 	    	

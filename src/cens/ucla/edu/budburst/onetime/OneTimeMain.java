@@ -45,6 +45,10 @@ public class OneTimeMain extends ListActivity {
 	ArrayList<Button> buttonBar = new ArrayList<Button>();
 	private MyListAdapter mylistapdater;
 	private SharedPreferences pref;
+	private String imagePath = null;
+	private double latitude = 0.0;
+	private double longitude = 0.0;
+	private String dt_taken = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -56,7 +60,17 @@ public class OneTimeMain extends ListActivity {
 	    SharedPreferences.Editor edit = pref.edit();				
 		edit.putString("visited","false");
 		edit.commit();
+		
+		
+		Intent p_intent = getIntent();
+		
+		imagePath = p_intent.getExtras().getString("imagePath");
+		latitude = p_intent.getExtras().getDouble("latitude");
+		longitude = p_intent.getExtras().getDouble("longitude");
+		dt_taken = p_intent.getExtras().getString("dt_taken");
 
+		Log.i("K", "Image Path : " + imagePath + " , lat : " + latitude + " lon : " + longitude);
+		
 	    // TODO Auto-generated method stub
 	}
 	
@@ -78,19 +92,22 @@ public class OneTimeMain extends ListActivity {
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
-		otime = new oneTime("Map", "My Nearest Plants", "map", "");
+		otime = new oneTime("Select Plant Name", "Unknown / Edit", "", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("Recommendation List", "One Time Observation", "pbbicon", "Project Budburst");
+		otime = new oneTime("none", "Community Plants", "", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "What's Invasive", "invasive_plant", "Help locate invasive plants");
+		otime = new oneTime("Recommendation Plants Lists", "Project Budburst", "pbbicon", "Project Budburst");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "What's Blooming", "whatsblooming", "Local plants in flower now");
+		otime = new oneTime("none", "Local Invasives", "invasive_plant", "Help locate invasive plants");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "What's Native", "whatsnative", "Native and cultural plants");
+		otime = new oneTime("none", "Local Blooming", "whatsblooming", "Local plants in flower now");
+		onetime_title.add(otime);
+		
+		otime = new oneTime("none", "Local Native", "whatsnative", "Native and cultural plants");
 		onetime_title.add(otime);
 
 		// What's popular is currently not available
@@ -178,31 +195,46 @@ public class OneTimeMain extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
 		if(position == 0) {
-			Intent intent = new Intent(OneTimeMain.this, MyNearestPlants.class);
+			Intent intent = new Intent(OneTimeMain.this, SelectPlantName.class);
+			intent.putExtra("imagePath", imagePath);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
 			startActivity(intent);
 		}
 		else if(position == 1) {
-			Intent intent = new Intent(OneTimeMain.this, Flora_Observer.class);
+			Intent intent = new Intent(OneTimeMain.this, SelectPlantName.class);
+			intent.putExtra("imagePath", imagePath);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
 			startActivity(intent);
 		}
 		else {
-			Intent intent = new Intent(OneTimeMain.this, Recommendation.class);
+			
+			Intent intent = null;
+			
 			
 			switch(position) {
 			case 2:
-				intent.putExtra("SelectedList", "What's Invasive");
+				intent = new Intent(OneTimeMain.this, Flora_Observer.class);
+				intent.putExtra("imagePath", imagePath);
+				intent.putExtra("latitude", latitude);
+				intent.putExtra("longitude", longitude);
+				intent.putExtra("dt_taken", dt_taken);
+				startActivity(intent);
 				break;
 			case 3:
-				intent.putExtra("SelectedList", "What's Blooming");
+		    	intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
+				startActivity(intent);
 				break;
 			case 4:
-				intent.putExtra("SelectedList", "What's Native");
+				intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
+				startActivity(intent);
 				break;
 			case 5:
-				intent.putExtra("SelectedList", "What's Popular");
+				Toast.makeText(OneTimeMain.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
 				break;
 			}
-			startActivity(intent);
+			
 		}
 	}
 
@@ -211,8 +243,8 @@ public class OneTimeMain extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		menu.add(0, 1, 0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
-		menu.add(0, 2, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
+		menu.add(0, 1, 0,"Help").setIcon(android.R.drawable.ic_menu_help);
+		menu.add(0, 2, 0, "Update").setIcon(android.R.drawable.ic_menu_help);
 			
 		return true;
 	}
@@ -222,8 +254,6 @@ public class OneTimeMain extends ListActivity {
 		Intent intent;
 		switch(item.getItemId()){
 			case 1:
-				intent = new Intent(OneTimeMain.this, Queue.class);
-				startActivity(intent);
 				return true;
 			case 2:
 				return true;
