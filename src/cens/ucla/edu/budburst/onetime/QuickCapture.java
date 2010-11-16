@@ -89,6 +89,12 @@ public class QuickCapture extends Activity {
 		// we launch.
 		Log.d("K", "onActivityResult");
 		
+		if(resultCode == Activity.RESULT_CANCELED) {
+			if (requestCode == PHOTO_CAPTURE_CODE) {
+				Toast.makeText(QuickCapture.this, "Cancelled", Toast.LENGTH_SHORT).show();
+			}
+		}
+		
 		if(resultCode == Activity.RESULT_OK) {
 			
 			if (requestCode == PHOTO_CAPTURE_CODE) {

@@ -15,18 +15,13 @@ public class firstActivity extends Activity{
 	    
 	    try {
 			Thread.sleep(2500);
-			
 			Intent intent = new Intent(firstActivity.this, Splash.class);
 			finish();
 			startActivity(intent);
-
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}   
-		
-		
-
 	}
 }

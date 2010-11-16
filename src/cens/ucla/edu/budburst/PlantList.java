@@ -40,6 +40,7 @@ import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.Flora_Observer;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
+import cens.ucla.edu.budburst.onetime.SelectPlantName;
 
 public class PlantList extends ListActivity {
 	
@@ -60,8 +61,8 @@ public class PlantList extends ListActivity {
 	private Button buttonSharedplant = null;
 	
 	//MENU contants
-	final private int MENU_ADD_PLANT = 1;
-	final private int MENU_ADD_SITE = 2;
+	final private int MENU_ADD_MONITORED = 1;
+	final private int MENU_ADD_QUICK = 2;
 	final private int MENU_LOGOUT = 5;
 	final private int MENU_SYNC = 6;
 	final private int MENU_HELP = 7;
@@ -362,12 +363,12 @@ public class PlantList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		SubMenu addButton = menu.addSubMenu(getString(R.string.Menu_manage))
+		SubMenu addButton = menu.addSubMenu(getString(R.string.Menu_addplants))
 			.setIcon(android.R.drawable.ic_menu_manage);
-		addButton.add(0,MENU_ADD_SITE,0,getString(R.string.AddSite_addSite));
-		addButton.add(0,MENU_ADD_PLANT,0,getString(R.string.AddPlant_addPlant));
-		
-		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
+		//addButton.add(0,MENU_ADD_SITE,0,getString(R.string.AddSite_addSite));
+		addButton.add(0,MENU_ADD_MONITORED,0,getString(R.string.Menu_addMonitored));
+		addButton.add(0,MENU_ADD_QUICK,0,getString(R.string.Menu_addQuick));
+		menu.add(0, MENU_SYNC, 0, "Sync").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0, MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
 			
 		return true;
@@ -377,15 +378,15 @@ public class PlantList extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item){
 		Intent intent;
 		switch(item.getItemId()){
-			case MENU_ADD_PLANT:
-				intent = new Intent(PlantList.this, AddPlant.class);
+			case MENU_ADD_MONITORED:
+				intent = new Intent(PlantList.this, SelectPlantName.class);
 				startActivity(intent);
 				finish();
 				return true;
-			case MENU_ADD_SITE:
+			case MENU_ADD_QUICK:
 				intent = new Intent (PlantList.this, AddSite.class);
 				startActivity(intent);
-				//finish();
+				finish();
 				return true;
 			case MENU_SYNC:
 				intent = new Intent(PlantList.this, Sync.class);

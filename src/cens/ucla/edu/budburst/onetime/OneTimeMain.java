@@ -95,8 +95,8 @@ public class OneTimeMain extends ListActivity {
 		otime = new oneTime("Select Plant Name", "Unknown / Edit", "", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Community Plants", "", "");
-		onetime_title.add(otime);
+		//otime = new oneTime("none", "Community Plants", "", "");
+		//onetime_title.add(otime);
 		
 		otime = new oneTime("Recommendation Plants Lists", "Project Budburst", "pbbicon", "Project Budburst");
 		onetime_title.add(otime);

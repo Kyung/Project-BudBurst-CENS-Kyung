@@ -163,10 +163,14 @@
 <string name="PlantInfo_editObs">Edit Observation</string>
 <string name="Alert_synchronized">Synchronized phone with server.</string>
 <string name="Alert_dbUpdated">Database successfully updated.</string>
-
-<string name="Menu_manage">Manage</string>
-
+<string name="Menu_addplants">Add Plants</string>
+<string name="Menu_addMonitored">Add Monitored</string>
+<string name="Menu_addQuick">Add Quick</string>
 <string name="AddPlant_addPlant">Add Plant</string>
+<string name="AddSite_HumanDistance">Human Distance</string>
+<string name="AddSite_Shading">Shading</string>
+<string name="AddSite_Irrigation">Irrigation</string>
+<string name="AddSite_Habitat">Habitat</string>
 <string name="SpeciesDetail_info">Species Information</string>
 <string name="Menu_sync">Sync</string>
 <string name="Alert_uploadingSites">Uploading sites...</string>
@@ -196,9 +200,6 @@
 <string name="Button_synchronize">Synchronize</string>
 <string name="username">Username</string>
 <string name="password">Password</string>
-
-
-
 <string name="Main_myPlants">My Plants</string>
 <string name="Main_quickCapture">Quick Capture</string>
 <string name="Main_plantLists">Local Lists</string>
@@ -209,4 +210,24 @@
 <string name="PlantList_phenosObserved">phenophases observed</string>
 <string name="Button_editObs">Edit Observation</string>
 <string name="Button_more">More</string>
+<string name="AddSite_Urban_Highly_Modified">Urban/Highly Modified</string>
+<string name="AddSite_Suburban">Suburban</string>
+<string name="AddSite_Rural">Rural</string>
+<string name="AddSite_Wildland_or_natural_area">Wildland or natural area</string>
+<string name="AddSite_Open">Open</string>
+<string name="AddSite_Partially_Shaded">Partially Shaded</string>
+<string name="AddSite_Shaded">Shaded</string>
+<string name="AddSite_Irrigated_Regualarly">Irrigated Regualarly</string>
+<string name="AddSite_Not_Irrigated">Not Irrigated</string>
+<string name="AddSite_Field_or_grassland">Field or grassland</string>
+<string name="AddSite_Vegetable_or_flower_garden">Vegetable or flower garden</string>
+<string name="AddSite_Lawn">Lawn</string>
+<string name="AddSite_Pavement_over_50_of_area">Pavement over 50% of area</string>
+<string name="AddSite_Desert_or_dunes">Desert or dunes(little vegetation)</string>
+<string name="AddSite_Shrub_thicket">Shrub thicket</string>
+<string name="AddSite_Forest_or_woodland">Forest or woodland</string>
+<string name="AddSite_Edge_of_forest_or_woodland">Edge of forest or woodland</string>
+<string name="AddSite_Stream_lake_pond_edge">Stream/lake/pond edge</string>
+
+
 </resources>

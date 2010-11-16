@@ -92,14 +92,118 @@
 	android:layout_marginRight="30dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
-	android:enabled="false"
 	android:textColor="@color/black"
+	android:enabled="false"
 	android:hint="@string/AddSite_lookingAddress">
 	</EditText>
-
+	
+	<!-- Human Distance -->
+	
+	<TextView
+	android:id="@+id/human_distance"
+	android:textStyle="bold"
+	android:layout_below="@+id/longitude"
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_marginTop="10dip"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="5dip"
+	android:textSize="17dip" android:text="@string/AddSite_HumanDistance">
+	</TextView>
+	<Button 
+	android:id="@+id/human_distance_text"
+	android:layout_below="@+id/human_distance"
+	android:textSize="16px"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="30dip"	
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:textColor="@color/black"
+	android:hint="@string/AddSite_HumanDistance">
+	</Button>
+	
+	<!-- Shading -->
+	<TextView
+	android:id="@+id/shading"
+	android:textStyle="bold"
+	android:layout_below="@+id/human_distance_text"
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_marginTop="10dip"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="5dip"
+	android:textSize="17dip" 
+	android:text="@string/AddSite_Shading">
+	</TextView>
+	<Button 
+	android:id="@+id/shading_text"
+	android:layout_below="@+id/shading"
+	android:textSize="16px"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="30dip"	
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:textColor="@color/black"
+	android:hint="@string/AddSite_Shading">
+	</Button>
+	
+	<!-- Irrigation -->
+	
+	<TextView
+	android:id="@+id/irrigation"
+	android:textStyle="bold"
+	android:layout_below="@+id/shading_text"
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_marginTop="10dip"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="5dip"
+	android:textSize="17dip" 
+	android:text="@string/AddSite_Irrigation">
+	</TextView>
+	<Button 
+	android:id="@+id/irrigation_text"
+	android:layout_below="@+id/irrigation"
+	android:textSize="16px"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="30dip"	
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:textColor="@color/black"
+	android:hint="@string/AddSite_Irrigation">
+	</Button>
+	
+	<!-- Habitat -->
+	
+	<TextView
+	android:id="@+id/habitat"
+	android:textStyle="bold"
+	android:layout_below="@+id/irrigation"
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_marginTop="10dip"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="5dip"
+	android:textSize="17dip" 
+	android:text="@string/AddSite_Habitat">
+	</TextView>
+	<Button 
+	android:id="@+id/habitat_text"
+	android:layout_below="@+id/habitat"
+	android:textSize="16px"
+	android:layout_marginLeft="30dip"
+	android:layout_marginRight="30dip"	
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:textColor="@color/black"
+	android:hint="@string/AddSite_Habitat">
+	</Button>
+	
+	
+	<!-- 
 	<TextView
 	android:id="@+id/comment_lable"
-	android:layout_below="@+id/longitude"
+	android:layout_below="@+id/human_distance_text"
 	android:textStyle="bold"
 	android:layout_marginTop="10dip"
 	android:layout_marginLeft="30dip"
@@ -118,10 +222,11 @@
 	android:layout_width="fill_parent"
 	android:hint="@string/AddSite_optional">
 	</EditText>
-
+ 	-->
+ 	
 	<LinearLayout
 	android:id="@+id/buttons"
-	android:layout_below="@+id/comment"
+	android:layout_below="@+id/habitat_text"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
 	android:orientation="horizontal">
@@ -129,14 +234,14 @@
 	<Button
 	android:id="@+id/save"
 	android:textColor="@drawable/black"
-	android:layout_width="130dip"
+	android:layout_width="200dip"
 	android:layout_height="wrap_content"
 	android:layout_margin="10dip"
 	android:gravity="center" 
 	android:textSize="20dip"
 	android:focusable="true"
 	android:text="@string/Button_save"/>
-	
+	<!-- 
 	<Button
 	android:id="@+id/cancel"
 	android:textColor="@drawable/black"
@@ -148,6 +253,7 @@
 	android:textSize="20dip"
 	android:focusable="true"
 	android:text="@string/Button_cancel"/>
+	 -->
 	</LinearLayout>
 </RelativeLayout>
 </ScrollView>
