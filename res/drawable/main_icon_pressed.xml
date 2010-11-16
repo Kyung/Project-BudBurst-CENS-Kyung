@@ -20,5 +20,5 @@
    		/>
    		</shape>
    	</item>   	
-    <item android:drawable="@drawable/world" />
+    <item android:drawable="@drawable/map" />
 </selector>

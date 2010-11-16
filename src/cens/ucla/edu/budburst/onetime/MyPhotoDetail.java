@@ -44,7 +44,7 @@ public class MyPhotoDetail extends MapActivity {
 
 	    // set title bar
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.myphotodetail);
+		setContentView(R.layout.plantsummary);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
@@ -72,16 +72,6 @@ public class MyPhotoDetail extends MapActivity {
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);
 	    TextView dt_takenTxt = (TextView) findViewById(R.id.timestamp_text);
 	    TextView notesTxt = (TextView) findViewById(R.id.mynotes);
-	    Button okBtn = (Button) findViewById(R.id.okay);
-	    
-	    okBtn.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				finish();
-			}
-	    });
 	    
 	    String imagePath = null;
 	    File file = new File(TEMP_PATH + photo_name + ".jpg");
