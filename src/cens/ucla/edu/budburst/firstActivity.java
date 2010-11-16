@@ -9,7 +9,7 @@ public class firstActivity extends Activity{
 	 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		//Retrieve username and password
+
 	    setContentView(R.layout.splash);
 	    // TODO Auto-generated method stub
 	    

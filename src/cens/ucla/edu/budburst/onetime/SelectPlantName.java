@@ -2,12 +2,7 @@ package cens.ucla.edu.budburst.onetime;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.onetime.OneTimeMain.MyListAdapter;
-import cens.ucla.edu.budburst.onetime.OneTimeMain.oneTime;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -49,7 +44,6 @@ public class SelectPlantName extends ListActivity {
 		edit.putString("visited","false");
 		edit.commit();
 		
-		
 		Intent p_intent = getIntent();
 		
 		imagePath = p_intent.getExtras().getString("imagePath");
@@ -81,31 +75,31 @@ public class SelectPlantName extends ListActivity {
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
-		otime = new oneTime("Flowers", "Early", "", "");
+		otime = new oneTime("Flowers", "Early", "p4", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Peak", "", "");
+		otime = new oneTime("none", "Peak", "p5", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Late", "pbbicon", "Project Budburst");
+		otime = new oneTime("none", "Late", "p6", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("Leaves", "Early", "invasive_plant", "Help locate invasive plants");
+		otime = new oneTime("Leaves", "Early", "p18", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Peak", "whatsblooming", "Local plants in flower now");
+		otime = new oneTime("none", "Peak", "p19", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Color Change", "whatsnative", "Native and cultural plants");
+		otime = new oneTime("none", "Color Change", "p21", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Drop", "whatsnative", "Native and cultural plants");
+		otime = new oneTime("none", "Drop", "p22", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("Fruit", "Early", "whatsnative", "Native and cultural plants");
+		otime = new oneTime("Fruit", "Early", "p7", "");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Peak", "whatsnative", "Native and cultural plants");
+		otime = new oneTime("none", "Peak", "p8", "");
 		onetime_title.add(otime);
 
 		// What's popular is currently not available
@@ -191,39 +185,7 @@ public class SelectPlantName extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		
-		if(position == 0) {
-			Intent intent = new Intent(SelectPlantName.this, MyNearestPlants.class);
-			startActivity(intent);
-		}
-		else if(position == 1) {
-			
-		}
-		else {
-			
-			Intent intent = null;
-			
-			switch(position) {
-			case 2:
-				intent = new Intent(SelectPlantName.this, Flora_Observer.class);
-				intent.putExtra("SelectedList", "Project Budburst");
-				startActivity(intent);
-				break;
-			case 3:
-		    	intent = new Intent(SelectPlantName.this, Whatsinvasive.class);
-				intent.putExtra("SelectedList", "What's Invasive");
-				startActivity(intent);
-				break;
-			case 4:
-				intent = new Intent(SelectPlantName.this, Whatsinvasive.class);
-				intent.putExtra("SelectedList", "What's Blooming");
-				startActivity(intent);
-				break;
-			case 5:
-				Toast.makeText(SelectPlantName.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
-				break;
-			}
-		}
+
 	}
 
 	///////////////////////////////////////////////////////////

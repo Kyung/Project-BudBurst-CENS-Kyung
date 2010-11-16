@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -49,11 +50,14 @@ public class OneTimeMain extends ListActivity {
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	private String dt_taken = null;
+	final private int PLANT_LIST = 100;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+	    
+	       
 	    setContentView(R.layout.onetimemain);
 	    
 	    pref = getSharedPreferences("userinfo",0);
@@ -61,14 +65,25 @@ public class OneTimeMain extends ListActivity {
 		edit.putString("visited","false");
 		edit.commit();
 		
-		
 		Intent p_intent = getIntent();
 		
-		imagePath = p_intent.getExtras().getString("imagePath");
-		latitude = p_intent.getExtras().getDouble("latitude");
-		longitude = p_intent.getExtras().getDouble("longitude");
-		dt_taken = p_intent.getExtras().getString("dt_taken");
+		// if previous activity is "PlantList.java"
+		if(p_intent.getExtras().getInt("FROM") == PLANT_LIST) {
+			latitude = 0.0;
+			longitude = 0.0;
+			imagePath = "";
+			dt_taken = "";
 
+		}
+		// else
+		else {
+			imagePath = p_intent.getExtras().getString("imagePath");
+			latitude = p_intent.getExtras().getDouble("latitude");
+			longitude = p_intent.getExtras().getDouble("longitude");
+			dt_taken = p_intent.getExtras().getString("dt_taken");
+			
+		}
+		
 		Log.i("K", "Image Path : " + imagePath + " , lat : " + latitude + " lon : " + longitude);
 		
 	    // TODO Auto-generated method stub
@@ -79,6 +94,7 @@ public class OneTimeMain extends ListActivity {
 		super.onResume();
 		
 		//My plant button
+		/*
 		Button buttonMyplant = (Button)findViewById(R.id.myplant);
 		buttonMyplant.setOnClickListener(new View.OnClickListener(){
 			@Override
@@ -88,7 +104,7 @@ public class OneTimeMain extends ListActivity {
 				startActivity(intent);
 			}
 		});
-		
+		*/
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
@@ -201,20 +217,13 @@ public class OneTimeMain extends ListActivity {
 			intent.putExtra("longitude", longitude);
 			startActivity(intent);
 		}
-		else if(position == 1) {
-			Intent intent = new Intent(OneTimeMain.this, SelectPlantName.class);
-			intent.putExtra("imagePath", imagePath);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			startActivity(intent);
-		}
 		else {
 			
 			Intent intent = null;
 			
 			
 			switch(position) {
-			case 2:
+			case 1:
 				intent = new Intent(OneTimeMain.this, Flora_Observer.class);
 				intent.putExtra("imagePath", imagePath);
 				intent.putExtra("latitude", latitude);
@@ -222,15 +231,15 @@ public class OneTimeMain extends ListActivity {
 				intent.putExtra("dt_taken", dt_taken);
 				startActivity(intent);
 				break;
-			case 3:
+			case 2:
 		    	intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
 				startActivity(intent);
 				break;
-			case 4:
+			case 3:
 				intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
 				startActivity(intent);
 				break;
-			case 5:
+			case 4:
 				Toast.makeText(OneTimeMain.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
 				break;
 			}

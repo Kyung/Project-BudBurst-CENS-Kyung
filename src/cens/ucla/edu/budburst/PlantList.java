@@ -66,6 +66,7 @@ public class PlantList extends ListActivity {
 	final private int MENU_LOGOUT = 5;
 	final private int MENU_SYNC = 6;
 	final private int MENU_HELP = 7;
+	final private int PLANT_LIST = 100;
 	
 	ArrayList<PlantItem> arPlantItem;
 	
@@ -379,7 +380,8 @@ public class PlantList extends ListActivity {
 		Intent intent;
 		switch(item.getItemId()){
 			case MENU_ADD_MONITORED:
-				intent = new Intent(PlantList.this, SelectPlantName.class);
+				intent = new Intent(PlantList.this, OneTimeMain.class);
+				intent.putExtra("FROM", PLANT_LIST);
 				startActivity(intent);
 				finish();
 				return true;
