@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item 
@@ -22,29 +21,4 @@
    		</shape>
    	</item>   	
     <item android:drawable="@drawable/map" />
-=======
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item 
-    	android:state_pressed="true"
-    	android:state_focused="false"> 
-    	<shape>
-   		<stroke
-   			android:color="#f7ff18"
-   			android:width="2dp"
-   		/>
-   		</shape>
-   	</item>
-    <item 
-    	android:state_pressed="true"
-    	android:state_focused="true"> 
-    	<shape>
-   		<stroke
-   			android:color="#f7ff18"
-   			android:width="2dp"
-   		/>
-   		</shape>
-   	</item>   	
-    <item android:drawable="@drawable/world" />
->>>>>>> de797a2903b569d9d426480b5ef1bd8629984de7
 </selector>
