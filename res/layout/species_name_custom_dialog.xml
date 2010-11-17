@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+ 	android:layout_width="wrap_content" 
+ 	android:layout_height="wrap_content"
+ 	android:paddingLeft="5px">
+ 
+	<TextView 
+	 	android:text="Common Name" 
+	 	android:id="@+id/custom_common_name_text"
+	 	android:layout_marginTop="10px"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content" />
+ 	<EditText
+ 		android:hint="Common Name"
+ 		android:id="@+id/custom_common_name"
+ 		android:layout_below="@+id/custom_common_name_text"
+ 		android:layout_width="200px"
+ 		android:layout_height="wrap_content"
+ 	/>
+ 	
+ 	<TextView 
+	 	android:text="Science Name" 
+	 	android:id="@+id/custom_science_name_text"
+	 	android:layout_marginTop="10px"
+	 	android:layout_below="@+id/custom_common_name"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content" />
+ 	<EditText
+ 		android:layout_below="@+id/custom_science_name_text"
+ 		android:id="@+id/custom_science_name"
+ 		android:hint="Science Name"
+ 		android:layout_width="200px"
+ 		android:layout_height="wrap_content"
+ 	/>
+ 
+ 
+ 	<Button 
+ 		android:id="@+id/custom_done" 
+ 		android:layout_below="@+id/custom_science_name"
+ 		android:layout_marginTop="10px"
+ 		android:layout_width="200px" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_centerHorizontal="true" 
+ 		android:text="Done" />
+ 
+</RelativeLayout>

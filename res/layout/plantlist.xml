@@ -21,11 +21,13 @@
 	     	android:layout_gravity="center" 
 	     	android:paddingLeft="0px" 
 	     	android:layout_centerVertical="true" android:paddingTop="12px"/>
+		<!-- 
 		<Button
 			android:id="@+id/sharedplant"
 			android:layout_marginLeft="7dip"
 			android:layout_alignParentTop="true"
-	        android:paddingLeft="4dp" android:background="@drawable/left_arrowcopy" android:layout_width="50dip" android:layout_height="30dip"/>	 
+	        android:paddingLeft="4dp" android:background="@drawable/left_arrowcopy" android:layout_width="50dip" android:layout_height="30dip"/>
+	     -->	 
 	</LinearLayout>        
 	<!-- 	
 	<LinearLayout 

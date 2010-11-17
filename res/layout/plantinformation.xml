@@ -196,6 +196,25 @@
 			android:paddingBottom="10dip">
 				
 			<Button
+				android:id="@+id/site_information" 
+				android:textColor="@drawable/black"
+				android:layout_width="250px" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16dip"
+				android:focusable="true"
+				android:text="@string/Button_SiteInfo"/>
+		</LinearLayout>			
+			
+		<LinearLayout
+			android:paddingTop="3dip" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:paddingBottom="10dip">
+				
+			<Button
 				android:id="@+id/save_changes" 
 				android:textColor="@drawable/black"
 				android:layout_width="250px" 

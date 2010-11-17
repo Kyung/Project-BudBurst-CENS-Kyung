@@ -85,7 +85,8 @@ public class SpeciesDetail extends Activity {
 			image.setImageResource(resID);
 	    }
 	    
- 
+	    cursor.close();
+	    
 	    syncDBH = new SyncDBHelper(SpeciesDetail.this);
 	    db = syncDBH.getReadableDatabase();
 	    

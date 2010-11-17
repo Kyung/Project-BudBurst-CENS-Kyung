@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
+import cens.ucla.edu.budburst.GetPhenophase_PBB;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.Whatsinvasive.MyListAdapter;
 import cens.ucla.edu.budburst.onetime.Whatsinvasive.species;
@@ -20,6 +22,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationManager;
@@ -46,11 +50,17 @@ public class OneTimeMain extends ListActivity {
 	ArrayList<Button> buttonBar = new ArrayList<Button>();
 	private MyListAdapter mylistapdater;
 	private SharedPreferences pref;
-	private String imagePath = null;
+	private String imagePath = "";
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	private String dt_taken = null;
-	final private int PLANT_LIST = 100;
+	final private int PLANT_LIST = 99;
+	private int SELECT_PLANT_NAME = 100;
+	private int WILD_FLOWERS = 0;
+	private int GRASSES = 1;
+	private int DECIDUOUS_TREES = 2;
+	private int EVERGREEN_TREES = 3;
+	private int CONIFERS = 4;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -71,9 +81,8 @@ public class OneTimeMain extends ListActivity {
 		if(p_intent.getExtras().getInt("FROM") == PLANT_LIST) {
 			latitude = 0.0;
 			longitude = 0.0;
-			imagePath = "";
+			imagePath = "none";
 			dt_taken = "";
-
 		}
 		// else
 		else {
@@ -211,17 +220,73 @@ public class OneTimeMain extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
 		if(position == 0) {
-			Intent intent = new Intent(OneTimeMain.this, SelectPlantName.class);
-			intent.putExtra("imagePath", imagePath);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			startActivity(intent);
+				
+				new AlertDialog.Builder(OneTimeMain.this)
+				.setTitle(getString(R.string.OneTime_category))
+				.setIcon(android.R.drawable.ic_menu_more)
+				.setItems(R.array.category, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						String[] category = getResources().getStringArray(R.array.category);
+						StaticDBHelper staticDBHelper = new StaticDBHelper(OneTimeMain.this);
+						SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase(); 
+						
+						Cursor cursor = null;
+
+						if(category[which].equals(getString(R.string.Wild_Flowers))) {
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + WILD_FLOWERS + " LIMIT 1;",null);
+						}
+						else if(category[which].equals(getString(R.string.Grass))) {
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + GRASSES + " LIMIT 1;",null);
+						}
+						else if(category[which].equals(getString(R.string.Deciduous_Trees_and_Shrubs))) {
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + DECIDUOUS_TREES + " LIMIT 1;",null);
+						}
+						else if(category[which].equals(getString(R.string.Evergreen_Trees_and_Shrubs))) {
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + EVERGREEN_TREES + " LIMIT 1;",null);
+						}
+						else if(category[which].equals(getString(R.string.Conifer))) {
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + CONIFERS + " LIMIT 1;",null);
+						}
+						else {
+						}
+						
+						while(cursor.moveToNext()){
+							Integer protocol_id = cursor.getInt(3);
+										
+							Intent intent = new Intent(OneTimeMain.this, GetPhenophase_PBB.class);
+							intent.putExtra("cname", "");
+							intent.putExtra("sname", "");
+							intent.putExtra("site_id", 0);
+							intent.putExtra("protocol_id", protocol_id);
+							intent.putExtra("species_id", "");
+							intent.putExtra("imagePath", imagePath);
+							intent.putExtra("FROM", SELECT_PLANT_NAME);
+							intent.putExtra("imagePath", imagePath);
+							intent.putExtra("latitude", latitude);
+							intent.putExtra("longitude", longitude);
+							
+							startActivity(intent);
+						}
+						
+						cursor.close();
+						staticDB.close();
+						staticDBHelper.close();
+						
+					}
+				})
+				.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+					}
+				})
+				.show();
 		}
 		else {
 			
 			Intent intent = null;
-			
-			
+	
 			switch(position) {
 			case 1:
 				intent = new Intent(OneTimeMain.this, Flora_Observer.class);

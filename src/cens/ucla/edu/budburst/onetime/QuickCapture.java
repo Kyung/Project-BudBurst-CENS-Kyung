@@ -7,9 +7,13 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.Media;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -91,7 +95,38 @@ public class QuickCapture extends Activity {
 		
 		if(resultCode == Activity.RESULT_CANCELED) {
 			if (requestCode == PHOTO_CAPTURE_CODE) {
-				Toast.makeText(QuickCapture.this, "Cancelled", Toast.LENGTH_SHORT).show();
+				new AlertDialog.Builder(QuickCapture.this)
+				.setTitle("Quit Camera")
+				.setMessage("Make Observation without photo?")
+				.setIcon(R.drawable.pbbicon_small)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
+						
+						Intent intent = new Intent(QuickCapture.this, OneTimeMain.class);
+						intent.putExtra("imagePath", "none");
+						intent.putExtra("latitude", latitude);
+						intent.putExtra("longitude", longitude);
+						intent.putExtra("dt_taken", currentDateTimeString);
+	
+						finish();
+						
+						startActivity(intent);
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				})
+				.show();
+				
 			}
 		}
 		
@@ -108,9 +143,9 @@ public class QuickCapture extends Activity {
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);
 				intent.putExtra("dt_taken", currentDateTimeString);
-				startActivity(intent);
 				
 				finish();
+				startActivity(intent);
 				
 			}
 		}			

@@ -138,7 +138,6 @@
 <string name="Alert_synchronizing">Synchronizing</string>
 <string name="Alert_pleaseWait">Please wait...</string>
 <string name="Alert_errorDownload">An error occurred while downloading.  Please try again.</string>
-
 <string name="Alert_comingSoon">Coming Soon!</string>
 <string name="Alert_thanks">Thank you!</string>
 <string name="Alert_holdBackExit">Hold the Back Button to exit.</string>
@@ -228,6 +227,17 @@
 <string name="AddSite_Forest_or_woodland">Forest or woodland</string>
 <string name="AddSite_Edge_of_forest_or_woodland">Edge of forest or woodland</string>
 <string name="AddSite_Stream_lake_pond_edge">Stream/lake/pond edge</string>
+<string name="GetPhenophase_PBB_not_defined">Not Defined\n(Press icon to add names)</string>
+<string name="GetPhenophase_PBB_message">Enter Species Name</string>
+<string name="GetPhenophase_PBB_update_name">Species Name Updated</string>
+<string name="Button_SiteInfo">Site Information</string>
+<string name="OneTime_category">Select Category</string>
+<string name="Wild_Flowers">Wild Flowers and Herbs</string>
+<string name="Grass">Grass</string>
+<string name="Deciduous_Trees_and_Shrubs">Deciduous Trees and Shrubs</string>
+<string name="Evergreen_Trees_and_Shrubs">Evergreen Trees and Shrubs</string>
+<string name="Conifer">Conifer</string>
+
 
 
 </resources>

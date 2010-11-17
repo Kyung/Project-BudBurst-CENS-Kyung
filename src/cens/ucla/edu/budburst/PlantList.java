@@ -40,7 +40,6 @@ import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.Flora_Observer;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
-import cens.ucla.edu.budburst.onetime.SelectPlantName;
 
 public class PlantList extends ListActivity {
 	
@@ -155,6 +154,7 @@ public class PlantList extends ListActivity {
 		*/
 		
 		//Shared plant button
+		/*
 		buttonSharedplant = (Button)findViewById(R.id.sharedplant);
 		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
 			@Override
@@ -164,6 +164,7 @@ public class PlantList extends ListActivity {
 				startActivity(intent);
 			}
 		});
+		*/
 		//buttonMyplant.setSelected(true);
 		
 		arPlantItem = new ArrayList<PlantItem>();

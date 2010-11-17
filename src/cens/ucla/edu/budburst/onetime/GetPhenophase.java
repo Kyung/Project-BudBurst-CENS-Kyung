@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.onetime.Flora_Observer.MyListAdapter;
-import cens.ucla.edu.budburst.onetime.Flora_Observer.PlantItem;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;

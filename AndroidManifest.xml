@@ -82,7 +82,7 @@
 <activity android:name="Splash" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.QuickCapture" ></activity>
 
-<activity android:name=".onetime.SelectPlantName" android:theme="@android:style/Theme.Light"></activity>
+
 </application>
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 
