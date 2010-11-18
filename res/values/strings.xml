@@ -8,12 +8,9 @@
     <string name="get_my_sites_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_sites</string>
     <string name="get_observation_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?get_my_obs</string>
     <string name="authentication_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?authentication</string>
-    
     <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below to first add a site, then add plants.\n \n (1) Add your site. \nClick MENU-&gt;ADD-&gt;ADD SITE \n\n (2) Add a plant. \nClick MENU-&gt;ADD-&gt;ADD PLANT \n\n</string>
-    
     <string name="get_user_spcies_URL">http://www.google.com</string>
     <string name="upload_observation_URL">http://www.naver.com</string>
-    
     <string name="add_site_URL">http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/register.php</string>
     <string name="download_obs_image_URL">
     http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/upload_images/view.php
@@ -21,11 +18,6 @@
     <string name="add_plant_URL">
     http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php?add_plant
     </string>
-    
-    
-       
-    
-    
     <string name="submit_question">You have unsubmitted data. Do you want to submit them?</string>
     <string-array name="state">
        <item>AL</item> 
@@ -79,8 +71,6 @@
        <item>WI</item> 
        <item>WY</item> 
     </string-array>
-    
-    
 <string name="Title_text">A National Phenology and\nClimate Change Campaign\nfor Citizen Scientists!</string>
 <string name="sign_up">Sign Up!</string>
 <string name="preview_mode">Preview Mode</string>
@@ -175,7 +165,7 @@
 <string name="Alert_uploadingSites">Uploading sites...</string>
 <string name="Alert_downloadingSites">Downloading sites...</string>
 <string name="Alert_downloadingImages">Downloading images...</string>
-<string name="AddSite_intro">Describe your new site</string>
+<string name="AddSite_intro">Describe the site</string>
 <string name="AddSite_siteName">Site Name</string>
 <string name="AddSite_latlong">Current Latitude/Longitude</string>
 <string name="AddSite_gettingLatLong">Getting lat/long from GPS...</string>
@@ -209,8 +199,14 @@
 <string name="PlantList_phenosObserved">phenophases observed</string>
 <string name="Button_editObs">Edit Observation</string>
 <string name="Button_more">More</string>
+<string-array name="AddSite_hDistance">
+	<item>Urban/Highly Modified</item>
+	<item>Suburban</item>
+	<item>Rural</item>
+	<item>Wildland or natural area</item>
+</string-array>
 <string name="AddSite_Urban_Highly_Modified">Urban/Highly Modified</string>
-<string name="AddSite_Suburban">Suburban</string>
+<string name="AddSite_Suburban">Suburban</string>	
 <string name="AddSite_Rural">Rural</string>
 <string name="AddSite_Wildland_or_natural_area">Wildland or natural area</string>
 <string name="AddSite_Open">Open</string>
@@ -227,7 +223,7 @@
 <string name="AddSite_Forest_or_woodland">Forest or woodland</string>
 <string name="AddSite_Edge_of_forest_or_woodland">Edge of forest or woodland</string>
 <string name="AddSite_Stream_lake_pond_edge">Stream/lake/pond edge</string>
-<string name="GetPhenophase_PBB_not_defined">Not Defined\n(Press icon to add names)</string>
+<string name="GetPhenophase_PBB_not_defined">Not Defined - add names</string>
 <string name="GetPhenophase_PBB_message">Enter Species Name</string>
 <string name="GetPhenophase_PBB_update_name">Species Name Updated</string>
 <string name="Button_SiteInfo">Site Information</string>
@@ -237,7 +233,4 @@
 <string name="Deciduous_Trees_and_Shrubs">Deciduous Trees and Shrubs</string>
 <string name="Evergreen_Trees_and_Shrubs">Evergreen Trees and Shrubs</string>
 <string name="Conifer">Conifer</string>
-
-
-
 </resources>

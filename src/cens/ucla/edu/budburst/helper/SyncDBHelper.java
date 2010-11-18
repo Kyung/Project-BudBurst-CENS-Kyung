@@ -61,6 +61,10 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"zipcode TEXT," +
 				"country TEXT," +
 				"comments TEXT, " +
+				"hdistance TEXT, " +
+				"shading TEXT, " +
+				"irrigation TEXT, " +
+				"habitat TEXT, " +
 				"synced NUMERIC);");
 		//If syned is
 		// : 5, then this site is synced with server

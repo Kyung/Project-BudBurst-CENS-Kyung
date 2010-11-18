@@ -58,15 +58,18 @@ public class AddSite extends Activity{
 	private static GpsListener gpsListener;
 	private double lat = 0.0;
 	private double lon = 0.0;
-	protected String[] list_hdistance = {getString(R.string.AddSite_Urban_Highly_Modified), getString(R.string.AddSite_Suburban)
-			, getString(R.string.AddSite_Rural), getString(R.string.AddSite_Wildland_or_natural_area)};
-	protected String[] list_shading = {getString(R.string.AddSite_Open), getString(R.string.AddSite_Partially_Shaded), getString(R.string.AddSite_Shaded)};
-	protected String[] list_irrigation = {getString(R.string.AddSite_Irrigated_Regualarly), getString(R.string.AddSite_Not_Irrigated)};
-	protected String[] list_habitat = {getString(R.string.AddSite_Field_or_grassland), getString(R.string.AddSite_Vegetable_or_flower_garden)
-			, getString(R.string.AddSite_Lawn), getString(R.string.AddSite_Pavement_over_50_of_area)
-			, getString(R.string.AddSite_Desert_or_dunes), getString(R.string.AddSite_Shrub_thicket)
-			, getString(R.string.AddSite_Forest_or_woodland), getString(R.string.AddSite_Edge_of_forest_or_woodland)
-			, getString(R.string.AddSite_Stream_lake_pond_edge)};
+	//protected String[] list_hdistance = {getString(R.string.AddSite_Urban_Highly_Modified), getString(R.string.AddSite_Suburban), getString(R.string.AddSite_Rural), getString(R.string.AddSite_Wildland_or_natural_area)};
+	
+	//protected String[] list_shading = {getString(R.string.AddSite_Open), getString(R.string.AddSite_Partially_Shaded), getString(R.string.AddSite_Shaded)};
+	//protected String[] list_irrigation = {getString(R.string.AddSite_Irrigated_Regualarly), getString(R.string.AddSite_Not_Irrigated)};
+	//protected String[] list_habitat = {getString(R.string.AddSite_Field_or_grassland), getString(R.string.AddSite_Vegetable_or_flower_garden), getString(R.string.AddSite_Lawn), getString(R.string.AddSite_Pavement_over_50_of_area), getString(R.string.AddSite_Desert_or_dunes), getString(R.string.AddSite_Shrub_thicket), getString(R.string.AddSite_Forest_or_woodland), getString(R.string.AddSite_Edge_of_forest_or_woodland), getString(R.string.AddSite_Stream_lake_pond_edge)};
+	
+	protected String[] list_hdistance = {"Urban/Highly Modified", "Suburban", "Rural", "Wildland or natural area"};
+	protected String[] list_shading = {"Open", "Partially Shaded", "Shaded"};
+	protected String[] list_irrigation = {"Irrigated Regualarly", "Not Irrigated"};
+	protected String[] list_habitat = {"Field or grassland", "Vegetable or flower garden", "Lawn", 
+			"Pavement over 50% of area", "Desert or dunes(little vegetation)", "Shrub thicket", "Forest or woodland",
+			"Edge of forest or woodland", "Stream/lake/pond edge"};
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -252,6 +255,7 @@ public class AddSite extends Activity{
 
 					//Insert user typed site name into database
 					//Calendar now = Calendar.getInstance();
+					
 					long epoch = System.currentTimeMillis()/1000;
 					query = "INSERT INTO my_sites VALUES(" +
 					"null, " + 
@@ -259,11 +263,10 @@ public class AddSite extends Activity{
 					"'" + usertype_stname + "'," +
 					"'" + latitude.getText().toString() + "'," + 
 					"'" + longitude.getText().toString() + "'," +
-					"''," +
-					"'" + selectedState + "'," +
-					"''," +
-					"''," +
-					"'" + comment.getText().toString() + "'," +
+					"'" + Human_Disturbance.getText().toString() + "'," +
+					"'" + Shading.getText().toString() + "'," +
+					"'" + Irrigation.getText().toString() + "'," +
+					"'" + Habitat.getText().toString() + "'," +
 					SyncDBHelper.SYNCED_NO + ");";
 					syncWDB.execSQL(query);
 					cursor.close();

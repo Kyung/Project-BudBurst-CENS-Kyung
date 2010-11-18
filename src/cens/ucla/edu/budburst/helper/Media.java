@@ -2,14 +2,10 @@ package cens.ucla.edu.budburst.helper;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
-import cens.ucla.edu.budburst.R;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.util.Log;
-import android.widget.ImageView;
 
 public class Media {
 	
@@ -39,7 +35,7 @@ public class Media {
 		
 		try{
 			FileOutputStream out = new FileOutputStream(imagePath);
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
 		}catch(Exception e){
 			Log.e("K", e.toString());
 		}
@@ -49,8 +45,8 @@ public class Media {
 	   	
 	    Bitmap resized_bitmap = null;
 	    // set new width and height of the phone_image
-	    int new_width = 60;
-	    int new_height = 60;
+	    int new_width = 100;
+	    int new_height = 100;
 	   	
 	   	float scale_width = ((float) new_width) / width;
 	   	float scale_height = ((float) new_height) / height;

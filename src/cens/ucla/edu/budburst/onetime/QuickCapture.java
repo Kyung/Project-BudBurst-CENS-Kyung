@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -29,7 +30,7 @@ import android.widget.Toast;
 public class QuickCapture extends Activity {
 
 	protected static final int PHOTO_CAPTURE_CODE = 0;
-	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
+	public final String BASE_PATH = "/sdcard/pbudburst/";
 	private String camera_image_id 	= null;
 	private static GpsListener gpsListener;
 	private LocationManager lm		= null;
@@ -46,7 +47,7 @@ public class QuickCapture extends Activity {
 	    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 30, gpsListener);
 	 
 		try {
-			File ld = new File(TEMP_PATH);
+			File ld = new File(BASE_PATH);
 			if(ld.exists()) {
 				if (!ld.isDirectory()) {
 					// Should probably inform user ... hmm!
@@ -75,7 +76,7 @@ public class QuickCapture extends Activity {
 			
 			Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
-					Uri.fromFile(new File(TEMP_PATH, camera_image_id + ".jpg")));
+					Uri.fromFile(new File(BASE_PATH, camera_image_id + ".jpg")));
 			startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
 			
 		}
@@ -133,13 +134,15 @@ public class QuickCapture extends Activity {
 		if(resultCode == Activity.RESULT_OK) {
 			
 			if (requestCode == PHOTO_CAPTURE_CODE) {
-				String imagePath = TEMP_PATH + camera_image_id + ".jpg";
 				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
 				
 				String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 				
+				Media media = new Media();
+				Bitmap bitmap = media.ShowPhotoTaken(BASE_PATH + camera_image_id + ".jpg");
+				
 				Intent intent = new Intent(QuickCapture.this, OneTimeMain.class);
-				intent.putExtra("imagePath", imagePath);
+				intent.putExtra("camera_image_id", camera_image_id);
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);
 				intent.putExtra("dt_taken", currentDateTimeString);

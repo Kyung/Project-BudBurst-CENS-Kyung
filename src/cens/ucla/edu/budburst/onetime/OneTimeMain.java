@@ -50,7 +50,7 @@ public class OneTimeMain extends ListActivity {
 	ArrayList<Button> buttonBar = new ArrayList<Button>();
 	private MyListAdapter mylistapdater;
 	private SharedPreferences pref;
-	private String imagePath = "";
+	private String camera_image_id = "";
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	private String dt_taken = null;
@@ -81,19 +81,17 @@ public class OneTimeMain extends ListActivity {
 		if(p_intent.getExtras().getInt("FROM") == PLANT_LIST) {
 			latitude = 0.0;
 			longitude = 0.0;
-			imagePath = "none";
+			camera_image_id = "none";
 			dt_taken = "";
 		}
 		// else
 		else {
-			imagePath = p_intent.getExtras().getString("imagePath");
+			camera_image_id = p_intent.getExtras().getString("camera_image_id");
 			latitude = p_intent.getExtras().getDouble("latitude");
 			longitude = p_intent.getExtras().getDouble("longitude");
 			dt_taken = p_intent.getExtras().getString("dt_taken");
 			
 		}
-		
-		Log.i("K", "Image Path : " + imagePath + " , lat : " + latitude + " lon : " + longitude);
 		
 	    // TODO Auto-generated method stub
 	}
@@ -259,9 +257,8 @@ public class OneTimeMain extends ListActivity {
 							intent.putExtra("site_id", 0);
 							intent.putExtra("protocol_id", protocol_id);
 							intent.putExtra("species_id", "");
-							intent.putExtra("imagePath", imagePath);
+							intent.putExtra("camera_image_id", camera_image_id);
 							intent.putExtra("FROM", SELECT_PLANT_NAME);
-							intent.putExtra("imagePath", imagePath);
 							intent.putExtra("latitude", latitude);
 							intent.putExtra("longitude", longitude);
 							
@@ -290,7 +287,7 @@ public class OneTimeMain extends ListActivity {
 			switch(position) {
 			case 1:
 				intent = new Intent(OneTimeMain.this, Flora_Observer.class);
-				intent.putExtra("imagePath", imagePath);
+				intent.putExtra("camera_image_id", camera_image_id);
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);
 				intent.putExtra("dt_taken", dt_taken);

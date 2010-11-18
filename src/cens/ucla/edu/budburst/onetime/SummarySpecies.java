@@ -1,20 +1,15 @@
 package cens.ucla.edu.budburst.onetime;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
-
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,7 +26,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,6 +34,7 @@ import android.widget.Toast;
 public class SummarySpecies extends MapActivity {
 
 	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
+	public final String BASE_PATH = "/sdcard/pbudburst/";
 	private OneTimeDBHelper otDBH = null;
 	private String cname = null;
 	private String sname = null;
@@ -49,7 +44,7 @@ public class SummarySpecies extends MapActivity {
 	private String dt_taken = null;
 	private String notes = null;
 	private String photo_name = null;
-	private String imagePath = null;
+	private String camera_image_id = null;
 	private HelloItemizedOverlay itemizedOverlay = null;
 	private List<Overlay> mapOverlays = null;
 	private ImageView phone_image = null;
@@ -82,7 +77,7 @@ public class SummarySpecies extends MapActivity {
 	    dt_taken = intent.getExtras().getString("dt_taken");
 	    notes = intent.getExtras().getString("notes");
 	    //photo_name = intent.getExtras().getString("photo_name");
-	    imagePath = intent.getExtras().getString("imagePath");
+	    camera_image_id = intent.getExtras().getString("camera_image_id");
 	    
 	    
 	    // Start mapView
@@ -118,7 +113,7 @@ public class SummarySpecies extends MapActivity {
 	    Button saveBtn = (Button) findViewById(R.id.save);
 	    //Button editBtn = (Button) findViewById(R.id.edit);
 	    
-	    File file = new File(imagePath);
+	    File file = new File(BASE_PATH + camera_image_id + ".jpg");
 	    Bitmap bitmap = null;
 	    Bitmap resized_bitmap = null;
 	    
@@ -128,7 +123,7 @@ public class SummarySpecies extends MapActivity {
 	   
 	    if(file.exists()) {
 	    	//imagePath = TEMP_PATH + photo_name + ".jpg";
-	    	bitmap = BitmapFactory.decodeFile(imagePath);
+	    	bitmap = BitmapFactory.decodeFile(BASE_PATH + camera_image_id + ".jpg");
 	    	
 		   	int width = bitmap.getWidth();
 		   	int height = bitmap.getHeight();
@@ -248,16 +243,6 @@ public class SummarySpecies extends MapActivity {
 			}
 		});
 		
-		/*
-		editBtn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				finish();
-			}
-		});
-	    */
 	    // TODO Auto-generated method stub
 	}
 	@Override

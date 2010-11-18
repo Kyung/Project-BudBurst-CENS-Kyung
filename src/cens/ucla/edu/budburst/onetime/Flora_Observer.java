@@ -63,7 +63,7 @@ public class Flora_Observer extends ListActivity{
 	private TextView myTitleText = null;
 	
 	private int current_position = 0;
-	private String imagePath = null;
+	private String camera_image_id = null;
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	private String dt_taken = null;
@@ -83,10 +83,13 @@ public class Flora_Observer extends ListActivity{
 		
 		Intent p_intent = getIntent();
 		
-		imagePath = p_intent.getExtras().getString("imagePath");
+		camera_image_id = p_intent.getExtras().getString("camera_image_id");
 		latitude = p_intent.getExtras().getDouble("latitude");
 		longitude = p_intent.getExtras().getDouble("longitude");
 		dt_taken = p_intent.getExtras().getString("dt_taken");
+		
+		Log.i("K", "camera_image_id : " + camera_image_id);
+		
 		
 		rb1 = (RadioButton)findViewById(R.id.option1);
 		rb2 = (RadioButton)findViewById(R.id.option2);
@@ -305,7 +308,7 @@ public class Flora_Observer extends ListActivity{
 		intent.putExtra("dt_taken", dt_taken);
 		intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
 		intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
-		intent.putExtra("imagePath", imagePath);
+		intent.putExtra("camera_image_id", camera_image_id);
 		intent.putExtra("latitude", latitude);
 		intent.putExtra("longitude", longitude);
 		

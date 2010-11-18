@@ -3,15 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-	<!--  
-	<LinearLayout
-		android:id="@+id/top_background"
-		android:layout_below="@+id/logo_layout"
-		android:layout_width="fill_parent"
-		android:layout_height="50px"	
-	>
-	</LinearLayout>
-	 -->
+	
 	<LinearLayout 
 	   		android:id="@+id/two_button"
 	   	    android:layout_width="fill_parent"
@@ -162,7 +154,7 @@
 					android:layout_width="70px"
 					android:layout_height="70px"
 					android:id="@+id/map"
-					android:background="@drawable/main_icon_pressed"
+					android:background="@drawable/map"
 				/>
 				</LinearLayout>
 				<TextView
@@ -249,5 +241,5 @@
 				/>
 			</LinearLayout>
 		</LinearLayout>
-	</LinearLayout> 
+	</LinearLayout>
 </RelativeLayout>

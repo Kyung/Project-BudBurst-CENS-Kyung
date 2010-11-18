@@ -31,6 +31,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +50,7 @@ public class GetPhenophase_PBB extends ListActivity {
 	private ImageView img = null;
 	private Dialog dialog = null;
 	private TextView species_name = null;
-	private String imagePath = "none";
+	private String camera_image_id = "none";
 	protected static final int RETURN_FROM_PLANT_INFORMATION = 0;
 	protected static final int RETURN_FROM_PLANT_QUICK = 1;
 	public final String BASE_PATH = "/sdcard/pbudburst/pbb/";
@@ -79,7 +80,9 @@ public class GetPhenophase_PBB extends ListActivity {
 	    common_name = intent.getExtras().getString("cname");
 	    science_name = intent.getExtras().getString("sname");
 	    wherefrom = intent.getExtras().getInt("FROM");
-	    imagePath = intent.getExtras().getString("imagePath");
+	    camera_image_id = intent.getExtras().getString("camera_image_id");
+	    
+	    LinearLayout add_species_name = (LinearLayout)findViewById(R.id.add_species_name);
 	    
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    species_name = (TextView) findViewById(R.id.species_name);
@@ -87,8 +90,9 @@ public class GetPhenophase_PBB extends ListActivity {
 	    if(wherefrom == SELECT_PLANT_NAME) {
 		    species_image.setVisibility(View.VISIBLE);
 		    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+		    species_image.setBackgroundResource(R.drawable.shapedrawable);
 		    species_name.setText(" " + getString(R.string.GetPhenophase_PBB_not_defined));
-		    species_image.setOnClickListener(new View.OnClickListener(){
+		    add_species_name.setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
@@ -110,8 +114,13 @@ public class GetPhenophase_PBB extends ListActivity {
 							// TODO Auto-generated method stub
 							common_name = et1.getText().toString();
 							science_name = et2.getText().toString();
-							species_name.setText(common_name + "\n" + science_name);
-							Toast.makeText(GetPhenophase_PBB.this, getString(R.string.GetPhenophase_PBB_update_name), Toast.LENGTH_SHORT).show();
+							if(common_name.equals("") && science_name.equals("")) {
+							}
+							else {
+								species_name.setText(common_name + "\n" + science_name);
+								Toast.makeText(GetPhenophase_PBB.this, getString(R.string.GetPhenophase_PBB_update_name), Toast.LENGTH_SHORT).show();
+							}
+							
 							dialog.cancel();
 						}
 					});
@@ -247,7 +256,7 @@ public class GetPhenophase_PBB extends ListActivity {
 			intent.putExtra("notes", pItem.get(position).Notes);
 			intent.putExtra("cname", common_name);
 			intent.putExtra("sname", science_name);
-			intent.putExtra("imagePath", imagePath);
+			intent.putExtra("camera_image_id", camera_image_id);
 			intent.putExtra("from", SELECT_PLANT_NAME);
 			intent.putExtra("direct", true);
 			startActivityForResult(intent, RETURN_FROM_PLANT_QUICK);

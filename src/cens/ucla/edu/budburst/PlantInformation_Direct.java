@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +57,7 @@ public class PlantInformation_Direct extends Activity {
 	private String dt_taken			= null;
 	private View take_photo 		= null;
 	private View replace_photo 		= null;
-	private ImageButton photo_image 		= null;
+	private ImageView photo_image 		= null;
 	protected static final int PHOTO_CAPTURE_CODE = 0;
 	protected static final int GET_SUMMARY_CODE = 1;
 	private int SELECT_PLANT_NAME = 100;
@@ -90,9 +91,7 @@ public class PlantInformation_Direct extends Activity {
 		dt_taken = p_intent.getExtras().getString("dt_taken");
 		note = p_intent.getExtras().getString("notes");
 		wherefrom = p_intent.getExtras().getInt("from");
-		imagePath = p_intent.getExtras().getString("imagePath");
 		boolean direct = p_intent.getExtras().getBoolean("direct");
-		
 		camera_image_id = photo_name;
 		
 		ImageView species_image = (ImageView) findViewById(R.id.species_image);
@@ -100,7 +99,7 @@ public class PlantInformation_Direct extends Activity {
 		ImageView phenoImg = (ImageView) findViewById(R.id.pheno_image);
 		TextView phenoTxt = (TextView) findViewById(R.id.pheno_text);
 		TextView phenoName = (TextView) findViewById(R.id.pheno_name);
-		photo_image = (ImageButton) findViewById(R.id.image);
+		photo_image = (ImageView) findViewById(R.id.image);
 		photo_image.setVisibility(View.VISIBLE);
 		
 	
@@ -138,22 +137,26 @@ public class PlantInformation_Direct extends Activity {
 	    take_photo.setVisibility(View.VISIBLE);
 	    replace_photo.setVisibility(View.GONE);
 
-	    Log.i("K", "ImagePATH : " + imagePath);
-	    
-		
+	    		
 		if(wherefrom == SELECT_PLANT_NAME) {
-			Media media = new Media();
-			if(!imagePath.equals("none")) {
-				photo_image.setImageBitmap(media.ShowPhotoTaken(imagePath));
+			
+			camera_image_id = p_intent.getExtras().getString("camera_image_id");
+			
+			File file = new File(BASE_PATH + camera_image_id + ".jpg");
+			
+			if(file.exists()) {
+				Bitmap bitmap = BitmapFactory.decodeFile(BASE_PATH + camera_image_id + ".jpg");
+				photo_image.setImageBitmap(bitmap);
 				take_photo.setVisibility(View.GONE);
 			    replace_photo.setVisibility(View.VISIBLE);
+			    photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 			}
 			else {
 				photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+				photo_image.setEnabled(false);
 				take_photo.setVisibility(View.VISIBLE);
 			    replace_photo.setVisibility(View.GONE);
 			}
-
 		}
 		else {
 			photo_image.setVisibility(View.VISIBLE);
@@ -168,27 +171,25 @@ public class PlantInformation_Direct extends Activity {
 				
 				photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 				// TODO Auto-generated method stub
-				final LinearLayout linear = (LinearLayout) View.inflate(PlantInformation_Direct.this, R.layout.image_popup, null);
-				
+				final RelativeLayout linear = (RelativeLayout) View.inflate(PlantInformation_Direct.this, R.layout.image_popup, null);
 				// TODO Auto-generated method stub
 				AlertDialog.Builder dialog = new AlertDialog.Builder(PlantInformation_Direct.this);
 				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
 				
-			    String imagePath = "/sdcard/pbudburst/" + camera_image_id + ".jpg";
+			    String imagePath = BASE_PATH + camera_image_id + ".jpg";
 
 			    File file = new File(imagePath);
 			    Bitmap bitmap = null;
 			    
 			    // if file exists show the photo on the ImageButton
 			    if(file.exists()) {
-			    	imagePath = "/sdcard/pbudburst/" + camera_image_id + ".jpg";
+			    	imagePath = BASE_PATH + camera_image_id + ".jpg";
 				   	bitmap = BitmapFactory.decodeFile(imagePath);
 				   	image_view.setImageBitmap(bitmap);
 			    }
 			    // if not, show 'no image' ImageButton
 			    else {
 			    	image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
-			    	image_view.setVisibility(View.VISIBLE);
 			    }
 			    
 			    // when press 'Back', close the dialog
@@ -368,7 +369,8 @@ public class PlantInformation_Direct extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				
+				Intent intent = new Intent(PlantInformation_Direct.this, AddSite.class);
+				startActivity(intent);
 			}
 			
 		});
@@ -401,9 +403,10 @@ public class PlantInformation_Direct extends Activity {
 				
 				String imagePath = BASE_PATH + camera_image_id + ".jpg";
 				
-				Log.i("K", "IMAGE PATH : " + imagePath);
 				Media media = new Media();
 				photo_image.setImageBitmap(media.ShowPhotoTaken(imagePath));
+				photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+				photo_image.setEnabled(true);
 				
 				Toast.makeText(this, getString(R.string.PlantInfo_photoAdded), Toast.LENGTH_SHORT).show();
 				

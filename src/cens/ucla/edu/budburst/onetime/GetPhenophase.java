@@ -2,6 +2,8 @@ package cens.ucla.edu.budburst.onetime;
 
 import java.util.ArrayList;
 
+import cens.ucla.edu.budburst.GetPhenophase_PBB;
+import cens.ucla.edu.budburst.PlantInformation_Direct;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import android.app.Activity;
@@ -41,10 +43,11 @@ public class GetPhenophase extends ListActivity {
 	private TextView myTitleText = null;
 	private MyListAdapter MyAdapter = null;
 	private ListView myList = null;
-	private String imagePath = null;
+	private String camera_image_id = null;
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	private String dt_taken = null;
+	private int SELECT_PLANT_NAME = 100;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -64,7 +67,7 @@ public class GetPhenophase extends ListActivity {
 	    cname = intent.getExtras().getString("cname");
 	    sname = intent.getExtras().getString("sname");
 	    species_id = intent.getExtras().getInt("species_id");
-		imagePath = intent.getExtras().getString("imagePath");
+	    camera_image_id = intent.getExtras().getString("camera_image_id");
 		latitude = intent.getExtras().getDouble("latitude");
 		longitude = intent.getExtras().getDouble("longitude");
 		dt_taken = intent.getExtras().getString("dt_taken");
@@ -80,6 +83,9 @@ public class GetPhenophase extends ListActivity {
 		rb2.setOnClickListener(radio_listener);
 		rb3.setOnClickListener(radio_listener);
 	    
+		
+		Log.i("K", "camera_image_id : " + camera_image_id);
+		
 	    //ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    //TextView species_name = (TextView) findViewById(R.id.species_name);
 	    
@@ -257,20 +263,22 @@ public class GetPhenophase extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(this, SummarySpecies.class);
-		//intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
-		//intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
-		//intent.putExtra("pheno_text", pItem.get(position).Note);
-
+		Intent intent = new Intent(this, PlantInformation_Direct.class);
+		intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
+		intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
+		intent.putExtra("pheno_text", pItem.get(position).Note);
+		intent.putExtra("protocol_id", protocol_id);
 		intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
 		intent.putExtra("cname", cname);
 		intent.putExtra("sname", sname);
 		intent.putExtra("lat", latitude);
 		intent.putExtra("lng", longitude);
 		intent.putExtra("species_id", species_id);
-		intent.putExtra("imagePath", imagePath);
+		intent.putExtra("camera_image_id", camera_image_id);
 		intent.putExtra("dt_taken", dt_taken);
 		intent.putExtra("notes", "");
+		intent.putExtra("from", SELECT_PLANT_NAME);
+		intent.putExtra("direct", true);
 		startActivity(intent);
 	}
 	

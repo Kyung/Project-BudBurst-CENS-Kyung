@@ -31,15 +31,15 @@
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" android:text="@string/AddSite_siteName">
 	</TextView>
 	<EditText 
 	android:id="@+id/sitename"
 	android:layout_below="@+id/sitename_lable"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:hint="@string/AddSite_siteName">
@@ -51,7 +51,7 @@
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="5dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textStyle="bold"
 	android:textSize="17dip"
@@ -63,8 +63,8 @@
 	<EditText 
 	android:id="@+id/latitude"
 	android:layout_below="@+id/latitude_label"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:enabled="false"
@@ -80,7 +80,7 @@
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" android:text="@string/AddSite_address">
 	</TextView>
@@ -88,8 +88,8 @@
 	android:id="@+id/longitude"
 	android:layout_below="@+id/longitude_label"
 	android:textSize="16px"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:textColor="@color/black"
@@ -106,7 +106,7 @@
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" android:text="@string/AddSite_HumanDistance">
 	</TextView>
@@ -114,8 +114,8 @@
 	android:id="@+id/human_distance_text"
 	android:layout_below="@+id/human_distance"
 	android:textSize="16px"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:textColor="@color/black"
@@ -130,7 +130,7 @@
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" 
 	android:text="@string/AddSite_Shading">
@@ -139,8 +139,8 @@
 	android:id="@+id/shading_text"
 	android:layout_below="@+id/shading"
 	android:textSize="16px"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:textColor="@color/black"
@@ -156,7 +156,7 @@
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" 
 	android:text="@string/AddSite_Irrigation">
@@ -165,8 +165,8 @@
 	android:id="@+id/irrigation_text"
 	android:layout_below="@+id/irrigation"
 	android:textSize="16px"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:textColor="@color/black"
@@ -178,11 +178,11 @@
 	<TextView
 	android:id="@+id/habitat"
 	android:textStyle="bold"
-	android:layout_below="@+id/irrigation"
+	android:layout_below="@+id/irrigation_text"
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" 
 	android:text="@string/AddSite_Habitat">
@@ -191,8 +191,8 @@
 	android:id="@+id/habitat_text"
 	android:layout_below="@+id/habitat"
 	android:textSize="16px"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"	
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:textColor="@color/black"
@@ -223,22 +223,17 @@
 	android:hint="@string/AddSite_optional">
 	</EditText>
  	-->
- 	
-	<LinearLayout
-	android:id="@+id/buttons"
-	android:layout_below="@+id/habitat_text"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:orientation="horizontal">
-	
+ 
 	<Button
 	android:id="@+id/save"
 	android:textColor="@drawable/black"
-	android:layout_width="200dip"
+	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:layout_margin="10dip"
-	android:gravity="center" 
-	android:textSize="20dip"
+	android:layout_marginTop="20dip"
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"
+	android:layout_below="@+id/habitat_text"
+	android:textSize="16dip"
 	android:focusable="true"
 	android:text="@string/Button_save"/>
 	<!-- 
@@ -254,6 +249,5 @@
 	android:focusable="true"
 	android:text="@string/Button_cancel"/>
 	 -->
-	</LinearLayout>
 </RelativeLayout>
 </ScrollView>
