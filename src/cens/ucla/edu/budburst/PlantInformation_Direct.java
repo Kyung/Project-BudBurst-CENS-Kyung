@@ -370,6 +370,8 @@ public class PlantInformation_Direct extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(PlantInformation_Direct.this, AddSite.class);
+				// change the site text indicating - done!
+				siteBtn.setText(getString(R.string.Button_SiteInfo2));
 				startActivity(intent);
 			}
 			

@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.SyncNetworkHelper;
 
@@ -55,6 +56,9 @@ public class Sync extends Activity{
 	final private int DOWNLOAD_OBSERVATION = 7;
 	final private int DOWNLOAD_OBSERVATION_IMG = 8;
 	final private int SYNC_COMPLETE = 9;
+	
+	final private int UPLOAD_ONE_TIME_OB = 10;
+	final private int DOWNLOAD_ONE_TIME_OB = 11;
 	
 	//Boolean constant with integer
 	final private int FINISH_INT = 1;
@@ -90,30 +94,7 @@ public class Sync extends Activity{
 			}
 			}
 		);
-		
-		/*
-		//My plant button
-		Button buttonMyplant = (Button)findViewById(R.id.myplant);
-		buttonMyplant.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-
-			}
-		}
-		);
-
-		//Shared plant button
-		Button buttonSharedplant = (Button)findViewById(R.id.sharedplant);
-		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(Sync.this,"Please do sync first",Toast.LENGTH_SHORT).show();
-			}
-			}
-		);
-		*/
-		//buttonMyplant.setSelected(true);
-
+	
 		//If the previous activity is not plant list, then start sync instantly.  
 		Intent parent_intent = getIntent();
 		if(parent_intent.getExtras() != null &&
@@ -257,7 +238,7 @@ public class Sync extends Activity{
 			}
 		
 			//Each step would be reached whenever doSyncThread transfer data with server
-			switch(msg.what){
+			switch(msg.what){			
 			case SYNC_START:
 				mProgress.setProgress(0);
 				mProgress.setMessage(getString(R.string.Alert_uploadingSites));
@@ -282,6 +263,15 @@ public class Sync extends Activity{
 				msgToThread.what = UPLOAD_OBSERVATION;
 				msgToThread.arg1 = mProgressVal;
 				break;
+			
+			case UPLOAD_ONE_TIME_OB:
+				mProgress.setProgress(mProgressVal);
+				mProgress.setMessage(getString(R.string.Alert_uploadingOneTimeOB));
+				
+				msgToThread.what = UPLOAD_OBSERVATION;
+				msgToThread.arg1 = mProgressVal;
+				break;	
+				
 			case UPLOAD_OBSERVATION:
 				mProgress.setProgress(mProgressVal);
 				mProgress.setMessage(getString(R.string.Alert_uploadingObs));
@@ -297,6 +287,7 @@ public class Sync extends Activity{
 					msgToThread.arg1 = mProgressVal; 
 				}
 				break;
+	
 			case DOWNLOAD_USER_STATION:
 				mProgress.setProgress(mProgressVal);
 				mProgress.setMessage(getString(R.string.Alert_downloadingSites));
@@ -322,6 +313,15 @@ public class Sync extends Activity{
 				msgToThread.what = DOWNLOAD_OBSERVATION_IMG;
 				msgToThread.arg1 = mProgressVal;
 				break;
+		
+			case DOWNLOAD_ONE_TIME_OB:
+				mProgress.setProgress(mProgressVal);
+				mProgress.setMessage(getString(R.string.Alert_downloadingOneTimeOB));
+				
+				msgToThread.what = DOWNLOAD_ONE_TIME_OB;
+				msgToThread.arg1 = mProgressVal;
+				break;
+		
 			case DOWNLOAD_OBSERVATION_IMG:
 				mProgress.setProgress(mProgressVal);
 				mProgress.setMessage(getString(R.string.Alert_downloadingImages));
@@ -411,6 +411,9 @@ class doSyncThread extends Thread{
 	final private int DOWNLOAD_OBSERVATION_IMG = 8;
 	final private int SYNC_COMPLETE = 9;
 	
+	final private int UPLOAD_ONE_TIME_OB = 10;
+	final private int DOWNLOAD_ONE_TIME_OB = 11;
+	
 	private String TAG = new String("SYNC");
 	
 	private String username;
@@ -467,6 +470,10 @@ class doSyncThread extends Thread{
 	    	SyncDBHelper syncDBHelper = new SyncDBHelper(context);
 	    	SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
 	    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
+	    	OneTimeDBHelper otDBHelper = new OneTimeDBHelper(context);
+	    	SQLiteDatabase otRDB = syncDBHelper.getReadableDatabase();
+	    	SQLiteDatabase otWDB = syncDBHelper.getWritableDatabase();
+	    	
 	    	Cursor cursor;
 	    	String query;
 	    	JSONObject jsonobj;
@@ -475,7 +482,7 @@ class doSyncThread extends Thread{
 			switch(msg.what){
 			case UPLOAD_ADDED_SITE:
 				msgToMain.what = UPLOAD_ADDED_SITE;
-				msgToMain.arg1 = mProgressVal + 5;
+				msgToMain.arg1 = mProgressVal + 3;
 				
 				query = "SELECT site_id, site_name, latitude, longitude, state, comments " +
 						"FROM my_sites WHERE synced=" + SyncDBHelper.SYNCED_NO;
@@ -538,7 +545,7 @@ class doSyncThread extends Thread{
 				break;
 			case UPLOAD_ADDED_PLANT:
 				msgToMain.what = UPLOAD_ADDED_PLANT;
-				msgToMain.arg1 = mProgressVal + 5;
+				msgToMain.arg1 = mProgressVal + 2;
 				
 		    	//Open database cursor
 		    	query =	"SELECT species_id, site_id " +
@@ -587,6 +594,44 @@ class doSyncThread extends Thread{
 				}
 				cursor.close();
 				break;
+				
+			case UPLOAD_ONE_TIME_OB:
+				msgToMain.what = UPLOAD_ONE_TIME_OB;
+				msgToMain.arg1 = mProgressVal + 2;
+		
+				query = "SELECT cname, sname, lat, lng, dt_taken, notes, photo_name FROM onetimeob " +
+						"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
+				cursor = otRDB.rawQuery(query, null);
+				
+				if(cursor.getCount() == 0) {
+					cursor.close();
+					break;
+				}
+				else {
+					while(cursor.moveToNext()) {
+						String cname = cursor.getString(0);
+						String sname = cursor.getString(1);
+						double lat = cursor.getDouble(2);
+						double lng = cursor.getDouble(3);
+						String dt_taken = cursor.getString(4);
+						String notes = cursor.getString(5);	
+						String photo_name = cursor.getString(6);
+						
+						serverResponse = 
+							SyncNetworkHelper.upload_onetime_ob(username, password, cname, sname, lat, lng, dt_taken, notes, photo_name);
+						
+						if(!serverResponse.equals("upload_ok")) {
+							msgToMain.what = Sync.SERVER_ERROR;
+							msgToMain.obj = "Upload Error - One time Observation";
+							mLoop.quit();
+							break;
+						}
+					}
+				}
+	
+				cursor.close();
+				break;
+				
 			case UPLOAD_OBSERVATION:
 				msgToMain.what = UPLOAD_OBSERVATION;
 		    	msgToMain.arg1 = mProgressVal;
@@ -795,6 +840,7 @@ class doSyncThread extends Thread{
 						"'"+
 						jsonresult.getJSONObject(i).getString("note") + "'," + 
 						SyncDBHelper.IMG_FILE_NEED_TO_BE_DOWNLOADED + ");";
+						
 						syncWDB.execSQL(query);
 					}
 					
@@ -804,6 +850,12 @@ class doSyncThread extends Thread{
 					Log.d(TAG, "DOWNLOAD_OBSERVATION: failed to store into db");
 				}						
 				break;
+				
+			
+				
+			case DOWNLOAD_ONE_TIME_OB:
+				break;	
+			
 			case DOWNLOAD_OBSERVATION_IMG:
 				msgToMain.what = DOWNLOAD_OBSERVATION_IMG;
 		    	msgToMain.arg1 = mProgressVal;
@@ -859,6 +911,7 @@ class doSyncThread extends Thread{
 					cursor.close();
 				}
 				break;
+			
 			case SYNC_COMPLETE:
 				msgToMain.what = SYNC_COMPLETE;
 		    	msgToMain.arg1 = 100;

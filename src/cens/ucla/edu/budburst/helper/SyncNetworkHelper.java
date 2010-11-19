@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -26,6 +27,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+
+import cens.ucla.edu.budburst.onetime.Queue;
 
 import android.app.Activity;
 import android.content.Context;
@@ -85,6 +88,62 @@ public class SyncNetworkHelper extends Activity{
 	        Log.d(TAG, result);
 	        
 			return result;
+		}catch(Exception e){
+			
+		}
+		
+		return null;
+	}
+	
+	static public String upload_onetime_ob(String username, String password, String cname, String sname, Double lat, 
+			Double lng, String dt_taken, String note, String photo_name) {
+		try{
+	        // Add your data  
+			MultipartEntity entity = new MultipartEntity();
+			HttpClient httpClient = new DefaultHttpClient();
+	        String result = null;
+			
+			String latitude = lat.toString();
+			String longitude = lng.toString();
+			    
+			String url = new String("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service?username=" + username + "&password=" + password);
+		    HttpPost httpPost = new HttpPost(url);
+
+		    entity.addPart("cname", new StringBody(cname));  
+		    entity.addPart("sname", new StringBody(sname));
+		    entity.addPart("latitude", new StringBody(latitude));
+		    entity.addPart("longitude", new StringBody(longitude));
+		    entity.addPart("dt_taken", new StringBody(dt_taken));
+		    entity.addPart("note", new StringBody(note));
+		    
+		    if(!photo_name.equals("")){
+			    File file = new File("/sdcard/pbudburst/" + photo_name.toString() + ".jpg");
+	        	entity.addPart("image", new FileBody(file));
+		    }
+        	
+			httpPost.setEntity(entity);
+			
+			//Log.i("K", "HTTP POST : " + httpPost);
+			
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			//Log.i("K", "Response from the server : " + response.toString());
+			
+			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				
+				BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent())); 
+	        	String line = br.readLine();
+				
+				Log.i("K", "Result : " + line);
+				
+				if(line.equals("UPLOADED_OK")) {
+					
+					return "upload_ok";
+				}
+				else {
+					Log.e("K", "UPLOADED FAILED!!");
+				}
+			}
 		}catch(Exception e){
 			
 		}

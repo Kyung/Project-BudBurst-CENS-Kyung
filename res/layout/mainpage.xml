@@ -44,7 +44,7 @@
 						android:layout_width="70px"
 						android:layout_height="70px"
 						android:gravity="center"
-						android:background="@drawable/plant"
+						android:background="@drawable/icon_myplants"
 						android:id="@+id/my_plant"
 					/>
 				</LinearLayout>
@@ -82,7 +82,7 @@
 				<Button
 					android:layout_width="70px"
 					android:layout_height="70px"
-					android:background="@drawable/camera"
+					android:background="@drawable/icon_camera"
 					android:id="@+id/onetimeobservation"
 				/>
 				</LinearLayout>
@@ -121,7 +121,7 @@
 				<Button
 					android:layout_width="70px"
 					android:layout_height="70px"
-					android:background="@drawable/mylist"
+					android:background="@drawable/icon_mylist"
 					android:id="@+id/myresults"
 				/>
 			</LinearLayout>
@@ -154,7 +154,7 @@
 					android:layout_width="70px"
 					android:layout_height="70px"
 					android:id="@+id/map"
-					android:background="@drawable/map"
+					android:background="@drawable/icon_map"
 				/>
 				</LinearLayout>
 				<TextView
@@ -194,7 +194,7 @@
 				<Button
 					android:layout_width="70px"
 					android:layout_height="70px"
-					android:background="@drawable/news"
+					android:background="@drawable/icon_news"
 					android:id="@+id/news"
 				/>
 				</LinearLayout>
@@ -226,7 +226,7 @@
 				<Button
 					android:layout_width="70px"
 					android:layout_height="70px"
-					android:background="@drawable/weekly"
+					android:background="@drawable/icon_weekly"
 					android:id="@+id/weekly"
 				/>
 				</LinearLayout>

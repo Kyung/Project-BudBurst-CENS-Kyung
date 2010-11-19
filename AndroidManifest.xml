@@ -22,7 +22,7 @@
       
     <application android:label="@string/app_name" android:debuggable="true" android:icon="@drawable/pbbicon">
  
- <activity android:name="firstActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden">
+ <activity android:name="firstActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait">
  <intent-filter>
     			<action android:name="android.intent.action.MAIN"/>
     			<category android:name="android.intent.category.LAUNCHER"/>

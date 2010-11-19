@@ -8,41 +8,29 @@
   android:background="@color/BudBurstBackground">
 <ImageView 
 	android:id="@+id/ImageView01" 
-	android:src="@drawable/splash_logo_mdpi" 
 	android:layout_height="wrap_content" 
-	android:paddingTop="40dp" 
+	android:paddingTop="15dp" 
 	android:scaleType="fitCenter" 
 	android:layout_width="wrap_content" 
-	android:paddingBottom="20dp">
+	android:paddingBottom="20dp" android:src="@drawable/splash_head">
 </ImageView>
 <LinearLayout 
 	android:id="@+id/LinearLayout01" 
 	android:orientation="vertical" 
-	android:layout_marginTop="10dp"
-	android:layout_height="fill_parent" 
-	android:layout_width="fill_parent">
-	<TextView 
-		android:id="@+id/TextView01" 
-		android:layout_width="fill_parent" 
-		android:text="@string/splash_text" 
-		android:layout_marginLeft="10dp" 
-		android:layout_marginRight="10dp" 
-		android:gravity="center_horizontal" 
-		android:typeface="normal"
-		android:textStyle="bold" 
-		android:textColor="@color/black" 
-		android:layout_height="wrap_content" 
-		android:textSize="22dp">
-	</TextView>
-	<TextView 
-		android:id="@+id/TextView02" 
-		android:layout_height="wrap_content" 
-		android:text="@string/spalsh_text_2" 
-		android:layout_width="fill_parent" 
-		android:gravity="center_horizontal" 
-		android:textSize="25dp" 
-		android:textStyle="bold" 
-		android:layout_marginTop="10dp">
-	</TextView>
+	android:layout_width="fill_parent" 
+	android:layout_height="wrap_content" 
+	android:paddingBottom="10dp" 
+	android:paddingTop="5dp" 
+	android:background="@color/BudBurstHighlight">
+<ImageView 
+	android:id="@+id/ImageView02" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:src="@drawable/splash_tail"></ImageView>
+</LinearLayout>
+<LinearLayout 
+android:id="@+id/LinearLayout02" 
+android:layout_width="wrap_content" 
+android:layout_height="wrap_content">
 </LinearLayout>
 </LinearLayout>

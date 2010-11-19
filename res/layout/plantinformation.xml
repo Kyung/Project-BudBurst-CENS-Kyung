@@ -203,7 +203,7 @@
 				android:textStyle="bold"
 				android:textSize="16dip"
 				android:focusable="true"
-				android:text="@string/Button_SiteInfo"/>
+				android:text="@string/Button_SiteInfo1"/>
 		</LinearLayout>			
 			
 		<LinearLayout

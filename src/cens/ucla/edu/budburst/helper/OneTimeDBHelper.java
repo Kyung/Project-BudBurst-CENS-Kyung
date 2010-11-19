@@ -24,7 +24,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"dt_taken TEXT," +
 				"notes TEXT," +
 				"photo_name TEXT," + 
-				"uploaded TEXT);");
+				"synced NUMERIC);");
 		
 		db.execSQL("CREATE TABLE speciesLists (" +
 				"id NUMERIC, " +

@@ -118,7 +118,7 @@
 <string name="Button_no">No</string>
 <string name="Alert_errorSpecies">An error occured while downloading species.  Please try again.</string>
 <string name="Alert_checkConnectivity">Please check your network connectivity and try again.</string>
-<string name="Alert_uploadingPlants">Uploading newly added plants...</string>
+<string name="Alert_uploadingPlants">Uploading plants...</string>
 <string name="Alert_uploadingObs">Uploading obseravtions...</string>
 <string name="Alert_downloadingPlants">Downloading plants...</string>
 <string name="Alert_downloadingObs">Downloading observations...</string>
@@ -163,6 +163,8 @@
 <string name="SpeciesDetail_info">Species Information</string>
 <string name="Menu_sync">Sync</string>
 <string name="Alert_uploadingSites">Uploading sites...</string>
+<string name="Alert_uploadingOneTimeOB">Uploading onetime OB</string>
+<string name="Alert_downloadingOneTimeOB">Downloading onetime OB</string>
 <string name="Alert_downloadingSites">Downloading sites...</string>
 <string name="Alert_downloadingImages">Downloading images...</string>
 <string name="AddSite_intro">Describe the site</string>
@@ -226,7 +228,8 @@
 <string name="GetPhenophase_PBB_not_defined">Not Defined - add names</string>
 <string name="GetPhenophase_PBB_message">Enter Species Name</string>
 <string name="GetPhenophase_PBB_update_name">Species Name Updated</string>
-<string name="Button_SiteInfo">Site Information</string>
+<string name="Button_SiteInfo1">Add Site Information</string>
+<string name="Button_SiteInfo2">Site Information(Done)</string>
 <string name="OneTime_category">Select Category</string>
 <string name="Wild_Flowers">Wild Flowers and Herbs</string>
 <string name="Grass">Grass</string>
