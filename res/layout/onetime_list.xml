@@ -2,17 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="vertical"
-    android:gravity="center_vertical" >
+	android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight" >
     <TextView
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:id="@+id/list_header"
-    	android:gravity="center"
     	android:background="#DDD"
-    	android:textSize="18px"
-    	android:textStyle="bold"
+    	android:textSize="16px"
     	android:visibility="gone"
     />
     <LinearLayout

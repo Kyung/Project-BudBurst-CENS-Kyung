@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    >
 
     <LinearLayout  
     	android:id="@+id/logo_layout"
@@ -10,7 +11,6 @@
 	    android:layout_height="63px"
 	    android:gravity="center"
 	    android:orientation="horizontal"
-	    android:background="@drawable/Flora_Observer"
 	    >
 	    <!-- 
 	    <Button
@@ -21,10 +21,8 @@
 	    <ImageView 
 	    	android:id="@+id/logo"
 	     	android:layout_height="wrap_content"
-	     	android:layout_centerVertical="true" 
-	     	android:src="@drawable/flora_observercopy" 
+	     	android:layout_centerVertical="true"  
 	     	android:paddingBottom="2px" 
-	     	
 	     	android:paddingLeft="5px" 
 	     	android:layout_gravity="center_vertical" 
 	     	android:gravity="center"
@@ -101,13 +99,56 @@
 	/>
 	</LinearLayout>
 	-->
-
+	<LinearLayout
+		android:weightSum="1"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_below="@+id/logo_layout"
+		android:orientation="vertical"
+	>
+	
 	<ListView 
+		android:layout_weight="0.2"
 		android:id="@android:id/list"
 		android:layout_below="@+id/logo_layout"
 		android:layout_width="fill_parent" 
 		android:layout_height="fill_parent">
 	</ListView>
+	<!-- 
+	<LinearLayout
+		android:layout_weight="0.8"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:paddingLeft="10px"
+	>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+			<EditText
+				android:layout_width="200px"
+				android:layout_height="fill_parent"
+				android:id="@+id/unknown_plant"
+			/>
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="fill_parent"
+				android:layout_marginLeft="10px"
+				android:id="@+id/submit"
+				android:text="@string/Submit"
+			/>
+		</LinearLayout>
+	<TextView
+		android:layout_marginTop="5px"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/Unknown_Plant_Text"
+	/>
+	</LinearLayout>
+	 -->
+	</LinearLayout>
 	
 </RelativeLayout>
 

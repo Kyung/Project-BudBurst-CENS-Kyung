@@ -563,6 +563,9 @@ class doSyncThread extends Thread{
 				while(cursor.moveToNext()){
 					String a = cursor.getString(0);
 					String b = cursor.getString(1);
+					
+					Log.i("K","species_id : " + a + " site_id : " + b);
+					
 					serverResponse = 
 					SyncNetworkHelper.upload_new_plant(username, password, context, 
 							a, b);
@@ -640,6 +643,8 @@ class doSyncThread extends Thread{
 		    	query = "SELECT species_id, site_id, phenophase_id, time, note, image_id, _id " +
 		    			"FROM my_observation " +
 		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
+		    	
+		    	
 				cursor = syncRDB.rawQuery(query, null);
 				
 				//Check if returned data is empty, then break switch statement
@@ -651,6 +656,10 @@ class doSyncThread extends Thread{
 				}else{
 			        msgToMain.arg2 = NOT_FINISH_INT;
 					cursor.moveToNext();
+					
+					Log.i("K", "OOO : " + cursor.getString(0));
+					
+					
 					serverResponse = SyncNetworkHelper.upload_new_obs(username, password, context,
 							cursor.getString(0), cursor.getString(1), cursor.getString(2),
 							cursor.getString(3), cursor.getString(4), cursor.getString(5));
@@ -758,6 +767,9 @@ class doSyncThread extends Thread{
 				}
 				
 				try{
+					
+					Log.i("K", "SERVER RESPONSE : " + serverResponse);
+					
 					jsonobj = new JSONObject(serverResponse);
 					
 					//Server response check
@@ -777,10 +789,29 @@ class doSyncThread extends Thread{
 					jsonresult = new JSONArray(jsonobj.getString("results"));
 					syncWDB.execSQL("DELETE FROM my_plants;");
 					for(int i=0; i<jsonresult.length(); i++){
+						
+						int species_id = Integer.parseInt(jsonresult.getJSONObject(i).getString("spc_id"));
+						
+						Log.i("K", "INSERT INTO my_plants " +
+								"(species_id, site_id, site_name, protocol_id, synced)" +
+								"VALUES(" +
+								species_id + "," +
+								jsonresult.getJSONObject(i).getString("st_id") + "," +
+								"'"+
+								jsonresult.getJSONObject(i).getString("st_name") + "'," +
+								jsonresult.getJSONObject(i).getString("pro_id") + "," +
+								SyncDBHelper.SYNCED_YES + ");");
+						
+						
+						
+						//if(species_id > 76) {
+						//	species_id = 77;
+						//}
+						
 						syncWDB.execSQL("INSERT INTO my_plants " +
 								"(species_id, site_id, site_name, protocol_id, synced)" +
 								"VALUES(" +
-								jsonresult.getJSONObject(i).getString("spc_id") + "," +
+								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
 								"'"+
 								jsonresult.getJSONObject(i).getString("st_name") + "'," +

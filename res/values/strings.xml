@@ -236,4 +236,6 @@
 <string name="Deciduous_Trees_and_Shrubs">Deciduous Trees and Shrubs</string>
 <string name="Evergreen_Trees_and_Shrubs">Evergreen Trees and Shrubs</string>
 <string name="Conifer">Conifer</string>
+<string name="Unknown_Plant_Text">Type plant name or Submit for unknown plant</string>
+<string name="Submit">Submit</string>
 </resources>

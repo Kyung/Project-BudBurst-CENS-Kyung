@@ -130,7 +130,12 @@ public class GetPhenophase_PBB extends ListActivity {
 	    else {
 	    	species_image.setVisibility(View.VISIBLE);
 	    	species_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
-	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_ids, null, null));
+	    	if(species_ids > 76) {
+	    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    	}
+	    	else {
+	    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_ids, null, null));
+	    	}
 	    	species_name.setText(common_name + "\n" + science_name);
 	    }
 	    

@@ -108,7 +108,13 @@ public class PlantSummary extends Activity {
 	    snameTxt.setText(sname + " ");
 	    
 	    snameTxt.setText(sname_split[0] + " " + sname_split[1] + " ");
-	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+	    if(species_id > 76) {
+	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    }
+	    else {
+	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+	    }
+	    
 	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 	    

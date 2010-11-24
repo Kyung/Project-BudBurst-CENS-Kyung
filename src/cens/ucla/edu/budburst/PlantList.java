@@ -60,12 +60,12 @@ public class PlantList extends ListActivity {
 	private Button buttonSharedplant = null;
 	
 	//MENU contants
-	final private int MENU_ADD_MONITORED = 1;
+	final private int MENU_ADD_PLANT = 1;
 	final private int MENU_ADD_QUICK = 2;
 	final private int MENU_LOGOUT = 5;
 	final private int MENU_SYNC = 6;
 	final private int MENU_HELP = 7;
-	final private int PLANT_LIST = 100;
+	final private int PLANT_LIST = 99;
 	
 	ArrayList<PlantItem> arPlantItem;
 	
@@ -173,6 +173,12 @@ public class PlantList extends ListActivity {
 		
 		staticDBHelper = new StaticDBHelper(PlantList.this);
         
+		
+		Cursor cursorss = syncDB.rawQuery("SELECT _id, species_id, site_id FROM my_observation;", null);
+		while(cursorss.moveToNext()) {
+			Log.i("K", "OUTPUT : " + cursorss.getInt(0) + " , " + cursorss.getInt(1) + " , " + cursorss.getInt(2));
+		}
+		cursorss.close();
 	
 		try {
         	staticDBHelper.createDataBase();
@@ -253,16 +259,30 @@ public class PlantList extends ListActivity {
 						"WHERE site_name = '" + user_station_name.get(i) + "';", null);
 				int count = 0;
 				while(cursor2.moveToNext()){
-					String qry = "SELECT _id, species_name, common_name, protocol_id FROM species WHERE _id = " + cursor2.getInt(0) + ";";
+					Log.i("K", "sPECIES_ID : " + cursor2.getInt(0));
+					int species_id = 0;
+					if(cursor2.getInt(0) > 76) {
+						species_id = 999;
+					}
+					else {
+						species_id = cursor2.getInt(0);
+					}
+					String qry = "SELECT _id, species_name, common_name, protocol_id FROM species WHERE _id = " + species_id + ";";
 					
 					Cursor cursor3 = staticDB.rawQuery(qry, null);
 					
 					cursor3.moveToNext();
-					int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor3.getString(0), null, null);
+					int resID = 0;
+					if(Integer.parseInt(cursor3.getString(0)) > 76) {
+						resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null);
+					}
+					else {
+						resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor3.getString(0), null, null);
+					}
 
 					// get the number of check-marked data
 					String pheno_done = "SELECT _id FROM my_observation WHERE species_id = " 
-						+ cursor3.getString(0) + " AND site_id = " + user_station_id.get(i) + " GROUP BY phenophase_id;";
+						+ cursor2.getInt(0) + " AND site_id = " + user_station_id.get(i) + " GROUP BY phenophase_id;";
 					Cursor cursor4 = syncDB.rawQuery(pheno_done, null);
 					
 					// get total_number_of phenophases from species
@@ -271,11 +291,11 @@ public class PlantList extends ListActivity {
 					
 					if(count == 0) {
 						pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-								, cursor3.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
+								, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
 					}
 					else {
 						pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-								, cursor3.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
+								, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
 					}
 					//PlantItem structure = >int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int siteID)
 					
@@ -305,7 +325,7 @@ public class PlantList extends ListActivity {
 	protected void onListItemClick(View v, int position, long id){
 		//Intent intent = new Intent(this, PlantInfo.class);
 		
-		Log.i("K", "POSITION : " + position);
+		Log.i("K", "POSITION -> SPECIES_ID : " + arPlantItem.get(position).SpeciesID);
 			
 		Intent intent = new Intent(this, GetPhenophase_PBB.class);
 		intent.putExtra("species_id", arPlantItem.get(position).SpeciesID);
@@ -365,11 +385,11 @@ public class PlantList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		SubMenu addButton = menu.addSubMenu(getString(R.string.Menu_addplants))
-			.setIcon(android.R.drawable.ic_menu_manage);
+		//SubMenu addButton = menu.addSubMenu(getString(R.string.Menu_addplants)).setIcon(android.R.drawable.ic_menu_manage);
 		//addButton.add(0,MENU_ADD_SITE,0,getString(R.string.AddSite_addSite));
-		addButton.add(0,MENU_ADD_MONITORED,0,getString(R.string.Menu_addMonitored));
-		addButton.add(0,MENU_ADD_QUICK,0,getString(R.string.Menu_addQuick));
+	//	addButton.add(0,MENU_ADD_MONITORED,0,getString(R.string.Menu_addMonitored));
+		//addButton.add(0,MENU_ADD_QUICK,0,getString(R.string.Menu_addQuick));
+		menu.add(0, MENU_ADD_PLANT, 0, "Add Plant").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_SYNC, 0, "Sync").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0, MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
 			
@@ -380,11 +400,10 @@ public class PlantList extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item){
 		Intent intent;
 		switch(item.getItemId()){
-			case MENU_ADD_MONITORED:
+			case MENU_ADD_PLANT:
 				intent = new Intent(PlantList.this, OneTimeMain.class);
 				intent.putExtra("FROM", PLANT_LIST);
 				startActivity(intent);
-				finish();
 				return true;
 			case MENU_ADD_QUICK:
 				intent = new Intent (PlantList.this, AddSite.class);
@@ -440,9 +459,7 @@ public class PlantList extends ListActivity {
 				convertView = Inflater.inflate(layout, parent, false);
 			
 			TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
-			
-			Log.i("K", "POSITION : " + position + " TOPITEM : " + arSrc.get(position).TopItem);
-			
+
 			if(arSrc.get(position).TopItem) {
 				//site_header.setVisibility(View.VISIBLE);
 				//site_header.setText("  " + arSrc.get(position).Site);
@@ -454,6 +471,10 @@ public class PlantList extends ListActivity {
 			}
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
+			
+			
+			Log.i("K", "IMAGE RESOURCES : " + arSrc.get(position).Picture);
+			
 			img.setImageResource(arSrc.get(position).Picture);
 			
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
@@ -483,7 +504,7 @@ public class PlantList extends ListActivity {
 			
 			TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
 			if(arSrc.get(position).total_pheno != 0) {
-				pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
+				pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno + " ");
 			}
 			else {
 				pheno_stat.setVisibility(View.GONE);
@@ -494,44 +515,3 @@ public class PlantList extends ListActivity {
 	}
 }
 
-	
-class PlantItem{
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-	}
-
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-		siteID = aSiteID;
-	}
-	
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		Site = aSiteName;
-		SpeciesID = aSpeciesID;
-		siteID = aSiteID;
-		protocolID = aProtocolID;
-		current_pheno = aPheno_done;
-		total_pheno = aTotal_pheno;
-		TopItem = aTopItem;
-	}
-	
-	int Picture;
-	String CommonName;
-	String SpeciesName;
-	int SpeciesID;
-	int siteID;
-	int protocolID;
-	int current_pheno;
-	int total_pheno;
-	String Site;
-	boolean TopItem;
-}

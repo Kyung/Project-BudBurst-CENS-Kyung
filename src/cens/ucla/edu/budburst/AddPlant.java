@@ -277,19 +277,23 @@ public class AddPlant extends ListActivity{
 		}
 	};
 	
-	public String[] getUserSite(){
+	public CharSequence[] getUserSite(){
 		
 		SyncDBHelper syncDBHelper = new SyncDBHelper(this);
 		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase();
-		String[] arrUsersite;
+		CharSequence[] arrUsersite;
 		try{
 			Cursor cursor = syncDB.rawQuery("SELECT site_name FROM my_sites;", null);
 			
-			arrUsersite = new String[cursor.getCount()];
+			arrUsersite = new String[cursor.getCount()+1];
 			int i=0;
 			while(cursor.moveToNext()){
 				arrUsersite[i++] = cursor.getString(0);
+				
+				Log.i("K", "SITE : " + cursor.getString(0));
 			}
+			arrUsersite[i++] = "Add New Site";
+			
 			cursor.close();
 			return arrUsersite;
 		}
@@ -317,7 +321,7 @@ public class AddPlant extends ListActivity{
 		//Pop up choose site dialog box
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.AddPlant_chooseSite))
-		.setSingleChoiceItems(seqUserSite, -1, new DialogInterface.OnClickListener() {
+		.setItems(seqUserSite, new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -325,15 +329,13 @@ public class AddPlant extends ListActivity{
 				mSelect = which;				
 				new_plant_site_id = mapUserSiteNameID.get(seqUserSite[mSelect].toString());
 				new_plant_site_name = seqUserSite[mSelect].toString();
-			}
-		})
-		.setPositiveButton(getString(R.string.Button_select), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if(new_plant_site_id == null){
-					Toast.makeText(AddPlant.this, getString(R.string.AddPlant_pleaseSelectSite), Toast.LENGTH_SHORT).show();
+				
+				if(new_plant_site_name == "Add New Site") {
+					Intent intent = new Intent(AddPlant.this, AddSite.class);
+					startActivity(intent);
+					finish();
 				}
-				else{
+				else {
 					if(checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id)){
 						Toast.makeText(AddPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
@@ -416,6 +418,7 @@ public class AddPlant extends ListActivity{
 			textname.setText(arSrc.get(position).CommonName);
 			
 			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
+			Log.i("K", "NAME : " + arSrc.get(position).SpeciesName);
 			String [] splits = arSrc.get(position).SpeciesName.split(" ");
 			textdesc.setText(splits[0] + " " + splits[1]);
 			
@@ -472,6 +475,7 @@ public class AddPlant extends ListActivity{
 					siteid + "," +
 					"'" + sitename + "',"+
 					"0,"+
+					"1,"+ // 1 means it's official, from add plant list
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			syncDBHelper.close();
@@ -496,6 +500,7 @@ public class AddPlant extends ListActivity{
 		while(cursor.moveToNext()){
 			localMapUserSiteNameID.put(cursor.getString(0), cursor.getInt(1));
 		}
+		localMapUserSiteNameID.put("Add New Site", 10000);
 		
 		
 		//Close DB and cursor
@@ -507,3 +512,43 @@ public class AddPlant extends ListActivity{
 	}
 }
 
+class PlantItem{
+	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		SpeciesID = aSpeciesID;
+	}
+
+	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		SpeciesID = aSpeciesID;
+		siteID = aSiteID;
+	}
+	
+	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		Site = aSiteName;
+		SpeciesID = aSpeciesID;
+		siteID = aSiteID;
+		protocolID = aProtocolID;
+		current_pheno = aPheno_done;
+		total_pheno = aTotal_pheno;
+		TopItem = aTopItem;
+	}
+	
+	int Picture;
+	String CommonName;
+	String SpeciesName;
+	int SpeciesID;
+	int siteID;
+	int protocolID;
+	int current_pheno;
+	int total_pheno;
+	String Site;
+	boolean TopItem;
+}

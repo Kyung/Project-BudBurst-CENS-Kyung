@@ -182,12 +182,12 @@ public class SyncNetworkHelper extends Activity{
 				result_str.append(line+'\n');
 			}
         	result = result_str.toString();
-	        Log.d(TAG, response.toString());
+	        Log.d("K", "Add Plant Response : " + result);
 	        
 			return result;
 		}
 		catch(Exception e){
-			Log.e(TAG, e.toString());
+			Log.e("K", e.toString());
 			return null;
 		}
 	}
@@ -252,6 +252,9 @@ public class SyncNetworkHelper extends Activity{
 							break;
 						result.append(line+'\n');
 					}
+					
+					Log.i("K", "RESULT : " + result);
+					
 					br.close();
 				}
 				else{
