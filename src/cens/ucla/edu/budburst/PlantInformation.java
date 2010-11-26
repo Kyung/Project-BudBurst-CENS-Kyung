@@ -63,7 +63,7 @@ public class PlantInformation extends Activity {
 	private View take_photo 		= null;
 	private View replace_photo 		= null;
 	private Bitmap bitmap 			= null;
-	private ImageButton photo_image 		= null;
+	private ImageView photo_image 		= null;
 	protected static final int PHOTO_CAPTURE_CODE = 0;
 	protected static final int GET_SUMMARY_CODE = 1;
 	public final String BASE_PATH = "/sdcard/pbudburst/";
@@ -105,7 +105,12 @@ public class PlantInformation extends Activity {
 		
 		ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    TextView species_name = (TextView) findViewById(R.id.species_name);
-		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+	    if(species_id > 76) {
+	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    }
+		else {
+			species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
+		}
 	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    species_name.setText(cname + " \n" + sname + " ");
 		
@@ -125,7 +130,7 @@ public class PlantInformation extends Activity {
 		phenoTxt.setText(pheno_text);
 		notes.setText(note);
 		
-		photo_image = (ImageButton) findViewById(R.id.image);
+		photo_image = (ImageView) findViewById(R.id.image);
 		photo_image.setVisibility(View.VISIBLE);
 		
 	    dict_tmp = new File(Environment.getExternalStorageDirectory(), "pbudburst/pbb/");

@@ -54,7 +54,7 @@ public class AddSite extends Activity{
 	private Location cur_location = null;
 	private LocationManager lmanager = null;
 	ArrayAdapter<CharSequence> adspin;
-	private String selectedState;
+	private String selectedState = "";
 	private static GpsListener gpsListener;
 	private double lat = 0.0;
 	private double lon = 0.0;
@@ -227,72 +227,83 @@ public class AddSite extends Activity{
 			@Override
 			public void onClick(View v) {
 
-				SyncDBHelper syncDBHelper = new SyncDBHelper(AddSite.this);
-				SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
-
-				try{
-					String usertype_stname = sitename.getText().toString();
-
-					//Check site name is empty
-					if(usertype_stname.equals("")){
-						Toast.makeText(AddSite.this,getString(R.string.AddSite_checkSiteName), Toast.LENGTH_SHORT).show();
-						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
-						return;
-					}
-
-					//Check if site name is duplicated
-					String query = "SELECT site_id FROM my_sites WHERE site_name='" 
-						+ usertype_stname + "';";
-					Cursor cursor = syncWDB.rawQuery(query, null);
-					if(cursor.getCount() != 0){
-						Toast.makeText(AddSite.this,getString(R.string.AddSite_alreadyExists), Toast.LENGTH_SHORT).show();
-						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
-						cursor.close();
-						return;
-					}
-
-					//Insert user typed site name into database
-					//Calendar now = Calendar.getInstance();
+				
+				if(selectedState.equals("")) {
+					Toast.makeText(AddSite.this, "Still getting GPS data...", Toast.LENGTH_SHORT).show();
 					
-					long epoch = System.currentTimeMillis()/1000;
-					query = "INSERT INTO my_sites VALUES(" +
-					"null, " + 
-					"'" + epoch + "'," + 
-					"'" + usertype_stname + "'," +
-					"'" + latitude.getText().toString() + "'," + 
-					"'" + longitude.getText().toString() + "'," +
-					"'" + Human_Disturbance.getText().toString() + "'," +
-					"'" + Shading.getText().toString() + "'," +
-					"'" + Irrigation.getText().toString() + "'," +
-					"'" + Habitat.getText().toString() + "'," +
-					SyncDBHelper.SYNCED_NO + ");";
-					syncWDB.execSQL(query);
-					cursor.close();
+				}
+				else {
+					SyncDBHelper syncDBHelper = new SyncDBHelper(AddSite.this);
+					SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 
-					
-					
-					new AlertDialog.Builder(AddSite.this)
-					.setTitle(getString(R.string.AddSite_newAdded))
-					.setIcon(R.drawable.pbbicon_small)
-					.setMessage(getString(R.string.AddSite_note1))
-					.setPositiveButton(getString(R.string.Button_OK), new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
-							Intent intent = new Intent(AddSite.this, PlantList.class);
-							startActivity(intent);
-							finish();
+					try{
+						String usertype_stname = sitename.getText().toString();
+
+						//Check site name is empty
+						if(usertype_stname.equals("")){
+							Toast.makeText(AddSite.this,getString(R.string.AddSite_checkSiteName), Toast.LENGTH_SHORT).show();
+							InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
+							return;
 						}
-					})
-					.show();
-					
-				}catch(Exception e){
-					Log.e(TAG, e.toString());
-				}finally{
-					syncDBHelper.close();					
+
+						//Check if site name is duplicated
+						String query = "SELECT site_id FROM my_sites WHERE site_name='" 
+							+ usertype_stname + "';";
+						Cursor cursor = syncWDB.rawQuery(query, null);
+						if(cursor.getCount() != 0){
+							Toast.makeText(AddSite.this,getString(R.string.AddSite_alreadyExists), Toast.LENGTH_SHORT).show();
+							InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
+							cursor.close();
+							return;
+						}
+
+						//Insert user typed site name into database
+						//Calendar now = Calendar.getInstance();
+						
+						long epoch = System.currentTimeMillis()/1000;
+						
+						query = "INSERT INTO my_sites VALUES(" +
+						"null, " + 
+						"'" + epoch + "'," + 
+						"'" + usertype_stname + "'," +
+						"'" + latitude.getText().toString() + "'," + 
+						"'" + longitude.getText().toString() + "'," +
+						"'" + selectedState + "'," +
+						"'" + comment.getText().toString() + "'," +
+						"'" + Human_Disturbance.getText().toString() + "'," +
+						"'" + Shading.getText().toString() + "'," +
+						"'" + Irrigation.getText().toString() + "'," +
+						"'" + Habitat.getText().toString() + "'," +		
+						SyncDBHelper.SYNCED_NO + ");";
+						
+						
+						syncWDB.execSQL(query);
+						cursor.close();
+
+						new AlertDialog.Builder(AddSite.this)
+						.setTitle(getString(R.string.AddSite_newAdded))
+						.setIcon(R.drawable.pbbicon_small)
+						.setMessage(getString(R.string.AddSite_note1))
+						.setPositiveButton(getString(R.string.Button_OK), new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+								Intent intent = new Intent(AddSite.this, PlantList.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								startActivity(intent);
+								finish();
+							}
+						})
+						.show();
+						
+					}catch(Exception e){
+						Log.e(TAG, e.toString());
+					}finally{
+						syncDBHelper.close();					
+					}
 				}
 			}
 		});
@@ -345,6 +356,8 @@ public class AddSite extends Activity{
 					
 					if(addr.size() > 0) {
 						Address address = addr.get(0);
+						
+						selectedState = address.getAdminArea();
 						
 						sb.append(address.getLocality()).append(", ").append(address.getAdminArea()).append("\n");
 						sb.append(address.getCountryName()).append(", ").append(address.getPostalCode());

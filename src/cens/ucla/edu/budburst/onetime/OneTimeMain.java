@@ -275,6 +275,7 @@ public class OneTimeMain extends ListActivity {
 		*/
 	}
 	
+	/*
 	public boolean insertNewPlantToDB(int speciesid, int siteid, String sitename){
 		
 		Log.i("K", "species id : " + speciesid + " siteid : " + siteid + " sitename : " + sitename);
@@ -301,6 +302,7 @@ public class OneTimeMain extends ListActivity {
 			return false;
 		}
 	}
+	*/
 	
 	public String[] getUserSite(){
 		

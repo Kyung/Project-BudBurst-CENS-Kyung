@@ -9,12 +9,12 @@
 	    android:layout_height="63px"
 	    android:gravity="center"
 	    android:orientation="horizontal"
-	    android:background="@drawable/PBB_teel2">
+	    android:background="@color/BudBurstBackground">
 	    <ImageView 
 	    	android:id="@+id/logo"
 	     	android:layout_width="wrap_content"
 		 	android:layout_height="wrap_content"
-	     	android:src="@drawable/logo_medium" 
+	     	android:src="@drawable/header_small_modified" 
 	     	android:layout_centerInParent="true"
 	     	android:layout_gravity="center" 
 	     	android:paddingLeft="0px" 

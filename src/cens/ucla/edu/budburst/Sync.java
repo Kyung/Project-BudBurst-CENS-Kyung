@@ -47,7 +47,8 @@ public class Sync extends Activity{
 	final private int MENU_LOGOUT = 4;
 	
 	//Sync constants
-	final private int SYNC_START = 1;
+	final private int SYNC_START = 0;
+	final private int GET_SPECIES_ID = 1;
 	final private int UPLOAD_ADDED_SITE = 2;
 	final private int UPLOAD_ADDED_PLANT = 3;
 	final private int UPLOAD_OBSERVATION = 4;
@@ -244,6 +245,13 @@ public class Sync extends Activity{
 				mProgress.setMessage(getString(R.string.Alert_uploadingSites));
 				
 				//Start Next Step
+				msgToThread.what = GET_SPECIES_ID;
+				msgToThread.arg1 = mProgressVal;
+				break;
+			case GET_SPECIES_ID:
+				mProgress.setProgress(mProgressVal);
+				mProgress.setMessage("");
+				
 				msgToThread.what = UPLOAD_ADDED_SITE;
 				msgToThread.arg1 = mProgressVal;
 				break;
@@ -401,7 +409,8 @@ class doSyncThread extends Thread{
 	Context context;
 	
 	//Sync constants
-	final private int SYNC_START = 1;
+	final private int SYNC_START = 0;
+	final private int GET_SPECIES_ID = 1;
 	final private int UPLOAD_ADDED_SITE = 2;
 	final private int UPLOAD_ADDED_PLANT = 3;
 	final private int UPLOAD_OBSERVATION = 4;
@@ -480,6 +489,47 @@ class doSyncThread extends Thread{
 	    	JSONArray jsonresult;
 			
 			switch(msg.what){
+			
+			case SYNC_START:
+				msgToMain.what = SYNC_START;
+				msgToMain.arg1 = mProgressVal;
+				break;
+			case GET_SPECIES_ID:
+
+				msgToMain.what = GET_SPECIES_ID;
+				msgToMain.arg1 = mProgressVal + 1;
+				serverResponse = SyncNetworkHelper.get_species_id(username, password);
+
+				if(serverResponse == null){
+					mLoop.quit();
+					break;
+				}
+				
+				//Server response check
+				try{
+					jsonobj = new JSONObject(serverResponse);
+					if(jsonobj.getBoolean("success") == false){
+						msgToMain.what = Sync.SERVER_ERROR;
+						msgToMain.obj = jsonobj.getString("error_message");
+						mLoop.quit();
+						break;
+					}else{
+						//Retrieve new site id 
+						String max_species_id = jsonobj.getString("results");
+							
+						SharedPreferences.Editor edit = pref.edit();				
+						edit.putInt("other_species_id", Integer.parseInt(max_species_id));
+						edit.commit();
+						
+						Log.i("K", " GET MAX SPECIES ID : " + max_species_id);
+					}
+				}catch(Exception e){
+		            e.printStackTrace();
+					Log.e(TAG, e.toString());
+					Log.d(TAG, "UPLOAD_ADDED_SITE: failed");
+				}
+				
+				break;
 			case UPLOAD_ADDED_SITE:
 				msgToMain.what = UPLOAD_ADDED_SITE;
 				msgToMain.arg1 = mProgressVal + 3;
@@ -565,7 +615,7 @@ class doSyncThread extends Thread{
 					String b = cursor.getString(1);
 					
 					Log.i("K","species_id : " + a + " site_id : " + b);
-					
+
 					serverResponse = 
 					SyncNetworkHelper.upload_new_plant(username, password, context, 
 							a, b);
@@ -730,21 +780,18 @@ class doSyncThread extends Thread{
 						break;
 					}
 					
+					
 					jsonresult = new JSONArray(jsonobj.getString("results"));
 					syncWDB.execSQL("DELETE FROM my_sites;");
 					for(int i=0; i<jsonresult.length(); i++){
 						syncWDB.execSQL("INSERT INTO my_sites " +
-								"(site_id, site_name, latitude, longitude, city" +
-								", state, zipcode, country, comments, synced)" +
+								"(site_id, site_name, latitude, longitude, state, comments, synced)" +
 								"VALUES(" +
 								"'" + jsonresult.getJSONObject(i).getString("_id") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("name") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("latitude") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("longitude") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("city") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("state") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("postal") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("country") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("comments") + "'," +
 								SyncDBHelper.SYNCED_YES + ");");
 					}
@@ -793,13 +840,15 @@ class doSyncThread extends Thread{
 						int species_id = Integer.parseInt(jsonresult.getJSONObject(i).getString("spc_id"));
 						
 						Log.i("K", "INSERT INTO my_plants " +
-								"(species_id, site_id, site_name, protocol_id, synced)" +
+								"(species_id, site_id, site_name, protocol_id, common_name, synced)" +
 								"VALUES(" +
 								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
 								"'"+
 								jsonresult.getJSONObject(i).getString("st_name") + "'," +
 								jsonresult.getJSONObject(i).getString("pro_id") + "," +
+								"'"+
+								jsonresult.getJSONObject(i).getString("c_name") + "'," +
 								SyncDBHelper.SYNCED_YES + ");");
 						
 						
@@ -809,13 +858,15 @@ class doSyncThread extends Thread{
 						//}
 						
 						syncWDB.execSQL("INSERT INTO my_plants " +
-								"(species_id, site_id, site_name, protocol_id, synced)" +
+								"(species_id, site_id, site_name, protocol_id, common_name, synced)" +
 								"VALUES(" +
 								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
 								"'"+
 								jsonresult.getJSONObject(i).getString("st_name") + "'," +
 								jsonresult.getJSONObject(i).getString("pro_id") + "," +
+								"'"+
+								jsonresult.getJSONObject(i).getString("c_name") + "'," +
 								SyncDBHelper.SYNCED_YES + ");");
 					}
 					Log.d(TAG, "DOWNLOAD_USER_PLANTS: success to store into db");

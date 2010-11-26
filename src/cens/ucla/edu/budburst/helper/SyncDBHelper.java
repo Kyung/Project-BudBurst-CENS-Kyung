@@ -24,7 +24,8 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"site_id NUMERIC," +
 				"site_name TEXT," +
 				"protocol_id NUMERIC," +
-				"official NUMERIC," +
+				"common_name TEXT," +
+				//"official NUMERIC," +
 				"synced NUMERIC);");
 				
 		//INSERT INTO onetimeob(photo_name, dt_taken, notes, sname, cname, image_id) VALUES(?, ?, ?, ?, ?, ?);
@@ -57,10 +58,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"site_name TEXT," +
 				"latitude TEXT," +
 				"longitude TEXT," +
-				"city TEXT," +
 				"state TEXT," +
-				"zipcode TEXT," +
-				"country TEXT," +
 				"comments TEXT, " +
 				"hdistance TEXT, " +
 				"shading TEXT, " +

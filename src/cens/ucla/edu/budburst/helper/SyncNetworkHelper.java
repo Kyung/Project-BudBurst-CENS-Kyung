@@ -49,6 +49,39 @@ public class SyncNetworkHelper extends Activity{
 	public SyncNetworkHelper(){
 	}
 	
+	static public String get_species_id(String username, String password) {
+		
+		try {
+			String result = null;
+			HttpClient httpClient = new DefaultHttpClient();
+			String url = new String("" +
+		    		"http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php" +
+		    		"?get_spcies_id&username=" + 
+		    		username+"&password="+password);
+			
+			HttpPost httppost = new HttpPost(url);
+			
+			HttpResponse response = httpClient.execute(httppost);
+        	BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent())); 
+        	StringBuilder result_str = new StringBuilder();
+			for(;;){
+				String line = rd.readLine();
+				if (line == null) 
+					break;
+				result_str.append(line+'\n');
+			}
+        	result = result_str.toString();
+	        Log.d(TAG, result);
+	        return result;
+			
+		}
+		catch(Exception e){
+		
+		}
+	
+		return null;
+	}
+	
 	static public String upload_new_site(String username, String password, 
 			String site_id, String site_name, String latitude, String longitude, 
 			String state, String comments){
@@ -61,7 +94,7 @@ public class SyncNetworkHelper extends Activity{
 			HttpClient httpclient = new DefaultHttpClient();  
 		    		    
 		    String url = new String("" +
-		    		"http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php" +
+		    		"http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php" +
 		    		"?add_site&username=" + 
 		    		username+"&password="+password);
 		    HttpPost httppost = new HttpPost(url);
@@ -162,14 +195,19 @@ public class SyncNetworkHelper extends Activity{
 			HttpClient httpclient = new DefaultHttpClient();  
 		    		    
 		    String url = new String("" +
-		    		"http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php" +
+		    		"http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php" +
 		    		"?add_plant&username=" + 
 		    		username+"&password="+password);
 		    HttpPost httppost = new HttpPost(url);
-
+		    
+		    Log.i("K","@@@@@@@@@@species_id : " + species_id + " , @@@@@@@@site_id : " + site_id);
+		    
         	nameValuePairs.add(new BasicNameValuePair("species_id", species_id));  
         	nameValuePairs.add(new BasicNameValuePair("site_id", site_id));  
-        	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
+        	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+        	
+        	
+        	Log.i("K", "HTTP POST : " + httppost.toString());
 	  
 	        // Execute HTTP Post Request  
         	HttpResponse response = httpclient.execute(httppost);

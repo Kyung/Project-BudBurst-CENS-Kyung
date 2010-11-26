@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -154,7 +155,7 @@ public class PlantSummary extends Activity {
 			public void onClick(View v) {
 				phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 				
-				final LinearLayout linear = (LinearLayout) View.inflate(PlantSummary.this, R.layout.image_popup, null);
+				final RelativeLayout linear = (RelativeLayout) View.inflate(PlantSummary.this, R.layout.image_popup, null);
 				
 				// TODO Auto-generated method stub
 				AlertDialog.Builder dialog = new AlertDialog.Builder(PlantSummary.this);

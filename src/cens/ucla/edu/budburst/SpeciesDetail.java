@@ -16,6 +16,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -50,11 +51,13 @@ public class SpeciesDetail extends Activity {
 		v.setPadding(0, 0, 0, 0);
 		
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(getString(R.string.SpeciesDetail_info));
+		myTitleText.setText(" " + getString(R.string.SpeciesDetail_info));
 	    
 		Intent intent = getIntent();
 	    species_id = intent.getExtras().getInt("id");
 	    site_id = intent.getExtras().getInt("site_id");
+	    
+	    
 	    
 	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
 	    
@@ -70,63 +73,74 @@ public class SpeciesDetail extends Activity {
 	    sDBH = new StaticDBHelper(SpeciesDetail.this);
 	    
 	    db = sDBH.getReadableDatabase();
-	
-	    cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id + ";", null);
 	    
-	    Log.i("K", "SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id);
 	    
-	    while(cursor.moveToNext()) {
-	    	snameTxt.setText(" " + cursor.getString(1) + " ");
-	    	cnameTxt.setText(" " + cursor.getString(2) + " ");
-	    	notesTxt.setText("" + cursor.getString(3) + " ");
-	    	
-			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
-		
-			image.setImageResource(resID);
+	    if(species_id > 76) {
+	    	image.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 	    }
-	    
-	    cursor.close();
-	    
+	    else {
+	    	cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id + ";", null);
+		    
+		    Log.i("K", "SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id);
+		    
+		    while(cursor.moveToNext()) {
+		    	snameTxt.setText(" " + cursor.getString(1) + " ");
+		    	cnameTxt.setText(" " + cursor.getString(2) + " ");
+		    	notesTxt.setText("" + cursor.getString(3) + " ");
+		    	
+				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
+			
+				image.setImageResource(resID);
+		    }
+		    
+		    cursor.close();
+	    }
+	        
 	    syncDBH = new SyncDBHelper(SpeciesDetail.this);
 	    db = syncDBH.getReadableDatabase();
 	    
 	    cursor = db.rawQuery("SELECT species_id from my_plants;", null);
 	    
-	    Log.i("K", "COUNT : " + cursor.getCount());
-	    
-	    while(cursor.moveToNext()) {
-	    	
-	    	Log.i("K", "CURSOR : " + cursor.getInt(0));
-	    	
-		    db = sDBH.getReadableDatabase();
-		    Cursor cursor2;
-		    cursor2 = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + cursor.getInt(0) + ";", null);
-	    	
-		    while(cursor2.moveToNext()) {
-		    	
-		    	if(cursor2.getInt(0) == species_id)
-		    		continue;
-		    	
-		    	LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
-		 	    View itemView = inflater.inflate(R.layout.species_detail, null);
-		 	    
-		 	    TextView t1 = (TextView)itemView.findViewById(R.id.science_name);
-		 	    t1.setText(" " + cursor2.getString(1) + " ");
-		 	    
-		 	    TextView t2 = (TextView)itemView.findViewById(R.id.common_name);
-		 	    t2.setText(" " + cursor2.getString(2) + " ");
-		 	    
-		 	    TextView note = (TextView)itemView.findViewById(R.id.text);
-		 	    note.setText("" + cursor2.getString(3) + " ");
-		 	    
-		 	    ImageView image2 = (ImageView) itemView.findViewById(R.id.species_image);
-		 	    int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor2.getInt(0), null, null);
-		 	    image2.setImageResource(resID);
-		 	    
-		 	    vf.addView(itemView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		 	    
+	    //Log.i("K", "COUNT : " + cursor.getCount());
+
+		while(cursor.moveToNext()) {
+			
+			//Log.i("K", "CURSOR : " + cursor.getInt(0));
+			//Log.i("K", "SPECIES ID : " + species_id);
+			
+			if(cursor.getInt(0) == species_id)
+				continue;
+			
+			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+	 	    View itemView = inflater.inflate(R.layout.species_detail, null);
+	 	    TextView t1 = (TextView)itemView.findViewById(R.id.science_name);
+	 	    TextView t2 = (TextView)itemView.findViewById(R.id.common_name);
+	 	    TextView note = (TextView)itemView.findViewById(R.id.text);
+	 	    ImageView image2 = (ImageView) itemView.findViewById(R.id.species_image);
+	 	    
+		    if(cursor.getInt(0) > 76) {
+		    	image2.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+		    	vf.addView(itemView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		    }
-		    cursor2.close();
+
+			db = sDBH.getReadableDatabase();
+			
+			Cursor cursor2;
+			cursor2 = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + cursor.getInt(0) + ";", null);
+		    	
+			while(cursor2.moveToNext()) {	    
+			    if(cursor2.getInt(0) == species_id)
+					continue;
+				    	
+				t1.setText(" " + cursor2.getString(1) + " ");
+				t2.setText(" " + cursor2.getString(2) + " ");
+				note.setText("" + cursor2.getString(3) + " ");
+				image2.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor2.getInt(0), null, null));
+				 	    
+				vf.addView(itemView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		    }
+			cursor2.close();
+
 	    }
 	    
 		cursor.close();
@@ -137,8 +151,10 @@ public class SpeciesDetail extends Activity {
 	    // TODO Auto-generated method stub
 	}
 	
+	
 	public boolean onTouchEvent(MotionEvent touchevent) {
-		switch (touchevent.getAction()) {
+			// TODO Auto-generated method stub
+			switch (touchevent.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 			{
 				oldTouchValue = touchevent.getX();
@@ -176,5 +192,4 @@ public class SpeciesDetail extends Activity {
 		}
 		return true;
 	}
-
 }

@@ -102,7 +102,6 @@ public class PlantInformation_Direct extends Activity {
 		photo_image = (ImageView) findViewById(R.id.image);
 		photo_image.setVisibility(View.VISIBLE);
 		
-	
 		
 		if(species_id == 0) {
 			species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
@@ -119,8 +118,6 @@ public class PlantInformation_Direct extends Activity {
 		    species_image.setBackgroundResource(R.drawable.shapedrawable);
 		    species_name.setText(cname + " \n" + sname + " ");
 		}
-		
-		
 		
 		// set xml
 		notes = (EditText) findViewById(R.id.notes);
@@ -367,7 +364,7 @@ public class PlantInformation_Direct extends Activity {
 				
 			}
 		});
-		
+		/*
 		siteBtn = (Button)findViewById(R.id.site_information);
 		siteBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -381,7 +378,7 @@ public class PlantInformation_Direct extends Activity {
 			}
 			
 		});
-		
+		*/
 	    // TODO Auto-generated method stub
 	}
 	

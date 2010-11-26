@@ -9,6 +9,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -43,6 +44,7 @@ public class AddPlant extends ListActivity{
 	private int EVERGREEN_TREES = 3;
 	private int CONIFERS = 4;
 	private Integer new_plant_species_id;
+	private String new_plant_species_name;
 	private Integer new_plant_site_id; 
 	private String new_plant_site_name;
 	
@@ -115,7 +117,7 @@ public class AddPlant extends ListActivity{
  		cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;",null);
  		while(cursor.moveToNext()){
 			Integer id = cursor.getInt(0);
-			if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24) {
+			if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24 || id == 999) {
 				String species_name = cursor.getString(1);
 				String common_name = cursor.getString(2);
 							
@@ -160,7 +162,7 @@ public class AddPlant extends ListActivity{
 		 		Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
 				while(cursor.moveToNext()){
 					Integer id = cursor.getInt(0);
-					if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24) {
+					if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24 || id == 999) {
 						String species_name = cursor.getString(1);
 						String common_name = cursor.getString(2);
 									
@@ -258,6 +260,9 @@ public class AddPlant extends ListActivity{
 							arPlantList.add(pi);
 						}
 						
+						PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+						arPlantList.add(pi);
+						
 						mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
 						MyList = getListView(); 
 						MyList.setAdapter(mylistapdater);
@@ -310,6 +315,8 @@ public class AddPlant extends ListActivity{
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
 		new_plant_species_id = arPlantList.get(position).SpeciesID;
+		new_plant_species_name = arPlantList.get(position).CommonName;
+
 		
 		Log.i("K", "POSITION : " + position);
 		Log.i("K", "SPECIES_ID : " + arPlantList.get(position).SpeciesID);
@@ -333,15 +340,16 @@ public class AddPlant extends ListActivity{
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(AddPlant.this, AddSite.class);
 					startActivity(intent);
-					finish();
 				}
 				else {
 					if(checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id)){
 						Toast.makeText(AddPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
-						if(insertNewPlantToDB(new_plant_species_id, new_plant_site_id, new_plant_site_name)){
+						if(insertNewPlantToDB(new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name)){
 							Intent intent = new Intent(AddPlant.this, PlantList.class);
 							Toast.makeText(AddPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+							//clear all stacked activities.
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							startActivity(intent);
 							finish();
 						}else{
@@ -355,6 +363,7 @@ public class AddPlant extends ListActivity{
 		.show();
 	}
 	
+	/*
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
 	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
@@ -365,7 +374,7 @@ public class AddPlant extends ListActivity{
 	    }
 		return super.onKeyDown(keyCode, event);
 	}
-	
+	*/
 	
 	//Adapters:MyListAdapter and SeparatedAdapter
 	class MyListAdapter extends BaseAdapter{
@@ -464,7 +473,16 @@ public class AddPlant extends ListActivity{
 		}
 	}
 	
-	public boolean insertNewPlantToDB(int speciesid, int siteid, String sitename){
+	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename){
+
+		int s_id = speciesid;
+		SharedPreferences pref = getSharedPreferences("userinfo",0);
+		
+		if(speciesid == 999) {
+			s_id = pref.getInt("other_species_id", 0);
+			s_id++;
+		}
+		
 		try{
 			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
 			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
@@ -475,9 +493,17 @@ public class AddPlant extends ListActivity{
 					siteid + "," +
 					"'" + sitename + "',"+
 					"0,"+
-					"1,"+ // 1 means it's official, from add plant list
+					//"1,"+ // 1 means it's official, from add plant list
+					"'" + speciesname + "'," +
 					SyncDBHelper.SYNCED_NO + ");"
 					);
+			
+			if(speciesid == 999) {
+				SharedPreferences.Editor edit = pref.edit();				
+				edit.putInt("other_species_id", s_id);
+				edit.commit();
+			}
+			
 			syncDBHelper.close();
 			return true;
 		}

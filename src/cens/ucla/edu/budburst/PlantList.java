@@ -179,7 +179,14 @@ public class PlantList extends ListActivity {
 			Log.i("K", "OUTPUT : " + cursorss.getInt(0) + " , " + cursorss.getInt(1) + " , " + cursorss.getInt(2));
 		}
 		cursorss.close();
-	
+		
+		cursorss = syncDB.rawQuery("SELECT species_id, common_name, synced FROM my_plants;", null);
+		while(cursorss.moveToNext()) {
+			Log.i("K", "MY PLANTS : " + cursorss.getInt(0) + " , " + cursorss.getString(1) + " , synced : " + cursorss.getInt(2));
+		}
+		cursorss.close();
+		
+		
 		try {
         	staticDBHelper.createDataBase();
 	 	} catch (IOException ioe) {
@@ -255,11 +262,12 @@ public class PlantList extends ListActivity {
 				PlantItem pi;
 				
 				//Retrieves plants from each site.
-				Cursor cursor2 = syncDB.rawQuery("SELECT species_id FROM my_plants " +
+				Cursor cursor2 = syncDB.rawQuery("SELECT species_id, common_name FROM my_plants " +
 						"WHERE site_name = '" + user_station_name.get(i) + "';", null);
 				int count = 0;
 				while(cursor2.moveToNext()){
-					Log.i("K", "sPECIES_ID : " + cursor2.getInt(0));
+					
+					// check if the species_id and common_name are from "UNKNOWN"
 					int species_id = 0;
 					if(cursor2.getInt(0) > 76) {
 						species_id = 999;
@@ -267,6 +275,17 @@ public class PlantList extends ListActivity {
 					else {
 						species_id = cursor2.getInt(0);
 					}
+					
+					// if common_name from the server is "null", change it to "Unknown Plant"
+					String common_name = "";
+					if(cursor2.getString(1).equals("null")) {
+						common_name = "Unknown Plant";
+					}
+					else {
+						common_name = cursor2.getString(1);
+					}
+					
+					
 					String qry = "SELECT _id, species_name, common_name, protocol_id FROM species WHERE _id = " + species_id + ";";
 					
 					Cursor cursor3 = staticDB.rawQuery(qry, null);
@@ -290,11 +309,11 @@ public class PlantList extends ListActivity {
 					Cursor cursor5 = staticDB.rawQuery(total_pheno, null);
 					
 					if(count == 0) {
-						pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
+						pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
 								, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
 					}
 					else {
-						pi = new PlantItem(resID, cursor3.getString(2), cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
+						pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
 								, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
 					}
 					//PlantItem structure = >int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int siteID)
@@ -350,13 +369,16 @@ public class PlantList extends ListActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
-				String[] category = getResources().getStringArray(R.array.category);
-				if(category[which].equals("Delete")) {
+				String[] category = getResources().getStringArray(R.array.plantlist);
+				// temporary deleting item not used
+				if(category[which].equals("Delete itemssss")) {
 					try{
 						SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
 						SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
 						
 						syncDB.execSQL("DELETE FROM my_plants WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
+										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
+						syncDB.execSQL("DELETE FROM my_observation WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
 										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
 						syncDBHelper.close();
 						
@@ -370,7 +392,7 @@ public class PlantList extends ListActivity {
 						Log.e(TAG,e.toString());
 					}
 				}
-				else {
+				else{
 					Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -404,11 +426,6 @@ public class PlantList extends ListActivity {
 				intent = new Intent(PlantList.this, OneTimeMain.class);
 				intent.putExtra("FROM", PLANT_LIST);
 				startActivity(intent);
-				return true;
-			case MENU_ADD_QUICK:
-				intent = new Intent (PlantList.this, AddSite.class);
-				startActivity(intent);
-				finish();
 				return true;
 			case MENU_SYNC:
 				intent = new Intent(PlantList.this, Sync.class);
@@ -513,5 +530,17 @@ public class PlantList extends ListActivity {
 			return convertView;
 		}
 	}
+	
+    // or when user press back button
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == event.KEYCODE_BACK) {
+			
+			
+			finish();
+			return true;
+		}
+		return false;
+	}
+	
 }
 

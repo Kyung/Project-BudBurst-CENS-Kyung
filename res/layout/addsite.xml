@@ -200,29 +200,29 @@
 	</Button>
 	
 	
-	<!-- 
 	<TextView
 	android:id="@+id/comment_lable"
-	android:layout_below="@+id/human_distance_text"
+	android:layout_below="@+id/habitat_text"
 	android:textStyle="bold"
 	android:layout_marginTop="10dip"
-	android:layout_marginLeft="30dip"
+	android:layout_marginLeft="40dip"
 	android:layout_marginRight="5dip"
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
-	android:textSize="17dip" android:text="@string/AddSite_description">
+	android:textSize="17dip" 
+	android:text="@string/AddSite_description">
 	</TextView>
 	<EditText 
 	android:id="@+id/comment"
 	android:layout_below="@+id/comment_lable"
 	android:gravity="top"
-	android:layout_marginLeft="30dip"
-	android:layout_marginRight="30dip"	
+	android:layout_marginLeft="40dip"
+	android:layout_marginRight="40dip"
 	android:layout_height="100dip"
 	android:layout_width="fill_parent"
 	android:hint="@string/AddSite_optional">
 	</EditText>
- 	-->
+
  
 	<Button
 	android:id="@+id/save"
@@ -232,7 +232,7 @@
 	android:layout_marginTop="20dip"
 	android:layout_marginLeft="40dip"
 	android:layout_marginRight="40dip"
-	android:layout_below="@+id/habitat_text"
+	android:layout_below="@+id/comment"
 	android:textSize="16dip"
 	android:focusable="true"
 	android:text="@string/Button_save"/>

@@ -3,7 +3,7 @@
 		xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:layout_width="fill_parent" 
 	    android:layout_height="fill_parent"  
-	   	android:background="@drawable/PBB_teel2"
+	   	android:background="@color/BudBurstBackground"
 		>
 	<LinearLayout 
 	    android:orientation="vertical" 
@@ -15,7 +15,7 @@
 				android:id="@+id/logo" 
 				android:layout_height="wrap_content" 
 				android:layout_centerHorizontal = "true"
-				android:src="@drawable/loging_pbb_logo"
+				android:src="@drawable/header_small_modified"
 				android:focusableInTouchMode="true"
 				android:layout_gravity="center" android:layout_width="wrap_content" android:paddingBottom="10dip" android:paddingTop="20dip">
 			</ImageView>
