@@ -180,9 +180,9 @@ public class PlantList extends ListActivity {
 		}
 		cursorss.close();
 		
-		cursorss = syncDB.rawQuery("SELECT species_id, common_name, synced FROM my_plants;", null);
+		cursorss = syncDB.rawQuery("SELECT species_id, common_name, active, synced FROM my_plants;", null);
 		while(cursorss.moveToNext()) {
-			Log.i("K", "MY PLANTS : " + cursorss.getInt(0) + " , " + cursorss.getString(1) + " , synced : " + cursorss.getInt(2));
+			Log.i("K", "MY PLANTS : " + cursorss.getInt(0) + " , " + cursorss.getString(1) + " , active : " + cursorss.getInt(2)+ " , synced : " + cursorss.getInt(3));
 		}
 		cursorss.close();
 		
@@ -262,69 +262,76 @@ public class PlantList extends ListActivity {
 				PlantItem pi;
 				
 				//Retrieves plants from each site.
-				Cursor cursor2 = syncDB.rawQuery("SELECT species_id, common_name FROM my_plants " +
+				Cursor cursor2 = syncDB.rawQuery("SELECT species_id, common_name, active FROM my_plants " +
 						"WHERE site_name = '" + user_station_name.get(i) + "';", null);
 				int count = 0;
 				while(cursor2.moveToNext()){
 					
-					// check if the species_id and common_name are from "UNKNOWN"
-					int species_id = 0;
-					if(cursor2.getInt(0) > 76) {
-						species_id = 999;
+					// if active flag is 0, skip the operation below...
+					// active = 0 means, the corresponding species got deleted
+					if(cursor2.getInt(2) == 0) {
+						continue;
 					}
 					else {
-						species_id = cursor2.getInt(0);
-					}
-					
-					// if common_name from the server is "null", change it to "Unknown Plant"
-					String common_name = "";
-					if(cursor2.getString(1).equals("null")) {
-						common_name = "Unknown Plant";
-					}
-					else {
-						common_name = cursor2.getString(1);
-					}
-					
-					
-					String qry = "SELECT _id, species_name, common_name, protocol_id FROM species WHERE _id = " + species_id + ";";
-					
-					Cursor cursor3 = staticDB.rawQuery(qry, null);
-					
-					cursor3.moveToNext();
-					int resID = 0;
-					if(Integer.parseInt(cursor3.getString(0)) > 76) {
-						resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null);
-					}
-					else {
-						resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor3.getString(0), null, null);
-					}
+						// check if the species_id and common_name are from "UNKNOWN"
+						int species_id = 0;
+						if(cursor2.getInt(0) > 76) {
+							species_id = 999;
+						}
+						else {
+							species_id = cursor2.getInt(0);
+						}
+						
+						// if common_name from the server is "null", change it to "Unknown Plant"
+						String common_name = "";
+						if(cursor2.getString(1).equals("null")) {
+							common_name = "Unknown Plant";
+						}
+						else {
+							common_name = cursor2.getString(1);
+						}
+						
+						
+						String qry = "SELECT _id, species_name, common_name, protocol_id FROM species WHERE _id = " + species_id + ";";
+						
+						Cursor cursor3 = staticDB.rawQuery(qry, null);
+						
+						cursor3.moveToNext();
+						int resID = 0;
+						if(Integer.parseInt(cursor3.getString(0)) > 76) {
+							resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null);
+						}
+						else {
+							resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor3.getString(0), null, null);
+						}
 
-					// get the number of check-marked data
-					String pheno_done = "SELECT _id FROM my_observation WHERE species_id = " 
-						+ cursor2.getInt(0) + " AND site_id = " + user_station_id.get(i) + " GROUP BY phenophase_id;";
-					Cursor cursor4 = syncDB.rawQuery(pheno_done, null);
-					
-					// get total_number_of phenophases from species
-					String total_pheno = "SELECT Phenophase_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID = " + cursor3.getInt(3) + ";";
-					Cursor cursor5 = staticDB.rawQuery(total_pheno, null);
-					
-					if(count == 0) {
-						pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-								, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
+						// get the number of check-marked data
+						String pheno_done = "SELECT _id FROM my_observation WHERE species_id = " 
+							+ cursor2.getInt(0) + " AND site_id = " + user_station_id.get(i) + " GROUP BY phenophase_id;";
+						Cursor cursor4 = syncDB.rawQuery(pheno_done, null);
+						
+						// get total_number_of phenophases from species
+						String total_pheno = "SELECT Phenophase_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID = " + cursor3.getInt(3) + ";";
+						Cursor cursor5 = staticDB.rawQuery(total_pheno, null);
+						
+						if(count == 0) {
+							pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
+									, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
+						}
+						else {
+							pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
+									, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
+						}
+						//PlantItem structure = >int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int siteID)
+						
+						arPlantItem.add(pi);
+						
+						cursor3.close();
+						cursor4.close();
+						cursor5.close();
+						
+						count++;
 					}
-					else {
-						pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-								, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
-					}
-					//PlantItem structure = >int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int siteID)
-					
-					arPlantItem.add(pi);
-					
-					cursor3.close();
-					cursor4.close();
-					cursor5.close();
-					
-					count++;
 				}
 				cursor2.close();
 			}
@@ -371,14 +378,14 @@ public class PlantList extends ListActivity {
 				// TODO Auto-generated method stub
 				String[] category = getResources().getStringArray(R.array.plantlist);
 				// temporary deleting item not used
-				if(category[which].equals("Delete itemssss")) {
+				if(category[which].equals("Delete Species")) {
 					try{
 						SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
 						SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
 						
-						syncDB.execSQL("DELETE FROM my_plants WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
+						syncDB.execSQL("UPDATE my_plants SET active = 0 AND synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
 										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
-						syncDB.execSQL("DELETE FROM my_observation WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
+						syncDB.execSQL("UPDATE my_plants SET synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
 										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
 						syncDBHelper.close();
 						

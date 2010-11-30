@@ -598,7 +598,7 @@ class doSyncThread extends Thread{
 				msgToMain.arg1 = mProgressVal + 2;
 				
 		    	//Open database cursor
-		    	query =	"SELECT species_id, site_id " +
+		    	query =	"SELECT species_id, site_id, active " +
 		    			"FROM my_plants " +
 		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = syncRDB.rawQuery(query, null);
@@ -613,12 +613,13 @@ class doSyncThread extends Thread{
 				while(cursor.moveToNext()){
 					String a = cursor.getString(0);
 					String b = cursor.getString(1);
+					Integer c = cursor.getInt(2);
 					
-					Log.i("K","species_id : " + a + " site_id : " + b);
+					Log.i("K","species_id : " + a + " site_id : " + b + " active : " + c);
 
 					serverResponse = 
 					SyncNetworkHelper.upload_new_plant(username, password, context, 
-							a, b);
+							a, b, c);
 
 //					serverResponse = 
 //						SyncNetworkHelper.upload_new_plant(username, password, context, 
@@ -840,7 +841,7 @@ class doSyncThread extends Thread{
 						int species_id = Integer.parseInt(jsonresult.getJSONObject(i).getString("spc_id"));
 						
 						Log.i("K", "INSERT INTO my_plants " +
-								"(species_id, site_id, site_name, protocol_id, common_name, synced)" +
+								"(species_id, site_id, site_name, protocol_id, common_name, active, synced)" +
 								"VALUES(" +
 								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
@@ -849,6 +850,7 @@ class doSyncThread extends Thread{
 								jsonresult.getJSONObject(i).getString("pro_id") + "," +
 								"'"+
 								jsonresult.getJSONObject(i).getString("c_name") + "'," +
+								"1," +
 								SyncDBHelper.SYNCED_YES + ");");
 						
 						
@@ -858,7 +860,7 @@ class doSyncThread extends Thread{
 						//}
 						
 						syncWDB.execSQL("INSERT INTO my_plants " +
-								"(species_id, site_id, site_name, protocol_id, common_name, synced)" +
+								"(species_id, site_id, site_name, protocol_id, common_name, active, synced)" +
 								"VALUES(" +
 								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
@@ -867,6 +869,7 @@ class doSyncThread extends Thread{
 								jsonresult.getJSONObject(i).getString("pro_id") + "," +
 								"'"+
 								jsonresult.getJSONObject(i).getString("c_name") + "'," +
+								"1," +
 								SyncDBHelper.SYNCED_YES + ");");
 					}
 					Log.d(TAG, "DOWNLOAD_USER_PLANTS: success to store into db");

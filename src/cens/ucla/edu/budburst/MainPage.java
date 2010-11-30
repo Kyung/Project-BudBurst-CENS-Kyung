@@ -141,7 +141,9 @@ public class MainPage extends Activity {
 			boolean flag = false;
 			if(event.getRepeatCount() == 3) {
 				Toast.makeText(MainPage.this, getString(R.string.Alert_thanks), Toast.LENGTH_SHORT).show();
-				finish();
+				System.exit(0);
+				//finish();
+				
 				return true;
 			}
 			else if(event.getRepeatCount() == 0 && flag == false){
@@ -196,6 +198,7 @@ public class MainPage extends Activity {
 						onehelper.close();
 						
 						deleteContents("/sdcard/pbudburst/tmp/");
+						deleteContents("/sdcard/pbudburst/wi_list/");
 						deleteContents("/sdcard/pbudburst/");
 						
 						Intent intent = new Intent(MainPage.this, Login.class);

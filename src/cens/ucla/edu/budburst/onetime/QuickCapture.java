@@ -139,6 +139,12 @@ public class QuickCapture extends Activity {
 				String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 				
 				Media media = new Media();
+				
+				if(camera_image_id.equals(null)) {
+					Toast.makeText(QuickCapture.this, "Please start again", Toast.LENGTH_SHORT).show();
+					finish();
+				}
+				
 				Bitmap bitmap = media.ShowPhotoTaken(BASE_PATH + camera_image_id + ".jpg");
 				
 				Intent intent = new Intent(QuickCapture.this, OneTimeMain.class);

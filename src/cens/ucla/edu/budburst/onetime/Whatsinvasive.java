@@ -81,7 +81,7 @@ public class Whatsinvasive extends ListActivity {
 	private String sname;
 	private String image_path;
 	private TextView areaTxt2 = null;
-	public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
+	public final String TEMP_PATH = "/sdcard/pbudburst/wi_list/";
 	protected static int GET_AREA_LIST = 1;
 	protected static int TO_WI_INFO = 2;
 	private ProgressDialog dialog = null;

@@ -451,9 +451,12 @@ public class AddPlant extends ListActivity{
 		SyncDBHelper syncDBHelper = new SyncDBHelper(this);
 		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase();
 		
+		Log.i("K", "SPECIES ID : " + speciesid + " ,SITE ID : " + siteid);
+		
 		try{
-			Cursor cursor = syncDB.rawQuery("SELECT species_id FROM my_plants " +
-					"WHERE species_id = " + speciesid +
+			Cursor cursor = syncDB.rawQuery("SELECT species_id FROM my_plants" +
+					" WHERE species_id = " + speciesid +
+					" AND active = 1" +
 					" AND site_id = " + siteid, null);
 			if(cursor.getCount() > 0){
 				cursor.close();
@@ -495,6 +498,7 @@ public class AddPlant extends ListActivity{
 					"0,"+
 					//"1,"+ // 1 means it's official, from add plant list
 					"'" + speciesname + "'," +
+					"1, " +
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			

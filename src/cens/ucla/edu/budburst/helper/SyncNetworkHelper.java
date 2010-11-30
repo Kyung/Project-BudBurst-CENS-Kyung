@@ -185,7 +185,7 @@ public class SyncNetworkHelper extends Activity{
 	}
 	
 	static public String upload_new_plant(String username, String password, Context cont
-			,String species_id, String site_id){
+			,String species_id, String site_id, Integer active){
 		try{
 			
 	        // Add your data  
@@ -200,10 +200,12 @@ public class SyncNetworkHelper extends Activity{
 		    		username+"&password="+password);
 		    HttpPost httppost = new HttpPost(url);
 		    
-		    Log.i("K","@@@@@@@@@@species_id : " + species_id + " , @@@@@@@@site_id : " + site_id);
+		    Log.i("K","@@@@@@@@@@species_id : " + species_id + " , @@@@@@@@site_id : " + site_id + ", ACTIVE : " + active);
+		    String active_str = active.toString();
 		    
         	nameValuePairs.add(new BasicNameValuePair("species_id", species_id));  
         	nameValuePairs.add(new BasicNameValuePair("site_id", site_id));  
+        	nameValuePairs.add(new BasicNameValuePair("active", active_str));
         	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
         	
         	

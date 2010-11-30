@@ -85,6 +85,7 @@ public class GetPhenophase_PBB extends ListActivity {
 	    LinearLayout add_species_name = (LinearLayout)findViewById(R.id.add_species_name);
 	    
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
+	    
 	    species_name = (TextView) findViewById(R.id.species_name);
 	    
 	    if(wherefrom == SELECT_PLANT_NAME) {
@@ -138,6 +139,18 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	}
 	    	species_name.setText(common_name + "\n" + science_name);
 	    }
+	    
+	    species_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(GetPhenophase_PBB.this, SpeciesDetail.class);
+				intent.putExtra("id", species_ids);
+				intent.putExtra("site_id", "");
+				startActivity(intent);
+			}
+		});
 	    
 	    pItem = new ArrayList<PlantItem>();
 	    PlantItem pi;
