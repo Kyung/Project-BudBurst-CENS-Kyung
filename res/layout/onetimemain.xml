@@ -4,111 +4,59 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-
-    <LinearLayout  
-    	android:id="@+id/logo_layout"
-	    android:layout_width="fill_parent" 
-	    android:layout_height="63px"
-	    android:gravity="center"
-	    android:orientation="horizontal"
-	    >
-	    <!-- 
-	    <Button
-	        android:id="@+id/myplant"
-	        android:layout_alignParentTop="true"
-	        android:background="@drawable/right_arrowcopy" android:layout_marginLeft="8dip" android:layout_width="50dip" android:layout_height="30dip"/>
-	     -->
-	    <ImageView 
-	    	android:id="@+id/logo"
-	     	android:layout_height="wrap_content"
-	     	android:layout_centerVertical="true"  
-	     	android:paddingBottom="2px" 
-	     	android:paddingLeft="5px" 
-	     	android:layout_gravity="center_vertical" 
-	     	android:gravity="center"
-	     	android:layout_width="wrap_content"/>
-
-	</LinearLayout>        
-	<!-- 	
-	<LinearLayout 
-	   		android:id="@+id/two_button"
-	   	    android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	   		android:weightSum="1"
-	   		android:layout_below="@+id/logo_layout">
-	   		
-	    <cens.ucla.edu.budburst.helper.CustomButton
-	        android:id="@+id/myplant"
-			android:layout_width="fill_parent"
-	        android:layout_height="29dip"
-	        android:layout_alignParentTop="true" 
-	        android:layout_weight="0.5"
-	        android:text="My Plants"/>
-	
-	    <cens.ucla.edu.budburst.helper.CustomButton
-			android:id="@+id/sharedplant"
-			android:layout_width="fill_parent"
-	        android:layout_height="29dip"
-	        android:layout_alignParentTop="true" 
-	        android:layout_weight="0.5"
-	        android:text="Shared Plants"/>
-	</LinearLayout> 
-	 -->
-	<!-- 
 	<LinearLayout
-			android:layout_below="@+id/logo_layout"
-	   	    android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="vertical"
-	        android:gravity="center">
-	
-	<TextView
-		android:id="@+id/instruction"
-		android:layout_below="@+id/logo_layout"
-		android:textSize="17dip"
-		android:text="@string/no_site_no_species_instruction"
+		android:id="@+id/logo_layout"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_margin="10dip"
-		android:visibility="gone"		
-		>
-	</TextView>
-	
-	<Button
-		android:id="@+id/observation_btn"
-		android:text="Observation"
-		android:layout_below="@+id/logo_layout"
-		android:layout_width="300px"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="20dip"
-		android:textSize="20dip"
-		android:drawableTop="@drawable/search"
-		android:layout_gravity="center"
-	/>
-	<Button
-		android:id="@+id/recommend_btn"
-		android:text="Recommendation"
-		android:layout_below="@+id/observation_btn"
-		android:layout_width="300px"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="10dip"
-		android:textSize="20dip"
-		android:drawableTop="@drawable/favorite"
-		android:layout_gravity="center"
-	/>
-	</LinearLayout>
-	-->
+		android:layout_height="59px"
+		android:gravity="center_vertical|center_horizontal" 
+		android:background="@color/BudBurstBackground">
+		<ImageView 
+			android:id="@+id/logo" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:src="@drawable/header_small_modified">
+		</ImageView>
+	</LinearLayout>  
 	<LinearLayout
 		android:weightSum="1"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:layout_below="@+id/logo_layout"
 		android:orientation="vertical"
+	>  
+		<LinearLayout
+		android:layout_weight="0.83"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:id="@+id/done_layout"
+		android:paddingLeft="5dp"
 	>
-	
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_marginTop="10dp"
+			android:orientation="horizontal"
+		>
+			<Button
+				android:layout_width="100px"
+				android:layout_height="wrap_content"
+				android:id="@+id/submit"
+				android:text="@string/Submit"
+			/>
+			<TextView
+				android:layout_marginLeft="2dp"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/Unknown_Plant_Text"
+				android:textSize="15dp"
+			/>
+		</LinearLayout>
+
+	</LinearLayout>
+
 	<ListView 
-		android:layout_weight="0.2"
+		android:layout_weight="0.17"
 		android:id="@android:id/list"
 		android:layout_below="@+id/logo_layout"
 		android:layout_width="fill_parent" 

@@ -1,13 +1,21 @@
 package cens.ucla.edu.budburst.onetime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import cens.ucla.edu.budburst.GetPhenophase_PBB;
+import cens.ucla.edu.budburst.AddPlant;
+import cens.ucla.edu.budburst.AddSite;
+import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.PlantInformation_Direct;
+import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
+import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,11 +32,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GetPhenophase extends ListActivity {
 	
@@ -37,9 +48,13 @@ public class GetPhenophase extends ListActivity {
 	private String cname = null;
 	private String sname = null;
 	private int species_id = 0;
-	private RadioButton rb1 = null;
-	private RadioButton rb2 = null;
-	private RadioButton rb3 = null;
+	private int _position = 0;
+	//private RadioButton rb1 = null;
+	//private RadioButton rb2 = null;
+	//private RadioButton rb3 = null;
+	private Button submitBtn = null;
+	private String previous_activity;
+	private EditText et1;
 	private TextView myTitleText = null;
 	private MyListAdapter MyAdapter = null;
 	private ListView myList = null;
@@ -48,6 +63,12 @@ public class GetPhenophase extends ListActivity {
 	private double longitude = 0.0;
 	private String dt_taken = null;
 	private int SELECT_PLANT_NAME = 100;
+	private Integer new_plant_site_id; 
+	private String new_plant_site_name;
+	private CharSequence[] seqUserSite;
+	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>();
+	FunctionsHelper helper;
+	
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -56,11 +77,14 @@ public class GetPhenophase extends ListActivity {
 	    
 	    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 	    setContentView(R.layout.getphenophase);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
 		v = (ViewGroup)v.getChildAt(0);
 		v.setPadding(0, 0, 0, 0);
+		
+		helper = new FunctionsHelper();
+		mapUserSiteNameID = helper.getUserSiteIDMap(GetPhenophase.this);
 		
 	    Intent intent = getIntent();
 	    protocol_id = intent.getExtras().getInt("protocol_id");
@@ -71,10 +95,32 @@ public class GetPhenophase extends ListActivity {
 		latitude = intent.getExtras().getDouble("latitude");
 		longitude = intent.getExtras().getDouble("longitude");
 		dt_taken = intent.getExtras().getString("dt_taken");
+		previous_activity = intent.getExtras().getString("from");
 	    
 	    myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(cname + " > Phenophase");
+		
+		submitBtn = (Button) findViewById(R.id.submit);
+		submitBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				helper.insertNewPlantToDB(GetPhenophase.this, species_id, 0, 9, cname, sname);
+				int getID = helper.getID(GetPhenophase.this);
+				helper.insertNewObservation(GetPhenophase.this, getID, protocol_id, latitude, longitude, camera_image_id, dt_taken, "");
+				
+				//helper.insertNewPlantToDB(GetPhenophase.this, species_id, 0, protocol_id, cname, sname, latitude, longitude, dt_taken, "", camera_image_id);
+				Toast.makeText(GetPhenophase.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+				
+				Intent intent = new Intent(GetPhenophase.this, MainPage.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+			}
+		});
 	    
+		/*
 		rb1 = (RadioButton)findViewById(R.id.option1);
 		rb2 = (RadioButton)findViewById(R.id.option2);
 		rb3 = (RadioButton)findViewById(R.id.option3);
@@ -82,7 +128,7 @@ public class GetPhenophase extends ListActivity {
 		rb1.setOnClickListener(radio_listener);
 		rb2.setOnClickListener(radio_listener);
 		rb3.setOnClickListener(radio_listener);
-	    
+	    */
 		
 		Log.i("K", "camera_image_id : " + camera_image_id);
 		
@@ -127,36 +173,29 @@ public class GetPhenophase extends ListActivity {
 	    //species_name.setText(cname + " \n" + sname + " ");
 
 	    pItem = new ArrayList<PlantItem>();
-	    
-		myTitleText.setText(" " + cname + " > Leaves");
+		myTitleText.setText(" " + cname);
 		
-		//PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name)
-		int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p18", null, null);
-		Log.i("K","RESID : " + resID);
-		PlantItem pi = new PlantItem(resID, "10% budburst", 18, "10% budburst");
-		pItem.add(pi);
+		SQLiteDatabase db;
+		StaticDBHelper staticDB = new StaticDBHelper(GetPhenophase.this);
 		
-		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p19", null, null);
-		pi = new PlantItem(resID, "full leaf", 19, "full leaf");
-		pItem.add(pi);
+		db = staticDB.getReadableDatabase();
 		
-		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p20", null, null);
-		pi = new PlantItem(resID, "10% leaf color", 20, "10% leaf color");
-		pItem.add(pi);
+		Cursor cursor = db.rawQuery("SELECT _id, Type, Phenophase_ID, Phenophase_Icon, Chrono_Order, Description FROM Onetime_Observation ORDER BY Chrono_Order;", null);
+		while(cursor.moveToNext()) {
+			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(3), null, null);
+			PlantItem pi = new PlantItem(resID, cursor.getString(5), cursor.getInt(3), cursor.getString(1));
+			pItem.add(pi);
+		}
 		
-		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p19", null, null);
-		pi = new PlantItem(resID, "full leaf color", 19, "full leaf color");
-		pItem.add(pi);
-		
-		resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p22", null, null);
-		pi = new PlantItem(resID, "90% leaf drop", 22, "90% leaf drop");
-		pItem.add(pi);
-		
+		cursor.close();
+		db.close();
+
 		MyAdapter = new MyListAdapter(GetPhenophase.this, R.layout.phenophaselist, pItem);
 		myList = getListView(); 
 		myList.setAdapter(MyAdapter);
 	}
 	
+	/*
 	private OnClickListener radio_listener = new OnClickListener() {
 
 		@Override
@@ -258,12 +297,13 @@ public class GetPhenophase extends ListActivity {
 			}
 		}
 	};
-	
-	
+   */
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
-		Intent intent = new Intent(this, PlantInformation_Direct.class);
+		/*
+		
+		Intent intent = new Intent(this, AddSite.class);
 		intent.putExtra("pheno_id", pItem.get(position).Pheno_image);
 		intent.putExtra("pheno_name", pItem.get(position).Pheno_name);
 		intent.putExtra("pheno_text", pItem.get(position).Note);
@@ -279,7 +319,103 @@ public class GetPhenophase extends ListActivity {
 		intent.putExtra("notes", "");
 		intent.putExtra("from", SELECT_PLANT_NAME);
 		intent.putExtra("direct", true);
-		startActivity(intent);
+		startActivity(intent);*/
+		
+		
+		
+		_position = position;
+		seqUserSite = helper.getUserSite(GetPhenophase.this);
+		
+		//Pop up choose site dialog box
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.AddPlant_chooseSite))
+		.setItems(seqUserSite, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+			
+				new_plant_site_id = mapUserSiteNameID.get(seqUserSite[which].toString());
+				new_plant_site_name = seqUserSite[which].toString();
+				
+				if(new_plant_site_name == "Add New Site") {
+					Intent intent = new Intent(GetPhenophase.this, AddSite.class);
+					intent.putExtra("pheno_id", pItem.get(_position).Pheno_image);
+					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("cname", cname);
+					intent.putExtra("sname", sname);
+					intent.putExtra("lat", latitude);
+					intent.putExtra("lng", longitude);
+					intent.putExtra("species_id", species_id);
+					intent.putExtra("camera_image_id", camera_image_id);
+					intent.putExtra("dt_taken", dt_taken);
+					intent.putExtra("notes", "");
+					intent.putExtra("from", SELECT_PLANT_NAME);
+					startActivity(intent);
+				}
+				else {	
+					if(species_id == 999 && !previous_activity.equals("Whatsinvasive")) {
+						newDialog();
+					}
+					else {
+						
+						Log.i("K", "species_id : " + species_id + ", new_plant_site_id : " + new_plant_site_id + " , protocol : " + protocol_id + " , cname : " + cname + " , sname : " + sname + " , latitude : " + latitude + " , longitude : " + longitude + " , dt_taken : " + dt_taken + " , camera_image_id : " + camera_image_id);
+						
+						if(helper.insertNewPlantToDB(GetPhenophase.this, species_id, new_plant_site_id, 9, cname, sname)){							
+							int getID = helper.getID(GetPhenophase.this);
+							helper.insertNewObservation(GetPhenophase.this, getID, protocol_id, latitude, longitude, camera_image_id, dt_taken, "");
+							Intent intent = new Intent(GetPhenophase.this, MainPage.class);
+							Toast.makeText(GetPhenophase.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+							//clear all stacked activities.
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
+							finish();
+						}else{
+							Toast.makeText(GetPhenophase.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+						}
+					}
+				}
+			}
+		})
+		.setNegativeButton(getString(R.string.Button_cancel), null)
+		.show();
+
+	}
+	
+	private void newDialog() {
+		Dialog dialog = new Dialog(GetPhenophase.this);
+		
+		dialog.setContentView(R.layout.species_name_custom_dialog);
+		dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+		dialog.setCancelable(true);
+		dialog.show();
+		
+		et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
+		Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+		
+		doneBtn.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String common_name = et1.getText().toString();
+				
+				if(helper.insertNewPlantToDB(GetPhenophase.this, species_id, new_plant_site_id, 9, cname, sname)){
+					int getID = helper.getID(GetPhenophase.this);
+					helper.insertNewObservation(GetPhenophase.this, getID, protocol_id, latitude, longitude, camera_image_id, dt_taken, "");
+					
+					Toast.makeText(GetPhenophase.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+					
+					Intent intent = new Intent(GetPhenophase.this, PlantList.class);
+					//clear all stacked activities.
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}else{
+					Toast.makeText(GetPhenophase.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	}
 	
 	class PlantItem{

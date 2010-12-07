@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -22,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 public class SpeciesDetail extends Activity {
@@ -82,6 +84,8 @@ public class SpeciesDetail extends Activity {
 	    	cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id + ";", null);
 		    
 		    Log.i("K", "SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id);
+		    
+		    Log.i("K", "COUNT : " + cursor.getCount());
 		    
 		    while(cursor.moveToNext()) {
 		    	snameTxt.setText(" " + cursor.getString(1) + " ");
@@ -147,8 +151,20 @@ public class SpeciesDetail extends Activity {
 		db.close();
 		sDBH.close();
 		syncDBH.close();
-
 	    // TODO Auto-generated method stub
+	}
+	
+	
+	
+    // or when user press back button
+	// when you hold the button for 3 sec, the app will be exited
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == event.KEYCODE_BACK) {
+			vf.removeAllViews();
+			finish();
+			return true;
+		}
+		return false;
 	}
 	
 	

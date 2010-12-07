@@ -80,7 +80,7 @@
 <activity android:name="SpeciesDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="Help" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="Splash" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.QuickCapture" ></activity>
+<activity android:name=".onetime.QuickCapture" android:configChanges="orientation|keyboardHidden"></activity>
 
 
 </application>

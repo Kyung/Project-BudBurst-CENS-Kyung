@@ -2,6 +2,10 @@ package cens.ucla.edu.budburst.helper;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -55,5 +59,5 @@ public class Media {
 	   	resized_bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 		
 	   	return resized_bitmap;
-	}
+	}	
 }

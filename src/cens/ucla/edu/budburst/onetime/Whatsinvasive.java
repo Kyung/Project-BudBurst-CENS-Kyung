@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Timer;
 
 import org.apache.http.HttpResponse;
@@ -59,11 +60,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.AddPlant;
+import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.PlantInformation;
+import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.AreaList.DoAsyncTask;
 import cens.ucla.edu.budburst.onetime.AreaList.area;
@@ -79,12 +85,32 @@ public class Whatsinvasive extends ListActivity {
 	private String area_name;
 	private String cname;
 	private String sname;
+	private Double latitude;
+	private Double longitude;
 	private String image_path;
+	private String dt_taken;
+	private String camera_image_id;
+	private int new_plant_species_id;
+	private int protocol_id;
+	private String new_plant_species_name;
+	private CharSequence[] seqUserSite;
+	final private int PLANT_LIST = 99;
 	private TextView areaTxt2 = null;
+	private int previous_activity = 0;
+	private int current_position = 0;
+	private int WILD_FLOWERS = 2;
+	private int GRASSES = 3;
+	private int DECIDUOUS_TREES = 4;
+	private int DECIDUOUS_TREES_WIND = 5;
+	private int EVERGREEN_TREES = 6;
+	private int EVERGREEN_TREES_WIND = 7;
+	private int CONIFERS = 8;
 	public final String TEMP_PATH = "/sdcard/pbudburst/wi_list/";
 	protected static int GET_AREA_LIST = 1;
 	protected static int TO_WI_INFO = 2;
 	private ProgressDialog dialog = null;
+	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>();
+	private FunctionsHelper helper = null;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -94,7 +120,7 @@ public class Whatsinvasive extends ListActivity {
 	    // set title bar
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.whatsinvasive);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
 		v = (ViewGroup)v.getChildAt(0);
@@ -103,11 +129,22 @@ public class Whatsinvasive extends ListActivity {
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText("  Select the species");
 		
+		Intent p_intent = getIntent();
+		previous_activity = p_intent.getExtras().getInt("FROM");
+		camera_image_id = p_intent.getExtras().getString("camera_image_id");
+		latitude = p_intent.getExtras().getDouble("latitude");
+		longitude = p_intent.getExtras().getDouble("longitude");
+		dt_taken = p_intent.getExtras().getString("dt_taken"); 
+			
 	    arSpeciesList = new ArrayList<species>();
 	    otDBH = new OneTimeDBHelper(Whatsinvasive.this);
 	    
 	    areaTxt2 = (TextView) findViewById(R.id.title2);
 	   
+		//Get User site name and id using Map.
+		mapUserSiteNameID = getUserSiteIDMap();
+		helper = new FunctionsHelper();
+	    
 	    //Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
 		//startActivityForResult(intent, GET_AREA_LIST);
 	    // TODO Auto-generated method stub
@@ -178,6 +215,8 @@ public class Whatsinvasive extends ListActivity {
 		
 		getSpecies();
 	}
+	
+	
 	/*
 	class getAreaId extends AsyncTask<String, Integer, Void> {
 		ProgressDialog dialog;
@@ -432,22 +471,166 @@ public class Whatsinvasive extends ListActivity {
 		
 		String imagePath = TEMP_PATH + arSpeciesList.get(position).image_url + ".jpg";
 		
-		Intent intent = new Intent(Whatsinvasive.this, WI_observation.class);
-		intent.putExtra("sname", arSpeciesList.get(position).science_name);
-		intent.putExtra("cname", arSpeciesList.get(position).common_name);
-		intent.putExtra("image_path", imagePath);
-		intent.putExtra("title", arSpeciesList.get(position).title);
-		intent.putExtra("area_id", area_id);
-		startActivity(intent);
-		
-		/*
-		Intent intent = new Intent(Whatsinvasive.this, WIinfo.class);
-		intent.putExtra("title", arSpeciesList.get(position).title);
-		intent.putExtra("area_id", area_id);
-		startActivityForResult(intent, TO_WI_INFO);
-		*/
+		// if the previous activity is from "Add_PLANT", we just add a new species and end
+		if(previous_activity == PLANT_LIST) {
+			unKnownPlantDialog(position);
+		}
+		else {
+			
+			Intent intent = new Intent(Whatsinvasive.this, GetPhenophase.class);
+			intent.putExtra("from", "Whatsinvasive");
+			intent.putExtra("cname", arSpeciesList.get(position).common_name);
+			intent.putExtra("sname", arSpeciesList.get(position).science_name);
+			intent.putExtra("protocol_id", protocol_id);
+			intent.putExtra("dt_taken", dt_taken);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
+			intent.putExtra("species_id", 999);
+			intent.putExtra("camera_image_id", "");
+			
+			startActivity(intent);
+			
+			/*
+			Intent intent = new Intent(Whatsinvasive.this, WI_observation.class);
+			intent.putExtra("sname", arSpeciesList.get(position).science_name);
+			intent.putExtra("cname", arSpeciesList.get(position).common_name);
+			intent.putExtra("image_path", imagePath);
+			intent.putExtra("title", arSpeciesList.get(position).title);
+			intent.putExtra("area_id", area_id);
+			startActivity(intent);
+			*/
+		}
 	}
+	
+	private void unKnownPlantDialog(int position) {
+		
+		current_position = position;
+		
+		new AlertDialog.Builder(Whatsinvasive.this)
+		.setTitle(getString(R.string.AddPlant_SelectCategory))
+		.setIcon(android.R.drawable.ic_menu_more)
+		.setItems(R.array.category2, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				String[] category = getResources().getStringArray(R.array.category2);
+	
+				if(category[which].equals("Wild Flowers and Herbs")) {
+					protocol_id = WILD_FLOWERS;
+				}
+				else if(category[which].equals("Grass")) {
+					protocol_id = GRASSES;
+				}
+				else if(category[which].equals("Deciduous Trees and Shrubs")) {
+					protocol_id = DECIDUOUS_TREES;
+				}
+				else if(category[which].equals("Deciduous Trees and Shrubs - Wind")) {
+					protocol_id = DECIDUOUS_TREES_WIND;
+				}
+				else if(category[which].equals("Evergreen Trees and Shrubs")) {
+					protocol_id = EVERGREEN_TREES;
+				}
+				else if(category[which].equals("Evergreen Trees and Shrubs - Wind")) {
+					protocol_id = EVERGREEN_TREES_WIND;
+				}
+				else if(category[which].equals("Conifer")) {
+					protocol_id = CONIFERS;
+				}
+				else {
+				}
+				
+				popupDialog(current_position);
+			}
+		})
+		.setNegativeButton(getString(R.string.Button_back), null)
+		.show();
+		
+	}
+	
+	private void popupDialog(int position) {
+		//Pop up choose site dialog box
+		new_plant_species_id = 999;
+		new_plant_species_name = arSpeciesList.get(position).common_name;
+		
+		seqUserSite = helper.getUserSite(Whatsinvasive.this);
+		
+		//Pop up choose site dialog box
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.AddPlant_chooseSite))
+		.setItems(seqUserSite, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				int new_plant_site_id = mapUserSiteNameID.get(seqUserSite[which].toString());
+				String new_plant_site_name = seqUserSite[which].toString();
+				
+				if(new_plant_site_name == "Add New Site") {
+					Intent intent = new Intent(Whatsinvasive.this, AddSite.class);
+					startActivity(intent);
+				}
+				else {
+					if(helper.checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id, Whatsinvasive.this)){
+						Toast.makeText(Whatsinvasive.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
+					}else{
+						if(insertNewPlantToDB(new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocol_id)){
+							Intent intent = new Intent(Whatsinvasive.this, PlantList.class);
+							Toast.makeText(Whatsinvasive.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+							//clear all stacked activities.
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
+							finish();
+						}else{
+							Toast.makeText(Whatsinvasive.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+						}
+					}
+				}
+			}
+		})
+		.setNegativeButton(getString(R.string.Button_cancel), null)
+		.show();
+	}
+	
+	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename, int protocol_id){
 
+		int s_id = speciesid;
+		SharedPreferences pref = getSharedPreferences("userinfo",0);
+		
+		if(speciesid == 999) {
+			s_id = pref.getInt("other_species_id", 0);
+			s_id++;
+		}
+		
+		try{
+			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
+			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
+			
+			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
+					"null," +
+					 "999," +
+					siteid + "," +
+					"'" + sitename + "',"+
+					protocol_id + "," +
+					//"1,"+ // 1 means it's official, from add plant list
+					"'" + speciesname + "'," +
+					"1, " +
+					SyncDBHelper.SYNCED_NO + ");"
+					);
+			
+			if(speciesid == 999) {
+				SharedPreferences.Editor edit = pref.edit();				
+				edit.putInt("other_species_id", s_id);
+				edit.commit();
+			}
+			
+			syncDBHelper.close();
+			return true;
+		}
+		catch(Exception e){
+			Log.e("K",e.toString());
+			return false;
+		}
+	}
+	
+	
 	class DoAsyncTask extends AsyncTask<String, Integer, Void> {
 		
 		protected void onPreExecute() {
@@ -500,21 +683,24 @@ public class Whatsinvasive extends ListActivity {
 							e.printStackTrace();
 						}
 						
-						//insert into table						
-						db.execSQL("INSERT INTO speciesLists VALUES(" + area_id[0] + ","
-								+ "'" + split[0] + "',"
-								+ "'" + split[1] + "',"
-								+ "'" + split[2] + "',"
-								+ "'" + split[3] + "',"
-								+ "'" + image_name + "');");
-						
-						Log.i("K", "inserted into the table....");
-						// insert items into the list
-						
-						download_image(split[4], image_name);
-						species pi;
-						pi = new species(split[0], split[1], split[2], split[3], image_name);
-						arSpeciesList.add(pi);
+						if(!split[1].equals("Other")) {
+							//insert into table						
+							db.execSQL("INSERT INTO speciesLists VALUES(" + area_id[0] + ","
+									+ "'" + split[0] + "',"
+									+ "'" + split[1] + "',"
+									+ "'" + split[2] + "',"
+									+ "'" + split[3] + "',"
+									+ "'" + image_name + "');");
+							
+							Log.i("K", "inserted into the table....");
+							// insert items into the list
+							
+							download_image(split[4], image_name);
+							species pi;
+							pi = new species(split[0], split[1], split[2], split[3], image_name);
+							arSpeciesList.add(pi);
+
+						}
 					}
 					
 					db.close();
@@ -635,6 +821,30 @@ public class Whatsinvasive extends ListActivity {
 				db.close();
 			}
 		}
+	}
+	
+	public HashMap<String, Integer> getUserSiteIDMap(){
+
+		HashMap<String, Integer> localMapUserSiteNameID = new HashMap<String, Integer>(); 
+		
+		//Open plant list db from static db
+		SyncDBHelper syncDBHelper = new SyncDBHelper(this);
+		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase(); 
+		
+		//Rereive syncDB and add them to arUserPlatList arraylist
+		Cursor cursor = syncDB.rawQuery("SELECT site_name, site_id FROM my_sites;",null);
+		while(cursor.moveToNext()){
+			localMapUserSiteNameID.put(cursor.getString(0), cursor.getInt(1));
+		}
+		localMapUserSiteNameID.put("Add New Site", 10000);
+		
+		
+		//Close DB and cursor
+		cursor.close();
+		//syncDB.close();
+		syncDBHelper.close();
+	
+		return localMapUserSiteNameID;
 	}
 	
 	static private String hexEncode( byte[] aInput){

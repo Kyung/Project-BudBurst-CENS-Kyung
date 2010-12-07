@@ -72,7 +72,7 @@ public class Flora_Observer extends ListActivity{
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.flora_observer);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
 		v = (ViewGroup)v.getChildAt(0);
@@ -121,6 +121,10 @@ public class Flora_Observer extends ListActivity{
 				arPlantList.add(pi);
 			}
 		}
+ 		
+		// add plant at the last.
+		PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+		arPlantList.add(pi);
 		
 		mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
 		MyList = getListView(); 
@@ -162,6 +166,10 @@ public class Flora_Observer extends ListActivity{
 					}
 				}
 				
+				// add plant at the last.
+				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+				arPlantList.add(pi);
+				
 				mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
 				MyList = getListView(); 
 				MyList.setAdapter(mylistapdater);
@@ -189,9 +197,8 @@ public class Flora_Observer extends ListActivity{
 					arPlantList.add(pi);
 				}
 				
-				// add Others
-				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+999, null, null);
-				PlantItem pi = new PlantItem(resID, "Others", "Others", 999, 0);
+				// add plant at the last.
+				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
@@ -252,9 +259,8 @@ public class Flora_Observer extends ListActivity{
 							arPlantList.add(pi);
 						}
 						
-						int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+999, null, null);
-						PlantItem pi = new PlantItem(resID, "Others", "Others", 999, 0);
-						
+						// add plant at the last.
+						PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
 						arPlantList.add(pi);
 						
 						mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);

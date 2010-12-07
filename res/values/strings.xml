@@ -236,6 +236,10 @@
 <string name="Deciduous_Trees_and_Shrubs">Deciduous Trees and Shrubs</string>
 <string name="Evergreen_Trees_and_Shrubs">Evergreen Trees and Shrubs</string>
 <string name="Conifer">Conifer</string>
-<string name="Unknown_Plant_Text">Type plant name or Submit for unknown plant</string>
+<string name="Unknown_Plant_Text">Or Continue to add more info</string>
 <string name="Submit">Submit</string>
+<string name="Cannot_Change">You cannot change the name of this species</string>
+<string name="DoSyncFirst_For_UnknownPlant">Please sync first if you have unknown plant</string>
+<string name="Monitor_Plant">My Monitored Plants</string>
+<string name="Quick_Plant">My Quick Capture Plants</string>
 </resources>

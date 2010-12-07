@@ -17,14 +17,29 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		Log.i("K", "make a onetimeob table");
 		// TODO Auto-generated method stub
 		db.execSQL("CREATE TABLE onetimeob (" +
+				"_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+				"species_id NUMERIC," +
+				"site_id NUMERIC," +
+				"protocol_id NUMERIC," +
 				"cname TEXT," +
 				"sname TEXT," +
+				//"lat NUMERIC," +
+				//"lng NUMERIC," +
+				//"dt_taken TEXT," +
+				//"notes TEXT," +
+				//"image_name TEXT," + 
+				"synced NUMERIC);");
+		
+		db.execSQL("CREATE TABLE onetimeob_observation (" +
+				"plant_id NUMERIC," +
+				"phenophase_id NUMERIC," +
 				"lat NUMERIC," +
 				"lng NUMERIC," +
+				"image_id TEXT," +
 				"dt_taken TEXT," +
 				"notes TEXT," +
-				"photo_name TEXT," + 
-				"synced NUMERIC);");
+				"synced NUMERIC);"
+				);
 		
 		db.execSQL("CREATE TABLE speciesLists (" +
 				"id NUMERIC, " +
@@ -81,6 +96,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		db.execSQL("DELETE FROM speciesLists;");
 		db.execSQL("DELETE FROM popularLists;");
 		db.execSQL("DELETE FROM flickrLists;");
+		db.execSQL("DELETE FROM onetimeob_observation;");
 		
 	 	dbhelper.close();
  	}

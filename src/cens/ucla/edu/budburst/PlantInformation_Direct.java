@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import cens.ucla.edu.budburst.helper.Media;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,6 +50,8 @@ public class PlantInformation_Direct extends Activity {
 	private String sname	= null;
 	private String note		= null;
 	private String imagePath = null;
+	private Double lat = null;
+	private Double lng = null;
 	private File dict_tmp 			= null;
 	private String camera_image_id 	= null;
 	private Button saveBtn 			= null;
@@ -91,6 +94,8 @@ public class PlantInformation_Direct extends Activity {
 		dt_taken = p_intent.getExtras().getString("dt_taken");
 		note = p_intent.getExtras().getString("notes");
 		wherefrom = p_intent.getExtras().getInt("from");
+		lat = p_intent.getExtras().getDouble("lat");
+		lng = p_intent.getExtras().getDouble("lng");
 		boolean direct = p_intent.getExtras().getBoolean("direct");
 		camera_image_id = photo_name;
 		
@@ -299,7 +304,37 @@ public class PlantInformation_Direct extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				try{
-
+					/*
+					OneTimeDBHelper onetime = new OneTimeDBHelper(PlantInformation_Direct.this);
+					SQLiteDatabase ot = onetime.getWritableDatabase();
+					
+					dt_taken = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+					
+					ot.execSQL("INSERT INTO onetimeob VALUES ('" 
+							+ cname + "', '" 
+							+ sname + "', "
+							+ lat + ", "
+							+ lng + ", '"
+							+ dt_taken + "', '"
+							+ note + "', '"
+							+ camera_image_id + "', "
+							+ "9"
+							+ ");");
+					
+					Log.i("K","INSERT INTO onetimeob VALUES ('" 
+							+ cname + "', '" 
+							+ sname + "', "
+							+ lat + ", "
+							+ lng + ", '"
+							+ dt_taken + "', '"
+							+ note + "', '"
+							+ camera_image_id + "', "
+							+ "9"
+							+ ");" );
+					
+					ot.close();
+					onetime.close();*/
+					
 					SyncDBHelper syncDBHelper = new SyncDBHelper(PlantInformation_Direct.this);
 
 					SQLiteDatabase r_db = syncDBHelper.getReadableDatabase();
@@ -350,6 +385,7 @@ public class PlantInformation_Direct extends Activity {
 					db.execSQL(query);
 					db.close();
 					syncDBHelper.close();
+					
 					
 					// add vibration when done
 					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);

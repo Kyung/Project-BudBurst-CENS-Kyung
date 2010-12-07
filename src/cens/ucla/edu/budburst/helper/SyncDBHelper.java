@@ -1,6 +1,7 @@
 package cens.ucla.edu.budburst.helper;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -26,7 +27,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"protocol_id NUMERIC," +
 				"common_name TEXT," +
 				//"official NUMERIC," +
-				"active NUMERIC," +
+				"active NUMERIC," + // active 0(need to be removed), 1(nothing), 2(update the species)
 				"synced NUMERIC);");
 				
 		//INSERT INTO onetimeob(photo_name, dt_taken, notes, sname, cname, image_id) VALUES(?, ?, ?, ?, ?, ?);
@@ -84,6 +85,14 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
 		db.execSQL("DELETE FROM my_plants;");
+		
+		/*
+		Cursor c = db.rawQuery("SELECT species_id FROM my_observation;", null);
+		while(c.moveToNext()) {
+			db.execSQL("DELETE FROM my_observation WHERE species_id=" + c.getInt(0) + ";");
+		}
+		c.close();
+		*/
 		db.execSQL("DELETE FROM my_observation;");
 		db.execSQL("DELETE FROM my_sites;");
 		

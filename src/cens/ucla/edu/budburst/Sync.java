@@ -228,13 +228,14 @@ public class Sync extends Activity{
 					finish();
 					return;
 				}
-				dismissDialog(0);
-				removeDialog(0);
+				mProgress.dismiss();
+				//dismissDialog(0);
+				//removeDialog(0);
 				Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) 
 						+ error_message, Toast.LENGTH_LONG).show();
 			}else if(msg.what < NETWORK_ERROR){
-				dismissDialog(0);
-				removeDialog(0);
+				mProgress.dismiss();
+				//removeDialog(0);
 				Toast.makeText(Sync.this, getString(R.string.Alert_errorDownload), Toast.LENGTH_SHORT).show();
 			}
 		
@@ -349,6 +350,7 @@ public class Sync extends Activity{
 				
 				//Move to plant list screen
 				Intent intent = new Intent(Sync.this, MainPage.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
 				
@@ -598,7 +600,7 @@ class doSyncThread extends Thread{
 				msgToMain.arg1 = mProgressVal + 2;
 				
 		    	//Open database cursor
-		    	query =	"SELECT species_id, site_id, active " +
+		    	query =	"SELECT species_id, site_id, active, common_name " +
 		    			"FROM my_plants " +
 		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = syncRDB.rawQuery(query, null);
@@ -609,17 +611,22 @@ class doSyncThread extends Thread{
 			        cursor.close();
 					break;
 				}
+				else {
+					query = "DELETE FROM my_plants;";
+					syncRDB.execSQL(query);
+				}
 				
 				while(cursor.moveToNext()){
 					String a = cursor.getString(0);
 					String b = cursor.getString(1);
 					Integer c = cursor.getInt(2);
+					String d = cursor.getString(3);
 					
-					Log.i("K","species_id : " + a + " site_id : " + b + " active : " + c);
+					Log.i("K","species_id : " + a + " site_id : " + b + " active : " + c + " common_name : " + d);
 
 					serverResponse = 
 					SyncNetworkHelper.upload_new_plant(username, password, context, 
-							a, b, c);
+							a, b, c, d);
 
 //					serverResponse = 
 //						SyncNetworkHelper.upload_new_plant(username, password, context, 
@@ -913,7 +920,7 @@ class doSyncThread extends Thread{
 					syncWDB.execSQL("DELETE FROM my_observation;");
 					for(int i=0; i<jsonresult.length(); i++){
 						query = "INSERT INTO my_observation " +
-						"(species_id, site_id, phenophase_id, image_id, time, note,synced)" +
+						"(species_id, site_id, phenophase_id, image_id, time, note, synced)" +
 						"VALUES(" +
 						jsonresult.getJSONObject(i).getString("species_id") + "," +
 						jsonresult.getJSONObject(i).getString("site_id") + "," +

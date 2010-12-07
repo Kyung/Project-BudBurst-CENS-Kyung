@@ -7,6 +7,15 @@
 		<item>Evergreen Trees and Shrubs</item>
 		<item>Conifer</item>
 	</string-array>
+	<string-array name="category2">
+		<item>Wild Flowers and Herbs</item>
+		<item>Grass</item>
+		<item>Deciduous Trees and Shrubs</item>
+		<item>Deciduous Trees and Shrubs - Wind</item>
+		<item>Evergreen Trees and Shrubs</item>
+		<item>Evergreen Trees and Shrubs - Wind</item>
+		<item>Conifer</item>
+	</string-array>
 	<string-array name="recommend">
 		<item>"What's Blooming"</item>
 		<item>"What's Invasive"</item>

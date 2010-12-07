@@ -9,7 +9,7 @@
     <TextView
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:gravity="center"
+    	android:paddingLeft="6dip"
     	android:id="@+id/list_header"
     	android:background="#DDD"
     	android:textSize="17px"

@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,12 +30,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.Helloscr.UpdateThread;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.Flora_Observer;
@@ -51,6 +53,8 @@ public class PlantList extends ListActivity {
 	private SyncDBHelper syncDBHelper;
 	private StaticDBHelper staticDBHelper;
 	private ListView MyList;
+	private Dialog dialog = null;
+	private EditText et1 = null;
 	private Button tempBtn;
 	private ArrayList<PlantItem> user_species_list;
 	private int first_site_id = 0;
@@ -58,18 +62,17 @@ public class PlantList extends ListActivity {
 	private LinearLayout lout = null;
 	private static boolean first_site_flag = true;
 	private Button buttonSharedplant = null;
+	private int dialog_species_id = 0;
+	private int dialog_site_id = 0;
 	
 	//MENU contants
 	final private int MENU_ADD_PLANT = 1;
-	final private int MENU_ADD_QUICK = 2;
-	final private int MENU_LOGOUT = 5;
 	final private int MENU_SYNC = 6;
 	final private int MENU_HELP = 7;
 	final private int PLANT_LIST = 99;
 	
 	ArrayList<PlantItem> arPlantItem;
-	
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -176,7 +179,7 @@ public class PlantList extends ListActivity {
 		
 		Cursor cursorss = syncDB.rawQuery("SELECT _id, species_id, site_id FROM my_observation;", null);
 		while(cursorss.moveToNext()) {
-			Log.i("K", "OUTPUT : " + cursorss.getInt(0) + " , " + cursorss.getInt(1) + " , " + cursorss.getInt(2));
+			Log.i("K", "MY OBSERVATION : " + cursorss.getInt(0) + " , " + cursorss.getInt(1) + " , " + cursorss.getInt(2));
 		}
 		cursorss.close();
 		
@@ -185,6 +188,24 @@ public class PlantList extends ListActivity {
 			Log.i("K", "MY PLANTS : " + cursorss.getInt(0) + " , " + cursorss.getString(1) + " , active : " + cursorss.getInt(2)+ " , synced : " + cursorss.getInt(3));
 		}
 		cursorss.close();
+		
+		OneTimeDBHelper onetime = new OneTimeDBHelper(PlantList.this);
+		SQLiteDatabase ot  = onetime.getReadableDatabase();
+
+		cursorss = ot.rawQuery("SELECT _id, species_id, site_id, cname, sname, synced FROM onetimeob;", null);
+		while(cursorss.moveToNext()) {
+			Log.i("K", "ONETIME OB : " + cursorss.getInt(0) + " ,species_id " + cursorss.getInt(1) + " , site_id : " + cursorss.getString(2) + " , cname : " + cursorss.getString(3) + " , sname : " + cursorss.getString(4) + " , SYNCED : " + cursorss.getInt(5));
+		}
+		cursorss.close();
+		
+		cursorss = ot.rawQuery("SELECT plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes, synced FROM onetimeob_observation;", null);
+		while(cursorss.moveToNext()) {
+			Log.i("K", "ONETIME OBSERVATION - plant_ID : " + cursorss.getInt(0) + " , Phenophase_id : " + cursorss.getInt(1) + " , lat : " + cursorss.getDouble(2) + " , lng : " + cursorss.getDouble(3) + ", image_id : " + cursorss.getString(4) + " , date_taken : " + cursorss.getString(5));
+		}
+		
+		cursorss.close();
+		ot.close();
+		onetime.close();
 		
 		
 		try {
@@ -257,6 +278,8 @@ public class PlantList extends ListActivity {
 			cursor.close();
 			
 			arPlantItem.clear();
+			boolean header = false;
+			int count = 0;
 			for(int i=0; i<user_station_name.size(); i++){
 				
 				PlantItem pi;
@@ -264,9 +287,8 @@ public class PlantList extends ListActivity {
 				//Retrieves plants from each site.
 				Cursor cursor2 = syncDB.rawQuery("SELECT species_id, common_name, active FROM my_plants " +
 						"WHERE site_name = '" + user_station_name.get(i) + "';", null);
-				int count = 0;
 				while(cursor2.moveToNext()){
-					
+					count++;
 					// if active flag is 0, skip the operation below...
 					// active = 0 means, the corresponding species got deleted
 					if(cursor2.getInt(2) == 0) {
@@ -314,13 +336,14 @@ public class PlantList extends ListActivity {
 						String total_pheno = "SELECT Phenophase_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID = " + cursor3.getInt(3) + ";";
 						Cursor cursor5 = staticDB.rawQuery(total_pheno, null);
 						
-						if(count == 0) {
+						if(!header) {
 							pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-									, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i));
+									, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), true, user_station_name.get(i), true);
+							header = true;
 						}
 						else {
 							pi = new PlantItem(resID, common_name, cursor3.getString(1)+" (" + user_station_name.get(i) + ")"
-									, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i));
+									, cursor2.getInt(0), user_station_id.get(i), cursor3.getInt(3), cursor4.getCount(), cursor5.getCount(), false, user_station_name.get(i), true);
 						}
 						//PlantItem structure = >int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int siteID)
 						
@@ -329,13 +352,18 @@ public class PlantList extends ListActivity {
 						cursor3.close();
 						cursor4.close();
 						cursor5.close();
-						
-						count++;
 					}
 				}
 				cursor2.close();
+				
+				// show one_time_observation species
 			}
 			//To synchronize user_species_list with actual listview contents order.
+			
+			add_oneTimeObs();
+			
+			Log.i("K","@@@@@@@@@@@@@@@ : " + count);
+			
 			MyListAdapter mylistapdater = new MyListAdapter(this, R.layout.plantlist_item, arPlantItem);
 			MyList.setAdapter(mylistapdater);
 		}catch(Exception e){
@@ -344,22 +372,134 @@ public class PlantList extends ListActivity {
 		finally{
 			staticDBHelper.close();
 			syncDBHelper.close();
+			syncDB.close();
 		}
 		
+	}
+
+	private void add_oneTimeObs() {
+		
+		OneTimeDBHelper onetime = new OneTimeDBHelper(PlantList.this);
+		SQLiteDatabase ot  = onetime.getReadableDatabase();
+		SyncDBHelper syncHelper = new SyncDBHelper(PlantList.this);
+		SQLiteDatabase sync = syncHelper.getReadableDatabase();
+		
+		Cursor cursor = ot.rawQuery("SELECT _id, species_id, site_id, protocol_id, cname, sname, synced FROM onetimeob", null);
+		PlantItem pi;
+		
+		// header is called only once. (top)
+		boolean header = false;
+		
+		int count = 0;
+		while(cursor.moveToNext()) {
+			count++;
+			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + cursor.getInt(1), null, null);
+			
+			
+			
+			int pheno_count = 0;
+			int pheno_current = 0;
+			
+			// query the total number of onetime observations of each species - not decided yet
+			
+			/*
+			 * 
+			 * 
+			 * 
+			 * StaticDBHelper sDB = new StaticDBHelper(PlantList.this);
+			SQLiteDatabase staticDB = sDB.getReadableDatabase();
+			Cursor pheno_total = staticDB.rawQuery("SELECT COUNT(Protocol_ID) as cnt FROM PhenoPhase_Protocol_Icon WHERE Protocol_ID=" + cursor.getInt(3) + ";", null);
+			while(pheno_total.moveToNext()) {
+				pheno_count = pheno_total.getInt(0);
+			}
+			
+			pheno_total.close();
+			sDB.close();
+			staticDB.close();
+			*/
+			
+			Log.i("K", "PLANT ID : " + cursor.getInt(0));
+			
+			// query the number of onetime observations have been made by each species
+			Cursor pheno_cur = ot.rawQuery("SELECT COUNT(plant_id) as cnt FROM onetimeob_observation WHERE plant_id=" + cursor.getInt(0) + ";", null);
+			while(pheno_cur.moveToNext()) {
+				pheno_current = pheno_cur.getInt(0);
+			}
+			
+			pheno_cur.close();
+			
+			Log.i("K", "PHENO CURRENT : " + pheno_current);
+
+			
+			// if site_id == 0 meaning one-time observations are added to the database in "OneTimeMain"
+			if(cursor.getInt(2) == 0) {
+				if(!header) {
+					pi = new PlantItem(resID, cursor.getString(4), cursor.getString(4), cursor.getInt(1),
+							cursor.getInt(2), cursor.getInt(3), pheno_current, 12, true, "No Site", false);
+					// make header true (not called any more)
+					header = true;
+				}
+				else {
+					pi = new PlantItem(resID, cursor.getString(4), cursor.getString(4), cursor.getInt(1),
+							cursor.getInt(2), cursor.getInt(3), pheno_current, 12, false, "No Site", false);
+				}
+					
+				arPlantItem.add(pi);
+			}
+			// means one-time observations are added to the database in "Getphenophase" or "Add Plant"
+			else {
+
+				Cursor cursor2 = sync.rawQuery("SELECT site_name FROM my_sites WHERE site_id=" + cursor.getInt(2) + ";", null);
+				
+				while(cursor2.moveToNext()) {
+						
+					Log.i("K", "resID : " + resID + " , cname : " + cursor.getString(4) + " , species_id : " + cursor.getInt(1));
+					// resID, common_name, site_name, species_id, site_id, protocol_id, current_number_of_pheno, total_number_of_pheno, top, header_name, monitored
+					if(!header) {
+						pi = new PlantItem(resID, cursor.getString(4), "", cursor.getInt(1),
+								cursor.getInt(2), cursor.getInt(3), pheno_current, 12, true, cursor2.getString(0), false);
+						header = true;
+					}
+					else {
+						pi = new PlantItem(resID, cursor.getString(4), "", cursor.getInt(1),
+								cursor.getInt(2), cursor.getInt(3), pheno_current, 12, false, cursor2.getString(0), false);
+					}
+						
+					arPlantItem.add(pi);
+					cursor2.close();
+				}
+			}
+		}
+		
+		Log.i("K", "########### : " + count);
+		
+		cursor.close();
+		onetime.close();
+		ot.close();
+		
+		sync.close();
+		syncHelper.close();
 	}
 
 	protected void onListItemClick(View v, int position, long id){
 		//Intent intent = new Intent(this, PlantInfo.class);
 		
-		Log.i("K", "POSITION -> SPECIES_ID : " + arPlantItem.get(position).SpeciesID);
-			
-		Intent intent = new Intent(this, GetPhenophase_PBB.class);
-		intent.putExtra("species_id", arPlantItem.get(position).SpeciesID);
-		intent.putExtra("site_id", arPlantItem.get(position).siteID);
-		intent.putExtra("protocol_id", arPlantItem.get(position).protocolID);
-		intent.putExtra("cname", arPlantItem.get(position).CommonName);
-		intent.putExtra("sname", arPlantItem.get(position).SpeciesName);
-		startActivity(intent);
+		Log.i("K", "POSITION : " + position);
+		
+		if(arPlantItem.get(position).SpeciesID == 999) {
+			Toast.makeText(PlantList.this, getString(R.string.DoSyncFirst_For_UnknownPlant), Toast.LENGTH_SHORT).show();
+		}
+		else {
+			Log.i("K", "POSITION -> SPECIES_ID : " + arPlantItem.get(position).SpeciesID);
+				
+			Intent intent = new Intent(this, GetPhenophase_PBB.class);
+			intent.putExtra("species_id", arPlantItem.get(position).SpeciesID);
+			intent.putExtra("site_id", arPlantItem.get(position).siteID);
+			intent.putExtra("protocol_id", arPlantItem.get(position).protocolID);
+			intent.putExtra("cname", arPlantItem.get(position).CommonName);
+			intent.putExtra("sname", arPlantItem.get(position).SpeciesName);
+			startActivity(intent);
+		}
 	}
 	
 	protected boolean onLongListItemClick(View v, int position, long id) {
@@ -383,15 +523,18 @@ public class PlantList extends ListActivity {
 						SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
 						SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
 						
+						// 
 						syncDB.execSQL("UPDATE my_plants SET active = 0 AND synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
 										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
 						syncDB.execSQL("UPDATE my_plants SET synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(pos).SpeciesID 
 										+ " AND site_id=" + arPlantItem.get(pos).siteID + ";");
+						syncDB.execSQL("DELETE FROM my_observation WHERE species_id=" + arPlantItem.get(pos).SpeciesID + " AND site_id=" + arPlantItem.get(pos).siteID);
 						syncDBHelper.close();
 						
 						Toast.makeText(PlantList.this, "Item delete.", Toast.LENGTH_SHORT).show();
 						
 						Intent intent = new Intent(PlantList.this, PlantList.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						finish();
 						startActivity(intent);
 					}
@@ -400,13 +543,75 @@ public class PlantList extends ListActivity {
 					}
 				}
 				else{
-					Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+
+					if(arPlantItem.get(pos).SpeciesID > 0 && arPlantItem.get(pos).SpeciesID < 77) {
+						Toast.makeText(PlantList.this, getString(R.string.Cannot_Change), Toast.LENGTH_SHORT).show();
+					}
+					else {
+						
+						dialog(arPlantItem.get(pos).SpeciesID, arPlantItem.get(pos).siteID);	
+					}					
 				}
 			}
 		})
 		.show();
 		
 		return true;
+	}
+	
+	public void dialog(int species_id, int site_id) {
+		
+		dialog_species_id = species_id;
+		dialog_site_id = site_id;
+		
+		dialog = new Dialog(PlantList.this);
+		
+		dialog.setContentView(R.layout.species_name_custom_dialog);
+		dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+		dialog.setCancelable(true);
+		dialog.show();
+		
+		et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
+		Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+		
+		doneBtn.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String common_name = et1.getText().toString();
+				if(common_name.equals("")) {
+				// nothing happens
+				}
+				else {
+					
+					SyncDBHelper syncDBHelper = new SyncDBHelper(PlantList.this);
+					SQLiteDatabase syncDB  = syncDBHelper.getWritableDatabase();
+					
+					Log.i("K", "UPDATE my_plants SET common_name='" + common_name 
+							+ "' WHERE species_id=" + dialog_species_id 
+							+ ";");
+
+					syncDB.execSQL("UPDATE my_plants SET common_name='" + common_name 
+							+ "' WHERE species_id=" + dialog_species_id + " AND site_id =" + dialog_site_id 
+							+ ";");
+					
+					syncDB.execSQL("UPDATE my_plants SET active=2 WHERE species_id=" + dialog_species_id + ";");
+					syncDB.execSQL("UPDATE my_plants SET synced=9 WHERE species_id=" + dialog_species_id + ";");
+
+					syncDBHelper.close();
+
+					Toast.makeText(PlantList.this, getString(R.string.GetPhenophase_PBB_update_name), Toast.LENGTH_SHORT).show();
+				}
+				
+				dialog.cancel();
+				
+				Intent intent = new Intent(PlantList.this, PlantList.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				finish();
+				startActivity(intent);
+			}
+		});
 	}
 		
 	/////////////////////////////////////////////////////////////
@@ -483,15 +688,28 @@ public class PlantList extends ListActivity {
 				convertView = Inflater.inflate(layout, parent, false);
 			
 			TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
+			
+			Log.i("K", "COUNT : " + getCount());
+			
+			Log.i("K", "Position : " + position);
 
-			if(arSrc.get(position).TopItem) {
-				//site_header.setVisibility(View.VISIBLE);
-				//site_header.setText("  " + arSrc.get(position).Site);
-				
-				site_header.setVisibility(View.GONE);
+			if(arSrc.get(position).Monitor) {
+				if(arSrc.get(position).TopItem) {
+					site_header.setVisibility(View.VISIBLE);
+					site_header.setText(getString(R.string.Monitor_Plant));
+				}
+				else {
+					site_header.setVisibility(View.GONE);
+				}
 			}
-			else {
-				site_header.setVisibility(View.GONE);
+			else if(!arSrc.get(position).Monitor) {
+				if(arSrc.get(position).TopItem) {
+					site_header.setVisibility(View.VISIBLE);
+					site_header.setText(getString(R.string.Quick_Plant));
+				}
+				else {
+					site_header.setVisibility(View.GONE);
+				}
 			}
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
@@ -541,13 +759,10 @@ public class PlantList extends ListActivity {
     // or when user press back button
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
-			
-			
 			finish();
 			return true;
 		}
 		return false;
 	}
-	
 }
 

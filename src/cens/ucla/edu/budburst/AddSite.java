@@ -8,9 +8,11 @@ import com.google.android.maps.MapView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -37,16 +39,30 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.onetime.GetPhenophase;
 import cens.ucla.edu.budburst.onetime.MyNearestPlants;
 
 public class AddSite extends Activity{
 
-	final String TAG = "AddSite.class"; 
+	final String TAG = "AddSite.class";
+	final Integer SELECT_PLANT_NAME = 100;
+	private Integer species_id;
+	private Integer pheno_id;
+	private Integer protocol_id;
+	private Double lat;
+	private Double lon;
+	private String image_name;
+	private String notes;
+	private String dt_taken;
+	private Integer previous_activity;
+	private String species_name;
 	private EditText latitude;
 	private EditText longitude;
 	private EditText sitename;
 	private EditText comment;
+	private EditText et1;
 	private Button Human_Disturbance;
 	private Button Shading;
 	private Button Irrigation;
@@ -56,8 +72,8 @@ public class AddSite extends Activity{
 	ArrayAdapter<CharSequence> adspin;
 	private String selectedState = "";
 	private static GpsListener gpsListener;
-	private double lat = 0.0;
-	private double lon = 0.0;
+	
+	
 	//protected String[] list_hdistance = {getString(R.string.AddSite_Urban_Highly_Modified), getString(R.string.AddSite_Suburban), getString(R.string.AddSite_Rural), getString(R.string.AddSite_Wildland_or_natural_area)};
 	
 	//protected String[] list_shading = {getString(R.string.AddSite_Open), getString(R.string.AddSite_Partially_Shaded), getString(R.string.AddSite_Shaded)};
@@ -92,6 +108,23 @@ public class AddSite extends Activity{
 		    	 && lmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))){  
 		         createLocationServiceDisabledAlert();  
 		}
+		
+		Intent p_intent = getIntent();
+		previous_activity = p_intent.getExtras().getInt("from");
+		if(previous_activity == SELECT_PLANT_NAME) {
+			species_id = p_intent.getExtras().getInt("species_id");
+			species_name = p_intent.getExtras().getString("cname");
+			protocol_id = p_intent.getExtras().getInt("protocol_id");
+			pheno_id = p_intent.getExtras().getInt("pheno_id");
+			image_name = p_intent.getExtras().getString("camera_image_id");
+			dt_taken = p_intent.getExtras().getString("dt_taken");
+			notes = p_intent.getExtras().getString("notes");
+		}
+		else {
+			species_id = p_intent.getExtras().getInt("species_id");
+			species_name = p_intent.getExtras().getString("species_name");
+		}
+		
 		
 		gpsListener = new GpsListener();
 	    // set update the location data in 3secs or 30meters
@@ -281,23 +314,33 @@ public class AddSite extends Activity{
 						
 						syncWDB.execSQL(query);
 						cursor.close();
-
-						new AlertDialog.Builder(AddSite.this)
-						.setTitle(getString(R.string.AddSite_newAdded))
-						.setIcon(R.drawable.pbbicon_small)
-						.setMessage(getString(R.string.AddSite_note1))
-						.setPositiveButton(getString(R.string.Button_OK), new DialogInterface.OnClickListener() {
+						
+						if(species_id == 999) {
+							Dialog dialog = new Dialog(AddSite.this);
 							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								// TODO Auto-generated method stub
-								Intent intent = new Intent(AddSite.this, PlantList.class);
-								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-								startActivity(intent);
-								finish();
-							}
-						})
-						.show();
+							dialog.setContentView(R.layout.species_name_custom_dialog);
+							dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+							dialog.setCancelable(true);
+							dialog.show();
+							
+							et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
+							Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+							
+							doneBtn.setOnClickListener(new View.OnClickListener(){
+
+								@Override
+								public void onClick(View v) {
+									// TODO Auto-generated method stub
+									String common_name = et1.getText().toString();
+									species_name = common_name;
+									
+									insertDB();
+								}
+							});
+						}
+						else {
+							insertDB();
+						}
 						
 					}catch(Exception e){
 						Log.e(TAG, e.toString());
@@ -307,6 +350,83 @@ public class AddSite extends Activity{
 				}
 			}
 		});
+	}
+	
+	public void insertDB() {
+		SyncDBHelper syncDBHeler = new SyncDBHelper(AddSite.this);
+		SQLiteDatabase syncDB = syncDBHeler.getReadableDatabase();
+		
+		Cursor c = syncDB.rawQuery("SELECT site_id, site_name FROM my_sites WHERE latitude='" 
+				+ latitude.getText().toString() + "';", null);
+		while(c.moveToNext()) {
+			Log.i("K", "SPECIES_ID : " + species_id + " SPECIES NAME : " + species_name +
+					" SITE ID : " + c.getString(0) + " NAME : " + c.getString(1));
+			
+			// if the previous activity == GetPhenophase.java
+			if(previous_activity == SELECT_PLANT_NAME) {
+				FunctionsHelper helper = new FunctionsHelper();
+				helper.insertNewPlantToDB(AddSite.this, species_id, Integer.parseInt(c.getString(0)), 9, species_name, "");
+				int getID = helper.getID(AddSite.this);
+				helper.insertNewObservation(AddSite.this, getID, protocol_id, Double.parseDouble(latitude.getText().toString()), Double.parseDouble(longitude.getText().toString()), image_name, dt_taken, "");
+			}
+			// if the previous activity == AddPlant.java
+			else {
+				if(insertNewPlantToDB(species_id, species_name, Integer.parseInt(c.getString(0)), c.getString(1))){
+					Intent intent = new Intent(AddSite.this, PlantList.class);
+					Toast.makeText(AddSite.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+					//clear all stacked activities.
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}else{
+					Toast.makeText(AddSite.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
+		
+		c.close();
+		syncDB.close();
+	}
+	
+	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename){
+
+		int s_id = speciesid;
+		SharedPreferences pref = getSharedPreferences("userinfo",0);
+		
+		if(speciesid == 999) {
+			s_id = pref.getInt("other_species_id", 0);
+			s_id++;
+		}
+		
+		try{
+			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
+			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
+			
+			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
+					"null," +
+					speciesid + "," +
+					siteid + "," +
+					"'" + sitename + "',"+
+					"0,"+
+					//"1,"+ // 1 means it's official, from add plant list
+					"'" + speciesname + "'," +
+					"1, " +
+					SyncDBHelper.SYNCED_NO + ");"
+					);
+			
+			if(speciesid == 999) {
+				SharedPreferences.Editor edit = pref.edit();				
+				edit.putInt("other_species_id", s_id);
+				edit.commit();
+			}
+			
+			syncDBHelper.close();
+			return true;
+		}
+		catch(Exception e){
+			Log.e(TAG,e.toString());
+			return false;
+		}
 	}
 
 	private void createLocationServiceDisabledAlert(){  

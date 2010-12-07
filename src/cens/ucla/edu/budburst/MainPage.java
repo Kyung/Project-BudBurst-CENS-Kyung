@@ -44,6 +44,7 @@ public class MainPage extends Activity {
 		edit.commit();
 		
 		staticDBHelper = new StaticDBHelper(MainPage.this);
+		OneTimeDBHelper onetime = new OneTimeDBHelper(MainPage.this);
 
 		try {
         	staticDBHelper.createDataBase();
@@ -141,8 +142,7 @@ public class MainPage extends Activity {
 			boolean flag = false;
 			if(event.getRepeatCount() == 3) {
 				Toast.makeText(MainPage.this, getString(R.string.Alert_thanks), Toast.LENGTH_SHORT).show();
-				System.exit(0);
-				//finish();
+				finish();
 				
 				return true;
 			}

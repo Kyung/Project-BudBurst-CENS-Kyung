@@ -8,9 +8,11 @@ import java.util.HashMap;
 import cens.ucla.edu.budburst.AddPlant;
 import cens.ucla.edu.budburst.GetPhenophase_PBB;
 import cens.ucla.edu.budburst.Login;
+import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -60,6 +62,7 @@ public class OneTimeMain extends ListActivity {
 	private String dt_taken = null;
 	final private int PLANT_LIST = 99;
 	private int SELECT_PLANT_NAME = 100;
+	private int UNKNOWN_PLANT = 999;
 	private Integer new_plant_species_id;
 	private Integer new_plant_site_id; 
 	private String new_plant_site_name;
@@ -69,17 +72,17 @@ public class OneTimeMain extends ListActivity {
 	private int EVERGREEN_TREES = 3;
 	private int CONIFERS = 4;
 	private EditText unknownText = null;
-	private Button unknownBtn = null;
+	private Button submitBtn = null;
 	private int previous_activity = 0;
 	private CharSequence[] seqUserSite;
 	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>();
+	FunctionsHelper helper;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    
-	       
 	    setContentView(R.layout.onetimemain);
 	    
 	    pref = getSharedPreferences("userinfo",0);
@@ -90,28 +93,26 @@ public class OneTimeMain extends ListActivity {
 		Intent p_intent = getIntent();
 		previous_activity = p_intent.getExtras().getInt("FROM");
 		
-		LinearLayout ll = (LinearLayout)findViewById(R.id.logo_layout);
-		ImageView logo = (ImageView)findViewById(R.id.logo);
-		
+		helper = new FunctionsHelper();
+		LinearLayout ll = (LinearLayout)findViewById(R.id.done_layout);
+
 		// if previous activity is "PlantList.java"
 		// this page view is different by the previous activity
 		if(previous_activity == PLANT_LIST) {
+			ll.setVisibility(View.GONE);
 			Log.i("K"," From PlantList.java");
 			latitude = 0.0;
 			longitude = 0.0;
 			camera_image_id = "none";
 			dt_taken = "";
-			ll.setBackgroundColor(R.color.BudBurstBackground);
-			logo.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/header_small_modified", null, null));
 		}
 		// else
 		else {
+			ll.setVisibility(View.VISIBLE);
 			camera_image_id = p_intent.getExtras().getString("camera_image_id");
 			latitude = p_intent.getExtras().getDouble("latitude");
 			longitude = p_intent.getExtras().getDouble("longitude");
 			dt_taken = p_intent.getExtras().getString("dt_taken");
-			ll.setBackgroundColor(R.color.flora_title_background);
-			logo.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/flora_observercopy", null, null));
 		}
 	    // TODO Auto-generated method stub
 	}
@@ -121,7 +122,7 @@ public class OneTimeMain extends ListActivity {
 		super.onResume();
 		
 		//Get User site name and id using Map.
-		mapUserSiteNameID = getUserSiteIDMap();
+		mapUserSiteNameID = helper.getUserSiteIDMap(OneTimeMain.this);
 		
 		//My plant button
 		/*
@@ -164,11 +165,29 @@ public class OneTimeMain extends ListActivity {
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
 		
-		/*
-		//unknownText = (EditText)findViewById(R.id.unknown_plant);
-		//unknownBtn = (Button)findViewById(R.id.submit);
 		
-		unknownBtn.setOnClickListener(new View.OnClickListener() {
+		//unknownText = (EditText)findViewById(R.id.unknown_plant);
+		submitBtn = (Button)findViewById(R.id.submit);
+		
+		submitBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				helper.insertNewPlantToDB(OneTimeMain.this, UNKNOWN_PLANT, 0, 9, "Unknown Plant", "Unknown Plant");
+				int getID = helper.getID(OneTimeMain.this);
+				helper.insertNewObservation(OneTimeMain.this, getID, 0, latitude, longitude, camera_image_id, dt_taken, "");
+				Toast.makeText(OneTimeMain.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+				
+				Intent intent = new Intent(OneTimeMain.this, MainPage.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+			}
+		});
+		
+		/*
+		submitBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -274,85 +293,8 @@ public class OneTimeMain extends ListActivity {
 		});
 		*/
 	}
-	
-	/*
-	public boolean insertNewPlantToDB(int speciesid, int siteid, String sitename){
-		
-		Log.i("K", "species id : " + speciesid + " siteid : " + siteid + " sitename : " + sitename);
-		
-		try{
-			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
-			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
-			
-			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
-					"null," +
-					speciesid + "," +
-					siteid + "," +
-					"'" + sitename + "',"+
-					"0,"+
-					"1,"+ // 1 means it's official, from plant list
-					SyncDBHelper.SYNCED_NO + ");"
-					);
-			syncDBHelper.close();
-			syncDB.close();
-			return true;
-		}
-		catch(Exception e){
-			Log.e("K",e.toString());
-			return false;
-		}
-	}
-	*/
-	
-	public String[] getUserSite(){
-		
-		SyncDBHelper syncDBHelper = new SyncDBHelper(this);
-		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase();
-		String[] arrUsersite;
-		try{
-			Cursor cursor = syncDB.rawQuery("SELECT site_name FROM my_sites;", null);
-			
-			arrUsersite = new String[cursor.getCount()];
-			int i=0;
-			while(cursor.moveToNext()){
-				arrUsersite[i++] = cursor.getString(0);
-			}
-			cursor.close();
-			return arrUsersite;
-		}
-		catch(Exception e){
-			Log.e("K",e.toString());
-			return null;
-		}
-		finally{
-			syncDBHelper.close();
-		}
-	}
-	
-	public HashMap<String, Integer> getUserSiteIDMap(){
 
-		HashMap<String, Integer> localMapUserSiteNameID = new HashMap<String, Integer>(); 
-		
-		//Open plant list db from static db
-		SyncDBHelper syncDBHelper = new SyncDBHelper(this);
-		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase(); 
-		
-		//Rereive syncDB and add them to arUserPlatList arraylist
-		Cursor cursor = syncDB.rawQuery("SELECT site_name, site_id FROM my_sites;",null);
-		while(cursor.moveToNext()){
-			localMapUserSiteNameID.put(cursor.getString(0), cursor.getInt(1));
-		}
-		
-		
-		//Close DB and cursor
-		cursor.close();
-		//syncDB.close();
-		syncDBHelper.close();
-	
-		return localMapUserSiteNameID;
-	}
 
-	
 	class MyListAdapter extends BaseAdapter{
 		Context maincon;
 		LayoutInflater Inflater;
@@ -443,7 +385,13 @@ public class OneTimeMain extends ListActivity {
 			}
 			break;
 		case 1:
+			// Move to whatsinvasive.
 		   	intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
+		    intent.putExtra("FROM", previous_activity);
+		    intent.putExtra("camera_image_id", camera_image_id);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
+			intent.putExtra("dt_taken", dt_taken);
 			startActivity(intent);
 			break;
 		case 2:

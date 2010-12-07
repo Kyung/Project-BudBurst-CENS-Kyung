@@ -93,6 +93,7 @@ public class GetPhenophase_PBB extends ListActivity {
 		    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 		    species_image.setBackgroundResource(R.drawable.shapedrawable);
 		    species_name.setText(" " + getString(R.string.GetPhenophase_PBB_not_defined));
+		    /*
 		    add_species_name.setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -127,6 +128,7 @@ public class GetPhenophase_PBB extends ListActivity {
 					});
 				}
 		    });
+		    */
 	    }
 	    else {
 	    	species_image.setVisibility(View.VISIBLE);

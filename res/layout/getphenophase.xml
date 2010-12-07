@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:orientation="vertical">
+  <!-- 
     <LinearLayout
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
@@ -12,6 +13,8 @@
     	android:layout_marginTop="10px"
 		android:background="@drawable/bg_line"
     >
+     -->
+    <!-- 
     <RadioGroup
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
@@ -36,6 +39,8 @@
     		android:layout_weight="0.1"
     	/>    	
     </RadioGroup>
+     
+     
     <LinearLayout
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
@@ -65,9 +70,53 @@
     	android:text="@string/BBList_fruits"/>
     
     </LinearLayout>
+    
 	</LinearLayout>
-  	<ListView
+	-->
+	<LinearLayout
+		android:weightSum="1"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_below="@+id/header_box"
+		android:orientation="vertical"
+	>  
+		<LinearLayout
+		android:layout_weight="0.85"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:paddingLeft="5dp"
+		android:background="@drawable/bg_line"
+	>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_marginTop="10dp"
+			android:orientation="horizontal"
+		>
+			<Button
+				android:layout_width="100px"
+				android:layout_height="wrap_content"
+				android:id="@+id/submit"
+				android:text="@string/Submit"
+			/>
+			<TextView
+				android:layout_marginLeft="2dp"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/Unknown_Plant_Text"
+				android:textSize="15dp"
+			/>
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<ListView 
+		android:layout_weight="0.15"
 		android:id="@android:id/list"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"/>
-</LinearLayout>
+		android:layout_below="@+id/logo_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent">
+	</ListView>
+	</LinearLayout>
+</RelativeLayout>

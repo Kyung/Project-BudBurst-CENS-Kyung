@@ -25,9 +25,9 @@
 	<drawable name="PBB_teel">#06b592</drawable>
 	<drawable name="Flora_Observer">#edcb3f</drawable>
 	<drawable name="PBB_teel2">#d3fe9f</drawable>
-	<color name="pbb_text_color">#0c3d36</color>
+	<color name="pbb_text_color">#d3fe9f</color>
 	<color name="flora_text_color">#264811</color>
-	<color name="pbb_title_background">#d3fe9f</color>
+	<color name="pbb_title_background">#55940a</color>
 	<color name="flora_title_background">#edcb3f</color>
 	<color name="black">#000000</color>
 	<color name="main_text">#395a04</color>

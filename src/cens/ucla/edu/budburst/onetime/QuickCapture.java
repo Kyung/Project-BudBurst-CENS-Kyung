@@ -136,6 +136,8 @@ public class QuickCapture extends Activity {
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				Toast.makeText(this, "Photo added!", Toast.LENGTH_SHORT).show();
 				
+				Log.i("K","CAMERA_IMAGE_ID : " + camera_image_id);
+				
 				String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 				
 				Media media = new Media();
