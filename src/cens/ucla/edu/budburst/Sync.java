@@ -70,6 +70,11 @@ public class Sync extends Activity{
 	public static int SERVER_ERROR = -99;
 	public static int NETWORK_ERROR = 0;
 	
+	final private int FROM_PLANT_LIST = 100;
+	final private int FROM_MAIN_PAGE = 103;
+	
+	private int previous_activity;
+	
 	int mValue;
 	TextView mText;
 	ProgressDialog mProgress;
@@ -100,6 +105,8 @@ public class Sync extends Activity{
 	
 		//If the previous activity is not plant list, then start sync instantly.  
 		Intent parent_intent = getIntent();
+		
+		previous_activity = parent_intent.getExtras().getInt("from");
 		if(parent_intent.getExtras() != null &&
 				parent_intent.getExtras().getBoolean("sync_instantly",false)){
 			doSync();
@@ -194,33 +201,58 @@ public class Sync extends Activity{
 				return;
 			}
 			
-			if(msg.what == SERVER_ERROR){
-				String error_message = (String)msg.obj;
-				if(error_message.equals(getString(R.string.Alert_wrongUserPass)))
-				{
-					SharedPreferences.Editor edit = pref.edit();				
-					edit.putString("Username","");
-					edit.putString("Password","");
-					edit.commit();
-					
-					Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) 
-							+ error_message, Toast.LENGTH_LONG).show();
-					
-					Intent intent = new Intent(Sync.this,Login.class);
-					startActivity(intent);
-					finish();
-					return;
+			Log.i("K", "WHAT ?? : " + msg.what);
+			
+			if(msg.what < NETWORK_ERROR){
+				if(msg.what == SERVER_ERROR){
+					String error_message = (String)msg.obj;
+					//Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) + error_message, Toast.LENGTH_SHORT).show();
+					if(error_message.equals(getString(R.string.Alert_wrongUserPass)))
+					{
+						mProgress.dismiss();
+						// set Username and Password to empty, ""
+						SharedPreferences.Editor edit = pref.edit();				
+						edit.putString("Username","");
+						edit.putString("Password","");
+						edit.commit();
+						
+						//Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) + error_message, Toast.LENGTH_SHORT).show();
+					}
 				}
-				mProgress.dismiss();
-				//dismissDialog(0);
-				//removeDialog(0);
-				Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) 
-						+ error_message, Toast.LENGTH_LONG).show();
-			}else if(msg.what < NETWORK_ERROR){
-				mProgress.dismiss();
-				//removeDialog(0);
-				Toast.makeText(Sync.this, getString(R.string.Alert_errorDownload), Toast.LENGTH_SHORT).show();
+				else {					
+					mProgress.dismiss();
+					//removeDialog(0);
+					Toast.makeText(Sync.this, getString(R.string.Alert_errorDownload), Toast.LENGTH_SHORT).show();
+					
+				}
+				
+				new AlertDialog.Builder(Sync.this)
+				.setTitle(getString(R.string.Alert_synchronized))
+				.setIcon(R.drawable.pbbicon_small)
+				.setMessage(getString(R.string.Go_BackTo_Login))
+				.setPositiveButton(getString(R.string.Button_OK),new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						SharedPreferences.Editor edit = pref.edit();
+						edit.putString("Username", "");
+						edit.putString("Password", "");
+						edit.putString("Synced","false");
+						edit.commit();
+						
+						Intent intent = new Intent(Sync.this, firstActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						finish();
+						
+					}
+				})
+				.show();
+				
+				return;
 			}
+			
 		
 			//Each step would be reached whenever doSyncThread transfer data with server
 			switch(msg.what){			
@@ -349,10 +381,20 @@ public class Sync extends Activity{
 				removeDialog(0);
 				
 				//Move to plant list screen
-				Intent intent = new Intent(Sync.this, MainPage.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
+				
+				if(previous_activity == FROM_MAIN_PAGE) {
+					Intent intent = new Intent(Sync.this, MainPage.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}
+				else if(previous_activity == FROM_PLANT_LIST){
+					Intent intent = new Intent(Sync.this, PlantList.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}
+				
 				
 				Toast.makeText(Sync.this, getString(R.string.Alert_synchronized), Toast.LENGTH_SHORT).show();
 				
@@ -672,7 +714,7 @@ class doSyncThread extends Thread{
 				SQLiteDatabase otRDB = otDBHelper.getReadableDatabase();
 		    	//SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
 				
-				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname FROM onetimeob " +
+				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname, active FROM onetimeob " +
 						"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = otRDB.rawQuery(query, null);
 				
@@ -690,9 +732,10 @@ class doSyncThread extends Thread{
 						int protocol_id = cursor.getInt(3);
 						String cname = cursor.getString(4);
 						String sname = cursor.getString(5);
+						int active = cursor.getInt(6);
 						
 						serverResponse = 
-							SyncNetworkHelper.upload_onetime_ob(username, password, plant_id, species_id, site_id, protocol_id, cname, sname);
+							SyncNetworkHelper.upload_onetime_ob(username, password, plant_id, species_id, site_id, protocol_id, cname, sname, active);
 						
 						if(!serverResponse.equals("UPLOADED_OK")) {
 							msgToMain.what = Sync.SERVER_ERROR;
@@ -1053,7 +1096,7 @@ class doSyncThread extends Thread{
 		    	msgToMain.arg1 = mProgressVal + 5;
 		    	
 		    	Log.i("K", "Start DOWNLOAD_QUICK_CAPTURE_PLANT");
-		    	
+		    	otDBHelper.clearAllTable(context);
 		    	SQLiteDatabase onetime = otDBHelper.getWritableDatabase();
 		    	
 		    	Log.i("K", "URL : " + context.getString(R.string.get_onetime_plant_URL)
@@ -1095,7 +1138,7 @@ class doSyncThread extends Thread{
 					for(int i=0; i<jsonresult.length(); i++){
 						
 						onetime.execSQL("INSERT INTO onetimeob " +
-								"(plant_id, species_id, site_id, protocol_id, cname, sname, synced)" +
+								"(plant_id, species_id, site_id, protocol_id, cname, sname, active, synced)" +
 								"VALUES(" +
 								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
 								jsonresult.getJSONObject(i).getString("Species_ID") + "," +
@@ -1103,6 +1146,7 @@ class doSyncThread extends Thread{
 								jsonresult.getJSONObject(i).getString("Protocol_ID") + ",'" +
 								jsonresult.getJSONObject(i).getString("Common_Name") + "','" +
 								jsonresult.getJSONObject(i).getString("Science_Name") + "'," +
+								1 + "," + // set active to 1
 								SyncDBHelper.SYNCED_YES + ");");
 					}
 					onetime.close();

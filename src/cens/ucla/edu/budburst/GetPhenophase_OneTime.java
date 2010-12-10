@@ -83,6 +83,18 @@ public class GetPhenophase_OneTime extends ListActivity {
 	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));
 	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    species_name.setText(cname + "\n" + sname);
+	    
+	    species_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(GetPhenophase_OneTime.this, SpeciesDetail.class);
+				intent.putExtra("id", species_id);
+				intent.putExtra("site_id", "");
+				startActivity(intent);
+			}
+		});
 		
 		StaticDBHelper staticDB = new StaticDBHelper(GetPhenophase_OneTime.this);
 		SQLiteDatabase sDB = staticDB.getReadableDatabase();

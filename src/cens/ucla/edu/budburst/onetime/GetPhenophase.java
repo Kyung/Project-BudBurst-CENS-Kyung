@@ -81,7 +81,7 @@ public class GetPhenophase extends ListActivity {
 		v.setPadding(0, 0, 0, 0);
 		
 		myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" Choose Phenophase");
+		myTitleText.setText(" " + getString(R.string.Best_Phenophase));
 		
 		
 	    Intent intent = getIntent();

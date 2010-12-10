@@ -114,7 +114,7 @@ public class FunctionsHelper {
 			OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 			SQLiteDatabase ot = onetime.getReadableDatabase();
 			
-			Cursor c = ot.rawQuery("SELECT MAX(_id) as max FROM onetimeob;", null);
+			Cursor c = ot.rawQuery("SELECT MAX(plant_id) as max FROM onetimeob;", null);
 			while(c.moveToNext()) {
 				return_id = c.getInt(0);
 			}
@@ -142,7 +142,7 @@ public class FunctionsHelper {
 			
 			Log.i("K", "plant_id : " + plant_id);
 			
-			// species_id, site_id, cname, sname, lat, lng, dt_taken, notes, image_name, synced
+			// _id, plant_id, species_id, site_id, protocol_id, cname, sname, active, synced
 			ot.execSQL("INSERT INTO onetimeob VALUES(" +
 					"null," +
 					plant_id + "," +
@@ -151,11 +151,7 @@ public class FunctionsHelper {
 					protocolid + "," +
 					"'" + cname + "',"+
 					"'" + sname + "',"+
-					//"" + lat + "," +
-					//"" + lng + "," +
-					//"'" + dt_taken + "'," +
-					//"'" + notes + "'," +
-					//"'" + image_name + "'," +
+					1 + "," + // active
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			onetime.close();

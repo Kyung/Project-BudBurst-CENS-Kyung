@@ -125,7 +125,12 @@ public class AddSite extends Activity{
 		
 		helper = new FunctionsHelper();
 		
-		
+		sitename = (EditText)this.findViewById(R.id.sitename);
+		comment = (EditText)this.findViewById(R.id.comment);
+		Human_Disturbance = (Button)findViewById(R.id.human_distance_text);
+		Shading = (Button)findViewById(R.id.shading_text);
+		Irrigation = (Button)findViewById(R.id.irrigation_text);
+		Habitat = (Button)findViewById(R.id.habitat_text);
 		
 		
 		Intent p_intent = getIntent();
@@ -153,6 +158,10 @@ public class AddSite extends Activity{
 			dt_taken = p_intent.getExtras().getString("dt_taken");
 			//notes = p_intent.getExtras().getString("notes");
 			ll.setVisibility(View.VISIBLE);
+			
+			TextView site_label = (TextView)findViewById(R.id.sitename_lable);
+			site_label.setVisibility(View.GONE);
+			sitename.setVisibility(View.GONE);
 			
 			Log.i("K", "FROM_QUICK_CAPTURE //// species_id : " + species_id + " , pheno_id : " + pheno_id + " , camera_image_id : " + camera_image_id + " ,dt_taken : " + dt_taken);
 		}
@@ -184,6 +193,10 @@ public class AddSite extends Activity{
 					Intent intent = new Intent(AddSite.this, PlantList.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
+					
+					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+					vibrator.vibrate(1000);
+					
 					finish();
 			}
 		});
@@ -202,12 +215,7 @@ public class AddSite extends Activity{
 	public void onResume(){
 		super.onResume();
 		
-		sitename = (EditText)this.findViewById(R.id.sitename);
-		comment = (EditText)this.findViewById(R.id.comment);
-		Human_Disturbance = (Button)findViewById(R.id.human_distance_text);
-		Shading = (Button)findViewById(R.id.shading_text);
-		Irrigation = (Button)findViewById(R.id.irrigation_text);
-		Habitat = (Button)findViewById(R.id.habitat_text);
+		
 	
 		Human_Disturbance.setOnClickListener(new View.OnClickListener(){
 

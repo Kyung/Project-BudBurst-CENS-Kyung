@@ -11,11 +11,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * @author Jinha
+ * @author Kyung
  *
  */
 public class Login extends Activity{
-	private static final String TAG = "LoginActivity";	
+	private static final String TAG = "LoginActivity";
+	private int FROM_MAIN_PAGE = 103;
 	private TextView textUsername;
 	private TextView textPassword;
 	private SharedPreferences pref;
@@ -35,6 +36,7 @@ public class Login extends Activity{
 		
 		if(	!(pref.getString("Username","").equals("")) && !(pref.getString("Password","").equals(""))){
 			Intent intent = new Intent(Login.this, Sync.class);
+			intent.putExtra("from", FROM_MAIN_PAGE);
 			Login.this.startActivity(intent);
 			finish();
 		}
@@ -56,6 +58,7 @@ public class Login extends Activity{
 					edit.commit();
 					
 					Intent intent = new Intent(Login.this, Sync.class);
+					intent.putExtra("from", FROM_MAIN_PAGE);
 					Login.this.startActivity(intent);
 					finish();
 				}
@@ -75,6 +78,7 @@ public class Login extends Activity{
 				edit.commit();
 				
 				Intent intent = new Intent(Login.this, Sync.class);
+				intent.putExtra("from", FROM_MAIN_PAGE);
 				startActivity(intent);
 				finish();
 			}

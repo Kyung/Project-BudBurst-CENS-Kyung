@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.Media;
@@ -198,6 +199,11 @@ public class QuickCapture extends Activity {
 			if(loc != null) {
 				latitude = loc.getLatitude();
 				longitude = loc.getLongitude();
+				
+				if(latitude != 0.0) {
+					lm.removeUpdates(gpsListener);
+					//Toast.makeText(QuickCapture.this, getString(R.string.AddSite_gotGPS), Toast.LENGTH_SHORT).show();
+				}
 				
 				//String strLoc = String.format("Current Location : %10.5f, %10.5f", latitude, longitude);
 			

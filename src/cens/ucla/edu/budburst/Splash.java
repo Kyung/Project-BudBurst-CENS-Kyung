@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 
 public class Splash extends Activity {
 
+	final private int FROM_MAIN_PAGE = 103;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -25,6 +26,7 @@ public class Splash extends Activity {
 			}
 			else{
 				Intent intent = new Intent(Splash.this, Sync.class);
+				intent.putExtra("from", FROM_MAIN_PAGE);
 				startActivity(intent);
 				finish();
 			}

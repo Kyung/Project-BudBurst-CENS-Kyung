@@ -165,12 +165,12 @@
 <string name="Menu_sync">Sync</string>
 <string name="Menu_AddPlant">Add Plant</string>
 <string name="Alert_uploadingSites">Uploading sites...</string>
-<string name="Alert_uploadingOneTimeOB">Uploading onetime OB</string>
-<string name="Alert_downloadingOneTimeOB">Downloading onetime OB</string>
+<string name="Alert_uploadingOneTimeOB">Uploading onetime OB...</string>
+<string name="Alert_downloadingOneTimeOB">Downloading onetime OB...</string>
 <string name="Alert_downloadingSites">Downloading sites...</string>
 <string name="Alert_downloadingImages">Downloading images...</string>
 <string name="AddSite_intro">Describe the site</string>
-<string name="AddSite_siteName">Unknown Site</string>
+<string name="AddSite_siteName">Site Name</string>
 <string name="AddSite_latlong">Current Latitude/Longitude</string>
 <string name="AddSite_gettingLatLong">Getting lat/long from GPS...</string>
 <string name="AddSite_address">Address</string>
@@ -238,7 +238,8 @@
 <string name="Deciduous_Trees_and_Shrubs">Deciduous Trees and Shrubs</string>
 <string name="Evergreen_Trees_and_Shrubs">Evergreen Trees and Shrubs</string>
 <string name="Conifer">Conifer</string>
-<string name="Unknown_Plant_Text">Or Continue to add more info</string>
+<string name="Unknown_Plant_Text_1">Or Continue to add species name</string>
+<string name="Unknown_Plant_Text_2">Or Continue to add site</string>
 <string name="Submit">Submit</string>
 <string name="Cannot_Change">You cannot change the name of this species</string>
 <string name="DoSyncFirst_For_UnknownPlant">Please sync first if you have unknown plant</string>
@@ -248,4 +249,6 @@
 <string name="Item_deleted">Item deleted</string>
 <string name="Not_Finish_GPS">Still getting GPS data...</string>
 <string name="Observation_Summary"> Observation Summary</string>
+<string name="Best_Phenophase">Choose \"Best Fit\" Phenophase</string>
+<string name="Go_BackTo_Login">Please check your username and password again.\n\nRestart Project Budburst.</string>
 </resources>

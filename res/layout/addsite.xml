@@ -29,7 +29,7 @@
 			android:layout_marginLeft="2dp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/Unknown_Plant_Text"
+			android:text="@string/Unknown_Plant_Text_2"
 			android:textSize="15dp"
 		/>
 	</LinearLayout>

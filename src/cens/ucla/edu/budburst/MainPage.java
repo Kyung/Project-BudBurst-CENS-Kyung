@@ -32,6 +32,7 @@ public class MainPage extends Activity {
 	private Button weeklyBtn = null;
 	private SharedPreferences pref;
 	private StaticDBHelper staticDBHelper = null;
+	private Integer FROM_MAIN_PAGE = 103;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -233,6 +234,7 @@ public class MainPage extends Activity {
 			case 2:
 				Intent intent = new Intent(MainPage.this, Sync.class);
 				intent.putExtra("sync_instantly", true);
+				intent.putExtra("from", FROM_MAIN_PAGE);
 				startActivity(intent);
 				finish();
 				return true;

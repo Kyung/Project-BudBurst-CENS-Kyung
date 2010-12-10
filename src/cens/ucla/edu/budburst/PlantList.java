@@ -180,9 +180,9 @@ public class PlantList extends ListActivity {
 		OneTimeDBHelper onetime = new OneTimeDBHelper(PlantList.this);
 		SQLiteDatabase ot  = onetime.getReadableDatabase();
 
-		cursorss = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, cname, sname, synced FROM onetimeob;", null);
+		cursorss = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, cname, sname, active, synced FROM onetimeob;", null);
 		while(cursorss.moveToNext()) {
-			Log.i("K", "ONETIME OB : " + cursorss.getInt(0) + ", plant_id : " + cursorss.getInt(1) + ", species_id " + cursorss.getInt(2) + " , site_id : " + cursorss.getString(3) + " , cname : " + cursorss.getString(4) + " , sname : " + cursorss.getString(5) + " , SYNCED : " + cursorss.getInt(6));
+			Log.i("K", "ONETIME OB : " + cursorss.getInt(0) + ", plant_id : " + cursorss.getInt(1) + ", species_id " + cursorss.getInt(2) + " , site_id : " + cursorss.getString(3) + " , cname : " + cursorss.getString(4) + " , sname : " + cursorss.getString(5) + ", Active " + cursorss.getInt(6) + " , SYNCED : " + cursorss.getInt(7));
 		}
 		cursorss.close();
 		
@@ -374,7 +374,7 @@ public class PlantList extends ListActivity {
 		SyncDBHelper syncHelper = new SyncDBHelper(PlantList.this);
 		SQLiteDatabase sync = syncHelper.getReadableDatabase();
 		
-		Cursor cursor = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, protocol_id, cname, sname, synced FROM onetimeob", null);
+		Cursor cursor = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, protocol_id, cname, sname, synced FROM onetimeob WHERE active=1", null);
 		PlantItem pi;
 		
 		// header is called only once. (top)
@@ -402,43 +402,19 @@ public class PlantList extends ListActivity {
 
 			
 			// if site_id == 0 meaning one-time observations are added to the database in "OneTimeMain.class" activity
-			if(cursor.getInt(3) == 0) {
-				if(!header) {
-					pi = new PlantItem(resID, cursor.getString(5), cursor.getString(6), cursor.getInt(2),
-							cursor.getInt(3), cursor.getInt(4), pheno_current, 12, true, "No Site", false);
-					// make header true (not called any more)
-					header = true;
-				}
-				else {
-					pi = new PlantItem(resID, cursor.getString(5), cursor.getString(6), cursor.getInt(2),
-							cursor.getInt(3), cursor.getInt(4), pheno_current, 12, false, "No Site", false);
-				}
-					
-				arPlantItem.add(pi);
+			
+			if(!header) {
+				pi = new PlantItem(resID, cursor.getString(5), cursor.getString(6), cursor.getInt(2),
+						cursor.getInt(3), cursor.getInt(4), pheno_current, 12, true, "", false);
+				// make header true (not called any more)
+				header = true;
 			}
-			// means one-time observations are added to the database in "Getphenophase" or "Add Plant"
 			else {
-
-				Cursor cursor2 = sync.rawQuery("SELECT site_name FROM my_sites WHERE site_id=" + cursor.getInt(3) + ";", null);
-				
-				while(cursor2.moveToNext()) {
-						
-					Log.i("K", "resID : " + resID + " , cname : " + cursor.getString(5) + " , species_id : " + cursor.getInt(2));
-					// resID, common_name, site_name, species_id, site_id, protocol_id, current_number_of_pheno, total_number_of_pheno, top, header_name, monitored
-					if(!header) {
-						pi = new PlantItem(resID, cursor.getString(5), "", cursor.getInt(2),
-								cursor.getInt(3), cursor.getInt(4), pheno_current, 12, true, cursor2.getString(0), false);
-						header = true;
-					}
-					else {
-						pi = new PlantItem(resID, cursor.getString(5), "", cursor.getInt(2),
-								cursor.getInt(3), cursor.getInt(4), pheno_current, 12, false, cursor2.getString(0), false);
-					}
-						
-					arPlantItem.add(pi);
-					cursor2.close();
-				}
+				pi = new PlantItem(resID, cursor.getString(5), cursor.getString(6), cursor.getInt(2),
+						cursor.getInt(3), cursor.getInt(4), pheno_current, 12, false, "", false);
 			}
+					
+			arPlantItem.add(pi);
 		}
 		
 		//onetime_start_point = count;
@@ -554,9 +530,10 @@ public class PlantList extends ListActivity {
 					// else if the position is in the quick capture list
 					else {
 						// delete the onetime species_
-						//int click_pos = Quick_capture_click_position(pos);
-						//onetime.execSQL("DELETE FROM onetimeob WHERE _id=" + click_pos);
-						Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+						int click_pos = Quick_capture_click_position(pos);
+						onetime.execSQL("UPDATE onetimeob SET active = 0, synced = " + SyncDBHelper.SYNCED_NO + " WHERE plant_id=" + click_pos);
+						onetime.execSQL("DELETE FROM onetimeob_observation WHERE plant_id=" + click_pos);
+						//Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 					}
 					
 					syncDB.close();
@@ -585,7 +562,7 @@ public class PlantList extends ListActivity {
 	public int Quick_capture_click_position(int position) {
 		OneTimeDBHelper onetime = new OneTimeDBHelper(PlantList.this);
 		SQLiteDatabase onetimeDB  = onetime.getReadableDatabase();
-		Cursor cursor = onetimeDB.rawQuery("SELECT plant_id FROM onetimeob;", null);
+		Cursor cursor = onetimeDB.rawQuery("SELECT plant_id FROM onetimeob WHERE active = 1;", null);
 		
 		int query_count = 1;
 		int getID = 0;
@@ -665,7 +642,7 @@ public class PlantList extends ListActivity {
 						onetimeDB.close();
 						oneDB.close();
 
-						Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+						//Toast.makeText(PlantList.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 					}
 					
 					Toast.makeText(PlantList.this, getString(R.string.GetPhenophase_PBB_update_name), Toast.LENGTH_SHORT).show();
@@ -704,6 +681,7 @@ public class PlantList extends ListActivity {
 			case MENU_SYNC:
 				intent = new Intent(PlantList.this, Sync.class);
 				intent.putExtra("sync_instantly", true);
+				intent.putExtra("from", FROM_PLANT_LIST);
 				startActivity(intent);
 				finish();
 				return true;
@@ -716,7 +694,7 @@ public class PlantList extends ListActivity {
 	//Menu option
 	/////////////////////////////////////////////////////////////
 
-	//Adapters:MyListAdapter and SeparatedAdapter
+	//Adapters:MyListAdapter
 	class MyListAdapter extends BaseAdapter{
 		Context maincon;
 		LayoutInflater Inflater;
@@ -783,7 +761,14 @@ public class PlantList extends ListActivity {
 			textname.setText(arSrc.get(position).CommonName);
 			
 			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-			textdesc.setText(arSrc.get(position).Site);
+			if(arSrc.get(position).Monitor) {
+				textdesc.setText(arSrc.get(position).Site);
+				textdesc.setVisibility(View.VISIBLE);
+			}
+			else {
+				textdesc.setVisibility(View.GONE);
+			}
+			
 			//String [] splits = arSrc.get(position).SpeciesName.split(" ");
 			//textdesc.setText(splits[0] + " " + splits[1]);
 			

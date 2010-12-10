@@ -129,10 +129,10 @@ public class SyncNetworkHelper extends Activity{
 	}
 
 	static public String upload_onetime_ob(String username, String password, int plant_id, int species_id, int site_id,
-			int protocol_id, String cname, String sname) {
+			int protocol_id, String cname, String sname, int active) {
 		try{
 			
-			Log.i("K", "plant id : " + plant_id + " species_id : " + species_id + " site_id : " + site_id + " protocol_id : " + protocol_id + " cname : " + cname + " sname : " + sname);
+			Log.i("K", "plant id : " + plant_id + " species_id : " + species_id + " site_id : " + site_id + " protocol_id : " + protocol_id + " cname : " + cname + " sname : " + sname + " active : " + active);
 			
 	        // Add your data  
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
@@ -148,6 +148,7 @@ public class SyncNetworkHelper extends Activity{
         	nameValuePairs.add(new BasicNameValuePair("site_id", Integer.toString(site_id)));  
         	nameValuePairs.add(new BasicNameValuePair("cname", cname));
         	nameValuePairs.add(new BasicNameValuePair("sname", sname));
+        	nameValuePairs.add(new BasicNameValuePair("active", Integer.toString(active)));
         	httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 

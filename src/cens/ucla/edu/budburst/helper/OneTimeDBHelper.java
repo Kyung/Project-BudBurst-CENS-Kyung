@@ -24,6 +24,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"protocol_id NUMERIC," +
 				"cname TEXT," +
 				"sname TEXT," +
+				"active NUMERIC," +
 				"synced NUMERIC);");
 		
 		db.execSQL("CREATE TABLE onetimeob_observation (" +
@@ -85,6 +86,16 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS onetimeob_observation");
 		
 		onCreate(db);
+	}
+	
+	public void clearOneTimeTable(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		
+		db.execSQL("DELETE FROM onetimeob");
+		db.execSQL("DELETE FROM onetimeob_observation");
+		
+		db.close();
 	}
 	
 	public void clearAllTable(Context cont){
