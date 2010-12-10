@@ -43,6 +43,16 @@ public class MainPage extends Activity {
 		edit.putString("visited","false");
 		edit.commit();
 		
+		/*
+		Intent intent = getIntent();
+		boolean move_to_plantlist = intent.getExtras().getBoolean("move_to_plantlist");
+		if(move_to_plantlist) {
+			Intent to_plantlist = new Intent(MainPage.this, PlantList.class);
+			finish();
+			startActivity(to_plantlist);
+		}
+		*/
+		
 		staticDBHelper = new StaticDBHelper(MainPage.this);
 		OneTimeDBHelper onetime = new OneTimeDBHelper(MainPage.this);
 
@@ -82,6 +92,7 @@ public class MainPage extends Activity {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(MainPage.this, QuickCapture.class);
 				startActivity(intent);
+				
 			}
 	    	
 	    });
@@ -135,6 +146,7 @@ public class MainPage extends Activity {
 	}
 	
 	
+	
     // or when user press back button
 	// when you hold the button for 3 sec, the app will be exited
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -161,7 +173,8 @@ public class MainPage extends Activity {
 		super.onCreateOptionsMenu(menu);
 		
 		menu.add(0, 1, 0, getString(R.string.Menu_help)).setIcon(android.R.drawable.ic_menu_help);
-		menu.add(0, 2, 0, getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(0, 2, 0, getString(R.string.Menu_sync)).setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0, 3, 0, getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 			
 		return true;
 	}
@@ -172,7 +185,7 @@ public class MainPage extends Activity {
 		switch(item.getItemId()){
 			case 1:
 				return true;
-			case 2:
+			case 3:
 				new AlertDialog.Builder(MainPage.this)
 				.setTitle(getString(R.string.Menu_logout))
 				.setMessage(getString(R.string.Alert_logout))
@@ -216,6 +229,12 @@ public class MainPage extends Activity {
 				})
 				.setIcon(R.drawable.pbbicon_small)
 				.show();
+				return true;
+			case 2:
+				Intent intent = new Intent(MainPage.this, Sync.class);
+				intent.putExtra("sync_instantly", true);
+				startActivity(intent);
+				finish();
 				return true;
 		}
 		return false;

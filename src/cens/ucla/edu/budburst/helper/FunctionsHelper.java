@@ -40,9 +40,17 @@ public class FunctionsHelper {
 		
 		SyncDBHelper syncDBHelper = new SyncDBHelper(context);
 		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase();
+		
+		Cursor cc = syncDB.rawQuery("SELECT site_name, official FROM my_sites;", null);
+		while(cc.moveToNext()) {
+			Log.i("K", "site_name : " + cc.getString(0) + " , official : " + cc.getInt(1));
+		}
+		
+		cc.close();
+		
 		CharSequence[] arrUsersite;
 		try{
-			Cursor cursor = syncDB.rawQuery("SELECT site_name FROM my_sites;", null);
+			Cursor cursor = syncDB.rawQuery("SELECT site_name FROM my_sites WHERE official=1;", null);
 			
 			arrUsersite = new String[cursor.getCount()+1];
 			int i=0;
@@ -68,11 +76,13 @@ public class FunctionsHelper {
 	public boolean insertNewObservation(Context context, int plant_id, int phenophase_id, 
 			double lat, double lng, String image_id, String dt_taken, String notes) {
 		try{
-			Log.i("K", "INSIDE THE insertNewPlantDB function");
+			Log.i("K", "INSIDE THE insertNewObservation function");
 			
 			OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 			SQLiteDatabase ot = onetime.getWritableDatabase();
 			
+			Log.i("K", "image_id : " + image_id);
+
 			// species_id, site_id, cname, sname, lat, lng, dt_taken, notes, image_name, synced
 			ot.execSQL("INSERT INTO onetimeob_observation VALUES(" +
 					plant_id + "," +
@@ -127,9 +137,15 @@ public class FunctionsHelper {
 			OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 			SQLiteDatabase ot = onetime.getWritableDatabase();
 			
+			int plant_id = getID(context);
+			plant_id += 1;
+			
+			Log.i("K", "plant_id : " + plant_id);
+			
 			// species_id, site_id, cname, sname, lat, lng, dt_taken, notes, image_name, synced
 			ot.execSQL("INSERT INTO onetimeob VALUES(" +
 					"null," +
+					plant_id + "," +
 					speciesid + "," +
 					siteid + "," +
 					protocolid + "," +

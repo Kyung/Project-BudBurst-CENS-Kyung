@@ -10,9 +10,33 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@drawable/box_drawable_gray">
+    
+    <LinearLayout
+		android:id="@+id/header_item"
+		android:layout_width="fill_parent"
+		android:layout_height="70dp"
+		android:paddingTop="10dp"
+		android:orientation="horizontal"
+		android:background="@drawable/bg_line"
+	>
+		<Button
+			android:layout_width="100px"
+			android:layout_height="wrap_content"
+			android:id="@+id/submit"
+			android:text="@string/Done"
+		/>
+		<TextView
+			android:layout_marginLeft="2dp"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/Unknown_Plant_Text"
+			android:textSize="15dp"
+		/>
+	</LinearLayout>
 
 	<TextView
 	android:id="@+id/instruction"
+	android:layout_below="@+id/header_item"
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
 	android:layout_marginTop="10dip"

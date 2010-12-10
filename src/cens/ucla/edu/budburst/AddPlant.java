@@ -3,7 +3,6 @@ package cens.ucla.edu.budburst;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -48,6 +47,7 @@ public class AddPlant extends ListActivity{
 	private int EVERGREEN_TREES = 6;
 	private int EVERGREEN_TREES_WIND = 7;
 	private int CONIFERS = 8;
+	private int FROM_PLANT_LIST = 100;
 	private Integer new_plant_species_id;
 	private String new_plant_species_name;
 	private Integer new_plant_site_id; 
@@ -99,27 +99,6 @@ public class AddPlant extends ListActivity{
 		//header = (TextView) findViewById(R.id.header_text);
 		//header.setText("'TOP 10' list of the plants.");
 		
-		//Check if site table is empty
-		SyncDBHelper syncDBHelper = new SyncDBHelper(AddPlant.this);
-		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase();
-		
-		Cursor cursor = syncDB.rawQuery("SELECT site_id FROM my_sites;", null);
-		Log.d(TAG, String.valueOf(cursor.getCount()));
-		if(cursor.getCount() == 0)
-		{
-			Toast.makeText(AddPlant.this, "Please add your site first.", 
-					Toast.LENGTH_LONG).show();
-			cursor.close();
-			syncDBHelper.close();
-			Intent intent = new Intent(AddPlant.this, PlantList.class);
-			startActivity(intent);
-			finish();		
-			return;
-		}else{
-			syncDBHelper.close();
-			cursor.close();
-		}
-		
 		// show the top 10 lists first
 		top10List();
 
@@ -135,7 +114,7 @@ public class AddPlant extends ListActivity{
 		staticDBHelper = new StaticDBHelper(AddPlant.this);
 		staticDB = staticDBHelper.getReadableDatabase();
 		
-		myTitleText.setText(getString(R.string.AddPlant_top10));
+		myTitleText.setText(" " + getString(R.string.AddPlant_top10));
 		//header.setText("'TOP 10' list of the plants.");
 		arPlantList = new ArrayList<PlantItem>();
 	 	Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
@@ -177,7 +156,7 @@ public class AddPlant extends ListActivity{
 				top10List();
 			}
 			else if (v == rb2) {
-				myTitleText.setText(getString(R.string.AddPlant_all));
+				myTitleText.setText(" " + getString(R.string.AddPlant_all));
 				//header.setText("'ALL' list of the plants.");
 				//Rereive syncDB and add them to arUserPlatList arraylist
 				arPlantList = new ArrayList<PlantItem>();
@@ -373,6 +352,7 @@ public class AddPlant extends ListActivity{
 					Intent intent = new Intent(AddPlant.this, AddSite.class);
 					intent.putExtra("species_id", new_plant_species_id);
 					intent.putExtra("species_name", new_plant_species_name);
+					intent.putExtra("from", FROM_PLANT_LIST);
 					startActivity(intent);
 				}
 				else {

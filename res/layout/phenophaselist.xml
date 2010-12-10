@@ -3,11 +3,23 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content"
-  android:padding="10px">
+  >
+  <TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="6dip"
+    android:id="@+id/list_header"
+    android:background="#DDD"
+    android:textSize="16px"
+    android:textStyle="bold"
+    android:visibility="gone"
+    />
   <LinearLayout
+    android:layout_below="@+id/list_header"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   	android:orientation="horizontal"
+  	android:padding="7dp"
   >
   <LinearLayout
   	android:layout_width="wrap_content"

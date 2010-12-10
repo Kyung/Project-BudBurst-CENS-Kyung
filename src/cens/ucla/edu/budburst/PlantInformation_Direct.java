@@ -39,10 +39,11 @@ import android.widget.Toast;
 public class PlantInformation_Direct extends Activity {
 
 	private int phenophase_id = 0;
+	private int pheno_image_id = 0;
 	private int species_id 	= 0;
 	private int site_id 	= 0;
 	private int protocol_id = 0;
-	private int wherefrom = 0;
+	private int onetimeplant_id = 0;
 	private String pheno_name = null;
 	private String photo_name	= null;
 	private String pheno_text = null;
@@ -58,12 +59,15 @@ public class PlantInformation_Direct extends Activity {
 	private Button siteBtn			= null;
 	private EditText notes			= null;
 	private String dt_taken			= null;
+	private int previous_activity;
 	private View take_photo 		= null;
 	private View replace_photo 		= null;
 	private ImageView photo_image 		= null;
 	protected static final int PHOTO_CAPTURE_CODE = 0;
 	protected static final int GET_SUMMARY_CODE = 1;
-	private int SELECT_PLANT_NAME = 100;
+	protected static final int SELECT_PLANT_NAME = 100;
+	protected static final int FROM_QUICK_CAPTURE = 101;
+	
 	public final String BASE_PATH = "/sdcard/pbudburst/";
 	
 	/** Called when the activity is first created. */
@@ -79,10 +83,11 @@ public class PlantInformation_Direct extends Activity {
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(getString(R.string.PlantInfo_makeObs));
+		myTitleText.setText(" " + getString(R.string.PlantInfo_makeObs));
 	    
 	    Intent p_intent = getIntent();
-		phenophase_id = p_intent.getExtras().getInt("pheno_id",0);
+		phenophase_id = p_intent.getExtras().getInt("pheno_image_id",0);
+		pheno_image_id = p_intent.getExtras().getInt("pheno_id", 0);
 		species_id = p_intent.getExtras().getInt("species_id",0);
 		protocol_id = p_intent.getExtras().getInt("protocol_id", 0);
 		pheno_text = p_intent.getExtras().getString("pheno_text");
@@ -93,11 +98,15 @@ public class PlantInformation_Direct extends Activity {
 		sname = p_intent.getExtras().getString("sname");
 		dt_taken = p_intent.getExtras().getString("dt_taken");
 		note = p_intent.getExtras().getString("notes");
-		wherefrom = p_intent.getExtras().getInt("from");
+		previous_activity = p_intent.getExtras().getInt("from");
 		lat = p_intent.getExtras().getDouble("lat");
 		lng = p_intent.getExtras().getDouble("lng");
+		onetimeplant_id = p_intent.getExtras().getInt("onetimeplant_id"); 
 		boolean direct = p_intent.getExtras().getBoolean("direct");
 		camera_image_id = photo_name;
+		
+		Log.i("K", "PREVIOUS ACTIVITY : " + previous_activity);
+		Log.i("K", "phenophase_id : " + phenophase_id + " , pheno_image_id" + pheno_image_id + " onetimeplant_id : " + onetimeplant_id);
 		
 		ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    TextView species_name = (TextView) findViewById(R.id.species_name);
@@ -130,7 +139,7 @@ public class PlantInformation_Direct extends Activity {
 		replace_photo = this.findViewById(R.id.replace_photo);
 		// show pheno_image and pheno_text
 
-		phenoImg.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + phenophase_id, null, null));
+		phenoImg.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pheno_image_id, null, null));
 		phenoImg.setBackgroundResource(R.drawable.shapedrawable);
 		phenoName.setText(pheno_name);
 		phenoTxt.setText(pheno_text);
@@ -145,30 +154,20 @@ public class PlantInformation_Direct extends Activity {
 	    replace_photo.setVisibility(View.GONE);
 
 	    		
-		if(wherefrom == SELECT_PLANT_NAME) {
-			
-			camera_image_id = p_intent.getExtras().getString("camera_image_id");
-			
-			File file = new File(BASE_PATH + camera_image_id + ".jpg");
-			
-			if(file.exists()) {
-				Bitmap bitmap = BitmapFactory.decodeFile(BASE_PATH + camera_image_id + ".jpg");
-				photo_image.setImageBitmap(bitmap);
-				take_photo.setVisibility(View.GONE);
-			    replace_photo.setVisibility(View.VISIBLE);
-			    photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
-			}
-			else {
-				photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
-				photo_image.setEnabled(false);
-				take_photo.setVisibility(View.VISIBLE);
-			    replace_photo.setVisibility(View.GONE);
-			}
+	    File file = new File(BASE_PATH + camera_image_id + ".jpg");
+		
+		if(file.exists()) {
+			Bitmap bitmap = BitmapFactory.decodeFile(BASE_PATH + camera_image_id + ".jpg");
+			photo_image.setImageBitmap(bitmap);
+			take_photo.setVisibility(View.GONE);
+		    replace_photo.setVisibility(View.VISIBLE);
+		    photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 		}
 		else {
-			photo_image.setVisibility(View.VISIBLE);
-	    	photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
-	    	photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			photo_image.setEnabled(false);
+			take_photo.setVisibility(View.VISIBLE);
+		    replace_photo.setVisibility(View.GONE);
 		}
 	    
 	    photo_image.setOnClickListener(new View.OnClickListener() {
@@ -304,92 +303,24 @@ public class PlantInformation_Direct extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				try{
-					/*
-					OneTimeDBHelper onetime = new OneTimeDBHelper(PlantInformation_Direct.this);
-					SQLiteDatabase ot = onetime.getWritableDatabase();
 					
-					dt_taken = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+					Log.i("K"," I am in the SAVE BUTTON");
+					Log.i("K", "PREVIOUS ACTIVITY : " + previous_activity);
 					
-					ot.execSQL("INSERT INTO onetimeob VALUES ('" 
-							+ cname + "', '" 
-							+ sname + "', "
-							+ lat + ", "
-							+ lng + ", '"
-							+ dt_taken + "', '"
-							+ note + "', '"
-							+ camera_image_id + "', "
-							+ "9"
-							+ ");");
-					
-					Log.i("K","INSERT INTO onetimeob VALUES ('" 
-							+ cname + "', '" 
-							+ sname + "', "
-							+ lat + ", "
-							+ lng + ", '"
-							+ dt_taken + "', '"
-							+ note + "', '"
-							+ camera_image_id + "', "
-							+ "9"
-							+ ");" );
-					
-					ot.close();
-					onetime.close();*/
-					
-					SyncDBHelper syncDBHelper = new SyncDBHelper(PlantInformation_Direct.this);
-
-					SQLiteDatabase r_db = syncDBHelper.getReadableDatabase();
-					
-					String find_species = "SELECT _id FROM my_observation WHERE phenophase_id=" 
-									+ protocol_id + " AND species_id=" + species_id + " AND site_id=" + site_id;
-					Log.i("K", "QUERY : " + find_species);
-					Cursor cursor = r_db.rawQuery(find_species, null);
-					cursor.moveToNext();
-					
-					int count = cursor.getCount();
-					Log.i("K", "COUNT : " + count);
-		
-					r_db.close();
-					
-					SQLiteDatabase db = syncDBHelper.getWritableDatabase();
-					String query;
-					
-					dt_taken = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-					
-					//INSERT INTO my_observation VALUES (null,56,3339,24,'3224193362','2010-09-16 04:08:35','ppp',9);
-					if(count == 0){
-						query = "INSERT INTO my_observation VALUES (" +
-								"null," +
-								species_id + "," +
-								site_id + "," +
-								protocol_id+"," +
-								"'" + camera_image_id + "'," +
-								"'" + dt_taken + "'," +
-								"'" + notes.getText().toString() + "'," +
-								SyncDBHelper.SYNCED_NO + ");";
-						Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
-					}else{
-						int c_id = cursor.getInt(0);
-						Log.i("K", "C_ID : " + c_id);
-						
-						query = "UPDATE my_observation SET " +
-								"image_id='" + camera_image_id + "'," +
-								"time='" + dt_taken + "'," +
-								"note='" + notes.getText().toString() + "'" + "," +
-								"synced=" + SyncDBHelper.SYNCED_NO + " " + 
-								"WHERE _id=" + c_id + ";"; 
-						
-						Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
+					if(previous_activity == SELECT_PLANT_NAME) {
+						add_species_from_plantlist();
 					}
-					cursor.close();
-					Log.i("K", "QUERY : " + query);
-					db.execSQL(query);
-					db.close();
-					syncDBHelper.close();
-					
+					else if(previous_activity == FROM_QUICK_CAPTURE) {
+						add_species_from_quickcapture();
+					}
+					else {
+						// nothing is here.
+					}
 					
 					// add vibration when done
 					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 					vibrator.vibrate(1000);
+					
 				}catch(Exception e){
 					Log.e("K", e.toString());
 				}
@@ -400,24 +331,125 @@ public class PlantInformation_Direct extends Activity {
 				
 			}
 		});
-		/*
-		siteBtn = (Button)findViewById(R.id.site_information);
-		siteBtn.setOnClickListener(new View.OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent intent = new Intent(PlantInformation_Direct.this, AddSite.class);
-				// change the site text indicating - done!
-				siteBtn.setText(getString(R.string.Button_SiteInfo2));
-				startActivity(intent);
-			}
-			
-		});
-		*/
 	    // TODO Auto-generated method stub
 	}
 	
+	private void add_species_from_quickcapture() {
+		
+		Log.i("K", "in add_species_from_quickcapture() function");
+		
+		OneTimeDBHelper onetime = new OneTimeDBHelper(PlantInformation_Direct.this);
+		SQLiteDatabase ot = onetime.getReadableDatabase();
+		
+		dt_taken = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		Log.i("K", "SPECIES ID : " + phenophase_id + " , PHENOPHASE_ID : " + pheno_image_id + ", onetimeplant_id : " + onetimeplant_id);
+		
+		Cursor cursor = ot.rawQuery("SELECT plant_id FROM onetimeob_observation WHERE plant_id = " + onetimeplant_id
+				+ " AND phenophase_id=" + phenophase_id, null);
+		cursor.moveToNext();
+		
+		int count = cursor.getCount();
+		cursor.close();
+		ot.close();
+		
+		Log.i("K", "COUNT : " + count);
+		
+		SQLiteDatabase oneDB = onetime.getWritableDatabase();
+		String query = "";
+		
+		Log.i("K", "camera_image_id : " + camera_image_id);
+		Log.i("K", "onetimeplant_id : " + onetimeplant_id + " notes.getText().toString() : " + notes.getText().toString() + " dt_taken : " + dt_taken);
+		
+		if(count > 0) {
+			query = "UPDATE onetimeob_observation SET " +
+			"image_id='" + camera_image_id + "'," +
+			"dt_taken='" + dt_taken + "'," +
+			"notes='" + notes.getText().toString() + "'" + "," +
+			"synced=" + SyncDBHelper.SYNCED_NO + " " + 
+			"WHERE plant_id=" + onetimeplant_id + " AND phenophase_id=" + phenophase_id + ";"; 
+			Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
+		}
+		else {
+			
+			Log.i("K", "PHENO ID : " + phenophase_id);
+			
+			query = "INSERT INTO onetimeob_observation VALUES (" +
+			onetimeplant_id + "," +
+			phenophase_id + "," +
+			site_id + "," +
+			protocol_id+"," +
+			"'" + camera_image_id + "'," +
+			"'" + dt_taken + "'," +
+			"'" + notes.getText().toString() + "'," +
+			SyncDBHelper.SYNCED_NO + ");";
+			Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+		}
+
+		Log.i("K", "QUERY : " + query);
+		oneDB.execSQL(query);
+		oneDB.close();
+		onetime.close();
+	}
+	
+	
+	private void add_species_from_plantlist() {
+		
+		Log.i("K", "ADD SPECIES FROM PLANTLIST");
+		Log.i("K", "@@@ - camera_image_id : " + camera_image_id);
+		
+		
+		SyncDBHelper syncDBHelper = new SyncDBHelper(PlantInformation_Direct.this);
+
+		SQLiteDatabase r_db = syncDBHelper.getReadableDatabase();
+		
+		String find_species = "SELECT _id FROM my_observation WHERE phenophase_id=" 
+						+ protocol_id + " AND species_id=" + species_id + " AND site_id=" + site_id;
+		Log.i("K", "QUERY : " + find_species);
+		Cursor cursor = r_db.rawQuery(find_species, null);
+		cursor.moveToNext();
+		
+		int count = cursor.getCount();
+		Log.i("K", "COUNT : " + count);
+
+		r_db.close();
+		
+		SQLiteDatabase db = syncDBHelper.getWritableDatabase();
+		String query;
+		
+		dt_taken = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		
+		//INSERT INTO my_observation VALUES (null,56,3339,24,'3224193362','2010-09-16 04:08:35','ppp',9);
+		if(count == 0){
+			query = "INSERT INTO my_observation VALUES (" +
+					"null," +
+					species_id + "," +
+					site_id + "," +
+					protocol_id+"," +
+					"'" + camera_image_id + "'," +
+					"'" + dt_taken + "'," +
+					"'" + notes.getText().toString() + "'," +
+					SyncDBHelper.SYNCED_NO + ");";
+			Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+		}else{
+			int c_id = cursor.getInt(0);
+			Log.i("K", "C_ID : " + c_id);
+			
+			
+			query = "UPDATE my_observation SET " +
+					"image_id='" + camera_image_id + "'," +
+					"time='" + dt_taken + "'," +
+					"note='" + notes.getText().toString() + "'" + "," +
+					"synced=" + SyncDBHelper.SYNCED_NO + " " + 
+					"WHERE _id=" + c_id + ";"; 
+			
+			Toast.makeText(PlantInformation_Direct.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
+		}
+		cursor.close();
+		Log.i("K", "QUERY : " + query);
+		db.execSQL(query);
+		db.close();
+		syncDBHelper.close();
+	}
 
 	static private String hexEncode( byte[] aInput){
 		StringBuilder result = new StringBuilder();

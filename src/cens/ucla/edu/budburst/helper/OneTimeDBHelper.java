@@ -18,16 +18,12 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		// TODO Auto-generated method stub
 		db.execSQL("CREATE TABLE onetimeob (" +
 				"_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+				"plant_id NUMERIC," +
 				"species_id NUMERIC," +
 				"site_id NUMERIC," +
 				"protocol_id NUMERIC," +
 				"cname TEXT," +
 				"sname TEXT," +
-				//"lat NUMERIC," +
-				//"lng NUMERIC," +
-				//"dt_taken TEXT," +
-				//"notes TEXT," +
-				//"image_name TEXT," + 
 				"synced NUMERIC);");
 		
 		db.execSQL("CREATE TABLE onetimeob_observation (" +
@@ -85,18 +81,30 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// TODO Auto-generated method stub
+		db.execSQL("DROP TABLE IF EXISTS onetimeob");
+		db.execSQL("DROP TABLE IF EXISTS onetimeob_observation");
 		
+		onCreate(db);
 	}
 	
 	public void clearAllTable(Context cont){
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
-		db.execSQL("DELETE FROM onetimeob;");
-		db.execSQL("DELETE FROM speciesLists;");
-		db.execSQL("DELETE FROM popularLists;");
-		db.execSQL("DELETE FROM flickrLists;");
-		db.execSQL("DELETE FROM onetimeob_observation;");
+		db.execSQL("DROP TABLE IF EXISTS onetimeob");
+		db.execSQL("DROP TABLE IF EXISTS onetimeob_observation");
+		db.execSQL("DROP TABLE IF EXISTS speciesLists");
+		db.execSQL("DROP TABLE IF EXISTS flickrLists");
+		db.execSQL("DROP TABLE IF EXISTS popularLists");
+		db.execSQL("DROP TABLE IF EXISTS pbbFlickrLists");
+		
+		onCreate(db);
+		
+		//db.execSQL("DELETE FROM onetimeob;");
+		//db.execSQL("DELETE FROM speciesLists;");
+		//db.execSQL("DELETE FROM popularLists;");
+		//db.execSQL("DELETE FROM flickrLists;");
+		//db.execSQL("DELETE FROM onetimeob_observation;");
 		
 	 	dbhelper.close();
  	}

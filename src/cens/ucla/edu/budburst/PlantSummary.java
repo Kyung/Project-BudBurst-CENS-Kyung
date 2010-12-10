@@ -42,12 +42,19 @@ public class PlantSummary extends Activity {
 	private String notes = null;
 	private String photo_name = null;
 	private int pheno_id = 0;
+	private int pheno_image_id = 0;
+	private int onetime_pheno_id = 0;
+	private int previous_activity = 0;
 	private String pheno_name = null;
 	private String pheno_text = null;
 	private int species_id = 0;
 	private int site_id = 0;
 	private int protocol_id = 0;
 	protected static final int GET_CHANGE_CODE = 1;
+	protected static final int GETPHENOPHASE_ONE_TIME = 2;
+	protected static final int FROM_PLANT_LIST = 100;
+	protected static final int FROM_QUICK_CAPTURE = 101;
+
 	private PopupWindow popup = null;
 	private View popupview = null;
 	private ImageButton phone_image = null;
@@ -65,7 +72,7 @@ public class PlantSummary extends Activity {
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText("  Summary Species");
+		myTitleText.setText(" " + getString(R.string.Observation_Summary));
 	    // set database
 	    otDBH = new OneTimeDBHelper(PlantSummary.this);
 	    
@@ -79,11 +86,15 @@ public class PlantSummary extends Activity {
 	    pheno_name = intent.getExtras().getString("pheno_name");
 	    pheno_text = intent.getExtras().getString("pheno_text");
 	    pheno_id = intent.getExtras().getInt("pheno_id", 0);
+	    onetime_pheno_id = intent.getExtras().getInt("onetime_pheno_id", 0);
+	    pheno_image_id = intent.getExtras().getInt("pheno_image_id", 0);
 	    protocol_id = intent.getExtras().getInt("protocol_id", 0);
 	    species_id = intent.getExtras().getInt("species_id", 0);
 	    site_id = intent.getExtras().getInt("site_id", 0);
+	    previous_activity = intent.getExtras().getInt("from");
 	    
-	    Log.i("K", "NOTES : " + dt_taken);
+	    
+	    Log.i("K", "previous_activity : " + previous_activity + " , plant_id :" + pheno_id + " , pheno_image_id : " + pheno_image_id + " onetime_pheno_id : " + onetime_pheno_id);
 
 	    // setting up layout
 	    phone_image = (ImageButton) findViewById(R.id.phone_image);
@@ -98,8 +109,8 @@ public class PlantSummary extends Activity {
 	    phone_image.setVisibility(View.VISIBLE);
 	    
 	    String[] sname_split;
-	    sname_split = sname.split(" ");
-	    int sname_length = sname_split[0].length() + sname_split[1].length();
+	    //sname_split = sname.split(" ");
+	    //int sname_length = sname_split[0].length() + sname_split[1].length();
 	    
 	    // put cname and sname in the textView
 	    pheno_title.setText("'" + pheno_name + "' Observed");
@@ -108,7 +119,7 @@ public class PlantSummary extends Activity {
 	    cnameTxt.setText(cname + " ");
 	    snameTxt.setText(sname + " ");
 	    
-	    snameTxt.setText(sname_split[0] + " " + sname_split[1] + " ");
+	    //snameTxt.setText(sname_split[0] + " " + sname_split[1] + " ");
 	    if(species_id > 76) {
 	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 	    }
@@ -219,8 +230,8 @@ public class PlantSummary extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(PlantSummary.this, PlantInformation.class);
-				intent.putExtra("pheno_id", pheno_id);
+				Intent intent = new Intent(PlantSummary.this, PlantInformation_Direct.class);
+
 				intent.putExtra("protocol_id", protocol_id);
 				intent.putExtra("pheno_name", pheno_name);
 				intent.putExtra("pheno_text", pheno_text);
@@ -231,6 +242,18 @@ public class PlantSummary extends Activity {
 				intent.putExtra("photo_name", photo_name);
 				intent.putExtra("cname", cname);
 				intent.putExtra("sname", sname);
+				
+				if(previous_activity == FROM_QUICK_CAPTURE) {
+					intent.putExtra("from", FROM_QUICK_CAPTURE);
+					intent.putExtra("pheno_id", pheno_id);
+					intent.putExtra("pheno_image_id", pheno_image_id);
+					intent.putExtra("onetimeplant_id", onetime_pheno_id);
+				}
+				else {
+					intent.putExtra("pheno_id", pheno_id);
+					intent.putExtra("from", FROM_PLANT_LIST);
+				}
+				
 				startActivityForResult(intent, GET_CHANGE_CODE);
 			}
 		});

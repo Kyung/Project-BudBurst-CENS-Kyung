@@ -58,8 +58,10 @@ public class Sync extends Activity{
 	final private int DOWNLOAD_OBSERVATION_IMG = 8;
 	final private int SYNC_COMPLETE = 9;
 	
-	final private int UPLOAD_ONE_TIME_OB = 10;
-	final private int DOWNLOAD_ONE_TIME_OB = 11;
+	final private int UPLOAD_QUICK_CAPTURE_PLANT = 10;
+	final private int UPLOAD_QUICK_CAPTURE_OBSERVATION = 11;
+	final private int DOWNLOAD_QUICK_CAPTURE_PLANT = 12;
+	final private int DOWNLOAD_QUICK_CAPTURE_OBSERVATION = 13;
 	
 	//Boolean constant with integer
 	final private int FINISH_INT = 1;
@@ -124,12 +126,7 @@ public class Sync extends Activity{
 	/////////////////////////////////////////////////////////////
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
-		super.onCreateOptionsMenu(menu);
-		
-//		SubMenu addButton = menu.addSubMenu("Add")
-//			.setIcon(android.R.drawable.ic_menu_add);
-//		addButton.add(0,MENU_ADD_PLANT,0,"Add Plant");
-//		addButton.add(0,MENU_ADD_SITE,0,"Add Site");		
+		super.onCreateOptionsMenu(menu);	
 		
 		menu.add(0,MENU_SYNC,0,getString(R.string.Menu_sync)).setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0,MENU_LOGOUT,0,getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
@@ -141,21 +138,7 @@ public class Sync extends Activity{
 	public boolean onOptionsItemSelected(MenuItem item){
 		Intent intent;
 		switch(item.getItemId()){
-//			case MENU_ADD_PLANT:
-//				intent = new Intent(Sync.this, AddPlant.class);
-//				startActivity(intent);
-//				finish();
-//				return true;
-//			case MENU_ADD_SITE:
-//				intent = new Intent (Intent.ACTION_VIEW);
-//				intent.setData(Uri.parse(getString(R.string.add_site_URL)));
-//				startActivity(intent);
-//				finish();
-//				return true;
 			case MENU_SYNC:
-//				SharedPreferences.Editor edit = pref.edit();				
-//				edit.putString("Synced","true");
-//				edit.commit();
 				doSync();
 				return true;
 			case MENU_LOGOUT:
@@ -246,7 +229,7 @@ public class Sync extends Activity{
 				mProgress.setMessage(getString(R.string.Alert_uploadingSites));
 				
 				//Start Next Step
-				msgToThread.what = GET_SPECIES_ID;
+				msgToThread.what = UPLOAD_ADDED_SITE;
 				msgToThread.arg1 = mProgressVal;
 				break;
 			case GET_SPECIES_ID:
@@ -269,21 +252,29 @@ public class Sync extends Activity{
 				mProgress.setMessage(getString(R.string.Alert_uploadingPlants));
 				
 				//Trigger Next Step
-				msgToThread.what = UPLOAD_OBSERVATION;
+				msgToThread.what = UPLOAD_QUICK_CAPTURE_PLANT;
 				msgToThread.arg1 = mProgressVal;
 				break;
 			
-			case UPLOAD_ONE_TIME_OB:
+			case UPLOAD_QUICK_CAPTURE_PLANT:
 				mProgress.setProgress(mProgressVal);
 				mProgress.setMessage(getString(R.string.Alert_uploadingOneTimeOB));
 				
-				msgToThread.what = UPLOAD_OBSERVATION;
+				msgToThread.what = UPLOAD_QUICK_CAPTURE_OBSERVATION;
 				msgToThread.arg1 = mProgressVal;
 				break;	
-				
-			case UPLOAD_OBSERVATION:
+			// need to modify 	
+			case UPLOAD_QUICK_CAPTURE_OBSERVATION:
 				mProgress.setProgress(mProgressVal);
 				mProgress.setMessage(getString(R.string.Alert_uploadingObs));
+				
+				//Trigger Next Step
+				msgToThread.what = UPLOAD_OBSERVATION;
+				msgToThread.arg1 = mProgressVal;
+				break;
+			case UPLOAD_OBSERVATION:
+				mProgress.setProgress(mProgressVal);
+				mProgress.setMessage(getString(R.string.Alert_uploadingObs_Observations));
 				
 				//Trigger Next Step
 				//Check if this is done, then go next stage
@@ -319,16 +310,25 @@ public class Sync extends Activity{
 				mProgress.setMessage(getString(R.string.Alert_downloadingObs));
 				
 				//Trigger Next Step
-				msgToThread.what = DOWNLOAD_OBSERVATION_IMG;
+				msgToThread.what = DOWNLOAD_QUICK_CAPTURE_PLANT;
 				msgToThread.arg1 = mProgressVal;
 				break;
 		
-			case DOWNLOAD_ONE_TIME_OB:
+			case DOWNLOAD_QUICK_CAPTURE_PLANT:
 				mProgress.setProgress(mProgressVal);
 				mProgress.setMessage(getString(R.string.Alert_downloadingOneTimeOB));
 				
-				msgToThread.what = DOWNLOAD_ONE_TIME_OB;
+				msgToThread.what = DOWNLOAD_QUICK_CAPTURE_OBSERVATION;
 				msgToThread.arg1 = mProgressVal;
+				break;
+				
+			case DOWNLOAD_QUICK_CAPTURE_OBSERVATION:
+				mProgress.setProgress(mProgressVal);
+				mProgress.setMessage(getString(R.string.Alert_downloadingOneTimeOB));
+				
+				msgToThread.what = DOWNLOAD_OBSERVATION_IMG;
+				msgToThread.arg1 = mProgressVal;				
+
 				break;
 		
 			case DOWNLOAD_OBSERVATION_IMG:
@@ -422,8 +422,10 @@ class doSyncThread extends Thread{
 	final private int DOWNLOAD_OBSERVATION_IMG = 8;
 	final private int SYNC_COMPLETE = 9;
 	
-	final private int UPLOAD_ONE_TIME_OB = 10;
-	final private int DOWNLOAD_ONE_TIME_OB = 11;
+	final private int UPLOAD_QUICK_CAPTURE_PLANT = 10;
+	final private int UPLOAD_QUICK_CAPTURE_OBSERVATION = 11;
+	final private int DOWNLOAD_QUICK_CAPTURE_PLANT = 12;
+	final private int DOWNLOAD_QUICK_CAPTURE_OBSERVATION = 13;
 	
 	private String TAG = new String("SYNC");
 	
@@ -479,11 +481,9 @@ class doSyncThread extends Thread{
 			
 			//Open database
 	    	SyncDBHelper syncDBHelper = new SyncDBHelper(context);
-	    	SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
-	    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
+	    	
 	    	OneTimeDBHelper otDBHelper = new OneTimeDBHelper(context);
-	    	SQLiteDatabase otRDB = syncDBHelper.getReadableDatabase();
-	    	SQLiteDatabase otWDB = syncDBHelper.getWritableDatabase();
+	    	
 	    	
 	    	Cursor cursor;
 	    	String query;
@@ -535,6 +535,9 @@ class doSyncThread extends Thread{
 			case UPLOAD_ADDED_SITE:
 				msgToMain.what = UPLOAD_ADDED_SITE;
 				msgToMain.arg1 = mProgressVal + 3;
+				
+				SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
+		    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 				
 				query = "SELECT site_id, site_name, latitude, longitude, state, comments " +
 						"FROM my_sites WHERE synced=" + SyncDBHelper.SYNCED_NO;
@@ -593,11 +596,16 @@ class doSyncThread extends Thread{
 					}
 					
 				}
+				syncRDB.close();
+				syncWDB.close();
 				cursor.close();
 				break;
 			case UPLOAD_ADDED_PLANT:
 				msgToMain.what = UPLOAD_ADDED_PLANT;
 				msgToMain.arg1 = mProgressVal + 2;
+				
+				syncRDB = syncDBHelper.getReadableDatabase();
+
 				
 		    	//Open database cursor
 		    	query =	"SELECT species_id, site_id, active, common_name " +
@@ -653,35 +661,40 @@ class doSyncThread extends Thread{
 						Log.d(TAG, "UPLOAD_ADDED_PLANT: failed");
 					}
 				}
+				syncRDB.close();
 				cursor.close();
 				break;
 				
-			case UPLOAD_ONE_TIME_OB:
-				msgToMain.what = UPLOAD_ONE_TIME_OB;
+			case UPLOAD_QUICK_CAPTURE_PLANT:
+				msgToMain.what = UPLOAD_QUICK_CAPTURE_PLANT;
 				msgToMain.arg1 = mProgressVal + 2;
 		
-				query = "SELECT cname, sname, lat, lng, dt_taken, notes, photo_name FROM onetimeob " +
+				SQLiteDatabase otRDB = otDBHelper.getReadableDatabase();
+		    	//SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
+				
+				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname FROM onetimeob " +
 						"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = otRDB.rawQuery(query, null);
 				
 				if(cursor.getCount() == 0) {
+					otRDB.close();
 					cursor.close();
 					break;
 				}
 				else {
 					while(cursor.moveToNext()) {
-						String cname = cursor.getString(0);
-						String sname = cursor.getString(1);
-						double lat = cursor.getDouble(2);
-						double lng = cursor.getDouble(3);
-						String dt_taken = cursor.getString(4);
-						String notes = cursor.getString(5);	
-						String photo_name = cursor.getString(6);
+						int plant_id = cursor.getInt(0);
+						Log.i("K", "plant_id : " + plant_id);
+						int species_id = cursor.getInt(1);
+						int site_id = cursor.getInt(2);
+						int protocol_id = cursor.getInt(3);
+						String cname = cursor.getString(4);
+						String sname = cursor.getString(5);
 						
 						serverResponse = 
-							SyncNetworkHelper.upload_onetime_ob(username, password, cname, sname, lat, lng, dt_taken, notes, photo_name);
+							SyncNetworkHelper.upload_onetime_ob(username, password, plant_id, species_id, site_id, protocol_id, cname, sname);
 						
-						if(!serverResponse.equals("upload_ok")) {
+						if(!serverResponse.equals("UPLOADED_OK")) {
 							msgToMain.what = Sync.SERVER_ERROR;
 							msgToMain.obj = "Upload Error - One time Observation";
 							mLoop.quit();
@@ -689,7 +702,8 @@ class doSyncThread extends Thread{
 						}
 					}
 				}
-	
+				
+				otRDB.close();
 				cursor.close();
 				break;
 				
@@ -697,6 +711,9 @@ class doSyncThread extends Thread{
 				msgToMain.what = UPLOAD_OBSERVATION;
 		    	msgToMain.arg1 = mProgressVal;
 
+		    	syncRDB = syncDBHelper.getReadableDatabase();
+		    	syncWDB = syncDBHelper.getWritableDatabase();
+		   
 		    	//Open database cursor
 		    	query = "SELECT species_id, site_id, phenophase_id, time, note, image_id, _id " +
 		    			"FROM my_observation " +
@@ -750,11 +767,78 @@ class doSyncThread extends Thread{
 							"WHERE _id=" + cursor.getString(6)+";";
 					syncWDB.execSQL(query);
 				}
+				syncWDB.close();
 				cursor.close();
 				break;
+				
+			case UPLOAD_QUICK_CAPTURE_OBSERVATION:
+				
+				msgToMain.what = UPLOAD_QUICK_CAPTURE_OBSERVATION;
+		    	msgToMain.arg1 = mProgressVal;
+
+		    	otRDB = otDBHelper.getReadableDatabase();
+		    	
+		    	//Open database cursor
+		    	query = "SELECT plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes " +
+		    			"FROM onetimeob_observation " +
+		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
+		    	
+				cursor = otRDB.rawQuery(query, null);
+				
+				//Check if returned data is empty, then break switch statement
+				if(cursor.getCount() == 0){
+					msgToMain.arg1 = 30;
+			        msgToMain.arg2 = FINISH_INT;
+			        otRDB.close();
+					cursor.close();
+					break;
+				}else{
+			        msgToMain.arg2 = NOT_FINISH_INT;
+
+					while(cursor.moveToNext()) {
+						
+						
+						Log.i("K", cursor.getInt(0) + " , " + 
+								cursor.getInt(1) + " , " + 
+								cursor.getDouble(2) + " , " +
+								cursor.getDouble(3) + " , " +
+								cursor.getString(4) + " , " +
+								cursor.getString(5) + " , " +
+								cursor.getString(6));
+						
+						
+						serverResponse = SyncNetworkHelper.upload_quick_observations(username, password, context,
+								cursor.getInt(0),
+								cursor.getInt(1),
+								cursor.getDouble(2),
+								cursor.getDouble(3),
+								cursor.getString(4),
+								cursor.getString(5),
+								cursor.getString(6));
+						
+						if(!serverResponse.equals("UPLOADED_OK")) {
+							msgToMain.what = Sync.SERVER_ERROR;
+							msgToMain.obj = "Upload Error - One time Observation";
+							mLoop.quit();
+							
+							System.exit(0);
+							break;
+						}
+					}
+				}
+				
+				otRDB.close();
+				cursor.close();
+				break;
+				
+				
+
 			case DOWNLOAD_USER_STATION:
 				msgToMain.what = DOWNLOAD_USER_STATION;
 		    	msgToMain.arg1 = mProgressVal + 5;
+		    	
+		    	syncRDB = syncDBHelper.getReadableDatabase();
+		    	syncWDB = syncDBHelper.getWritableDatabase();
 		    	
 				serverResponse = SyncNetworkHelper.download_json(
 						context.getString(R.string.get_my_sites_URL)
@@ -793,7 +877,7 @@ class doSyncThread extends Thread{
 					syncWDB.execSQL("DELETE FROM my_sites;");
 					for(int i=0; i<jsonresult.length(); i++){
 						syncWDB.execSQL("INSERT INTO my_sites " +
-								"(site_id, site_name, latitude, longitude, state, comments, synced)" +
+								"(site_id, site_name, latitude, longitude, state, comments, synced, official)" +
 								"VALUES(" +
 								"'" + jsonresult.getJSONObject(i).getString("_id") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("name") + "'," +
@@ -801,18 +885,26 @@ class doSyncThread extends Thread{
 								"'" + jsonresult.getJSONObject(i).getString("longitude") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("state") + "'," +
 								"'" + jsonresult.getJSONObject(i).getString("comments") + "'," +
-								SyncDBHelper.SYNCED_YES + ");");
+								SyncDBHelper.SYNCED_YES + "," +
+								1 + ");");
 					}
 					Log.d(TAG, "DOWNLOAD_MY_SPECIES_IN_MY_STATION: success to store into db");
 				}catch(Exception e){
 					Log.e(TAG, e.toString());
 					Log.d(TAG, "DOWNLOAD_MY_SPECIES_IN_MY_STATION: failed to store into db");
 				}
+				
+				syncRDB.close();
+				syncWDB.close();
+				
 				break;
 			case DOWNLOAD_USER_PLANTS:
 				msgToMain.what = DOWNLOAD_USER_PLANTS;
 		    	msgToMain.arg1 = mProgressVal + 5;
 				
+		    	syncRDB = syncDBHelper.getReadableDatabase();
+		    	syncWDB = syncDBHelper.getWritableDatabase();
+		    	
 				serverResponse = SyncNetworkHelper
 				.download_json(context.getString(R.string.get_my_species_in_my_station_URL)
 						+"&username="+ username	+"&password="+ password);
@@ -885,11 +977,18 @@ class doSyncThread extends Thread{
 					Log.e(TAG, e.toString());
 					Log.d(TAG, "DOWNLOAD_USER_PLANTS: failed to store into db");
 				}
+				
+				syncRDB.close();
+				syncWDB.close();
+				
 				break;
 			case DOWNLOAD_OBSERVATION:
 				msgToMain.what = DOWNLOAD_OBSERVATION;
 		    	msgToMain.arg1 = mProgressVal + 5;
 				
+		    	syncRDB = syncDBHelper.getReadableDatabase();
+		    	syncWDB = syncDBHelper.getWritableDatabase();
+		    	
 				serverResponse = SyncNetworkHelper
 				.download_json(context.getString(R.string.get_observation_URL)
 						+"&username="+ username	+"&password="+ password);
@@ -940,17 +1039,173 @@ class doSyncThread extends Thread{
 				}catch(Exception e){
 					Log.e(TAG, e.toString());
 					Log.d(TAG, "DOWNLOAD_OBSERVATION: failed to store into db");
-				}						
+				}		
+				
+				syncRDB.close();
+				syncWDB.close();
+				
 				break;
 				
 			
 				
-			case DOWNLOAD_ONE_TIME_OB:
-				break;	
-			
+			case DOWNLOAD_QUICK_CAPTURE_PLANT:
+				msgToMain.what = DOWNLOAD_QUICK_CAPTURE_PLANT;
+		    	msgToMain.arg1 = mProgressVal + 5;
+		    	
+		    	Log.i("K", "Start DOWNLOAD_QUICK_CAPTURE_PLANT");
+		    	
+		    	SQLiteDatabase onetime = otDBHelper.getWritableDatabase();
+		    	
+		    	Log.i("K", "URL : " + context.getString(R.string.get_onetime_plant_URL)
+						+"?username="+ username	+"&password="+ password);
+		    	
+				serverResponse = SyncNetworkHelper
+				.download_json(context.getString(R.string.get_onetime_plant_URL)
+						+"?username="+ username	+"&password="+ password);
+				if(serverResponse == null){
+					msgToMain.what = DOWNLOAD_QUICK_CAPTURE_PLANT * -1;
+					mLoop.quit();
+					System.exit(0);
+				}
+				
+				try{
+					
+					Log.i("K", "SERVER RESPONSE : " + serverResponse);
+					
+					jsonobj = new JSONObject(serverResponse);
+					
+					//Server response check
+					if(jsonobj.getBoolean("success") == false){
+						msgToMain.what = Sync.SERVER_ERROR;
+						msgToMain.obj = jsonobj.getString("error_message");
+						mLoop.quit();
+						break;
+					}
+					
+					if(jsonobj.getString("results").equals("ONETIME PLANT LIST IS EMPTY")){
+						//User plant list is empty. Later PlantList activity prompts user
+						// to add new plant.
+						onetime.close();
+						break;
+					}
+		
+					jsonresult = new JSONArray(jsonobj.getString("results"));
+					// delete first
+					onetime.execSQL("DELETE FROM onetimeob;");
+					for(int i=0; i<jsonresult.length(); i++){
+						
+						onetime.execSQL("INSERT INTO onetimeob " +
+								"(plant_id, species_id, site_id, protocol_id, cname, sname, synced)" +
+								"VALUES(" +
+								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
+								jsonresult.getJSONObject(i).getString("Species_ID") + "," +
+								jsonresult.getJSONObject(i).getString("Site_ID") + "," +
+								jsonresult.getJSONObject(i).getString("Protocol_ID") + ",'" +
+								jsonresult.getJSONObject(i).getString("Common_Name") + "','" +
+								jsonresult.getJSONObject(i).getString("Science_Name") + "'," +
+								SyncDBHelper.SYNCED_YES + ");");
+					}
+					onetime.close();
+					Log.d(TAG, "DOWNLOAD_ONETIME_PLANTS: success to store into db");
+
+				}catch(Exception e){
+					Log.e(TAG, e.toString());
+					Log.d(TAG, "DOWNLOAD_ONETIME_PLANTS: failed to store into db");
+				}
+				
+				break;
+				
+				
+			case DOWNLOAD_QUICK_CAPTURE_OBSERVATION:
+				
+				Log.i("K", "Start DOWNLOAD_QUICK_CAPTURE_OBSERVATION");
+				
+				msgToMain.what = DOWNLOAD_QUICK_CAPTURE_OBSERVATION;
+		    	msgToMain.arg1 = mProgressVal + 5;
+		    	
+		    	onetime = otDBHelper.getWritableDatabase();
+		    	
+		    	Log.i("K", "URL : " + context.getString(R.string.get_onetime_observation_URL)
+						+"?username="+ username	+"&password="+ password);
+		    	
+				serverResponse = SyncNetworkHelper
+				.download_json(context.getString(R.string.get_onetime_observation_URL)
+						+"?username="+ username	+"&password="+ password);
+				if(serverResponse == null){
+					msgToMain.what = DOWNLOAD_QUICK_CAPTURE_PLANT * -1;
+					mLoop.quit();
+					System.exit(0);
+				}
+				
+				try{
+					
+					Log.i("K", "SERVER RESPONSE : " + serverResponse);
+					
+					jsonobj = new JSONObject(serverResponse);
+					
+					//Server response check
+					if(jsonobj.getBoolean("success") == false){
+						msgToMain.what = Sync.SERVER_ERROR;
+						msgToMain.obj = jsonobj.getString("error_message");
+						mLoop.quit();
+						break;
+					}
+					
+					if(jsonobj.getString("results").equals("ONETIME OBSERVATION LIST IS EMPTY")){
+						//User plant list is empty. Later PlantList activity prompts user
+						// to add new plant.
+						onetime.close();
+						break;
+					}
+		
+					jsonresult = new JSONArray(jsonobj.getString("results"));
+					// empty items in the onetimeob_observation table
+					onetime.execSQL("DELETE FROM onetimeob_observation;");
+					for(int i=0; i<jsonresult.length(); i++){
+						
+						String has_image_flag = jsonresult.getJSONObject(i).getString("Has_Image");
+						int image_flag = Integer.parseInt(has_image_flag);
+						
+						String image_name = "";
+						if(image_flag == 1) {
+							image_name = "quick_" + jsonresult.getJSONObject(i).getString("Image_ID");
+						}
+						
+						
+						onetime.execSQL("INSERT INTO onetimeob_observation " +
+								"(plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes, synced)" +
+								"VALUES(" +
+								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
+								jsonresult.getJSONObject(i).getString("Phenophase_ID") + "," +
+								jsonresult.getJSONObject(i).getString("Latitude") + "," +
+								jsonresult.getJSONObject(i).getString("Longitude") + ",'" +
+								image_name + "','" +
+								jsonresult.getJSONObject(i).getString("Dates") + "','" +
+								jsonresult.getJSONObject(i).getString("Notes") + "'," +
+								SyncDBHelper.SYNCED_YES + ");");
+	
+						
+						if(image_flag == 1) {
+							SyncNetworkHelper.download_image_for_onetime(context.getString(R.string.download_onetime_image_URL), Integer.parseInt(jsonresult.getJSONObject(i).getString("Image_ID")));
+						}
+					}
+					onetime.close();
+					Log.d(TAG, "DOWNLOAD_ONETIME_OBSERVATIONS: success to store into db");
+
+				}catch(Exception e){
+					Log.e(TAG, e.toString());
+					Log.d(TAG, "DOWNLOAD_ONETIME_OBSERVATIONS: failed to store into db");
+				}
+				
+				break;
+				
+							
 			case DOWNLOAD_OBSERVATION_IMG:
 				msgToMain.what = DOWNLOAD_OBSERVATION_IMG;
 		    	msgToMain.arg1 = mProgressVal;
+		    	
+		    	syncRDB = syncDBHelper.getReadableDatabase();
+		    	syncWDB = syncDBHelper.getWritableDatabase();
 		    	
 				cursor = syncRDB.rawQuery("SELECT image_id, _id FROM my_observation" +
 						" WHERE synced=" + SyncDBHelper.IMG_FILE_NEED_TO_BE_DOWNLOADED +
@@ -975,6 +1230,7 @@ class doSyncThread extends Thread{
 						"WHERE _id=" + cursor.getString(1)+";";
 						syncWDB.execSQL(query);
 						
+						syncWDB.close();
 						cursor.close();
 						break;
 					}
@@ -999,9 +1255,11 @@ class doSyncThread extends Thread{
 					"SET synced="+ SyncDBHelper.SYNCED_YES + " " +
 					"WHERE _id=" + cursor.getString(1)+";";
 					syncWDB.execSQL(query);
-					
+					syncWDB.close();
 					cursor.close();
 				}
+				syncRDB.close();
+				syncWDB.close();
 				break;
 			
 			case SYNC_COMPLETE:

@@ -42,7 +42,7 @@
 <activity android:name="AddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddSite" android:theme="@android:style/Theme.Light" android:label="AddSite" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
 <activity android:name=".onetime.Observation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
@@ -66,7 +66,6 @@
 
 <activity android:name=".onetime.SummarySpecies" android:theme="@android:style/Theme.Light"></activity>
 
-<activity android:name="PlantInformation" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
@@ -83,6 +82,7 @@
 <activity android:name=".onetime.QuickCapture" android:configChanges="orientation|keyboardHidden"></activity>
 
 
+<activity android:name="GetPhenophase_OneTime" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 

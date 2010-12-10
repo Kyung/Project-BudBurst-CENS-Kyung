@@ -34,7 +34,8 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import cens.ucla.edu.budburst.PlantInformation;
+import cens.ucla.edu.budburst.AddSite;
+import cens.ucla.edu.budburst.GetPhenophase_OneTime;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -49,6 +50,7 @@ public class Flora_Observer extends ListActivity{
 	private int DECIDUOUS_TREES = 2;
 	private int EVERGREEN_TREES = 3;
 	private int CONIFERS = 4;
+	private int FROM_QUICK_CAPTURE = 101;
 	
 	private StaticDBHelper staticDBHelper = null;
 	private SQLiteDatabase staticDB = null;
@@ -63,6 +65,7 @@ public class Flora_Observer extends ListActivity{
 	private TextView myTitleText = null;
 	
 	private int current_position = 0;
+	private int pheno_id = 0;
 	private String camera_image_id = null;
 	private double latitude = 0.0;
 	private double longitude = 0.0;
@@ -87,8 +90,9 @@ public class Flora_Observer extends ListActivity{
 		latitude = p_intent.getExtras().getDouble("latitude");
 		longitude = p_intent.getExtras().getDouble("longitude");
 		dt_taken = p_intent.getExtras().getString("dt_taken");
+		pheno_id = p_intent.getExtras().getInt("pheno_id");
 		
-		Log.i("K", "camera_image_id : " + camera_image_id);
+		Log.i("K", "Flora_OBSERVER = camera_image_id : " + camera_image_id + " , pheno_id : " + pheno_id);
 		
 		
 		rb1 = (RadioButton)findViewById(R.id.option1);
@@ -282,41 +286,21 @@ public class Flora_Observer extends ListActivity{
 		}
 	};
 	
-	/////////////////////////////////////////////////////////////
-	//Menu option
-	public boolean onCreateOptionsMenu(Menu menu){
-		super.onCreateOptionsMenu(menu);
-		
-		menu.add(0,1,0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
-			
-		return true;
-	}
-	
-	//Menu option selection handling
-	public boolean onOptionsItemSelected(MenuItem item){
-		Intent intent;
-		switch(item.getItemId()){
-			case 1:
-				intent = new Intent(Flora_Observer.this, Queue.class);
-				startActivity(intent);
-				return true;
-		}
-		return false;
-	}
-	/////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
-		Intent intent = new Intent(Flora_Observer.this, GetPhenophase.class);
+		Intent intent = new Intent(Flora_Observer.this, AddSite.class);
 		intent.putExtra("cname", arPlantList.get(position).CommonName);
 		intent.putExtra("sname", arPlantList.get(position).SpeciesName);
 		intent.putExtra("dt_taken", dt_taken);
 		intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
+		intent.putExtra("pheno_id", pheno_id);
 		intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
 		intent.putExtra("camera_image_id", camera_image_id);
 		intent.putExtra("latitude", latitude);
 		intent.putExtra("longitude", longitude);
+		intent.putExtra("from", FROM_QUICK_CAPTURE);
 		
 		startActivity(intent);
 	}

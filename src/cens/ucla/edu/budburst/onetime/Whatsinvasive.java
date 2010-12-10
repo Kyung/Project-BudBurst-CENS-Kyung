@@ -63,7 +63,6 @@ import android.widget.Toast;
 import cens.ucla.edu.budburst.AddPlant;
 import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.Login;
-import cens.ucla.edu.budburst.PlantInformation;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
@@ -105,6 +104,7 @@ public class Whatsinvasive extends ListActivity {
 	private int EVERGREEN_TREES = 6;
 	private int EVERGREEN_TREES_WIND = 7;
 	private int CONIFERS = 8;
+	private int WHATSINVASIVE = 1000;
 	public final String TEMP_PATH = "/sdcard/pbudburst/wi_list/";
 	protected static int GET_AREA_LIST = 1;
 	protected static int TO_WI_INFO = 2;
@@ -478,7 +478,7 @@ public class Whatsinvasive extends ListActivity {
 		else {
 			
 			Intent intent = new Intent(Whatsinvasive.this, GetPhenophase.class);
-			intent.putExtra("from", "Whatsinvasive");
+			intent.putExtra("from", WHATSINVASIVE);
 			intent.putExtra("cname", arSpeciesList.get(position).common_name);
 			intent.putExtra("sname", arSpeciesList.get(position).science_name);
 			intent.putExtra("protocol_id", protocol_id);

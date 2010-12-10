@@ -107,8 +107,8 @@ public class QuickCapture extends Activity {
 						// TODO Auto-generated method stub
 						String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 						
-						Intent intent = new Intent(QuickCapture.this, OneTimeMain.class);
-						intent.putExtra("imagePath", "none");
+						Intent intent = new Intent(QuickCapture.this, GetPhenophase.class);
+						intent.putExtra("camera_image_id", "");
 						intent.putExtra("latitude", latitude);
 						intent.putExtra("longitude", longitude);
 						intent.putExtra("dt_taken", currentDateTimeString);
@@ -149,7 +149,7 @@ public class QuickCapture extends Activity {
 				
 				Bitmap bitmap = media.ShowPhotoTaken(BASE_PATH + camera_image_id + ".jpg");
 				
-				Intent intent = new Intent(QuickCapture.this, OneTimeMain.class);
+				Intent intent = new Intent(QuickCapture.this, GetPhenophase.class);
 				intent.putExtra("camera_image_id", camera_image_id);
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);

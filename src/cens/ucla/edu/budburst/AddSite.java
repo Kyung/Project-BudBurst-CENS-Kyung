@@ -24,6 +24,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -34,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -43,23 +45,32 @@ import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
 import cens.ucla.edu.budburst.onetime.MyNearestPlants;
+import cens.ucla.edu.budburst.onetime.OneTimeMain;
 
 public class AddSite extends Activity{
 
 	final String TAG = "AddSite.class";
-	final Integer SELECT_PLANT_NAME = 100;
+	private Integer UNOFFICIAL = 0;
+	private Integer OFFICIAL = 1;
+	private Integer FROM_PLANT_LIST = 100;
+	private Integer FROM_QUICK_CAPTURE = 101;
 	private Integer species_id;
 	private Integer pheno_id;
 	private Integer protocol_id;
-	private Double lat;
-	private Double lon;
-	private String image_name;
+	private Integer previous_activity;
+	
+	private Double latitude = 0.0;
+	private Double longitude = 0.0;
+	
+	private String camera_image_id;
 	private String notes;
 	private String dt_taken;
-	private Integer previous_activity;
+	private String selectedState = "";
+	
 	private String species_name;
-	private EditText latitude;
-	private EditText longitude;
+	
+	private EditText latEdit;
+	private EditText lngEdit;
 	private EditText sitename;
 	private EditText comment;
 	private EditText et1;
@@ -67,15 +78,15 @@ public class AddSite extends Activity{
 	private Button Shading;
 	private Button Irrigation;
 	private Button Habitat;
+	
 	private Location cur_location = null;
 	private LocationManager lmanager = null;
 	ArrayAdapter<CharSequence> adspin;
-	private String selectedState = "";
-	private static GpsListener gpsListener;
 	
+	private static GpsListener gpsListener;
+	private FunctionsHelper helper;
 	
 	//protected String[] list_hdistance = {getString(R.string.AddSite_Urban_Highly_Modified), getString(R.string.AddSite_Suburban), getString(R.string.AddSite_Rural), getString(R.string.AddSite_Wildland_or_natural_area)};
-	
 	//protected String[] list_shading = {getString(R.string.AddSite_Open), getString(R.string.AddSite_Partially_Shaded), getString(R.string.AddSite_Shaded)};
 	//protected String[] list_irrigation = {getString(R.string.AddSite_Irrigated_Regualarly), getString(R.string.AddSite_Not_Irrigated)};
 	//protected String[] list_habitat = {getString(R.string.AddSite_Field_or_grassland), getString(R.string.AddSite_Vegetable_or_flower_garden), getString(R.string.AddSite_Lawn), getString(R.string.AddSite_Pavement_over_50_of_area), getString(R.string.AddSite_Desert_or_dunes), getString(R.string.AddSite_Shrub_thicket), getString(R.string.AddSite_Forest_or_woodland), getString(R.string.AddSite_Edge_of_forest_or_woodland), getString(R.string.AddSite_Stream_lake_pond_edge)};
@@ -98,8 +109,8 @@ public class AddSite extends Activity{
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		latitude = (EditText)this.findViewById(R.id.latitude);
-		longitude = (EditText)this.findViewById(R.id.longitude);
+		latEdit = (EditText)this.findViewById(R.id.latitude);
+		lngEdit = (EditText)this.findViewById(R.id.longitude);
 		myTitleText.setText("  " + getString(R.string.AddSite_addSite));
 		
 		lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -109,16 +120,41 @@ public class AddSite extends Activity{
 		         createLocationServiceDisabledAlert();  
 		}
 		
+		LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
+		ll.setVisibility(View.GONE);
+		
+		helper = new FunctionsHelper();
+		
+		
+		
+		
 		Intent p_intent = getIntent();
 		previous_activity = p_intent.getExtras().getInt("from");
-		if(previous_activity == SELECT_PLANT_NAME) {
+		
+		Log.i("K", "previous_activity : " + previous_activity);
+		
+		if(previous_activity == FROM_PLANT_LIST) {
+			species_id = p_intent.getExtras().getInt("species_id");
+			species_name = p_intent.getExtras().getString("species_name");
+			protocol_id = p_intent.getExtras().getInt("protocol_id");
+			pheno_id = p_intent.getExtras().getInt("pheno_id");
+			camera_image_id = p_intent.getExtras().getString("camera_image_id");
+			dt_taken = p_intent.getExtras().getString("dt_taken");
+			notes = p_intent.getExtras().getString("notes");
+			
+			Log.i("K", "FROM_PLANT_LIST //// species_id : " + species_id + " , pheno_id : " + pheno_id + " , camera_image_id : " + camera_image_id + " ,dt_taken : " + dt_taken);
+		}
+		else if(previous_activity == FROM_QUICK_CAPTURE){
 			species_id = p_intent.getExtras().getInt("species_id");
 			species_name = p_intent.getExtras().getString("cname");
 			protocol_id = p_intent.getExtras().getInt("protocol_id");
 			pheno_id = p_intent.getExtras().getInt("pheno_id");
-			image_name = p_intent.getExtras().getString("camera_image_id");
+			camera_image_id = p_intent.getExtras().getString("camera_image_id");
 			dt_taken = p_intent.getExtras().getString("dt_taken");
-			notes = p_intent.getExtras().getString("notes");
+			//notes = p_intent.getExtras().getString("notes");
+			ll.setVisibility(View.VISIBLE);
+			
+			Log.i("K", "FROM_QUICK_CAPTURE //// species_id : " + species_id + " , pheno_id : " + pheno_id + " , camera_image_id : " + camera_image_id + " ,dt_taken : " + dt_taken);
 		}
 		else {
 			species_id = p_intent.getExtras().getInt("species_id");
@@ -131,6 +167,26 @@ public class AddSite extends Activity{
 		lmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
 		
 		
+		Button doneBtn = (Button) findViewById(R.id.submit);
+		doneBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+					helper.insertNewPlantToDB(AddSite.this, species_id, 0, 0, species_name, "");
+					int getID = helper.getID(AddSite.this);
+					helper.insertNewObservation(AddSite.this, getID, pheno_id, latitude, longitude, camera_image_id, dt_taken, "");
+					
+					//helper.insertNewPlantToDB(GetPhenophase.this, species_id, 0, protocol_id, cname, sname, latitude, longitude, dt_taken, "", camera_image_id);
+					Toast.makeText(AddSite.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+					
+					Intent intent = new Intent(AddSite.this, PlantList.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+			}
+		});
 		/*
 		// start GPS
 		Criteria criteria = new Criteria();
@@ -237,21 +293,6 @@ public class AddSite extends Activity{
 				builder.show();
 			}
 		});
-		
-		
-		
-		//Cancel button handler
-		/*
-		Button cancelButton = (Button)this.findViewById(R.id.cancel);	
-		cancelButton.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				finish();
-			}
-		});
-		*/
 
 		//Save button handler
 		Button saveButton = (Button)this.findViewById(R.id.save);	
@@ -262,10 +303,11 @@ public class AddSite extends Activity{
 
 				
 				if(selectedState.equals("")) {
-					Toast.makeText(AddSite.this, "Still getting GPS data...", Toast.LENGTH_SHORT).show();
+					Toast.makeText(AddSite.this, getString(R.string.Not_Finish_GPS), Toast.LENGTH_SHORT).show();
 					
 				}
 				else {
+				
 					SyncDBHelper syncDBHelper = new SyncDBHelper(AddSite.this);
 					SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 
@@ -273,13 +315,13 @@ public class AddSite extends Activity{
 						String usertype_stname = sitename.getText().toString();
 
 						//Check site name is empty
-						if(usertype_stname.equals("")){
+						if(previous_activity == FROM_PLANT_LIST && usertype_stname.equals("")){
 							Toast.makeText(AddSite.this,getString(R.string.AddSite_checkSiteName), Toast.LENGTH_SHORT).show();
 							InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 							imm.hideSoftInputFromWindow(sitename.getWindowToken(), 0);
 							return;
 						}
-
+						
 						//Check if site name is duplicated
 						String query = "SELECT site_id FROM my_sites WHERE site_name='" 
 							+ usertype_stname + "';";
@@ -297,25 +339,40 @@ public class AddSite extends Activity{
 						
 						long epoch = System.currentTimeMillis()/1000;
 						
+						int official = OFFICIAL;
+						int synced = 9;
+						
+						if(usertype_stname.equals("")) {
+							usertype_stname = "Unknown Site";
+							official = UNOFFICIAL;
+							synced = SyncDBHelper.SYNCED_YES;
+						}
+						else {
+							official = OFFICIAL;
+							synced = SyncDBHelper.SYNCED_NO;
+						}
+						
 						query = "INSERT INTO my_sites VALUES(" +
 						"null, " + 
 						"'" + epoch + "'," + 
 						"'" + usertype_stname + "'," +
-						"'" + latitude.getText().toString() + "'," + 
-						"'" + longitude.getText().toString() + "'," +
+						"'" + latEdit.getText().toString() + "'," + 
+						"'" + lngEdit.getText().toString() + "'," +
 						"'" + selectedState + "'," +
 						"'" + comment.getText().toString() + "'," +
 						"'" + Human_Disturbance.getText().toString() + "'," +
 						"'" + Shading.getText().toString() + "'," +
 						"'" + Irrigation.getText().toString() + "'," +
-						"'" + Habitat.getText().toString() + "'," +		
-						SyncDBHelper.SYNCED_NO + ");";
+						"'" + Habitat.getText().toString() + "'," +
+						official + "," + 
+						synced + ");";
 						
 						
 						syncWDB.execSQL(query);
 						cursor.close();
 						
-						if(species_id == 999) {
+						// species from quick_capture will not show the additional dialog for adding species name...
+						if(previous_activity == FROM_PLANT_LIST && species_id == 999) {
 							Dialog dialog = new Dialog(AddSite.this);
 							
 							dialog.setContentView(R.layout.species_name_custom_dialog);
@@ -338,7 +395,7 @@ public class AddSite extends Activity{
 								}
 							});
 						}
-						else {
+						else{
 							insertDB();
 						}
 						
@@ -357,19 +414,35 @@ public class AddSite extends Activity{
 		SQLiteDatabase syncDB = syncDBHeler.getReadableDatabase();
 		
 		Cursor c = syncDB.rawQuery("SELECT site_id, site_name FROM my_sites WHERE latitude='" 
-				+ latitude.getText().toString() + "';", null);
+				+ latEdit.getText().toString() + "';", null);
 		while(c.moveToNext()) {
 			Log.i("K", "SPECIES_ID : " + species_id + " SPECIES NAME : " + species_name +
 					" SITE ID : " + c.getString(0) + " NAME : " + c.getString(1));
 			
-			// if the previous activity == GetPhenophase.java
-			if(previous_activity == SELECT_PLANT_NAME) {
+			Log.i("K", "previous_activity : " + previous_activity);
+			
+			// if the activity is from QUICK_CAPTURE
+			if(previous_activity == FROM_QUICK_CAPTURE) {
 				FunctionsHelper helper = new FunctionsHelper();
 				helper.insertNewPlantToDB(AddSite.this, species_id, Integer.parseInt(c.getString(0)), 9, species_name, "");
 				int getID = helper.getID(AddSite.this);
-				helper.insertNewObservation(AddSite.this, getID, protocol_id, Double.parseDouble(latitude.getText().toString()), Double.parseDouble(longitude.getText().toString()), image_name, dt_taken, "");
+
+				helper.insertNewObservation(AddSite.this, getID, pheno_id, latitude, longitude, camera_image_id, dt_taken, "");
+				
+				Intent intent = new Intent(AddSite.this, PlantList.class);
+				Toast.makeText(AddSite.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+				//clear all stacked activities.
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				
+				// add vibration when done
+				Toast.makeText(AddSite.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+				Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+				vibrator.vibrate(1000);
+				
+				finish();
 			}
-			// if the previous activity == AddPlant.java
+			// if other previous activities
 			else {
 				if(insertNewPlantToDB(species_id, species_name, Integer.parseInt(c.getString(0)), c.getString(1))){
 					Intent intent = new Intent(AddSite.this, PlantList.class);
@@ -377,6 +450,10 @@ public class AddSite extends Activity{
 					//clear all stacked activities.
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
+					
+					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+					vibrator.vibrate(1000);
+					
 					finish();
 				}else{
 					Toast.makeText(AddSite.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
@@ -465,13 +542,13 @@ public class AddSite extends Activity{
 			if(loc != null) {
 				Log.i("K", "LOCATION CHANGED!! ");
 				// get current location value
-				lat = loc.getLatitude();
-				lon = loc.getLongitude();
-				String strLoc = String.format("%10.6f / %10.6f", lat, lon);
+				latitude = loc.getLatitude();
+				longitude = loc.getLongitude();
+				String strLoc = String.format("%10.6f / %10.6f", latitude, longitude);
 				
 				Geocoder gc = new Geocoder(AddSite.this, Locale.getDefault());
 				try {
-					List<Address> addr = gc.getFromLocation(lat, lon, 1);
+					List<Address> addr = gc.getFromLocation(latitude, longitude, 1);
 					StringBuilder sb = new StringBuilder();
 					
 					if(addr.size() > 0) {
@@ -482,14 +559,14 @@ public class AddSite extends Activity{
 						sb.append(address.getLocality()).append(", ").append(address.getAdminArea()).append("\n");
 						sb.append(address.getCountryName()).append(", ").append(address.getPostalCode());
 						
-						longitude.setText(sb.toString());
+						lngEdit.setText(sb.toString());
 						
 						// when get the data, stop GPS
 						lmanager.removeUpdates(gpsListener);
 						Toast.makeText(AddSite.this, getString(R.string.AddSite_gotGPS), Toast.LENGTH_SHORT).show();
 					}
 					else {
-						longitude.setText(getString(R.string.Alert_gettingGPS));
+						lngEdit.setText(getString(R.string.Alert_gettingGPS));
 					}
 		
 				}
@@ -497,7 +574,7 @@ public class AddSite extends Activity{
 					
 				}
 				
-				latitude.setText("" + strLoc);
+				latEdit.setText("" + strLoc);
 			}
 		}
 		@Override

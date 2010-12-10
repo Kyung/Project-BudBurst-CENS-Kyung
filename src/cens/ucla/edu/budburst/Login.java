@@ -1,4 +1,5 @@
 package cens.ucla.edu.budburst;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,8 @@ public class Login extends Activity{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		
+		OneTimeDBHelper onetime = new OneTimeDBHelper(Login.this);
 		
 		textUsername = (TextView)findViewById(R.id.username_text);
 		textPassword = (TextView)findViewById(R.id.password_text);

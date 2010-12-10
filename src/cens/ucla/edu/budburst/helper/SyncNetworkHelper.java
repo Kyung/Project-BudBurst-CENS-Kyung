@@ -127,51 +127,41 @@ public class SyncNetworkHelper extends Activity{
 		
 		return null;
 	}
-	
-	static public String upload_onetime_ob(String username, String password, String cname, String sname, Double lat, 
-			Double lng, String dt_taken, String note, String photo_name) {
+
+	static public String upload_onetime_ob(String username, String password, int plant_id, int species_id, int site_id,
+			int protocol_id, String cname, String sname) {
 		try{
+			
+			Log.i("K", "plant id : " + plant_id + " species_id : " + species_id + " site_id : " + site_id + " protocol_id : " + protocol_id + " cname : " + cname + " sname : " + sname);
+			
 	        // Add your data  
-			MultipartEntity entity = new MultipartEntity();
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 			HttpClient httpClient = new DefaultHttpClient();
 	        String result = null;
-			
-			String latitude = lat.toString();
-			String longitude = lng.toString();
-			    
-			String url = new String("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service?username=" + username + "&password=" + password);
+    
+			String url = new String("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_plant.php?username=" + username + "&password=" + password);
 		    HttpPost httpPost = new HttpPost(url);
-
-		    entity.addPart("cname", new StringBody(cname));  
-		    entity.addPart("sname", new StringBody(sname));
-		    entity.addPart("latitude", new StringBody(latitude));
-		    entity.addPart("longitude", new StringBody(longitude));
-		    entity.addPart("dt_taken", new StringBody(dt_taken));
-		    entity.addPart("note", new StringBody(note));
 		    
-		    if(!photo_name.equals("")){
-			    File file = new File("/sdcard/pbudburst/" + photo_name.toString() + ".jpg");
-	        	entity.addPart("image", new FileBody(file));
-		    }
-        	
-			httpPost.setEntity(entity);
-			
-			//Log.i("K", "HTTP POST : " + httpPost);
-			
+		    nameValuePairs.add(new BasicNameValuePair("plant_id", Integer.toString(plant_id))); 
+        	nameValuePairs.add(new BasicNameValuePair("species_id", Integer.toString(species_id)));  
+        	nameValuePairs.add(new BasicNameValuePair("protocol_id", Integer.toString(protocol_id)));  
+        	nameValuePairs.add(new BasicNameValuePair("site_id", Integer.toString(site_id)));  
+        	nameValuePairs.add(new BasicNameValuePair("cname", cname));
+        	nameValuePairs.add(new BasicNameValuePair("sname", sname));
+        	httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+
 			HttpResponse response = httpClient.execute(httpPost);
-			
-			//Log.i("K", "Response from the server : " + response.toString());
 			
 			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				
 				BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent())); 
 	        	String line = br.readLine();
 				
-				Log.i("K", "Result : " + line);
+				Log.i("K", "Result(upload onetime ob) : " + line);
 				
 				if(line.equals("UPLOADED_OK")) {
-					
-					return "upload_ok";
+					return "UPLOADED_OK";
 				}
 				else {
 					Log.e("K", "UPLOADED FAILED!!");
@@ -232,6 +222,65 @@ public class SyncNetworkHelper extends Activity{
 			return null;
 		}
 	}
+	
+	
+	static public String upload_quick_observations(String username, String password, Context context,
+			Integer plant_id, Integer phenophase_id, Double latitude, Double longitude, String image_id,
+			String dt_taken, String notes) {
+		
+		try {
+			String result = null;
+			
+			HttpClient httpClient = new DefaultHttpClient();
+		    String url = new String("" +
+		    		"http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_observation.php?username=" +
+		    		username+"&password="+password);
+		    
+		    Log.i("K", "URL : " + url);
+		    HttpPost httppost = new HttpPost(url);
+
+		    Log.i("K", "plant_id " + plant_id + " phenophase_id : " + phenophase_id + " latitude : " + latitude + " longitude : " + longitude + " date : " + dt_taken + " notes : " + notes);
+		    
+        	MultipartEntity entity = new MultipartEntity();
+        	entity.addPart("plant_id", new StringBody(Integer.toString(plant_id)));
+        	entity.addPart("phenophase_id", new StringBody(Integer.toString(phenophase_id)));
+        	entity.addPart("latitude", new StringBody(latitude.toString()));
+        	entity.addPart("longitude", new StringBody(longitude.toString()));
+        	entity.addPart("date", new StringBody(dt_taken));
+        	entity.addPart("note", new StringBody(notes));
+
+        	File file = new File("/sdcard/pbudburst/" + image_id.toString() + ".jpg");
+		    if(file.exists()) {
+		    	Log.i("K", "=============FILE IS IN THE SDCARD=============");
+		    	entity.addPart("image", new FileBody(file));
+		    }
+		   
+		    httppost.setEntity(entity);
+        	
+	        // Execute HTTP Post Request  
+        	HttpResponse response = httpClient.execute(httppost);
+        
+			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				
+				BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent())); 
+	        	String line = br.readLine();
+				
+				Log.i("K", "Result(upload onetime ob) : " + line);
+				if(line.equals("UPLOADED_OK")) {
+					return "UPLOADED_OK";
+				}
+				else {
+					Log.e("K", "UPLOADED FAILED!!");
+				}
+			}
+		}
+		catch(Exception e){
+			Log.e(TAG, e.toString());
+			return null;
+		}
+		
+		return null;
+	}
 
 	
 	static public String upload_new_obs(String username, String password, Context cont,
@@ -243,7 +292,7 @@ public class SyncNetworkHelper extends Activity{
 
 			HttpClient httpclient = new DefaultHttpClient();  
 		    String url = new String("" +
-		    		"http://cens.solidnetdns.com/~jinha/PBB/PBsite_CENS/phone/phone_service.php" +
+		    		"http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php" +
 		    		"?submit_obs&username=" +
 		    		username+"&password="+password);
 		    HttpPost httppost = new HttpPost(url);
@@ -254,8 +303,10 @@ public class SyncNetworkHelper extends Activity{
         	entity.addPart("phenophase_id", new StringBody(phenophase_id));
         	entity.addPart("time", new StringBody(time));
         	entity.addPart("note", new StringBody(note));
+        	
+        	Log.i("K", "image_id.toString() : " + image_id.toString());
 
-		    if(!image_id.equals("")){
+		    if(!image_id.toString().equals("")){
 			    File file = new File("/sdcard/pbudburst/" + image_id.toString() + ".jpg");
 	        	entity.addPart("image", new FileBody(file));
 		    }
@@ -278,6 +329,9 @@ public class SyncNetworkHelper extends Activity{
 	//Download data
 	static public String download_json(String url_addr){
 		StringBuilder result = new StringBuilder();
+		
+		Log.i("K", "IN DOWNLOAD JSON");
+		
 		try{
 			URL url = new URL(url_addr);
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -333,6 +387,28 @@ public class SyncNetworkHelper extends Activity{
 		}catch(Exception e){
 			Log.e(TAG,e.toString());
 			return false;
+		}
+	}
+	
+	
+	//Download image
+	static public void download_image_for_onetime(String url_addr, int image_id){
+		try{
+			String BASE_PATH = "/sdcard/pbudburst/";
+			
+			if(!new File(BASE_PATH).exists()){
+				try{new File(BASE_PATH).mkdirs();}
+				catch(Exception e){
+					Log.e(TAG, e.toString());
+				}
+			}
+
+			String image_URL = url_addr + "?image_id=" + image_id;
+			String path  = BASE_PATH + "quick_" + image_id + ".jpg";
+			ContentDownloader downloader = new ContentDownloader(image_URL);
+			downloader.downloadContentsTo(path);
+		}catch(Exception e){
+			Log.e(TAG,e.toString());
 		}
 	}
 }

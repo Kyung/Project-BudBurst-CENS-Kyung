@@ -66,6 +66,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"shading TEXT, " +
 				"irrigation TEXT, " +
 				"habitat TEXT, " +
+				"official NUMERIC DEFAULT 1, " +
 				"synced NUMERIC);");
 		//If syned is
 		// : 5, then this site is synced with server

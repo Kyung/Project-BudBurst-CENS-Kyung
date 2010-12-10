@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -58,8 +59,6 @@ public class SpeciesDetail extends Activity {
 		Intent intent = getIntent();
 	    species_id = intent.getExtras().getInt("id");
 	    site_id = intent.getExtras().getInt("site_id");
-	    
-	    
 	    
 	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
 	    
@@ -124,7 +123,7 @@ public class SpeciesDetail extends Activity {
 	 	    
 		    if(cursor.getInt(0) > 76) {
 		    	image2.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-		    	vf.addView(itemView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		    	vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		    }
 
 			db = sDBH.getReadableDatabase();
@@ -141,7 +140,7 @@ public class SpeciesDetail extends Activity {
 				note.setText("" + cursor2.getString(3) + " ");
 				image2.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor2.getInt(0), null, null));
 				 	    
-				vf.addView(itemView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		    }
 			cursor2.close();
 

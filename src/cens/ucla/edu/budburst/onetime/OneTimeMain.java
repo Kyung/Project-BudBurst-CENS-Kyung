@@ -32,6 +32,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
@@ -54,36 +55,50 @@ import android.widget.Toast;
 public class OneTimeMain extends ListActivity {
 
 	ArrayList<Button> buttonBar = new ArrayList<Button>();
-	private MyListAdapter mylistapdater;
-	private SharedPreferences pref;
+
 	private String camera_image_id = "";
+	private String dt_taken = "";
+	private String new_plant_site_name;
+	
 	private double latitude = 0.0;
 	private double longitude = 0.0;
-	private String dt_taken = null;
-	final private int PLANT_LIST = 99;
-	private int SELECT_PLANT_NAME = 100;
-	private int UNKNOWN_PLANT = 999;
-	private Integer new_plant_species_id;
-	private Integer new_plant_site_id; 
-	private String new_plant_site_name;
+	
+	private int new_plant_species_id;
+	private int new_plant_site_id;
+	private int pheno_id;
+	private int previous_activity = 0;
 	private int WILD_FLOWERS = 0;
 	private int GRASSES = 1;
 	private int DECIDUOUS_TREES = 2;
 	private int EVERGREEN_TREES = 3;
 	private int CONIFERS = 4;
+	private int FROM_PLANT_LIST = 100;
+	private int FROM_QUICK_CAPTURE = 101;
+	private int UNKNOWN_PLANT = 999;
+	
+	private TextView myTitleText = null;
 	private EditText unknownText = null;
 	private Button submitBtn = null;
-	private int previous_activity = 0;
-	private CharSequence[] seqUserSite;
-	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>();
+	
+	private MyListAdapter mylistapdater;
+	private SharedPreferences pref;
 	FunctionsHelper helper;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    
+
+	    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 	    setContentView(R.layout.onetimemain);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+		
+		myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(" Select Plant Category");
 	    
 	    pref = getSharedPreferences("userinfo",0);
 	    SharedPreferences.Editor edit = pref.edit();				
@@ -98,7 +113,7 @@ public class OneTimeMain extends ListActivity {
 
 		// if previous activity is "PlantList.java"
 		// this page view is different by the previous activity
-		if(previous_activity == PLANT_LIST) {
+		if(previous_activity == FROM_PLANT_LIST) {
 			ll.setVisibility(View.GONE);
 			Log.i("K"," From PlantList.java");
 			latitude = 0.0;
@@ -113,38 +128,20 @@ public class OneTimeMain extends ListActivity {
 			latitude = p_intent.getExtras().getDouble("latitude");
 			longitude = p_intent.getExtras().getDouble("longitude");
 			dt_taken = p_intent.getExtras().getString("dt_taken");
+			pheno_id = p_intent.getExtras().getInt("pheno_id");
+			
+			Log.i("K","pheno_id: " + pheno_id);
 		}
 	    // TODO Auto-generated method stub
 	}
-	
 
 	public void onResume() {
 		super.onResume();
 		
-		//Get User site name and id using Map.
-		mapUserSiteNameID = helper.getUserSiteIDMap(OneTimeMain.this);
-		
-		//My plant button
-		/*
-		Button buttonMyplant = (Button)findViewById(R.id.myplant);
-		buttonMyplant.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				finish();
-				Intent intent = new Intent(OneTimeMain.this, PlantList.class);
-				startActivity(intent);
-			}
-		});
-		*/
 		ArrayList<oneTime> onetime_title = new ArrayList<oneTime>();
 		oneTime otime;
 		
-		//otime = new oneTime("Select Plant Name", "Unknown / Edit", "", "");
-		//onetime_title.add(otime);
-		
-		//otime = new oneTime("none", "Community Plants", "", "");
-		//onetime_title.add(otime);
-		
+		//oneTime(Header String, title, icon_name, sub_title)
 		otime = new oneTime("Select Plant Name", "Project Budburst", "pbbicon", "Project Budburst");
 		onetime_title.add(otime);
 		
@@ -157,16 +154,10 @@ public class OneTimeMain extends ListActivity {
 		otime = new oneTime("none", "Local Native", "whatsnative", "Native and cultural plants");
 		onetime_title.add(otime);
 
-		// What's popular is currently not available
-		//otime = new oneTime("none", "What's Popular", "");
-		//onetime_title.add(otime);
-
 		mylistapdater = new MyListAdapter(OneTimeMain.this, R.layout.onetime_list ,onetime_title);
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
 		
-		
-		//unknownText = (EditText)findViewById(R.id.unknown_plant);
 		submitBtn = (Button)findViewById(R.id.submit);
 		
 		submitBtn.setOnClickListener(new View.OnClickListener() {
@@ -176,122 +167,20 @@ public class OneTimeMain extends ListActivity {
 				// TODO Auto-generated method stub
 				helper.insertNewPlantToDB(OneTimeMain.this, UNKNOWN_PLANT, 0, 9, "Unknown Plant", "Unknown Plant");
 				int getID = helper.getID(OneTimeMain.this);
-				helper.insertNewObservation(OneTimeMain.this, getID, 0, latitude, longitude, camera_image_id, dt_taken, "");
-				Toast.makeText(OneTimeMain.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+				helper.insertNewObservation(OneTimeMain.this, getID, pheno_id, latitude, longitude, camera_image_id, dt_taken, "");
 				
-				Intent intent = new Intent(OneTimeMain.this, MainPage.class);
+				Intent intent = new Intent(OneTimeMain.this, PlantList.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
+				
+				// add vibration when done
+				Toast.makeText(OneTimeMain.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+				Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+				vibrator.vibrate(1000);
+				
 				finish();
 			}
 		});
-		
-		/*
-		submitBtn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				String speciesName = unknownText.getText().toString();
-				new AlertDialog.Builder(OneTimeMain.this)
-				.setTitle(getString(R.string.OneTime_category))
-				.setIcon(android.R.drawable.ic_menu_more)
-				.setItems(R.array.category, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						String[] category = getResources().getStringArray(R.array.category);
-						StaticDBHelper staticDBHelper = new StaticDBHelper(OneTimeMain.this);
-						SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase(); 
-						
-						Cursor cursor = null;
-
-						if(category[which].equals(getString(R.string.Wild_Flowers))) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + WILD_FLOWERS + " LIMIT 1;",null);
-						}
-						else if(category[which].equals(getString(R.string.Grass))) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + GRASSES + " LIMIT 1;",null);
-						}
-						else if(category[which].equals(getString(R.string.Deciduous_Trees_and_Shrubs))) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + DECIDUOUS_TREES + " LIMIT 1;",null);
-						}
-						else if(category[which].equals(getString(R.string.Evergreen_Trees_and_Shrubs))) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + EVERGREEN_TREES + " LIMIT 1;",null);
-						}
-						else if(category[which].equals(getString(R.string.Conifer))) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + CONIFERS + " LIMIT 1;",null);
-						}
-						else {
-						}
-						
-						while(cursor.moveToNext()){
-							Integer protocol_id = cursor.getInt(3);
-										
-							//Intent intent = new Intent(OneTimeMain.this, GetPhenophase_PBB.class);
-							//intent.putExtra("cname", "");
-							//intent.putExtra("sname", "");
-							//intent.putExtra("site_id", 0);
-							//intent.putExtra("protocol_id", protocol_id);
-							//intent.putExtra("species_id", "");
-							//intent.putExtra("camera_image_id", camera_image_id);
-							//intent.putExtra("FROM", SELECT_PLANT_NAME);
-							//intent.putExtra("latitude", latitude);
-							//intent.putExtra("longitude", longitude);
-								
-							
-							
-							seqUserSite = getUserSite();
-							
-							//Pop up choose site dialog box
-							AlertDialog.Builder builder = new AlertDialog.Builder(OneTimeMain.this);
-							builder.setTitle(getString(R.string.AddPlant_chooseSite))
-							.setSingleChoiceItems(seqUserSite, -1, new DialogInterface.OnClickListener() {
-								
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									// TODO Auto-generated method stub
-													
-									new_plant_site_id = mapUserSiteNameID.get(seqUserSite[which].toString());
-									new_plant_site_name = seqUserSite[which].toString();
-								}
-							})
-							.setPositiveButton(getString(R.string.Button_select), new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									if(new_plant_site_id == null){
-										Toast.makeText(OneTimeMain.this, getString(R.string.AddPlant_pleaseSelectSite), Toast.LENGTH_SHORT).show();
-									}
-									else{
-										if(insertNewPlantToDB(77, new_plant_site_id, new_plant_site_name)){
-											Intent intent = new Intent(OneTimeMain.this, PlantList.class);
-											Toast.makeText(OneTimeMain.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
-											startActivity(intent);
-											finish();
-										}else{
-											Toast.makeText(OneTimeMain.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
-										}
-									}
-								}
-							})
-							.setNegativeButton(getString(R.string.Button_cancel), null)
-							.show();
-								
-						}
-						cursor.close();
-						staticDB.close();
-						staticDBHelper.close();
-						
-					}
-				})
-				.setNegativeButton("Back", new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-					}
-				})
-				.show();
-			}
-		});
-		*/
 	}
 
 
@@ -368,10 +257,10 @@ public class OneTimeMain extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 	
 		Intent intent = null;
-	
+		
 		switch(position) {
 		case 0:
-			if(previous_activity == PLANT_LIST) {
+			if(previous_activity == FROM_PLANT_LIST) {
 				intent = new Intent(OneTimeMain.this, AddPlant.class);
 				startActivity(intent);
 			}
@@ -381,6 +270,7 @@ public class OneTimeMain extends ListActivity {
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);
 				intent.putExtra("dt_taken", dt_taken);
+				intent.putExtra("pheno_id", pheno_id);
 				startActivity(intent);
 			}
 			break;
@@ -392,13 +282,20 @@ public class OneTimeMain extends ListActivity {
 			intent.putExtra("latitude", latitude);
 			intent.putExtra("longitude", longitude);
 			intent.putExtra("dt_taken", dt_taken);
-			startActivity(intent);
+			intent.putExtra("pheno_id", pheno_id);
+			
+			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+			
+			//Something is wrong about the View - need to fix
+			//startActivity(intent);
 			break;
 		case 2:
-			Toast.makeText(OneTimeMain.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+			//Whats blooming
+			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			break;
 		case 3:
-			Toast.makeText(OneTimeMain.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+			//Whats native
+			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			break;
 		}
 	}
@@ -409,8 +306,7 @@ public class OneTimeMain extends ListActivity {
 		super.onCreateOptionsMenu(menu);
 		
 		menu.add(0, 1, 0,"Help").setIcon(android.R.drawable.ic_menu_help);
-		menu.add(0, 2, 0, "Update").setIcon(android.R.drawable.ic_menu_help);
-			
+		
 		return true;
 	}
 	
@@ -419,6 +315,7 @@ public class OneTimeMain extends ListActivity {
 		Intent intent;
 		switch(item.getItemId()){
 			case 1:
+				Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				return true;
 			case 2:
 				return true;
