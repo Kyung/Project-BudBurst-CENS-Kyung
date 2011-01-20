@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -35,22 +36,16 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.AddSite;
-import cens.ucla.edu.budburst.GetPhenophase_OneTime;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.MyListAdapter;
+import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
-
+import cens.ucla.edu.budburst.helper.Values;
 
 public class Flora_Observer extends ListActivity{
 	private final String TAG = "Flora_Observer";
 	private ArrayList<PlantItem> arPlantList;
-
-	private int WILD_FLOWERS = 0;
-	private int GRASSES = 1;
-	private int DECIDUOUS_TREES = 2;
-	private int EVERGREEN_TREES = 3;
-	private int CONIFERS = 4;
-	private int FROM_QUICK_CAPTURE = 101;
 	
 	private StaticDBHelper staticDBHelper = null;
 	private SQLiteDatabase staticDB = null;
@@ -60,16 +55,20 @@ public class Flora_Observer extends ListActivity{
 	private RadioButton rb1 = null;
 	private RadioButton rb2 = null;
 	private RadioButton rb3 = null;
+	private EditText et1 = null;
+	private Dialog dialog = null;
 	
 	//private TextView header = null;
 	private TextView myTitleText = null;
 	
 	private int current_position = 0;
 	private int pheno_id = 0;
-	private String camera_image_id = null;
 	private double latitude = 0.0;
 	private double longitude = 0.0;
+	private String camera_image_id = null;
 	private String dt_taken = null;
+	private String notes = "";
+	private String cname = "Unknown/Other";
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -91,9 +90,9 @@ public class Flora_Observer extends ListActivity{
 		longitude = p_intent.getExtras().getDouble("longitude");
 		dt_taken = p_intent.getExtras().getString("dt_taken");
 		pheno_id = p_intent.getExtras().getInt("pheno_id");
+		notes = p_intent.getExtras().getString("notes");
 		
 		Log.i("K", "Flora_OBSERVER = camera_image_id : " + camera_image_id + " , pheno_id : " + pheno_id);
-		
 		
 		rb1 = (RadioButton)findViewById(R.id.option1);
 		rb2 = (RadioButton)findViewById(R.id.option2);
@@ -127,7 +126,7 @@ public class Flora_Observer extends ListActivity{
 		}
  		
 		// add plant at the last.
-		PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+		PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
 		arPlantList.add(pi);
 		
 		mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
@@ -171,7 +170,7 @@ public class Flora_Observer extends ListActivity{
 				}
 				
 				// add plant at the last.
-				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
@@ -202,7 +201,7 @@ public class Flora_Observer extends ListActivity{
 				}
 				
 				// add plant at the last.
-				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
@@ -225,23 +224,23 @@ public class Flora_Observer extends ListActivity{
 						Cursor cursor = null;
 
 						if(category[which].equals("Wild Flowers and Herbs")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + WILD_FLOWERS + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.WILD_FLOWERS + " ORDER BY common_name;",null);
 							myTitleText.setText(" One Time Observation > Flowers");
 						}
 						else if(category[which].equals("Grass")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + GRASSES + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.GRASSES + " ORDER BY common_name;",null);
 							myTitleText.setText(" One Time Observation > Grass");
 						}
 						else if(category[which].equals("Deciduous Trees and Shrubs")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + DECIDUOUS_TREES + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.DECIDUOUS_TREES + " ORDER BY common_name;",null);
 							myTitleText.setText(" One Time Observation > Deciduous");
 						}
 						else if(category[which].equals("Evergreen Trees and Shrubs")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + EVERGREEN_TREES + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.EVERGREEN_TREES + " ORDER BY common_name;",null);
 							myTitleText.setText(" One Time Observation > Evergreen");
 						}
 						else if(category[which].equals("Conifer")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE category=" + CONIFERS + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.CONIFERS + " ORDER BY common_name;",null);
 							myTitleText.setText(" One Time Observation > Conifer");
 						}
 						else {
@@ -264,7 +263,7 @@ public class Flora_Observer extends ListActivity{
 						}
 						
 						// add plant at the last.
-						PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+						PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
 						arPlantList.add(pi);
 						
 						mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
@@ -290,19 +289,61 @@ public class Flora_Observer extends ListActivity{
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
-		Intent intent = new Intent(Flora_Observer.this, AddSite.class);
-		intent.putExtra("cname", arPlantList.get(position).CommonName);
-		intent.putExtra("sname", arPlantList.get(position).SpeciesName);
-		intent.putExtra("dt_taken", dt_taken);
-		intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
-		intent.putExtra("pheno_id", pheno_id);
-		intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
-		intent.putExtra("camera_image_id", camera_image_id);
-		intent.putExtra("latitude", latitude);
-		intent.putExtra("longitude", longitude);
-		intent.putExtra("from", FROM_QUICK_CAPTURE);
+		current_position = position;
 		
-		startActivity(intent);
+		if(arPlantList.get(position).SpeciesID == Values.UNKNOWN_SPECIES) {
+			dialog = new Dialog(Flora_Observer.this);
+			
+			dialog.setContentView(R.layout.species_name_custom_dialog);
+			dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+			dialog.setCancelable(true);
+			dialog.show();
+			
+			et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
+			Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+			doneBtn.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					cname = et1.getText().toString();
+					if(cname.equals("")) {
+						cname = "Unknown/Other";
+					}
+					Intent intent = new Intent(Flora_Observer.this, AddSite.class);
+					intent.putExtra("cname", cname);
+					intent.putExtra("sname", "Unknown/Other");
+					intent.putExtra("dt_taken", dt_taken);
+					intent.putExtra("protocol_id", arPlantList.get(current_position).protocolID);
+					intent.putExtra("pheno_id", pheno_id);
+					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+					intent.putExtra("camera_image_id", camera_image_id);
+					intent.putExtra("latitude", latitude);
+					intent.putExtra("longitude", longitude);
+					intent.putExtra("notes", notes);
+					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+					
+					dialog.dismiss();
+					
+					startActivity(intent);
+				}
+			});
+		}
+		else {
+			Intent intent = new Intent(Flora_Observer.this, AddSite.class);
+			intent.putExtra("cname", arPlantList.get(position).CommonName);
+			intent.putExtra("sname", arPlantList.get(position).SpeciesName);
+			intent.putExtra("dt_taken", dt_taken);
+			intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
+			intent.putExtra("pheno_id", pheno_id);
+			intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
+			intent.putExtra("camera_image_id", camera_image_id);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
+			intent.putExtra("notes", notes);
+			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+			startActivity(intent);
+		}
 	}
 }
 

@@ -5,21 +5,28 @@ import java.util.HashMap;
 
 import cens.ucla.edu.budburst.AddPlant;
 import cens.ucla.edu.budburst.AddSite;
+import cens.ucla.edu.budburst.GetPhenophase_OneTime;
 import cens.ucla.edu.budburst.MainPage;
+import cens.ucla.edu.budburst.PhenophaseDetail;
 import cens.ucla.edu.budburst.PlantInformation_Direct;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -62,10 +69,7 @@ public class GetPhenophase extends ListActivity {
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	
-	private int FROM_PLANT_LIST = 100;
-	private int FROM_QUICK_CAPTURE = 101;
-	private int WHATSINVASIVE = 1000;
-	
+
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -79,16 +83,23 @@ public class GetPhenophase extends ListActivity {
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
 		v = (ViewGroup)v.getChildAt(0);
 		v.setPadding(0, 0, 0, 0);
-		
+
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.Best_Phenophase));
-		
-		
-	    Intent intent = getIntent();
+
+		Intent intent = getIntent();
 	    camera_image_id = intent.getExtras().getString("camera_image_id");
-		latitude = intent.getExtras().getDouble("latitude");
-		longitude = intent.getExtras().getDouble("longitude");
+		//latitude = intent.getExtras().getDouble("latitude");
+		//longitude = intent.getExtras().getDouble("longitude");
 		dt_taken = intent.getExtras().getString("dt_taken");
+		
+		
+		SharedPreferences pref = getSharedPreferences("userinfo", 0);
+		if(pref.getBoolean("new", false)) {
+		    latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
+		    
+		    longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+		}
 		
 		pItem = new ArrayList<PlantItem>();
 
@@ -106,7 +117,7 @@ public class GetPhenophase extends ListActivity {
 			}
 			
 			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(3), null, null);
-			PlantItem pi = new PlantItem(resID, cursor.getString(5), cursor.getInt(3), cursor.getString(1), header);
+			PlantItem pi = new PlantItem(resID, cursor.getString(5), cursor.getInt(3), cursor.getString(1), cursor.getInt(2), header);
 			pItem.add(pi);
 		}
 		
@@ -119,8 +130,17 @@ public class GetPhenophase extends ListActivity {
 	}
 	
 	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		Intent service = new Intent(GetPhenophase.this, BackgroundService.class);
+	    stopService(service);
+	}
+	
+	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
+		//GetPhenophase.this.unregisterReceiver(receiver);
+		
 		Intent intent = new Intent(GetPhenophase.this, OneTimeMain.class);
 		
 		intent.putExtra("camera_image_id", camera_image_id);
@@ -128,22 +148,24 @@ public class GetPhenophase extends ListActivity {
 		intent.putExtra("longitude", longitude);
 		intent.putExtra("dt_taken", dt_taken);
 		intent.putExtra("pheno_id", position + 1);
-		intent.putExtra("from", FROM_QUICK_CAPTURE);
+		intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
 		
 		startActivity(intent);
 	}
 	
 	class PlantItem{
-		PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name, Boolean aHeader){
+		PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name, int aPheno_id, Boolean aHeader){
 			Picture = aPicture;
 			Note = aNote;
 			Pheno_image = pheno_img_id;
 			Pheno_name = aPheno_name;
 			Header = aHeader;
+			Pheno_id = aPheno_id;
 		}
 		int Picture;
 		String Note;
 		int Pheno_image;
+		int Pheno_id;
 		String Pheno_name;
 		Boolean Header;
 	}
@@ -188,6 +210,24 @@ public class GetPhenophase extends ListActivity {
 			else {
 				header.setVisibility(View.GONE);
 			}
+			
+			
+			View thumbnail = convertView.findViewById(R.id.wrap_icon);
+			thumbnail.setTag(arSrc.get(position));
+			thumbnail.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					PlantItem pi = (PlantItem)v.getTag();
+					
+					Intent intent = new Intent(GetPhenophase.this, PhenophaseDetail.class);
+					intent.putExtra("id", pi.Pheno_id);
+					intent.putExtra("frome", Values.FROM_QC_PHENOPHASE);
+					startActivity(intent);
+				}
+			});
+			
 			
 			TextView pheno_name = (TextView)convertView.findViewById(R.id.pheno_name);
 			pheno_name.setVisibility(View.GONE);

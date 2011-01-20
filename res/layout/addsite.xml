@@ -14,24 +14,50 @@
     <LinearLayout
 		android:id="@+id/header_item"
 		android:layout_width="fill_parent"
-		android:layout_height="70dp"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
 		android:paddingTop="10dp"
-		android:orientation="horizontal"
+		android:paddingBottom="5dp"
+		android:paddingLeft="5dp"
+		android:paddingRight="5dp"
 		android:background="@drawable/bg_line"
 	>
-		<Button
-			android:layout_width="100px"
-			android:layout_height="wrap_content"
-			android:id="@+id/submit"
-			android:text="@string/Done"
-		/>
-		<TextView
-			android:layout_marginLeft="2dp"
+		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/Unknown_Plant_Text_2"
-			android:textSize="15dp"
+			android:orientation="horizontal"
+			android:weightSum="1"
+		>
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:id="@+id/submit"
+			android:text="@string/Done"
+			android:layout_weight="0.2"
 		/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.6"
+		/>
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/notes"
+			android:text="@string/Add_Notes"
+			android:layout_weight="0.2"
+		/>
+		
+	</LinearLayout>
+	<TextView
+		android:layout_below="@+id/header_item"
+		android:layout_marginLeft="2dp"
+		android:layout_marginBottom="3dp"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/Unknown_Plant_Text_2"
+		android:textSize="15sp"
+	/>
 	</LinearLayout>
 
 	<TextView
@@ -39,15 +65,17 @@
 	android:layout_below="@+id/header_item"
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="5dip"
-	android:layout_marginRight="5dip"
-	android:textSize="17dip"
+	android:layout_marginTop="10dp"
+	android:layout_marginBottom="10dp"
+	android:layout_marginLeft="5dp"
+	android:layout_marginRight="5dp"
+	android:textSize="17sp"
+	android:textStyle="bold"
 	android:focusableInTouchMode="true"
 	android:focusable="true"
 	android:text="@string/AddSite_intro" android:gravity="center_horizontal">
 	</TextView>
-	
+	<!-- 
 	<TextView
 	android:id="@+id/sitename_lable"
 	android:textStyle="bold"
@@ -59,219 +87,155 @@
 	android:layout_marginRight="5dip"
 	android:textSize="17dip" android:text="@string/AddSite_siteName">
 	</TextView>
-	<EditText 
-	android:id="@+id/sitename"
-	android:layout_below="@+id/sitename_lable"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:hint="@string/AddSite_siteName">
-	</EditText>
-	
-	<TextView
-	android:id="@+id/latitude_label"
-	android:layout_below="@+id/sitename"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="5dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:textStyle="bold"
-	android:textSize="17dip"
-	android:focusableInTouchMode="true"
-	android:focusable="true"
-	android:text="@string/AddSite_latlong">
-	</TextView>
-	
-	<EditText 
-	android:id="@+id/latitude"
-	android:layout_below="@+id/latitude_label"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:enabled="false"
-	android:textColor="@color/black"
-	android:textSize="16px"
-	android:hint="@string/AddSite_gettingLatLong">
-	</EditText>
-
-	<TextView
-	android:id="@+id/longitude_label"
-	android:textStyle="bold"
-	android:layout_below="@+id/latitude"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:textSize="17dip" android:text="@string/AddSite_address">
-	</TextView>
-	<EditText 
-	android:id="@+id/longitude"
-	android:layout_below="@+id/longitude_label"
-	android:textSize="16px"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:textColor="@color/black"
-	android:enabled="false"
-	android:hint="@string/AddSite_lookingAddress">
-	</EditText>
-	
-	<!-- Human Distance -->
-	
-	<TextView
-	android:id="@+id/human_distance"
-	android:textStyle="bold"
-	android:layout_below="@+id/longitude"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:textSize="17dip" android:text="@string/AddSite_HumanDistance">
-	</TextView>
-	<Button 
-	android:id="@+id/human_distance_text"
-	android:layout_below="@+id/human_distance"
-	android:textSize="16px"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:textColor="@color/black"
-	android:hint="@string/AddSite_HumanDistance">
-	</Button>
-	
-	<!-- Shading -->
-	<TextView
-	android:id="@+id/shading"
-	android:textStyle="bold"
-	android:layout_below="@+id/human_distance_text"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:textSize="17dip" 
-	android:text="@string/AddSite_Shading">
-	</TextView>
-	<Button 
-	android:id="@+id/shading_text"
-	android:layout_below="@+id/shading"
-	android:textSize="16px"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:textColor="@color/black"
-	android:hint="@string/AddSite_Shading">
-	</Button>
-	
-	<!-- Irrigation -->
-	
-	<TextView
-	android:id="@+id/irrigation"
-	android:textStyle="bold"
-	android:layout_below="@+id/shading_text"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:textSize="17dip" 
-	android:text="@string/AddSite_Irrigation">
-	</TextView>
-	<Button 
-	android:id="@+id/irrigation_text"
-	android:layout_below="@+id/irrigation"
-	android:textSize="16px"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:textColor="@color/black"
-	android:hint="@string/AddSite_Irrigation">
-	</Button>
-	
-	<!-- Habitat -->
-	
-	<TextView
-	android:id="@+id/habitat"
-	android:textStyle="bold"
-	android:layout_below="@+id/irrigation_text"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:textSize="17dip" 
-	android:text="@string/AddSite_Habitat">
-	</TextView>
-	<Button 
-	android:id="@+id/habitat_text"
-	android:layout_below="@+id/habitat"
-	android:textSize="16px"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"	
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:textColor="@color/black"
-	android:hint="@string/AddSite_Habitat">
-	</Button>
-	
-	
-	<TextView
-	android:id="@+id/comment_lable"
-	android:layout_below="@+id/habitat_text"
-	android:textStyle="bold"
-	android:layout_marginTop="10dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="5dip"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:textSize="17dip" 
-	android:text="@string/AddSite_description">
-	</TextView>
-	<EditText 
-	android:id="@+id/comment"
-	android:layout_below="@+id/comment_lable"
-	android:gravity="top"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"
-	android:layout_height="100dip"
-	android:layout_width="fill_parent"
-	android:hint="@string/AddSite_optional">
-	</EditText>
-
- 
-	<Button
-	android:id="@+id/save"
-	android:textColor="@drawable/black"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:layout_marginTop="20dip"
-	android:layout_marginLeft="40dip"
-	android:layout_marginRight="40dip"
-	android:layout_below="@+id/comment"
-	android:textSize="16dip"
-	android:focusable="true"
-	android:text="@string/Button_save"/>
-	<!-- 
-	<Button
-	android:id="@+id/cancel"
-	android:textColor="@drawable/black"
-	android:layout_width="130dip"
-	android:layout_height="wrap_content"
-	android:layout_margin="10dip"
-	android:layout_centerHorizontal="true"
-	android:gravity="center" 
-	android:textSize="20dip"
-	android:focusable="true"
-	android:text="@string/Button_cancel"/>
 	 -->
+
+	<EditText 
+		android:id="@+id/sitename"
+		android:layout_below="@+id/instruction"
+		android:layout_marginLeft="25dp"
+		android:layout_marginRight="25dp"	
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:hint="@string/AddSite_siteName">
+	</EditText>
+	
+	<EditText 
+		android:id="@+id/geo_location"
+		android:layout_below="@+id/sitename"
+		android:layout_marginLeft="25dp"
+		android:layout_marginRight="25dp"
+		android:layout_marginTop="10dp"	
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:enabled="false"
+		android:textColor="@color/black"
+		android:textSize="16sp"
+		android:hint="@string/AddSite_gettingLatLong">
+	</EditText>
+	
+
+	<LinearLayout
+		android:layout_width="fill_parent"	
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:id="@+id/site_info"
+		android:layout_below="@+id/geo_location"
+		>
+		<LinearLayout
+			android:layout_width="fill_parent"	
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_marginTop="10dp"
+			android:weightSum="1"
+		>
+			<Button 
+				android:layout_weight="0.5"
+				android:id="@+id/human_distance_text"
+				android:layout_below="@+id/geo_location"
+				android:textSize="16sp"
+				android:layout_marginLeft="25dp"
+				android:layout_marginRight="10dp"	
+				android:layout_height="wrap_content"
+				android:layout_width="105dp"
+				android:textColor="@color/black"
+				android:singleLine="true"
+				android:text="@string/AddSite_HumanDisturbance">
+			</Button>
+			<Button 
+				android:layout_weight="0.5"
+				android:id="@+id/shading_text"
+				android:textSize="16sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="25dp"	
+				android:layout_height="wrap_content"
+				android:layout_width="105dp"
+				android:textColor="@color/black"
+				android:singleLine="true"
+				android:text="@string/AddSite_Shading">
+			</Button>
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"	
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_marginTop="10dp"
+			android:weightSum="1"
+		>		
+			<Button 
+				android:layout_weight="0.5"
+				android:id="@+id/irrigation_text"
+				android:textSize="16sp"
+				android:layout_marginLeft="25dp"
+				android:layout_marginRight="10dp"	
+				android:layout_height="wrap_content"
+				android:layout_width="105dp"
+				android:textColor="@color/black"
+				android:singleLine="true"
+				android:text="@string/AddSite_Irrigation">
+			</Button>
+			<Button 
+				android:layout_weight="0.5"
+				android:id="@+id/habitat_text"
+				android:textSize="16sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="25dp"	
+				android:layout_height="wrap_content"
+				android:layout_width="105dp"
+				android:textColor="@color/black"
+				android:singleLine="true"
+				android:text="@string/AddSite_Habitat">
+			</Button>
+		</LinearLayout>
+	</LinearLayout>
+	
+	<EditText 
+		android:id="@+id/comment"
+		android:layout_below="@+id/site_info"
+		android:gravity="top"
+		android:layout_marginLeft="25dp"
+		android:layout_marginRight="25dp"
+		android:layout_marginTop="10dp"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:maxLines="2"
+		android:hint="@string/AddSite_optional">
+	</EditText>
+	
+	<LinearLayout
+		android:layout_width="fill_parent"	
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_below="@+id/comment"
+		android:weightSum="1"
+		android:layout_marginTop="10dp"
+	>
+	<Button
+		android:layout_weight="0.5"
+		android:id="@+id/save"
+		android:textColor="@drawable/black"
+		android:layout_width="105dp"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="25dp"
+		android:layout_marginRight="10dp"
+		android:layout_marginBottom="20dp"
+		android:textSize="16sp"
+		android:focusable="true"
+		android:text="@string/Button_save"/>
+	
+	<Button
+		android:layout_weight="0.5"
+		android:id="@+id/updates_gps"
+		android:textColor="@drawable/black"
+		android:layout_width="105dp"
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+		android:gravity="center" 
+		android:layout_marginLeft="10dp"
+		android:layout_marginRight="25dp"
+		android:layout_marginBottom="20dp"
+		android:textSize="16sp"
+		android:focusable="true"
+		android:text="@string/Button_update_GPS"/>
+	</LinearLayout>
 </RelativeLayout>
 </ScrollView>

@@ -1,7 +1,12 @@
 package cens.ucla.edu.budburst.helper;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+
+import cens.ucla.edu.budburst.onetime.Whatsinvasive;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Media {
 	
@@ -59,5 +65,5 @@ public class Media {
 	   	resized_bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 		
 	   	return resized_bitmap;
-	}	
+	}
 }

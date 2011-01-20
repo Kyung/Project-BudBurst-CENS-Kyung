@@ -17,7 +17,7 @@
 				android:layout_centerHorizontal = "true"
 				android:src="@drawable/header_small_modified"
 				android:focusableInTouchMode="true"
-				android:layout_gravity="center" android:layout_width="wrap_content" android:paddingBottom="10dip" android:paddingTop="20dip">
+				android:layout_gravity="center" android:layout_width="wrap_content" android:paddingBottom="10dp" android:paddingTop="20dp">
 			</ImageView>
 			
 			<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:textColor="@color/black" android:text="@string/Title_text" android:textSize="16dp" android:typeface="normal" android:textStyle="bold" android:id="@+id/title_text" android:gravity="center" android:layout_marginLeft="5dp" android:layout_marginBottom="15dp" android:layout_marginRight="5dp"></TextView><LinearLayout 
@@ -27,13 +27,13 @@
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content" 
 				android:layout_gravity = "center"
-				android:layout_marginBottom = "8dip" android:padding="7dp">
+				android:layout_marginBottom = "8dp" android:padding="7dp">
 				<EditText android:id="@+id/username_text"
 					android:background="@layout/text_edit_field"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_horizontal"
 					android:layout_marginBottom="5dp"
-					android:focusable="true" android:layout_width="200px" android:hint="@string/username">
+					android:focusable="true" android:layout_width="200dp" android:hint="@string/username">
 				</EditText>
 				<EditText android:id="@+id/password_text"
 					android:password="true"

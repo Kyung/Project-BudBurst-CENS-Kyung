@@ -26,7 +26,6 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"site_name TEXT," +
 				"protocol_id NUMERIC," +
 				"common_name TEXT," +
-				//"official NUMERIC," +
 				"active NUMERIC," + // active 0(need to be removed), 1(nothing), 2(update the species)
 				"synced NUMERIC);");
 				
@@ -60,13 +59,14 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"site_name TEXT," +
 				"latitude TEXT," +
 				"longitude TEXT," +
+				"accuracy TEXT," +
 				"state TEXT," +
 				"comments TEXT, " +
 				"hdistance TEXT, " +
 				"shading TEXT, " +
 				"irrigation TEXT, " +
 				"habitat TEXT, " +
-				"official NUMERIC DEFAULT 1, " +
+				"official NUMERIC, " +
 				"synced NUMERIC);");
 		//If syned is
 		// : 5, then this site is synced with server

@@ -4,33 +4,12 @@
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:orientation="vertical" 
-  android:gravity="center_horizontal" 
   android:background="@color/BudBurstBackground">
 <ImageView 
 	android:id="@+id/ImageView01" 
-	android:layout_height="wrap_content" 
-	android:paddingTop="15dp" 
-	android:scaleType="fitCenter" 
-	android:layout_width="wrap_content" 
-	android:paddingBottom="20dp" android:src="@drawable/splash_head">
-</ImageView>
-<LinearLayout 
-	android:id="@+id/LinearLayout01" 
-	android:orientation="vertical" 
+	android:layout_height="fill_parent" 
 	android:layout_width="fill_parent" 
-	android:layout_height="wrap_content" 
-	android:paddingBottom="10dp" 
-	android:paddingTop="5dp" 
-	android:background="@color/BudBurstHighlight">
-<ImageView 
-	android:id="@+id/ImageView02" 
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:src="@drawable/splash_tail"></ImageView>
-</LinearLayout>
-<LinearLayout 
-android:id="@+id/LinearLayout02" 
-android:layout_width="wrap_content" 
-android:layout_height="wrap_content">
-</LinearLayout>
+	android:src="@drawable/splash">
+</ImageView>
+
 </LinearLayout>

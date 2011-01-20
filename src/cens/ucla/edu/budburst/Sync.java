@@ -28,9 +28,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.helper.First_Help;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.SyncNetworkHelper;
+import cens.ucla.edu.budburst.helper.Values;
 
 public class Sync extends Activity{
 	
@@ -70,10 +72,7 @@ public class Sync extends Activity{
 	public static int SERVER_ERROR = -99;
 	public static int NETWORK_ERROR = 0;
 	
-	final private int FROM_PLANT_LIST = 100;
-	final private int FROM_MAIN_PAGE = 103;
-	
-	private int previous_activity;
+	private int previous_activity = 0;
 	
 	int mValue;
 	TextView mText;
@@ -93,6 +92,28 @@ public class Sync extends Activity{
 		TextView textViewHello = (TextView)findViewById(R.id.hello_textview);
 		textViewHello.setText(getString(R.string.hello) + " " + username + "!" + getString(R.string.instruction));
 		
+		
+			
+		if(username.equals("test10")) {
+			textViewHello.setText(getString(R.string.hello) + " Preview" + "!" + getString(R.string.instruction));
+			
+			OneTimeDBHelper otHelper = new OneTimeDBHelper(Sync.this);
+			SyncDBHelper sHelper = new SyncDBHelper(Sync.this);
+			
+			SQLiteDatabase otDB  = otHelper.getWritableDatabase();
+			SQLiteDatabase syncDB  = sHelper.getWritableDatabase();
+
+			otDB.execSQL("UPDATE onetimeob SET synced = 5;");
+			otDB.execSQL("UPDATE onetimeob_observation SET synced = 5;");
+			
+			syncDB.execSQL("UPDATE my_plants SET synced = 5;");
+			syncDB.execSQL("UPDATE my_observation SET synced = 5;");
+			
+			otDB.close();
+			syncDB.close();
+			
+		}
+		
 		//Sync button
 		Button buttonSync = (Button)findViewById(R.id.sync);
 		buttonSync.setOnClickListener(new View.OnClickListener(){
@@ -107,6 +128,13 @@ public class Sync extends Activity{
 		Intent parent_intent = getIntent();
 		
 		previous_activity = parent_intent.getExtras().getInt("from");
+		
+		Log.i("K", "previous_activity == " + previous_activity);
+		
+		if(previous_activity == Values.FROM_PLANT_LIST || previous_activity == Values.FROM_MAIN_PAGE) {
+			textViewHello.setText(getString(R.string.instruction2));
+		}
+		
 		if(parent_intent.getExtras() != null &&
 				parent_intent.getExtras().getBoolean("sync_instantly",false)){
 			doSync();
@@ -204,9 +232,10 @@ public class Sync extends Activity{
 			Log.i("K", "WHAT ?? : " + msg.what);
 			
 			if(msg.what < NETWORK_ERROR){
+				// error with username and password
+				// we check username and password when starting synchronization.
 				if(msg.what == SERVER_ERROR){
 					String error_message = (String)msg.obj;
-					//Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) + error_message, Toast.LENGTH_SHORT).show();
 					if(error_message.equals(getString(R.string.Alert_wrongUserPass)))
 					{
 						mProgress.dismiss();
@@ -216,40 +245,68 @@ public class Sync extends Activity{
 						edit.putString("Password","");
 						edit.commit();
 						
-						//Toast.makeText(Sync.this, getString(R.string.Alert_messageServer) + error_message, Toast.LENGTH_SHORT).show();
+						// show alert message saying there is something wrong with username & password
+						new AlertDialog.Builder(Sync.this)
+						.setTitle(getString(R.string.Alert_synchronized))
+						.setMessage(getString(R.string.Go_BackTo_Login))
+						.setPositiveButton(getString(R.string.Button_OK),new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+								SharedPreferences.Editor edit = pref.edit();
+								edit.putString("Username", "");
+								edit.putString("Password", "");
+								edit.putString("Synced","false");
+								edit.commit();
+								
+								Intent intent = new Intent(Sync.this, firstActivity.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								startActivity(intent);
+								finish();
+								
+							}
+						})
+						.show();
 					}
 				}
-				else {					
+				else {
+					// problem with network connectivity...
 					mProgress.dismiss();
-					//removeDialog(0);
-					Toast.makeText(Sync.this, getString(R.string.Alert_errorDownload), Toast.LENGTH_SHORT).show();
-					
+					new AlertDialog.Builder(Sync.this)
+					.setTitle(getString(R.string.Alert_synchronized))
+					.setMessage(getString(R.string.Alert_errorDownload))
+					.setPositiveButton(getString(R.string.Button_OK),new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							SharedPreferences.Editor edit = pref.edit();
+							//edit.putString("Username", "");
+							//edit.putString("Password", "");
+							edit.putString("Synced","false");
+							edit.commit();
+							
+							Intent intent;
+							
+							if(previous_activity == Values.FROM_PLANT_LIST) {
+								intent = new Intent(Sync.this, PlantList.class);
+							}
+							else if(previous_activity == Values.FROM_MAIN_PAGE){
+								intent = new Intent(Sync.this, MainPage.class);
+							}							
+							else {
+								intent = new Intent(Sync.this, MainPage.class);
+							}
+
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
+							finish();
+							
+						}
+					})
+					.show();
 				}
-				
-				new AlertDialog.Builder(Sync.this)
-				.setTitle(getString(R.string.Alert_synchronized))
-				.setIcon(R.drawable.pbbicon_small)
-				.setMessage(getString(R.string.Go_BackTo_Login))
-				.setPositiveButton(getString(R.string.Button_OK),new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						SharedPreferences.Editor edit = pref.edit();
-						edit.putString("Username", "");
-						edit.putString("Password", "");
-						edit.putString("Synced","false");
-						edit.commit();
-						
-						Intent intent = new Intent(Sync.this, firstActivity.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(intent);
-						finish();
-						
-					}
-				})
-				.show();
-				
 				return;
 			}
 			
@@ -382,19 +439,25 @@ public class Sync extends Activity{
 				
 				//Move to plant list screen
 				
-				if(previous_activity == FROM_MAIN_PAGE) {
+				if(previous_activity == Values.FROM_MAIN_PAGE) {
 					Intent intent = new Intent(Sync.this, MainPage.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
 					finish();
 				}
-				else if(previous_activity == FROM_PLANT_LIST){
+				else if(previous_activity == Values.FROM_PLANT_LIST){
 					Intent intent = new Intent(Sync.this, PlantList.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
 					finish();
 				}
-				
+				else {
+					Intent intent = new Intent(Sync.this, First_Help.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}
+
 				
 				Toast.makeText(Sync.this, getString(R.string.Alert_synchronized), Toast.LENGTH_SHORT).show();
 				
@@ -581,7 +644,7 @@ class doSyncThread extends Thread{
 				SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
 		    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 				
-				query = "SELECT site_id, site_name, latitude, longitude, state, comments " +
+				query = "SELECT site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat " +
 						"FROM my_sites WHERE synced=" + SyncDBHelper.SYNCED_NO;
 				cursor = syncRDB.rawQuery(query, null);
 				
@@ -595,11 +658,15 @@ class doSyncThread extends Thread{
 					String site_name = cursor.getString(1);
 					String latitude = cursor.getString(2);
 					String longitude = cursor.getString(3);
-					String state = cursor.getString(4);
+					String accuracy = cursor.getString(4);
 					String comments = cursor.getString(5);
+					String hdistance = cursor.getString(6);
+					String shading = cursor.getString(7);
+					String irrigation = cursor.getString(8);
+					String habitat = cursor.getString(9);
 					
 					serverResponse = SyncNetworkHelper.upload_new_site(username, password, 
-							site_id, site_name, latitude, longitude, state, comments);
+							site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat);
 					
 					if(serverResponse == null){
 						msgToMain.what = UPLOAD_ADDED_SITE* -1;
@@ -650,7 +717,7 @@ class doSyncThread extends Thread{
 
 				
 		    	//Open database cursor
-		    	query =	"SELECT species_id, site_id, active, common_name " +
+		    	query =	"SELECT species_id, site_id, active, common_name, protocol_id " +
 		    			"FROM my_plants " +
 		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = syncRDB.rawQuery(query, null);
@@ -662,8 +729,8 @@ class doSyncThread extends Thread{
 					break;
 				}
 				else {
-					query = "DELETE FROM my_plants;";
-					syncRDB.execSQL(query);
+					//query = "DELETE FROM my_plants;";
+					//syncRDB.execSQL(query);
 				}
 				
 				while(cursor.moveToNext()){
@@ -671,12 +738,13 @@ class doSyncThread extends Thread{
 					String b = cursor.getString(1);
 					Integer c = cursor.getInt(2);
 					String d = cursor.getString(3);
+					Integer e = cursor.getInt(4);
 					
-					Log.i("K","species_id : " + a + " site_id : " + b + " active : " + c + " common_name : " + d);
+					Log.i("K","species_id : " + a + " site_id : " + b + " active : " + c + " common_name : " + d + " protocol_id : " + e);
 
 					serverResponse = 
 					SyncNetworkHelper.upload_new_plant(username, password, context, 
-							a, b, c, d);
+							a, b, c, d, e);
 
 //					serverResponse = 
 //						SyncNetworkHelper.upload_new_plant(username, password, context, 
@@ -697,9 +765,9 @@ class doSyncThread extends Thread{
 							mLoop.quit();
 							break;
 						}
-					}catch(Exception e){
-			            e.printStackTrace();
-						Log.e(TAG, e.toString());
+					}catch(Exception ee){
+			            ee.printStackTrace();
+						Log.e(TAG, ee.toString());
 						Log.d(TAG, "UPLOAD_ADDED_PLANT: failed");
 					}
 				}
@@ -822,7 +890,7 @@ class doSyncThread extends Thread{
 		    	otRDB = otDBHelper.getReadableDatabase();
 		    	
 		    	//Open database cursor
-		    	query = "SELECT plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes " +
+		    	query = "SELECT plant_id, phenophase_id, lat, lng, accuracy, image_id, dt_taken, notes " +
 		    			"FROM onetimeob_observation " +
 		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 		    	
@@ -845,9 +913,10 @@ class doSyncThread extends Thread{
 								cursor.getInt(1) + " , " + 
 								cursor.getDouble(2) + " , " +
 								cursor.getDouble(3) + " , " +
-								cursor.getString(4) + " , " +
+								cursor.getFloat(4) + " , " +
 								cursor.getString(5) + " , " +
-								cursor.getString(6));
+								cursor.getString(6) + " , " +
+								cursor.getString(7));
 						
 						
 						serverResponse = SyncNetworkHelper.upload_quick_observations(username, password, context,
@@ -855,9 +924,10 @@ class doSyncThread extends Thread{
 								cursor.getInt(1),
 								cursor.getDouble(2),
 								cursor.getDouble(3),
-								cursor.getString(4),
+								cursor.getFloat(4),
 								cursor.getString(5),
-								cursor.getString(6));
+								cursor.getString(6),
+								cursor.getString(7));
 						
 						if(!serverResponse.equals("UPLOADED_OK")) {
 							msgToMain.what = Sync.SERVER_ERROR;

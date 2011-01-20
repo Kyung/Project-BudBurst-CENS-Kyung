@@ -32,6 +32,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"phenophase_id NUMERIC," +
 				"lat NUMERIC," +
 				"lng NUMERIC," +
+				"accuracy NUMERIC," +
 				"image_id TEXT," +
 				"dt_taken TEXT," +
 				"notes TEXT," +

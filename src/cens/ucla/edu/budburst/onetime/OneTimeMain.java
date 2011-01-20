@@ -2,24 +2,30 @@ package cens.ucla.edu.budburst.onetime;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import cens.ucla.edu.budburst.AddPlant;
+import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.GetPhenophase_PBB;
+import cens.ucla.edu.budburst.Help;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.Whatsinvasive.MyListAdapter;
-import cens.ucla.edu.budburst.onetime.Whatsinvasive.species;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -57,32 +63,30 @@ public class OneTimeMain extends ListActivity {
 	ArrayList<Button> buttonBar = new ArrayList<Button>();
 
 	private String camera_image_id = "";
-	private String dt_taken = "";
 	private String new_plant_site_name;
+	private String notes = "";
+	private String common_name = "Unknown/Other";
 	
 	private double latitude = 0.0;
 	private double longitude = 0.0;
+	private float accuracy = 0;
 	
 	private int new_plant_species_id;
 	private int new_plant_site_id;
 	private int pheno_id;
 	private int previous_activity = 0;
-	private int WILD_FLOWERS = 0;
-	private int GRASSES = 1;
-	private int DECIDUOUS_TREES = 2;
-	private int EVERGREEN_TREES = 3;
-	private int CONIFERS = 4;
-	private int FROM_PLANT_LIST = 100;
-	private int FROM_QUICK_CAPTURE = 101;
-	private int UNKNOWN_PLANT = 999;
 	
 	private TextView myTitleText = null;
 	private EditText unknownText = null;
+	private Button noteBtn = null;
 	private Button submitBtn = null;
+	private Button siteBtn = null;
+	private EditText et1 = null;
 	
 	private MyListAdapter mylistapdater;
 	private SharedPreferences pref;
 	FunctionsHelper helper;
+	Dialog noteDialog = null;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -98,7 +102,7 @@ public class OneTimeMain extends ListActivity {
 		v.setPadding(0, 0, 0, 0);
 		
 		myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" Select Plant Category");
+		myTitleText.setText(" " + getString(R.string.OneTimeMain_Header));
 	    
 	    pref = getSharedPreferences("userinfo",0);
 	    SharedPreferences.Editor edit = pref.edit();				
@@ -109,28 +113,22 @@ public class OneTimeMain extends ListActivity {
 		previous_activity = p_intent.getExtras().getInt("FROM");
 		
 		helper = new FunctionsHelper();
-		LinearLayout ll = (LinearLayout)findViewById(R.id.done_layout);
+		LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
 
 		// if previous activity is "PlantList.java"
 		// this page view is different by the previous activity
-		if(previous_activity == FROM_PLANT_LIST) {
+		if(previous_activity == Values.FROM_PLANT_LIST) {
 			ll.setVisibility(View.GONE);
-			Log.i("K"," From PlantList.java");
 			latitude = 0.0;
 			longitude = 0.0;
 			camera_image_id = "none";
-			dt_taken = "";
 		}
 		// else
 		else {
 			ll.setVisibility(View.VISIBLE);
 			camera_image_id = p_intent.getExtras().getString("camera_image_id");
-			latitude = p_intent.getExtras().getDouble("latitude");
-			longitude = p_intent.getExtras().getDouble("longitude");
-			dt_taken = p_intent.getExtras().getString("dt_taken");
 			pheno_id = p_intent.getExtras().getInt("pheno_id");
 			
-			Log.i("K","pheno_id: " + pheno_id);
 		}
 	    // TODO Auto-generated method stub
 	}
@@ -142,13 +140,13 @@ public class OneTimeMain extends ListActivity {
 		oneTime otime;
 		
 		//oneTime(Header String, title, icon_name, sub_title)
-		otime = new oneTime("Select Plant Name", "Project Budburst", "pbbicon", "Project Budburst");
+		otime = new oneTime("Select plant name from lists", "Project Budburst", "pbb_icon_main", "Project Budburst");
 		onetime_title.add(otime);
 		
 		otime = new oneTime("Or Choose from other plant lists", "Local Invasives", "invasive_plant", "Help locate invasive plants");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Local Blooming", "whatsblooming", "Local plants in flower now");
+		otime = new oneTime("none", "Local Blooming", "pbbicon", "Local plants in flower now");
 		onetime_title.add(otime);
 		
 		otime = new oneTime("none", "Local Native", "whatsnative", "Native and cultural plants");
@@ -165,19 +163,162 @@ public class OneTimeMain extends ListActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				helper.insertNewPlantToDB(OneTimeMain.this, UNKNOWN_PLANT, 0, 9, "Unknown Plant", "Unknown Plant");
+				
+				SharedPreferences pref = getSharedPreferences("userinfo", 0);
+				
+				boolean highly = pref.getBoolean("highly", false);
+				latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
+				longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+				accuracy = Float.parseFloat(pref.getString("accuracy", "0"));
+				
+				Log.i("K", "HIGHLY : " + highly + " latitude : " + latitude + " accuracy : " + accuracy);
+				
+				
+				if(latitude == 0.0 || longitude == 0.0 || accuracy == 0) {
+					new AlertDialog.Builder(OneTimeMain.this)
+					.setTitle("Done Quick Capture")
+					.setMessage("Save without GeoLocation?")
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+
+							user_define_name();
+						}
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+						}
+					})
+					.show();
+				}
+				else if(highly == false){
+					new AlertDialog.Builder(OneTimeMain.this)
+					.setTitle("Done Quick Capture")
+					.setMessage("Save with GPS info - \n" + String.format("%6.3f / %6.3f \u00b1 %3.1fm", latitude, longitude, accuracy) + "?")
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							user_define_name();
+						}
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+						}
+					})
+					.show();
+				}
+				else {
+					user_define_name();
+				}
+			}
+		});
+		
+		siteBtn = (Button) findViewById(R.id.movetosite);
+		siteBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				String dt_taken = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
+				
+				Intent intent = new Intent(OneTimeMain.this, AddSite.class);
+				intent.putExtra("cname", "Unknown/Other");
+				intent.putExtra("sname", "Unknown/Other");
+				intent.putExtra("dt_taken", dt_taken);
+				intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
+				intent.putExtra("pheno_id", pheno_id);
+				intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+				intent.putExtra("camera_image_id", camera_image_id);
+				intent.putExtra("latitude", latitude);
+				intent.putExtra("longitude", longitude);
+				intent.putExtra("notes", notes);
+				intent.putExtra("from", Values.FROM_ONETIME_DIRECT);
+				
+				startActivity(intent);
+
+			}
+		});
+		
+		
+		noteBtn = (Button) findViewById(R.id.notes);
+		
+		noteBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				noteDialog = new Dialog(OneTimeMain.this);
+				
+				noteDialog.setContentView(R.layout.add_note_custom_dialog);
+				noteDialog.setCancelable(true);
+				noteDialog.show();
+				
+				et1 = (EditText)noteDialog.findViewById(R.id.custom_notes);
+				if(!notes.equals("")) {
+					et1.setText(notes);
+				}
+				
+				Button doneBtn = (Button)noteDialog.findViewById(R.id.custom_done);
+				
+				doneBtn.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						if(notes != "") {
+							Toast.makeText(OneTimeMain.this, "Updated Notes", Toast.LENGTH_SHORT).show();
+						}
+						else {
+							Toast.makeText(OneTimeMain.this, "Added Notes", Toast.LENGTH_SHORT).show();
+						}
+						notes = et1.getText().toString();
+						noteDialog.dismiss();
+					}
+				});
+			}
+		});
+	}
+	
+	
+	
+	public void user_define_name() {
+		Dialog dialog = new Dialog(OneTimeMain.this);
+		
+		dialog.setContentView(R.layout.species_name_custom_dialog);
+		dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+		dialog.setCancelable(true);
+		dialog.show();
+		
+		et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
+		Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+		
+		doneBtn.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				common_name= et1.getText().toString();
+				if(common_name.equals("")) {
+					common_name = "Unknown/Other";
+				}
+				
+				helper.insertNewPlantToDB(OneTimeMain.this, Values.UNKNOWN_SPECIES, 0, 9, common_name, "");
 				int getID = helper.getID(OneTimeMain.this);
-				helper.insertNewObservation(OneTimeMain.this, getID, pheno_id, latitude, longitude, camera_image_id, dt_taken, "");
+				helper.insertNewObservation(OneTimeMain.this, getID, pheno_id, latitude, longitude, accuracy, camera_image_id, notes);
 				
 				Intent intent = new Intent(OneTimeMain.this, PlantList.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				
 				// add vibration when done
-				Toast.makeText(OneTimeMain.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+				Toast.makeText(OneTimeMain.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
 				Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-				vibrator.vibrate(1000);
-				
+				vibrator.vibrate(500);
 				finish();
 			}
 		});
@@ -260,7 +401,7 @@ public class OneTimeMain extends ListActivity {
 		
 		switch(position) {
 		case 0:
-			if(previous_activity == FROM_PLANT_LIST) {
+			if(previous_activity == Values.FROM_PLANT_LIST) {
 				intent = new Intent(OneTimeMain.this, AddPlant.class);
 				startActivity(intent);
 			}
@@ -269,8 +410,8 @@ public class OneTimeMain extends ListActivity {
 				intent.putExtra("camera_image_id", camera_image_id);
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);
-				intent.putExtra("dt_taken", dt_taken);
 				intent.putExtra("pheno_id", pheno_id);
+				intent.putExtra("notes", notes);
 				startActivity(intent);
 			}
 			break;
@@ -281,13 +422,10 @@ public class OneTimeMain extends ListActivity {
 		    intent.putExtra("camera_image_id", camera_image_id);
 			intent.putExtra("latitude", latitude);
 			intent.putExtra("longitude", longitude);
-			intent.putExtra("dt_taken", dt_taken);
 			intent.putExtra("pheno_id", pheno_id);
-			
-			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-			
+			intent.putExtra("notes", notes);
 			//Something is wrong about the View - need to fix
-			//startActivity(intent);
+			startActivity(intent);
 			break;
 		case 2:
 			//Whats blooming
@@ -315,9 +453,9 @@ public class OneTimeMain extends ListActivity {
 		Intent intent;
 		switch(item.getItemId()){
 			case 1:
-				Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-				return true;
-			case 2:
+				intent = new Intent(OneTimeMain.this, Help.class);
+				intent.putExtra("from", Values.FROM_ONE_TIME_MAIN);
+				startActivity(intent);
 				return true;
 		}
 		return false;

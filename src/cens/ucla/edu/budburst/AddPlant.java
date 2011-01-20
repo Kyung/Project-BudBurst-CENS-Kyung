@@ -32,22 +32,17 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
+import cens.ucla.edu.budburst.helper.MyListAdapter;
+import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
 
 public class AddPlant extends ListActivity{
 	private final String TAG = "AddPlant";
 	private ArrayList<PlantItem> arPlantList;
 	
 	private int mSelect = 0;
-	private int WILD_FLOWERS = 2;
-	private int GRASSES = 3;
-	private int DECIDUOUS_TREES = 4;
-	private int DECIDUOUS_TREES_WIND = 5;
-	private int EVERGREEN_TREES = 6;
-	private int EVERGREEN_TREES_WIND = 7;
-	private int CONIFERS = 8;
-	private int FROM_PLANT_LIST = 100;
 	private Integer new_plant_species_id;
 	private String new_plant_species_name;
 	private Integer new_plant_site_id; 
@@ -67,16 +62,18 @@ public class AddPlant extends ListActivity{
 	
 	//private TextView header = null;
 	private TextView myTitleText = null;
+	private Dialog Name_dialog = null;
 	
 	FunctionsHelper helper = null;
 	CharSequence[] seqUserSite;
+	private boolean selectCategory = false;
 	
 	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>(); 
 		
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.addplant);
+		setContentView(R.layout.flora_observer);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
@@ -95,15 +92,14 @@ public class AddPlant extends ListActivity{
 		rb1.setOnClickListener(radio_listener);
 		rb2.setOnClickListener(radio_listener);
 		rb3.setOnClickListener(radio_listener);
-		
-		//header = (TextView) findViewById(R.id.header_text);
-		//header.setText("'TOP 10' list of the plants.");
+	
 		
 		// show the top 10 lists first
 		top10List();
 
 		//Get User site name and id using Map.
-		mapUserSiteNameID = getUserSiteIDMap();
+		FunctionsHelper helper = new FunctionsHelper();
+		mapUserSiteNameID = helper.getUserSiteIDMap(AddPlant.this);
 		Iterator<String> itr = mapUserSiteNameID.keySet().iterator();
 		while(itr.hasNext()){
 			Log.d(TAG, itr.next());
@@ -117,7 +113,7 @@ public class AddPlant extends ListActivity{
 		myTitleText.setText(" " + getString(R.string.AddPlant_top10));
 		//header.setText("'TOP 10' list of the plants.");
 		arPlantList = new ArrayList<PlantItem>();
-	 	Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
+	 	Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species ORDER BY common_name;", null);
 		while(cursor.moveToNext()){
 			Integer id = cursor.getInt(0);
 			if(id == 70 || id == 69 || id == 45 || id == 59 || id == 60 || id == 19 || id == 32 || id == 34 || id == 24) {
@@ -133,7 +129,7 @@ public class AddPlant extends ListActivity{
 		}
 			
 		// add plant at the last.
-		PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+		PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", Values.UNKNOWN_SPECIES);
 		arPlantList.add(pi);
 			
 		mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
@@ -142,6 +138,7 @@ public class AddPlant extends ListActivity{
 		cursor.close();		
 		staticDB.close();
 	}
+
 	
 	private OnClickListener radio_listener = new OnClickListener() {
 
@@ -153,9 +150,11 @@ public class AddPlant extends ListActivity{
 			staticDB = staticDBHelper.getReadableDatabase();
 			
 			if(v == rb1) {
+				selectCategory = false;
 				top10List();
 			}
 			else if (v == rb2) {
+				selectCategory = false;
 				myTitleText.setText(" " + getString(R.string.AddPlant_all));
 				//header.setText("'ALL' list of the plants.");
 				//Rereive syncDB and add them to arUserPlatList arraylist
@@ -165,7 +164,7 @@ public class AddPlant extends ListActivity{
 					Integer id = cursor.getInt(0);
 					
 					// if id is 999, skip that.
-					if(id == 999) 
+					if(id == Values.UNKNOWN_SPECIES) 
 						continue;
 				
 					String species_name = cursor.getString(1);
@@ -180,7 +179,7 @@ public class AddPlant extends ListActivity{
 				}
 				
 				// add plant at the last.
-				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+				PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", Values.UNKNOWN_SPECIES);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
@@ -189,8 +188,7 @@ public class AddPlant extends ListActivity{
 				cursor.close();
 			}
 			else {
-				
-				//header.setText("By Group.");
+				selectCategory = true;
 				new AlertDialog.Builder(AddPlant.this)
 				.setTitle(getString(R.string.AddPlant_SelectCategory))
 				.setIcon(android.R.drawable.ic_menu_more)
@@ -204,29 +202,29 @@ public class AddPlant extends ListActivity{
 						Cursor cursor = null;
 
 						if(category[which].equals("Wild Flowers and Herbs")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + WILD_FLOWERS + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.WILD_FLOWERS + " ORDER BY common_name;",null);
 							myTitleText.setText(getString(R.string.AddPlant_addFlowers));
-							protocol_id = WILD_FLOWERS;
+							protocol_id = Values.WILD_FLOWERS;
 						}
 						else if(category[which].equals("Grass")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + GRASSES + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.GRASSES + " ORDER BY common_name;",null);
 							myTitleText.setText(getString(R.string.AddPlant_addGrass));
-							protocol_id = GRASSES;
+							protocol_id = Values.GRASSES;
 						}
 						else if(category[which].equals("Deciduous Trees and Shrubs")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + DECIDUOUS_TREES + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.DECIDUOUS_TREES + " ORDER BY common_name;",null);
 							myTitleText.setText(getString(R.string.AddPlant_addDecid));
-							protocol_id = DECIDUOUS_TREES;
+							protocol_id = Values.DECIDUOUS_TREES;
 						}
 						else if(category[which].equals("Evergreen Trees and Shrubs")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + EVERGREEN_TREES + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.EVERGREEN_TREES + " ORDER BY common_name;",null);
 							myTitleText.setText(getString(R.string.AddPlant_addEvergreen));
-							protocol_id = EVERGREEN_TREES;
+							protocol_id = Values.EVERGREEN_TREES;
 						}
 						else if(category[which].equals("Conifer")) {
-							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + CONIFERS + " ORDER BY common_name;",null);
+							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.CONIFERS + " ORDER BY common_name;",null);
 							myTitleText.setText(getString(R.string.AddPlant_addConifer));
-							protocol_id = CONIFERS;
+							protocol_id = Values.CONIFERS;
 						}
 						else {
 						}
@@ -247,7 +245,7 @@ public class AddPlant extends ListActivity{
 							arPlantList.add(pi);
 						}
 						
-						PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown Plant", "Unknown Plant", 999);
+						PlantItem pi = new PlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", Values.UNKNOWN_SPECIES);
 						arPlantList.add(pi);
 						
 						mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
@@ -277,19 +275,26 @@ public class AddPlant extends ListActivity{
 		new_plant_species_id = arPlantList.get(position).SpeciesID;
 		new_plant_species_name = arPlantList.get(position).CommonName;
 
-		//Retreive user sites from data base.
-		//seqUserSite = mapUserSiteNameID.keySet().toArray(new String[0]);
+		//Retreive user sites from database.
 		seqUserSite = helper.getUserSite(AddPlant.this);
 		
-		if(new_plant_species_id == 999) {
-			unKnownPlantDialog();
+		if(new_plant_species_id == Values.UNKNOWN_SPECIES) {
+			newDialog();
 		}
 		else {
+			staticDBHelper = new StaticDBHelper(AddPlant.this);
+			SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
+			Cursor c = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id = " + new_plant_species_id, null);
+			while(c.moveToNext()) {
+				protocol_id = c.getInt(0);
+			}
+			c.close();
+			staticDB.close();
 			popupDialog();
 		}
 	}
 	
-	private void unKnownPlantDialog() {
+	private void plantCategory() {
 		
 		new AlertDialog.Builder(AddPlant.this)
 		.setTitle(getString(R.string.AddPlant_SelectCategory))
@@ -300,25 +305,25 @@ public class AddPlant extends ListActivity{
 				String[] category = getResources().getStringArray(R.array.category2);
 				
 				if(category[which].equals("Wild Flowers and Herbs")) {
-					protocol_id = WILD_FLOWERS;
+					protocol_id = Values.WILD_FLOWERS;
 				}
 				else if(category[which].equals("Grass")) {
-					protocol_id = GRASSES;
+					protocol_id = Values.GRASSES;
 				}
 				else if(category[which].equals("Deciduous Trees and Shrubs")) {
-					protocol_id = DECIDUOUS_TREES;
+					protocol_id = Values.DECIDUOUS_TREES;
 				}
 				else if(category[which].equals("Deciduous Trees and Shrubs - Wind")) {
-					protocol_id = DECIDUOUS_TREES_WIND;
+					protocol_id = Values.DECIDUOUS_TREES_WIND;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs")) {
-					protocol_id = EVERGREEN_TREES;
+					protocol_id = Values.EVERGREEN_TREES;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs - Wind")) {
-					protocol_id = EVERGREEN_TREES_WIND;
+					protocol_id = Values.EVERGREEN_TREES_WIND;
 				}
 				else if(category[which].equals("Conifer")) {
-					protocol_id = CONIFERS;
+					protocol_id = Values.CONIFERS;
 				}
 				else {
 				}
@@ -352,28 +357,25 @@ public class AddPlant extends ListActivity{
 					Intent intent = new Intent(AddPlant.this, AddSite.class);
 					intent.putExtra("species_id", new_plant_species_id);
 					intent.putExtra("species_name", new_plant_species_name);
-					intent.putExtra("from", FROM_PLANT_LIST);
+					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("from", Values.FROM_PLANT_LIST);
 					startActivity(intent);
 				}
 				else {
 					if(helper.checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id, AddPlant.this)){
 						Toast.makeText(AddPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
-						
-						if(new_plant_species_id == 999) {
-							newDialog();
-						}
-						else {
-							if(insertNewPlantToDB(new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, 0)){
-								Intent intent = new Intent(AddPlant.this, PlantList.class);
-								Toast.makeText(AddPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
-								//clear all stacked activities.
-								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-								startActivity(intent);
-								finish();
-							}else{
-								Toast.makeText(AddPlant.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
-							}
+
+						if(insertNewPlantToDB(new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocol_id)){
+							Intent intent = new Intent(AddPlant.this, PlantList.class);
+							Toast.makeText(AddPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+							
+							//clear all stacked activities.
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
+							finish();
+						}else{
+							Toast.makeText(AddPlant.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
@@ -384,15 +386,15 @@ public class AddPlant extends ListActivity{
 	}
 	
 	private void newDialog() {
-		Dialog dialog = new Dialog(AddPlant.this);
+		Name_dialog = new Dialog(AddPlant.this);
 		
-		dialog.setContentView(R.layout.species_name_custom_dialog);
-		dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
-		dialog.setCancelable(true);
-		dialog.show();
+		Name_dialog.setContentView(R.layout.species_name_custom_dialog);
+		Name_dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+		Name_dialog.setCancelable(true);
+		Name_dialog.show();
 		
-		et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
-		Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+		et1 = (EditText)Name_dialog.findViewById(R.id.custom_common_name);
+		Button doneBtn = (Button)Name_dialog.findViewById(R.id.custom_done);
 		
 		doneBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -401,129 +403,61 @@ public class AddPlant extends ListActivity{
 				// TODO Auto-generated method stub
 				String common_name = et1.getText().toString();
 				
-				if(insertNewPlantToDB(new_plant_species_id, common_name, new_plant_site_id, new_plant_site_name, protocol_id)){
-					Intent intent = new Intent(AddPlant.this, PlantList.class);
-					Toast.makeText(AddPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
-					//clear all stacked activities.
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(intent);
-					finish();
-				}else{
-					Toast.makeText(AddPlant.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+				if(common_name.equals("")) {
+					common_name = "Unknown/Other";
 				}
+				new_plant_species_name = common_name;
+				if(selectCategory) {
+					popupDialog();
+				}
+				else {
+					plantCategory();
+				}
+				Name_dialog.dismiss();
 			}
 		});
+		
+		
 	}
-	
-	/*
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)  {
-	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
-			Intent intent = new Intent(AddPlant.this, PlantList.class);
-			startActivity(intent);
-			finish();
-			return true;
-	    }
-		return super.onKeyDown(keyCode, event);
-	}
-	*/
-	
-	//Adapters:MyListAdapter and SeparatedAdapter
-	class MyListAdapter extends BaseAdapter{
-		Context maincon;
-		LayoutInflater Inflater;
-		ArrayList<PlantItem> arSrc;
-		int layout;
-		int previous_site = 0;
-		
-		public MyListAdapter(Context context, int alayout, ArrayList<PlantItem> aarSrc){
-			maincon = context;
-			Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			arSrc = aarSrc;
-			layout = alayout;
-		}
-		
-		public int getCount(){
-			return arSrc.size();
-		}
-		
-		public String getItem(int position){
-			return arSrc.get(position).CommonName;
-		}
-		
-		public long getItemId(int position){
-			return position;
-		}
-		
-		public View getView(int position, View convertView, ViewGroup parent){
-			if(convertView == null)
-				convertView = Inflater.inflate(layout, parent, false);
-			
-			TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
-			
-			Log.i("K", "POSITION : " + position + " TOPITEM : " + arSrc.get(position).TopItem);
-			
-			if(arSrc.get(position).TopItem) {
-				site_header.setVisibility(View.VISIBLE);
-				site_header.setText("  " + arSrc.get(position).Site);
-				
-			}
-			else {
-				site_header.setVisibility(View.GONE);
-			}
-			
-			ImageView img = (ImageView) convertView.findViewById(R.id.icon);
-			img.setImageResource(arSrc.get(position).Picture);
-			
-			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
-			textname.setText(arSrc.get(position).CommonName);
-			
-			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-			Log.i("K", "NAME : " + arSrc.get(position).SpeciesName);
-			String [] splits = arSrc.get(position).SpeciesName.split(" ");
-			textdesc.setText(splits[0] + " " + splits[1]);
-			
-			
-			TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
-			if(arSrc.get(position).total_pheno != 0) {
-				pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno);
-			}
-			else {
-				pheno_stat.setVisibility(View.GONE);
-			}
-
-			return convertView;
-		}
-	}
-	
 
 	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename, int protocol_id){
 
 		int s_id = speciesid;
 		SharedPreferences pref = getSharedPreferences("userinfo",0);
 		
-		if(speciesid == 999) {
+		if(speciesid == Values.UNKNOWN_SPECIES) {
 			s_id = pref.getInt("other_species_id", 0);
 			s_id++;
 		}
 		
+		Log.i("K", "INSERT PROTOCOL_ID : " + protocol_id);
+		
 		try{
 			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
 			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
+			
+			Log.i("K", "INSERTED STRING : " + "INSERT INTO my_plants VALUES(" +
+					"null," +
+					speciesid + "," +
+					siteid + "," +
+					"'" + sitename + "',"+
+					protocol_id + "," + 
+					"'" + speciesname + "'," +
+					"1, " + // active 0(need to be removed), 1(nothing), 2(update the species)
+					SyncDBHelper.SYNCED_NO + ");");
 			
 			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
 					"null," +
 					speciesid + "," +
 					siteid + "," +
 					"'" + sitename + "',"+
-					protocol_id + "," +
-					//"1,"+ // 1 means it's official, from add plant list
+					protocol_id + "," + 
 					"'" + speciesname + "'," +
-					"1, " +
+					"1, " + // active 0(need to be removed), 1(nothing), 2(update the species)
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			
-			if(speciesid == 999) {
+			if(speciesid == Values.UNKNOWN_SPECIES) {
 				SharedPreferences.Editor edit = pref.edit();				
 				edit.putInt("other_species_id", s_id);
 				edit.commit();
@@ -537,71 +471,12 @@ public class AddPlant extends ListActivity{
 			return false;
 		}
 	}
-	
-	public HashMap<String, Integer> getUserSiteIDMap(){
 
-		HashMap<String, Integer> localMapUserSiteNameID = new HashMap<String, Integer>(); 
-		
-		//Open plant list db from static db
-		SyncDBHelper syncDBHelper = new SyncDBHelper(this);
-		SQLiteDatabase syncDB = syncDBHelper.getReadableDatabase(); 
-		
-		//Rereive syncDB and add them to arUserPlatList arraylist
-		Cursor cursor = syncDB.rawQuery("SELECT site_name, site_id FROM my_sites;",null);
-		while(cursor.moveToNext()){
-			localMapUserSiteNameID.put(cursor.getString(0), cursor.getInt(1));
-		}
-		localMapUserSiteNameID.put("Add New Site", 10000);
-		
-		
-		//Close DB and cursor
-		cursor.close();
-		//syncDB.close();
-		syncDBHelper.close();
-	
-		return localMapUserSiteNameID;
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+	    	staticDB.close();
+	    }
+	    return super.onKeyDown(keyCode, event);
 	}
-}
-
-class PlantItem{
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-	}
-
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-		siteID = aSiteID;
-	}
-	
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName, boolean aMonitor){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		Site = aSiteName;
-		SpeciesID = aSpeciesID;
-		siteID = aSiteID;
-		protocolID = aProtocolID;
-		current_pheno = aPheno_done;
-		total_pheno = aTotal_pheno;
-		TopItem = aTopItem;
-		Monitor = aMonitor;
-	}
-	
-	int Picture;
-	String CommonName;
-	String SpeciesName;
-	int SpeciesID;
-	int siteID;
-	int protocolID;
-	int current_pheno;
-	int total_pheno;
-	String Site;
-	boolean TopItem;
-	boolean Monitor;
 }

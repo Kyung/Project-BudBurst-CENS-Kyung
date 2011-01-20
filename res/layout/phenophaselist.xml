@@ -7,10 +7,10 @@
   <TextView
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="6dip"
+    android:paddingLeft="6dp"
     android:id="@+id/list_header"
     android:background="#DDD"
-    android:textSize="16px"
+    android:textSize="16sp"
     android:textStyle="bold"
     android:visibility="gone"
     />
@@ -19,7 +19,7 @@
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   	android:orientation="horizontal"
-  	android:padding="7dp"
+  	android:padding="8dp"
   >
   <LinearLayout
   	android:layout_width="wrap_content"
@@ -28,32 +28,49 @@
   	android:orientation="vertical"
   	android:id="@+id/left_part"
   >
-  <ImageView 
-  	android:layout_width="wrap_content"
-  	android:layout_height="wrap_content"
-  	android:id="@+id/pheno_img"
-  	android:layout_alignParentLeft="true"
-  />
-  <TextView
-  	android:layout_width="wrap_content"
-  	android:layout_height="wrap_content"
-  	android:id="@+id/yesorno_photo"
-  	android:textSize="9px"
-  	android:textStyle="bold"
-  	android:textColor="@drawable/black"
-  />
+    <RelativeLayout
+    	android:layout_width="wrap_content"
+    	android:layout_height="60dp"
+    	android:id="@+id/wrap_icon"
+    >
+	  <ImageView 
+	  	android:layout_width="wrap_content"
+	  	android:layout_height="wrap_content"
+	  	android:id="@+id/pheno_img"
+	  	android:layout_alignParentLeft="true"
+	  />
+	  <TextView
+	  	android:layout_width="wrap_content"
+	  	android:layout_height="wrap_content"
+	  	android:layout_below="@+id/pheno_img"
+	  	android:id="@+id/yesorno_photo"
+	  	android:textSize="9sp"
+	  	android:textStyle="bold"
+	  	android:textColor="@drawable/black"
+	  />
+	</RelativeLayout>
   </LinearLayout>
+  <View 
+	android:id="@+id/divider"
+	android:background="@drawable/bborder"
+	android:layout_toRightOf="@+id/left_part"
+	android:layout_marginLeft="5dp"
+	android:layout_width="1dp"
+	android:layout_height="fill_parent"
+  />
+  
   <LinearLayout
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
-  	android:layout_marginLeft="10px"
+  	android:layout_marginLeft="10dp"
   	android:orientation="vertical"
+  	android:layout_toRightOf="@+id/divider"
   >
   <TextView
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
   	android:id="@+id/pheno_name"
-  	android:textSize="17px"
+  	android:textSize="17sp"
   	android:textStyle="bold"
   	android:textColor="@drawable/black"
   />
@@ -61,7 +78,7 @@
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
   	android:id="@+id/pheno_text"
-  	android:textSize="16px"
+  	android:textSize="16sp"
   	android:textColor="@drawable/black"
   />
   </LinearLayout>

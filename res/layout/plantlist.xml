@@ -7,29 +7,29 @@
 	<LinearLayout
 		android:id="@+id/logo_layout"
 		android:layout_width="fill_parent"
-		android:layout_height="59px"
+		android:layout_height="60dp"
 		android:gravity="center_vertical|center_horizontal" 
 		android:background="@color/BudBurstBackground">
 		<ImageView 
 			android:id="@+id/logo" 
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
-			android:src="@drawable/header_small_modified">
+			android:src="@drawable/header">
 		</ImageView>
 	</LinearLayout>     
-	<!-- 	 
+		 
 	<TextView
 		android:id="@+id/instruction"
 		android:layout_below="@+id/logo_layout"
-		android:textSize="17dip"
+		android:textSize="17dp"
 		android:text="@string/no_site_no_species_instruction"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_margin="10dip"
+		android:layout_margin="10dp"
 		android:visibility="gone"		
 		>
 	</TextView>
-	-->
+	
 	<ListView
 		android:id="@android:id/list"
 		android:layout_below="@+id/logo_layout"

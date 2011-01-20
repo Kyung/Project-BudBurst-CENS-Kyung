@@ -225,26 +225,5 @@ public class AreaList extends ListActivity {
 			dialog.dismiss();
 		}
 	}
-	
-	public boolean onCreateOptionsMenu(Menu menu){
-		super.onCreateOptionsMenu(menu);
-
-		menu.add(0, 1, 0,"Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);
-			
-		return true;
-	}
-	
-	//Menu option selection handling
-	public boolean onOptionsItemSelected(MenuItem item){
-		Intent intent;
-		switch(item.getItemId()){
-			case 1:
-				intent = new Intent(AreaList.this, Queue.class);
-				startActivity(intent);
-				return true;
-		}
-		return false;
-	}
 	/////////////////////////////////////////////////////////////////////////////////
-
 }

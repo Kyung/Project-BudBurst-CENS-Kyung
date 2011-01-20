@@ -6,7 +6,7 @@
     <LinearLayout  
     	android:id="@+id/logo_layout"
 	    android:layout_width="fill_parent" 
-	    android:layout_height="63px"
+	    android:layout_height="63dp"
 	    android:gravity="center"
 	    android:orientation="horizontal"
 	    android:background="@color/BudBurstBackground">
@@ -14,55 +14,51 @@
 	    	android:id="@+id/logo"
 	     	android:layout_width="wrap_content"
 		 	android:layout_height="wrap_content"
-	     	android:src="@drawable/header_small_modified" 
+	     	android:src="@drawable/header" 
+	     	android:paddingTop="5dp"
 	     	android:layout_centerInParent="true"
 	     	android:layout_gravity="center" 
-	     	android:paddingLeft="0px" 
-	     	android:layout_centerVertical="true" 
-	     	android:paddingBottom="0px" 
-	     	android:paddingTop="8px"/>
-	    <!-- 
-	    <cens.ucla.edu.budburst.helper.CustomButton
-	        android:id="@+id/myplant"
-			android:layout_width="wrap_content"
-	        android:layout_height="29dip"
-	        android:layout_alignParentTop="true" 
-	        android:text="My Plants"/>
-		<cens.ucla.edu.budburst.helper.CustomButton
-			android:id="@+id/sharedplant"
-			android:layout_width="wrap_content"
-	        android:layout_height="29dip"
-	        android:layout_alignParentTop="true" 
-	        android:text="Shared Plants"/>	        
-	     -->   	
-	     
+	     	android:layout_centerVertical="true" />
 	</LinearLayout>        
 	
 	<ScrollView
 		android:layout_below="@+id/logo_layout"
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
-		android:paddingTop="15dip"
+		android:paddingTop="15dp"
 		android:id="@+id/HelloScroll"
+		>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:weightSum="1"
 		>
 		<TextView
 			android:id="@+id/hello_textview"
-			android:layout_height="wrap_content"
-			android:layout_width="fill_parent"
-			android:paddingLeft="20px"
-			android:paddingRight="20px"
-			android:textSize="18dip"/>
+			android:layout_height="fill_parent"
+			android:layout_width="wrap_content"
+			android:paddingLeft="20dp"
+			android:paddingRight="20dp"
+			android:layout_marginBottom="30dp"
+			android:textSize="18sp"
+			android:layout_weight="0.8"/>
+			
+		<Button
+			android:id="@+id/sync"
+			android:textColor="@drawable/black"
+			android:layout_height="fill_parent"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="40dp"
+			android:textSize="20sp"
+			android:focusable="true"
+			android:layout_gravity="center"
+			android:text="@string/Button_synchronize" 
+			android:layout_weight="0.2"/>		
+			
+		</LinearLayout>			
 	</ScrollView>
 	
-	<Button
-		android:id="@+id/sync"
-		android:textColor="@drawable/black"
-		android:layout_height="wrap_content"
-		android:layout_margin="13dip"
-		android:layout_centerHorizontal="true"
-		android:layout_alignParentBottom="true"
-		android:textSize="20dip"
-		android:focusable="true"
-	android:text="@string/Button_synchronize" android:layout_width="wrap_content"/>
+	
 	
 </RelativeLayout>

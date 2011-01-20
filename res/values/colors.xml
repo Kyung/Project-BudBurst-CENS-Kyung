@@ -35,4 +35,5 @@
 	<color name="White">#ffffff</color>
 	<color name="BudBurstHighlight">#7fb57a</color>
 	<color name="BudBurstLightBackground">#f1ffe0</color>
+	<color name="blue">#0000FF</color>
 </resources>

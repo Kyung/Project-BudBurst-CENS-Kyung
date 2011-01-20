@@ -2,17 +2,25 @@ package cens.ucla.edu.budburst;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.mapview.PBB_map;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
 import cens.ucla.edu.budburst.onetime.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -20,11 +28,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class MainPage extends Activity {
 	
-	private Button myPlantBtn = null;
+	private ImageButton myPlantBtn = null;
 	private Button oneTimeBtn = null;
 	private Button myResultBtn = null;
 	private Button mapBtn = null;
@@ -32,7 +42,6 @@ public class MainPage extends Activity {
 	private Button weeklyBtn = null;
 	private SharedPreferences pref;
 	private StaticDBHelper staticDBHelper = null;
-	private Integer FROM_MAIN_PAGE = 103;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +49,8 @@ public class MainPage extends Activity {
 	    setContentView(R.layout.mainpage);
 	    
 	    pref = getSharedPreferences("userinfo",0);
-	    SharedPreferences.Editor edit = pref.edit();				
+	    SharedPreferences.Editor edit = pref.edit();	
+	    edit.putBoolean("new", false);
 		edit.putString("visited","false");
 		edit.commit();
 		
@@ -54,8 +64,9 @@ public class MainPage extends Activity {
 		}
 		*/
 		
+		int synced = checkSync();
+		
 		staticDBHelper = new StaticDBHelper(MainPage.this);
-		OneTimeDBHelper onetime = new OneTimeDBHelper(MainPage.this);
 
 		try {
         	staticDBHelper.createDataBase();
@@ -72,8 +83,27 @@ public class MainPage extends Activity {
 	 	}
 	 	
 	 	staticDBHelper.close();
+ 
+	    myPlantBtn = (ImageButton)findViewById(R.id.my_plant);
 	    
-	    myPlantBtn = (Button)findViewById(R.id.my_plant);
+	    if(synced == SyncDBHelper.SYNCED_NO) {
+	    	LinearLayout sync_layout = (LinearLayout)findViewById(R.id.my_plant_sync);
+	    	LinearLayout unsync_layout = (LinearLayout)findViewById(R.id.my_plant_unsync);
+	    	
+	    	sync_layout.setVisibility(View.GONE);
+	    	unsync_layout.setVisibility(View.VISIBLE);
+	    	
+	    	ImageButton unsync_Btn = (ImageButton) findViewById(R.id.unsync_my_plant);
+	    	unsync_Btn.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Intent intent = new Intent(MainPage.this, PlantList.class);
+					startActivity(intent);
+				}
+			});
+	    }
 	    
 	    myPlantBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -154,7 +184,7 @@ public class MainPage extends Activity {
 		if(keyCode == event.KEYCODE_BACK) {
 			boolean flag = false;
 			if(event.getRepeatCount() == 3) {
-				Toast.makeText(MainPage.this, getString(R.string.Alert_thanks), Toast.LENGTH_SHORT).show();
+				//Toast.makeText(MainPage.this, getString(R.string.Alert_thanks), Toast.LENGTH_SHORT).show();
 				finish();
 				
 				return true;
@@ -168,6 +198,46 @@ public class MainPage extends Activity {
 		return false;
 	}
 	
+	public int checkSync() {
+		SyncDBHelper syncDB = new SyncDBHelper(MainPage.this);
+		OneTimeDBHelper onetime = new OneTimeDBHelper(MainPage.this);
+		
+		SQLiteDatabase ot = onetime.getReadableDatabase();
+		SQLiteDatabase sync = syncDB.getReadableDatabase();
+		
+		int synced = SyncDBHelper.SYNCED_YES;
+		
+		Cursor syncCheck = ot.rawQuery("SELECT synced FROM onetimeob_observation", null);
+		while(syncCheck.moveToNext()) {
+			if(syncCheck.getInt(0) == SyncDBHelper.SYNCED_NO) {
+				synced = SyncDBHelper.SYNCED_NO;
+			}
+		}
+		syncCheck.close();
+		
+		syncCheck = ot.rawQuery("SELECT synced FROM onetimeob", null);
+		while(syncCheck.moveToNext()) {
+			if(syncCheck.getInt(0) == SyncDBHelper.SYNCED_NO) {
+				synced = SyncDBHelper.SYNCED_NO;
+			}
+		}
+		syncCheck.close();
+	
+		// check if there is any unsynced data from my_observation and onetimeob tables.
+		syncCheck = sync.rawQuery("SELECT synced FROM my_observation", null);
+		while(syncCheck.moveToNext()) {
+			if(syncCheck.getInt(0) == SyncDBHelper.SYNCED_NO) {
+				synced = SyncDBHelper.SYNCED_NO;
+			}
+		}
+		syncCheck.close();
+		
+		sync.close();
+		ot.close();
+		
+		return synced;
+	}
+	
 		///////////////////////////////////////////////////////////
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
@@ -175,7 +245,8 @@ public class MainPage extends Activity {
 		
 		menu.add(0, 1, 0, getString(R.string.Menu_help)).setIcon(android.R.drawable.ic_menu_help);
 		menu.add(0, 2, 0, getString(R.string.Menu_sync)).setIcon(android.R.drawable.ic_menu_rotate);
-		menu.add(0, 3, 0, getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(0, 3, 0, getString(R.string.Menu_about)).setIcon(android.R.drawable.ic_menu_info_details);
+		menu.add(0, 4, 0, getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 			
 		return true;
 	}
@@ -183,10 +254,26 @@ public class MainPage extends Activity {
 	//Menu option selection handling
 	public boolean onOptionsItemSelected(MenuItem item){
 
+		Intent intent;
 		switch(item.getItemId()){
 			case 1:
+				intent = new Intent(MainPage.this, Help.class);
+				intent.putExtra("from", Values.FROM_MAIN_PAGE);
+				startActivity(intent);
 				return true;
+			case 2:
+				intent = new Intent(MainPage.this, Sync.class);
+				intent.putExtra("sync_instantly", true);
+				intent.putExtra("from", Values.FROM_MAIN_PAGE);
+				startActivity(intent);
+				finish();
+				return true;				
 			case 3:
+				intent = new Intent(MainPage.this, Help.class);
+				intent.putExtra("from", Values.FROM_ABOUT);
+				startActivity(intent);
+				return true;
+			case 4:
 				new AlertDialog.Builder(MainPage.this)
 				.setTitle(getString(R.string.Menu_logout))
 				.setMessage(getString(R.string.Alert_logout))
@@ -228,15 +315,7 @@ public class MainPage extends Activity {
 						
 					}
 				})
-				.setIcon(R.drawable.pbbicon_small)
 				.show();
-				return true;
-			case 2:
-				Intent intent = new Intent(MainPage.this, Sync.class);
-				intent.putExtra("sync_instantly", true);
-				intent.putExtra("from", FROM_MAIN_PAGE);
-				startActivity(intent);
-				finish();
 				return true;
 		}
 		return false;

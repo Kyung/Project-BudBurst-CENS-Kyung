@@ -45,11 +45,11 @@
 	<TextView
 		android:id="@+id/instruction"
 		android:layout_below="@+id/two_button"
-		android:textSize="17dip"
+		android:textSize="17dp"
 		android:text="@string/no_site_no_species_instruction"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_margin="10dip"
+		android:layout_margin="10dp"
 		android:visibility="gone"		
 		>
 	</TextView>
@@ -61,11 +61,11 @@
 		android:layout_height="fill_parent"/>
 	<TextView
 		android:id="@+id/queue_empty"
-		android:textSize="25dip"
+		android:textSize="25dp"
 		android:text=""
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="120dip"
+		android:layout_marginTop="120dp"
 		android:layout_gravity="center"
 		android:gravity="center"
 		android:visibility="gone"
@@ -73,11 +73,11 @@
 	<TextView
 		android:id="@+id/queue_empty2"
 		android:layout_below="@+id/queue_empty"
-		android:textSize="20dip"
+		android:textSize="20dp"
 		android:text=""
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="20dip"
+		android:layout_marginTop="20dp"
 		android:layout_gravity="center"
 		android:gravity="center"
 		android:visibility="gone"

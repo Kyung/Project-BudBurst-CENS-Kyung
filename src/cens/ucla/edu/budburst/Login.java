@@ -1,6 +1,8 @@
 package cens.ucla.edu.budburst;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -36,7 +38,7 @@ public class Login extends Activity{
 		
 		if(	!(pref.getString("Username","").equals("")) && !(pref.getString("Password","").equals(""))){
 			Intent intent = new Intent(Login.this, Sync.class);
-			intent.putExtra("from", FROM_MAIN_PAGE);
+			intent.putExtra("from", 0);
 			Login.this.startActivity(intent);
 			finish();
 		}
@@ -58,7 +60,7 @@ public class Login extends Activity{
 					edit.commit();
 					
 					Intent intent = new Intent(Login.this, Sync.class);
-					intent.putExtra("from", FROM_MAIN_PAGE);
+					intent.putExtra("from", 0);
 					Login.this.startActivity(intent);
 					finish();
 				}
@@ -73,14 +75,12 @@ public class Login extends Activity{
 
 				//Set id/pwd as test/test
 				SharedPreferences.Editor edit = pref.edit();				
-				edit.putString("Username","mbbtest");
-				edit.putString("Password","mbbtest");
+				edit.putString("Username","test10");
+				edit.putString("Password","test10");
+				edit.putBoolean("Preview", true);
 				edit.commit();
 				
-				Intent intent = new Intent(Login.this, Sync.class);
-				intent.putExtra("from", FROM_MAIN_PAGE);
-				startActivity(intent);
-				finish();
+				show_dialog();
 			}
 		}
 		);
@@ -97,6 +97,24 @@ public class Login extends Activity{
 			}
 		}
 		);
+	}
+	
+	public void show_dialog() {
+		new AlertDialog.Builder(Login.this)
+		.setTitle(getString(R.string.Preview_Mode))
+		.setMessage(getString(R.string.Preview_Mode_Description))
+		.setPositiveButton(getString(R.string.Preview_Mode_Done), new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Login.this, Sync.class);
+				intent.putExtra("from", 0);
+				startActivity(intent);
+				finish();
+			}
+		})
+		.show();
 	}
 	
 	@Override

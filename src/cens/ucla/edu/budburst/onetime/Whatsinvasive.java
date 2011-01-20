@@ -65,52 +65,49 @@ import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.SpeciesDetail;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.AreaList.DoAsyncTask;
 import cens.ucla.edu.budburst.onetime.AreaList.area;
-import cens.ucla.edu.budburst.onetime.Queue.MyListAdapter;
-import cens.ucla.edu.budburst.onetime.Queue.myItem;
 
 public class Whatsinvasive extends ListActivity {
 	private SharedPreferences pref;
-	private ArrayList<species> arSpeciesList;
+	private ArrayList<Species> arSpeciesList;
 	private MyListAdapter mylistapdater;
 	private OneTimeDBHelper otDBH;
+	private ProgressDialog dialog = null;
+	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>();
+	private FunctionsHelper helper = null;
+	private TextView areaTxt2 = null;
+	
 	private String area_id;
 	private String area_name;
 	private String cname;
 	private String sname;
-	private Double latitude;
-	private Double longitude;
 	private String image_path;
 	private String dt_taken;
 	private String camera_image_id;
+	private String new_plant_species_name;
+	
+	private Double latitude;
+	private Double longitude;
+	
 	private int new_plant_species_id;
 	private int protocol_id;
-	private String new_plant_species_name;
+	private int pheno_id;
+	
 	private CharSequence[] seqUserSite;
-	final private int PLANT_LIST = 99;
-	private TextView areaTxt2 = null;
+	
 	private int previous_activity = 0;
 	private int current_position = 0;
-	private int WILD_FLOWERS = 2;
-	private int GRASSES = 3;
-	private int DECIDUOUS_TREES = 4;
-	private int DECIDUOUS_TREES_WIND = 5;
-	private int EVERGREEN_TREES = 6;
-	private int EVERGREEN_TREES_WIND = 7;
-	private int CONIFERS = 8;
-	private int WHATSINVASIVE = 1000;
-	public final String TEMP_PATH = "/sdcard/pbudburst/wi_list/";
 	protected static int GET_AREA_LIST = 1;
 	protected static int TO_WI_INFO = 2;
-	private ProgressDialog dialog = null;
-	private HashMap<String, Integer> mapUserSiteNameID = new HashMap<String, Integer>();
-	private FunctionsHelper helper = null;
+
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -131,12 +128,13 @@ public class Whatsinvasive extends ListActivity {
 		
 		Intent p_intent = getIntent();
 		previous_activity = p_intent.getExtras().getInt("FROM");
+		pheno_id = p_intent.getExtras().getInt("pheno_id");
 		camera_image_id = p_intent.getExtras().getString("camera_image_id");
 		latitude = p_intent.getExtras().getDouble("latitude");
 		longitude = p_intent.getExtras().getDouble("longitude");
 		dt_taken = p_intent.getExtras().getString("dt_taken"); 
 			
-	    arSpeciesList = new ArrayList<species>();
+	    arSpeciesList = new ArrayList<Species>();
 	    otDBH = new OneTimeDBHelper(Whatsinvasive.this);
 	    
 	    areaTxt2 = (TextView) findViewById(R.id.title2);
@@ -144,7 +142,11 @@ public class Whatsinvasive extends ListActivity {
 		//Get User site name and id using Map.
 		mapUserSiteNameID = getUserSiteIDMap();
 		helper = new FunctionsHelper();
-	    
+		
+		File f = new File(Values.TEMP_PATH);
+		if(!f.exists()) {
+			f.mkdir();
+		}
 	    //Intent intent = new Intent(Whatsinvasive.this, AreaList.class);
 		//startActivityForResult(intent, GET_AREA_LIST);
 	    // TODO Auto-generated method stub
@@ -188,6 +190,7 @@ public class Whatsinvasive extends ListActivity {
 				
 				BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 			
+				// parse the response message
 				String line = "{'area':";
 				String[] str = null;
 		
@@ -216,60 +219,6 @@ public class Whatsinvasive extends ListActivity {
 		getSpecies();
 	}
 	
-	
-	/*
-	class getAreaId extends AsyncTask<String, Integer, Void> {
-		ProgressDialog dialog;
-		
-		protected void onPreExecute() {
-			dialog = ProgressDialog.show(Whatsinvasive.this, "Loading...", "Loading registered area based on your location", true);
-		}
-		@Override
-		protected Void doInBackground(String... url) {
-			
-			HttpPost httpPost = new HttpPost(url[0]);
-			try {
-				
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpResponse response = httpClient.execute(httpPost);
-				
-				if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-					
-					BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-				
-					String line = "{'area':";
-					String[] str = null;
-			
-					line += br.readLine();
-					line += "}";
-					Log.i("K", "Line : " + line);
-						
-					JSONHelper jHelper = new JSONHelper();
-					String getAreaByJSON = jHelper.getArea(line);
-					str = getAreaByJSON.split("\n");
-
-					for(int i = 0 ; i < str.length ; i++) {
-						String[] split = str[i].split(";");
-						area_id = split[0];
-						area_name = split[1];
-					}
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		protected void onPostExecute(Void unused) {
-			dialog.dismiss();
-		}
-	}
-	*/
 	public void getSpecies(){
 		areaTxt2.setText(area_name);
 		
@@ -289,7 +238,7 @@ public class Whatsinvasive extends ListActivity {
 		// if count is 0, it means there are no data related to the selected park
 		if(count == 0) {
 			arSpeciesList = null;
-			arSpeciesList = new ArrayList<species>();
+			arSpeciesList = new ArrayList<Species>();
 			//if(area_id)
 			new DoAsyncTask().execute(area_id);
 		}
@@ -300,7 +249,7 @@ public class Whatsinvasive extends ListActivity {
 
 	public void showExistedSpecies(String area_id) {
 		arSpeciesList = null;
-		arSpeciesList = new ArrayList<species>();
+		arSpeciesList = new ArrayList<Species>();
 		
 		SQLiteDatabase db;
 		
@@ -314,8 +263,8 @@ public class Whatsinvasive extends ListActivity {
 		    
 		while(cursor.moveToNext()) {
 
-			species pi;
-			pi = new species(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
+			Species pi;
+			pi = new Species(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
 			arSpeciesList.add(pi);
 		}
 		
@@ -328,8 +277,8 @@ public class Whatsinvasive extends ListActivity {
 		db.close();
 	}
 	
-	class species{	
-		species(String aTitle, String aCommon_name, String aScience_name, String aText, String aImage_url){
+	class Species{	
+		Species(String aTitle, String aCommon_name, String aScience_name, String aText, String aImage_url){
 			title = aTitle;
 			common_name = aCommon_name;
 			science_name = aScience_name;
@@ -348,10 +297,10 @@ public class Whatsinvasive extends ListActivity {
 	class MyListAdapter extends BaseAdapter{
 		Context maincon;
 		LayoutInflater Inflater;
-		ArrayList<species> arSrc;
+		ArrayList<Species> arSrc;
 		int layout;
 		
-		public MyListAdapter(Context context, int alayout, ArrayList<species> aarSrc){
+		public MyListAdapter(Context context, int alayout, ArrayList<Species> aarSrc){
 			maincon = context;
 			Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			arSrc = aarSrc;
@@ -376,83 +325,43 @@ public class Whatsinvasive extends ListActivity {
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
 
-			String imagePath = TEMP_PATH + arSrc.get(position).image_url + ".jpg";
-			//Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-	
-			try{
-				//FileOutputStream out = new FileOutputStream(imagePath);
-				//bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
-			}catch(Exception e){
-				Log.e("K", e.toString());
-			}
+			String imagePath = Values.TEMP_PATH + arSrc.get(position).image_url + ".jpg";
 			image_path = imagePath;
 			
 			cname = arSrc.get(position).common_name;
 			sname = arSrc.get(position).science_name;
 			
-			img.setBackgroundResource(R.drawable.shapedrawable);
-			//img.setImageBitmap(bitmap);
 			Log.i("K", "IMAGE PATH : " + imagePath);
-			img.setImageBitmap(resizeImage(imagePath));
+			img.setImageBitmap(helper.resizeImage(Whatsinvasive.this, imagePath));
 			
 			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
 			textname.setText(arSrc.get(position).common_name);
 			
 			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
 			textdesc.setText(arSrc.get(position).science_name);
-
+			
+			// call View from the xml and link the view to current position.
+			View thumbnail = convertView.findViewById(R.id.wrap_icon);
+			thumbnail.setTag(arSrc.get(position));
+			thumbnail.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Species pi = (Species)v.getTag();
+					
+					Intent intent = new Intent(Whatsinvasive.this, WIinfo.class);
+					intent.putExtra("area_id", area_id);
+					intent.putExtra("title", pi.title);
+					startActivity(intent);
+				}
+			});
+			
 			return convertView;
 		}
 	}
 	
-	private Bitmap resizeImage(String path){
-		FileInputStream fin = null;
-		BufferedInputStream buf = null;
-		
-		File existFile = new File(path);
-		if(!existFile.exists()) {
-			Toast.makeText(Whatsinvasive.this, "Error occurs while processing the species list. ", Toast.LENGTH_SHORT).show();
-			finish();
-		}
-		
-    	Log.i("K", "PATH : " + path);
-    	
-		try {
-			fin = new FileInputStream(path);
-			Log.i("K", "FILE INPUT : " + fin);
-			
-			
-			buf = new BufferedInputStream(fin);
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Bitmap bitmap = BitmapFactory.decodeStream(buf);
-		
-		Log.i("K", "" + bitmap);
-		
-		int width = bitmap.getWidth();
-		int height = bitmap.getHeight();
-		int newWidth = 60;
-		int newHeight = 60;
-		
-		//Bitmap thumb = BitmapFactory.decodeFile(path, options);
-		
-		float scaleWidth = ((float) newWidth) / width;
-		float scaleHeight = ((float) newHeight) / height;
-		
-		Log.i("K", "SCALE WIDTH : " + scaleWidth);
-		Log.i("K", "SCALE HEIGHT : " + scaleHeight);
-		
-		Matrix matrix = new Matrix();
-		matrix.postScale(scaleWidth, scaleHeight);
-		
-		Bitmap resized = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 
-    	return resized;
-    }
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == GET_AREA_LIST) {
@@ -469,36 +378,14 @@ public class Whatsinvasive extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
-		String imagePath = TEMP_PATH + arSpeciesList.get(position).image_url + ".jpg";
+		String imagePath = Values.TEMP_PATH + arSpeciesList.get(position).image_url + ".jpg";
 		
 		// if the previous activity is from "Add_PLANT", we just add a new species and end
-		if(previous_activity == PLANT_LIST) {
+		if(previous_activity == Values.FROM_PLANT_LIST) {
 			unKnownPlantDialog(position);
 		}
 		else {
-			
-			Intent intent = new Intent(Whatsinvasive.this, GetPhenophase.class);
-			intent.putExtra("from", WHATSINVASIVE);
-			intent.putExtra("cname", arSpeciesList.get(position).common_name);
-			intent.putExtra("sname", arSpeciesList.get(position).science_name);
-			intent.putExtra("protocol_id", protocol_id);
-			intent.putExtra("dt_taken", dt_taken);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("species_id", 999);
-			intent.putExtra("camera_image_id", "");
-			
-			startActivity(intent);
-			
-			/*
-			Intent intent = new Intent(Whatsinvasive.this, WI_observation.class);
-			intent.putExtra("sname", arSpeciesList.get(position).science_name);
-			intent.putExtra("cname", arSpeciesList.get(position).common_name);
-			intent.putExtra("image_path", imagePath);
-			intent.putExtra("title", arSpeciesList.get(position).title);
-			intent.putExtra("area_id", area_id);
-			startActivity(intent);
-			*/
+			unKnownPlantDialog(position);
 		}
 	}
 	
@@ -514,30 +401,46 @@ public class Whatsinvasive extends ListActivity {
 				String[] category = getResources().getStringArray(R.array.category2);
 	
 				if(category[which].equals("Wild Flowers and Herbs")) {
-					protocol_id = WILD_FLOWERS;
+					protocol_id = Values.WILD_FLOWERS;
 				}
 				else if(category[which].equals("Grass")) {
-					protocol_id = GRASSES;
+					protocol_id = Values.GRASSES;
 				}
 				else if(category[which].equals("Deciduous Trees and Shrubs")) {
-					protocol_id = DECIDUOUS_TREES;
+					protocol_id = Values.DECIDUOUS_TREES;
 				}
 				else if(category[which].equals("Deciduous Trees and Shrubs - Wind")) {
-					protocol_id = DECIDUOUS_TREES_WIND;
+					protocol_id = Values.DECIDUOUS_TREES_WIND;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs")) {
-					protocol_id = EVERGREEN_TREES;
+					protocol_id = Values.EVERGREEN_TREES;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs - Wind")) {
-					protocol_id = EVERGREEN_TREES_WIND;
+					protocol_id = Values.EVERGREEN_TREES_WIND;
 				}
 				else if(category[which].equals("Conifer")) {
-					protocol_id = CONIFERS;
+					protocol_id = Values.CONIFERS;
 				}
 				else {
 				}
 				
-				popupDialog(current_position);
+				if(previous_activity == Values.FROM_PLANT_LIST) {
+					popupDialog(current_position);
+				}
+				else {
+					Intent intent = new Intent(Whatsinvasive.this, AddSite.class);
+					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+					intent.putExtra("cname", arSpeciesList.get(current_position).common_name);
+					intent.putExtra("sname", arSpeciesList.get(current_position).science_name);
+					intent.putExtra("pheno_id", pheno_id);
+					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("dt_taken", dt_taken);
+					intent.putExtra("latitude", latitude);
+					intent.putExtra("longitude", longitude);
+					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+					intent.putExtra("camera_image_id", camera_image_id);
+					startActivity(intent);
+				}
 			}
 		})
 		.setNegativeButton(getString(R.string.Button_back), null)
@@ -547,7 +450,7 @@ public class Whatsinvasive extends ListActivity {
 	
 	private void popupDialog(int position) {
 		//Pop up choose site dialog box
-		new_plant_species_id = 999;
+		new_plant_species_id = Values.UNKNOWN_SPECIES;
 		new_plant_species_name = arSpeciesList.get(position).common_name;
 		
 		seqUserSite = helper.getUserSite(Whatsinvasive.this);
@@ -589,12 +492,14 @@ public class Whatsinvasive extends ListActivity {
 		.show();
 	}
 	
-	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename, int protocol_id){
+	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename, int protocolid){
 
 		int s_id = speciesid;
 		SharedPreferences pref = getSharedPreferences("userinfo",0);
 		
-		if(speciesid == 999) {
+		Log.i("K", "PROTOCOL ID : " + protocolid);
+		
+		if(speciesid == Values.UNKNOWN_SPECIES) {
 			s_id = pref.getInt("other_species_id", 0);
 			s_id++;
 		}
@@ -608,14 +513,14 @@ public class Whatsinvasive extends ListActivity {
 					 "999," +
 					siteid + "," +
 					"'" + sitename + "',"+
-					protocol_id + "," +
+					protocolid + "," +
 					//"1,"+ // 1 means it's official, from add plant list
 					"'" + speciesname + "'," +
 					"1, " +
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			
-			if(speciesid == 999) {
+			if(speciesid == Values.UNKNOWN_SPECIES) {
 				SharedPreferences.Editor edit = pref.edit();				
 				edit.putInt("other_species_id", s_id);
 				edit.commit();
@@ -677,7 +582,7 @@ public class Whatsinvasive extends ListActivity {
 							String randomNum = new Integer(prng.nextInt()).toString();
 							MessageDigest sha = MessageDigest.getInstance("SHA-1");
 							byte[] result = sha.digest(randomNum.getBytes());
-							image_name = area_id[0] + "_" + hexEncode(result);
+							image_name = area_id[0] + "_" + helper.hexEncode(result);
 						} catch (NoSuchAlgorithmException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -696,8 +601,8 @@ public class Whatsinvasive extends ListActivity {
 							// insert items into the list
 							
 							download_image(split[4], image_name);
-							species pi;
-							pi = new species(split[0], split[1], split[2], split[3], image_name);
+							Species pi;
+							pi = new Species(split[0], split[1], split[2], split[3], image_name);
 							arSpeciesList.add(pi);
 
 						}
@@ -738,16 +643,11 @@ public class Whatsinvasive extends ListActivity {
 			Log.i("K", "IMAGE URL : " + imageURL);
 			HttpURLConnection conn = (HttpURLConnection)imageURL.openConnection();
 			conn.connect();
-			
-			File f = new File(TEMP_PATH);
-			if(!f.exists()) {
-				f.mkdir();
-			}
-			
+
 			int len = conn.getContentLength();
 			byte[] buffer = new byte[len];
 			InputStream is = conn.getInputStream();
-			FileOutputStream fos = new FileOutputStream(TEMP_PATH + fileName + ".jpg");
+			FileOutputStream fos = new FileOutputStream(Values.TEMP_PATH + fileName + ".jpg");
 			
 			while ((read = is.read(buffer)) > 0) {
 				fos.write(buffer, 0, read);
@@ -764,9 +664,8 @@ public class Whatsinvasive extends ListActivity {
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
-		menu.add(0, 1, 0, "Change Area").setIcon(android.R.drawable.ic_menu_search);
-		menu.add(0, 2, 0, "Update Lists").setIcon(android.R.drawable.ic_menu_rotate);
-		menu.add(0, 3, 0, "Queue").setIcon(android.R.drawable.ic_menu_sort_by_size);		
+		//menu.add(0, 1, 0, "Change Area").setIcon(android.R.drawable.ic_menu_search);
+		menu.add(0, 2, 0, "Refresh the List").setIcon(android.R.drawable.ic_menu_rotate);
 		return true;
 	}
 	
@@ -778,35 +677,31 @@ public class Whatsinvasive extends ListActivity {
 				startActivityForResult(intents, GET_AREA_LIST);
 				return true;
 			case 2:
-				deleteContents("/sdcard/pbudburst/tmp/");
+				// delete the invasive lists from the same park...
+				deleteContents(Values.TEMP_PATH);
 				new DoAsyncTask().execute(area_id);
-				return true;
-			case 3:
-				Intent intent = new Intent(Whatsinvasive.this, Queue.class);
-				startActivity(intent);
 				return true;
 		}
 		return false;
 	}
-	/////////////////////////////////////////////////////////////////////////////////
 	
-	void deleteContents(String path) {
+	public void deleteContents(String path) {
 		File file = new File(path);
 		if(file.isDirectory()) {
 			String[] fileList = file.list();
 			
-			arSpeciesList = new ArrayList<species>();
+			arSpeciesList = new ArrayList<Species>();
 			
 			for(int i = 0 ; i < fileList.length ; i++) {
-				//File newFile = new File(fileList[i]);
 				String delete_file_name = fileList[i];
+				
 				//Downloaded names of plantlists are starting with area_id
 				//to prevent the duplication, we delete the species images on the park
 				String[] split_delete_file_name = delete_file_name.split("_");
-				Log.i("K", "SPLIT : " + split_delete_file_name[0]);
-				Log.i("K", "AREA ID: " + area_id);
+				
 				SQLiteDatabase db;
 				db = otDBH.getWritableDatabase();
+				
 				if(split_delete_file_name[0].equals(area_id)) {
 					Log.i("K", "FILE_NAME : " + delete_file_name);
 					delete_file_name = delete_file_name.replace(".jpg", "");
@@ -845,16 +740,5 @@ public class Whatsinvasive extends ListActivity {
 		syncDBHelper.close();
 	
 		return localMapUserSiteNameID;
-	}
-	
-	static private String hexEncode( byte[] aInput){
-		   StringBuilder result = new StringBuilder();
-		   char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};
-		   for ( int idx = 0; idx < 4; ++idx) {
-			   byte b = aInput[idx];
-			   result.append( digits[ (b&0xf0) >> 4 ] );
-			   result.append( digits[ b&0x0f] );
-		   }
-		   return result.toString();
 	}
 }

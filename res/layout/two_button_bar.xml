@@ -8,7 +8,7 @@
     <cens.ucla.edu.budburst.helper.CustomButton
         android:id="@+id/button1"
 		android:layout_width="wrap_content"
-        android:layout_height="29dip"
+        android:layout_height="29dp"
         android:layout_alignParentTop="true" 
         android:layout_weight="0.5"
         android:text="My Plants"/>
@@ -16,7 +16,7 @@
     <cens.ucla.edu.budburst.helper.CustomButton
 		android:id="@+id/button2"
 		android:layout_width="wrap_content"
-        android:layout_height="29dip"
+        android:layout_height="29dp"
         android:layout_alignParentTop="true" 
         android:layout_weight="0.5"
         android:text="Share Plants"/>

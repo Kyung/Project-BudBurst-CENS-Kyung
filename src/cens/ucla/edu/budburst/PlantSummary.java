@@ -3,10 +3,20 @@ package cens.ucla.edu.budburst;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
+import com.google.android.maps.OverlayItem;
 
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.onetime.HelloItemizedOverlay;
 import cens.ucla.edu.budburst.onetime.WPinfo;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,6 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +43,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlantSummary extends Activity {
+public class PlantSummary extends MapActivity {
 
 	public final String BASE_PATH = "/sdcard/pbudburst/";
 	private OneTimeDBHelper otDBH = null;
@@ -42,22 +53,23 @@ public class PlantSummary extends Activity {
 	private String notes = null;
 	private String photo_name = null;
 	private int pheno_id = 0;
-	private int pheno_image_id = 0;
-	private int onetime_pheno_id = 0;
+	private int pheno_icon = 0;
+	private int onetimeplant_id = 0;
 	private int previous_activity = 0;
 	private String pheno_name = null;
 	private String pheno_text = null;
 	private int species_id = 0;
 	private int site_id = 0;
 	private int protocol_id = 0;
+	private double latitude = 0.0;
+	private double longitude = 0.0;
 	protected static final int GET_CHANGE_CODE = 1;
-	protected static final int GETPHENOPHASE_ONE_TIME = 2;
-	protected static final int FROM_PLANT_LIST = 100;
-	protected static final int FROM_QUICK_CAPTURE = 101;
 
 	private PopupWindow popup = null;
 	private View popupview = null;
 	private ImageButton phone_image = null;
+	private List<Overlay> mapOverlays = null;
+	private HelloItemizedOverlay itemizedOverlay = null;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,18 +95,49 @@ public class PlantSummary extends Activity {
 	    dt_taken = intent.getExtras().getString("dt_taken");
 	    notes = intent.getExtras().getString("notes");
 	    photo_name = intent.getExtras().getString("photo_name");
+	    
+	    // get phenophase information
 	    pheno_name = intent.getExtras().getString("pheno_name");
 	    pheno_text = intent.getExtras().getString("pheno_text");
 	    pheno_id = intent.getExtras().getInt("pheno_id", 0);
-	    onetime_pheno_id = intent.getExtras().getInt("onetime_pheno_id", 0);
-	    pheno_image_id = intent.getExtras().getInt("pheno_image_id", 0);
+	    pheno_icon = intent.getExtras().getInt("pheno_icon", 0);
+	    
+	    onetimeplant_id = intent.getExtras().getInt("onetimeplant_id", 0);
 	    protocol_id = intent.getExtras().getInt("protocol_id", 0);
 	    species_id = intent.getExtras().getInt("species_id", 0);
 	    site_id = intent.getExtras().getInt("site_id", 0);
+	    
 	    previous_activity = intent.getExtras().getInt("from");
 	    
+	    if(previous_activity == Values.FROM_PLANT_LIST) {
+	    	SyncDBHelper syncDBHelper = new SyncDBHelper(PlantSummary.this);
+			SQLiteDatabase syncDB  = syncDBHelper.getReadableDatabase();
+			
+			Cursor cur = syncDB.rawQuery("SELECT latitude, longitude FROM my_sites WHERE site_id = " + site_id, null);
+			while(cur.moveToNext()) {
+				latitude = Double.parseDouble(cur.getString(0));
+				longitude = Double.parseDouble(cur.getString(1));
+			}
+			
+			cur.close();
+			syncDB.close();
+	    }
+	    if(previous_activity == Values.FROM_QUICK_CAPTURE) {
+	    	OneTimeDBHelper otDBHelper = new OneTimeDBHelper(PlantSummary.this);
+			SQLiteDatabase otDB  = otDBHelper.getReadableDatabase();
+			
+			Cursor cur = otDB.rawQuery("SELECT lat, lng FROM onetimeob_observation WHERE plant_id = " + onetimeplant_id, null);
+			while(cur.moveToNext()) {
+				latitude = cur.getDouble(0);
+				longitude = cur.getDouble(1);
+			}
+			
+			cur.close();
+			otDB.close();
+	    }
 	    
-	    Log.i("K", "previous_activity : " + previous_activity + " , plant_id :" + pheno_id + " , pheno_image_id : " + pheno_image_id + " onetime_pheno_id : " + onetime_pheno_id);
+	    
+	    Log.i("K", "previous_activity : " + previous_activity + " , plant_id :" + pheno_id + " , pheno_image_id : " + pheno_icon + " onetimeplant_id : " + onetimeplant_id);
 
 	    // setting up layout
 	    phone_image = (ImageButton) findViewById(R.id.phone_image);
@@ -108,18 +151,35 @@ public class PlantSummary extends Activity {
 	    Button editBtn = (Button) findViewById(R.id.edit);
 	    phone_image.setVisibility(View.VISIBLE);
 	    
-	    String[] sname_split;
-	    //sname_split = sname.split(" ");
-	    //int sname_length = sname_split[0].length() + sname_split[1].length();
 	    
+	    // Start mapView
+	    MapView myMap = (MapView) findViewById(R.id.simpleGM_map);
+	    GeoPoint p = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
+	    
+	    myMap.setClickable(false);
+	    MapController mc = myMap.getController();
+	    mc.animateTo(p);
+	    mc.setZoom(10);
+	    
+	    mapOverlays = myMap.getOverlays();
+	    Drawable marker = getResources().getDrawable(R.drawable.marker);
+	    itemizedOverlay = new HelloItemizedOverlay(marker, this);
+	    
+	    OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found");
+	    
+		itemizedOverlay.addOverlay(overlayitem);
+		mapOverlays.add(itemizedOverlay);
+		
+		myMap.setSatellite(false);
+		myMap.setBackgroundResource(R.drawable.shapedrawable);
+		
 	    // put cname and sname in the textView
-	    pheno_title.setText("'" + pheno_name + "' Observed");
+	    pheno_title.setText(pheno_name + " ");
 	    dt_takenTxt.setText(dt_taken + " ");
 	    
 	    cnameTxt.setText(cname + " ");
 	    snameTxt.setText(sname + " ");
 	    
-	    //snameTxt.setText(sname_split[0] + " " + sname_split[1] + " ");
 	    if(species_id > 76) {
 	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 	    }
@@ -129,6 +189,48 @@ public class PlantSummary extends Activity {
 	    
 	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+	    if(pheno_id == 0) {
+	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    }
+	    else {
+	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pheno_icon, null, null));
+	    }
+	    
+	    pheno_image.setBackgroundResource(R.drawable.shapedrawable);
+	    pheno_image.setVisibility(View.VISIBLE);
+
+	    // when click species image
+	    species_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(PlantSummary.this, SpeciesDetail.class);
+				intent.putExtra("id", species_id);
+				intent.putExtra("site_id", "");
+				startActivity(intent);
+			}
+		});
+	    
+	    // when click phenophase image
+	    pheno_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(PlantSummary.this, PhenophaseDetail.class);
+				if(previous_activity == Values.FROM_PLANT_LIST) {
+					intent.putExtra("id", pheno_id);
+					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("from", Values.FROM_PBB_PHENOPHASE);
+				}
+				else {
+					intent.putExtra("id", pheno_id);
+					intent.putExtra("from", Values.FROM_QC_PHENOPHASE);
+				}
+				startActivity(intent);
+			}
+		});
 	    
 	    String imagePath = null;
 	    File file = new File(BASE_PATH + photo_name + ".jpg");
@@ -160,6 +262,7 @@ public class PlantSummary extends Activity {
 	   	    phone_image.setVisibility(View.VISIBLE);
 	   	}
 	    
+	    // when click the image taken through camera
 	    phone_image.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -201,20 +304,6 @@ public class PlantSummary extends Activity {
 			}
 		});
 	    
-
-	    if(pheno_id == 0) {
-	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-	    }
-	    else {
-	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pheno_id, null, null));
-	    }
-		
-	    
-	    pheno_image.setBackgroundResource(R.drawable.shapedrawable);
-	    pheno_image.setVisibility(View.VISIBLE);
-	    //phenoTxt.setText(pheno_text + " ");
-
-	    
 	    notesTxt.setEnabled(false);
 	    notesTxt.setClickable(false);
 	    
@@ -222,7 +311,7 @@ public class PlantSummary extends Activity {
 			notesTxt.setText(notes);
 		}
 		else {
-			notesTxt.setText("Add notes for this species.");
+			notesTxt.setText(getString(R.string.No_Notes));
 		}
 		
 		editBtn.setOnClickListener(new View.OnClickListener() {
@@ -243,15 +332,16 @@ public class PlantSummary extends Activity {
 				intent.putExtra("cname", cname);
 				intent.putExtra("sname", sname);
 				
-				if(previous_activity == FROM_QUICK_CAPTURE) {
-					intent.putExtra("from", FROM_QUICK_CAPTURE);
+				if(previous_activity == Values.FROM_QUICK_CAPTURE) {
+					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
 					intent.putExtra("pheno_id", pheno_id);
-					intent.putExtra("pheno_image_id", pheno_image_id);
-					intent.putExtra("onetimeplant_id", onetime_pheno_id);
+					intent.putExtra("pheno_icon", pheno_icon);
+					intent.putExtra("onetimeplant_id", onetimeplant_id);
 				}
 				else {
 					intent.putExtra("pheno_id", pheno_id);
-					intent.putExtra("from", FROM_PLANT_LIST);
+					intent.putExtra("pheno_icon", pheno_icon);
+					intent.putExtra("from", Values.FROM_PLANT_LIST);
 				}
 				
 				startActivityForResult(intent, GET_CHANGE_CODE);
@@ -278,5 +368,12 @@ public class PlantSummary extends Activity {
 			
 			}
 		}			
+	}
+
+
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

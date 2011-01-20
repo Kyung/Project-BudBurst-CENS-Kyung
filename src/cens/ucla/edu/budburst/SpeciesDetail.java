@@ -27,7 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-public class SpeciesDetail extends Activity {
+public class SpeciesDetail extends Activity implements View.OnTouchListener{
 
 	private StaticDBHelper sDBH;
 	private SyncDBHelper syncDBH;
@@ -55,19 +55,24 @@ public class SpeciesDetail extends Activity {
 		
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.SpeciesDetail_info));
-	    
+	    // end set-title-bar
+		
+		// get previous intent information
 		Intent intent = getIntent();
 	    species_id = intent.getExtras().getInt("id");
 	    site_id = intent.getExtras().getInt("site_id");
 	    
+	    // declare ViewFlipper
 	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
+	    vf.setOnTouchListener(this);
 	    
+	    // set the layout
 	    ImageView image = (ImageView) findViewById(R.id.species_image);
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);
 	    TextView cnameTxt = (TextView) findViewById(R.id.common_name);
 	    TextView notesTxt = (TextView) findViewById(R.id.text);
 	    
-	    
+	    // open database
 	    SQLiteDatabase db;
 	    Cursor cursor;
 	    
@@ -75,20 +80,17 @@ public class SpeciesDetail extends Activity {
 	    
 	    db = sDBH.getReadableDatabase();
 	    
-	    
 	    if(species_id > 76) {
 	    	image.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    	snameTxt.setText(" Unknown / Other ");
+	    	notesTxt.setText("This plant has been chosen from a list that does not contain an associated description of the plant.");
 	    }
 	    else {
 	    	cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id + ";", null);
-		    
-		    Log.i("K", "SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id);
-		    
-		    Log.i("K", "COUNT : " + cursor.getCount());
-		    
+
 		    while(cursor.moveToNext()) {
-		    	snameTxt.setText(" " + cursor.getString(1) + " ");
-		    	cnameTxt.setText(" " + cursor.getString(2) + " ");
+		    	snameTxt.setText(" " + cursor.getString(2) + " ");
+		    	cnameTxt.setText(" " + cursor.getString(1) + " ");
 		    	notesTxt.setText("" + cursor.getString(3) + " ");
 		    	
 				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
@@ -99,33 +101,20 @@ public class SpeciesDetail extends Activity {
 		    cursor.close();
 	    }
 	        
+	    LinearLayout llayout = (LinearLayout)findViewById(R.id.observation_linear_layout);
+	    
+	    // setting the viewflipper components
 	    syncDBH = new SyncDBHelper(SpeciesDetail.this);
 	    db = syncDBH.getReadableDatabase();
 	    
 	    cursor = db.rawQuery("SELECT species_id from my_plants;", null);
-	    
-	    //Log.i("K", "COUNT : " + cursor.getCount());
 
 		while(cursor.moveToNext()) {
 			
-			//Log.i("K", "CURSOR : " + cursor.getInt(0));
-			//Log.i("K", "SPECIES ID : " + species_id);
-			
 			if(cursor.getInt(0) == species_id)
 				continue;
-			
-			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
-	 	    View itemView = inflater.inflate(R.layout.species_detail, null);
-	 	    TextView t1 = (TextView)itemView.findViewById(R.id.science_name);
-	 	    TextView t2 = (TextView)itemView.findViewById(R.id.common_name);
-	 	    TextView note = (TextView)itemView.findViewById(R.id.text);
-	 	    ImageView image2 = (ImageView) itemView.findViewById(R.id.species_image);
-	 	    
-		    if(cursor.getInt(0) > 76) {
-		    	image2.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-		    	vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		    }
 
+			// open database to read the static table
 			db = sDBH.getReadableDatabase();
 			
 			Cursor cursor2;
@@ -134,29 +123,47 @@ public class SpeciesDetail extends Activity {
 			while(cursor2.moveToNext()) {	    
 			    if(cursor2.getInt(0) == species_id)
 					continue;
+			    
+			    LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+			    View itemView = inflater.inflate(R.layout.species_detail, null);
+		 	     
+		 	    TextView t1 = (TextView)itemView.findViewById(R.id.science_name);
+		 	    TextView t2 = (TextView)itemView.findViewById(R.id.common_name);
+		 	    TextView note = (TextView)itemView.findViewById(R.id.text);
+		 	    ImageView image2 = (ImageView)itemView.findViewById(R.id.species_image);
 				    	
-				t1.setText(" " + cursor2.getString(1) + " ");
-				t2.setText(" " + cursor2.getString(2) + " ");
-				note.setText("" + cursor2.getString(3) + " ");
-				image2.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor2.getInt(0), null, null));
-				 	    
-				vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+			    t1.setText(" " + cursor2.getString(2) + " ");
+			    t2.setText(" " + cursor2.getString(1) + " ");
+			    note.setText("" + cursor2.getString(3) + " ");
+			    image2.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor2.getInt(0), null, null));
+				 	
+			    //llayout.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		    }
 			cursor2.close();
-
 	    }
+		//vf.removeAllViews();
+		//vf.addView(llayout);
 	    
 		cursor.close();
 		db.close();
 		sDBH.close();
 		syncDBH.close();
 	    // TODO Auto-generated method stub
+
 	}
 	
+	public void onResume() {
+		super.onResume();
+		
+		Log.i("K", "VF : " + vf.getChildCount());
+		
+		
+		//vf.setOnTouchListener(SpeciesDetail.this);
+	}
 	
-	
-    // or when user press back button
-	// when you hold the button for 3 sec, the app will be exited
+	/*
+    // press back button
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
 			vf.removeAllViews();
@@ -165,44 +172,52 @@ public class SpeciesDetail extends Activity {
 		}
 		return false;
 	}
-	
-	
+	*/
+/*	
 	public boolean onTouchEvent(MotionEvent touchevent) {
-			// TODO Auto-generated method stub
-			switch (touchevent.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-			{
-				oldTouchValue = touchevent.getX();
-				oldTouchValue2 = touchevent.getY();
+		// TODO Auto-generated method stub
+			return true;
+	}
 
-				Log.i("K","oldTouchValue : " + oldTouchValue);
-				Log.i("K","oldTouchValue2 : " + oldTouchValue2);
-				Log.i("K", "Action Started");
+*/
 
-				break;
-				
-			}
+	@Override
+	public boolean onTouch(View v, MotionEvent touchevent) {
+		// TODO Auto-generated method stub
+		if(v != vf) {
+			Log.i("K", "FALSE~~ touch event");
+			return false;
+		}
 			
-			case MotionEvent.ACTION_UP:
-			{
-				float currentX = touchevent.getX();
-
-				Log.i("K","currentX : " + currentX);
-				if (oldTouchValue < currentX) {
-					vf.setInAnimation(AnimationHelper.inFromLeftAnimation());
-					vf.setOutAnimation(AnimationHelper.outToRightAnimation());
-					vf.showNext();
-					Log.i("K", "Right to Left");
+		else {
+			switch (touchevent.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+				{
+					oldTouchValue = touchevent.getX();
+					Log.i("K","oldTouchValue : " + oldTouchValue);
+					break;
 				}
-				
-				if (oldTouchValue > currentX) {
-					vf.setInAnimation(AnimationHelper.inFromRightAnimation());
-					vf.setOutAnimation(AnimationHelper.outToLeftAnimation());
-					vf.showPrevious();
-					Log.i("K", "Left to Right");
+				case MotionEvent.ACTION_UP:
+				{
+					float currentX = touchevent.getX();
+	
+					Log.i("K","currentX : " + currentX);
+					if (oldTouchValue < currentX) {
+						vf.setInAnimation(AnimationHelper.inFromLeftAnimation());
+						vf.setOutAnimation(AnimationHelper.outToRightAnimation());
+						vf.showNext();
+						Log.i("K", "Right to Left");
+					}
+					
+					if (oldTouchValue > currentX) {
+						vf.setInAnimation(AnimationHelper.inFromRightAnimation());
+						vf.setOutAnimation(AnimationHelper.outToLeftAnimation());
+						vf.showPrevious();
+						Log.i("K", "Left to Right");
+					}
+					
+					break;
 				}
-				
-				break;
 			}
 		}
 		return true;

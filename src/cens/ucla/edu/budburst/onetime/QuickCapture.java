@@ -10,12 +10,18 @@ import java.util.Date;
 import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.Media;
+import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
@@ -33,19 +39,24 @@ public class QuickCapture extends Activity {
 	protected static final int PHOTO_CAPTURE_CODE = 0;
 	public final String BASE_PATH = "/sdcard/pbudburst/";
 	private String camera_image_id 	= null;
-	private static GpsListener gpsListener;
+	private SharedPreferences pref;
 	private LocationManager lm		= null;
 	private double latitude 		= 0.0;
 	private double longitude 		= 0.0;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    
-	    gpsListener = new GpsListener();
-	    lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-	    // set update the location data in 3secs or 30meters
-	    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 30, gpsListener);
+	    // start BackgroundService
+	    Intent service = new Intent(QuickCapture.this, BackgroundService.class);
+	    startService(service);
+	    
+	    pref = getSharedPreferences("userinfo", 0);
+	    latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
+	    longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+	    
 	 
 		try {
 			File ld = new File(BASE_PATH);
@@ -89,6 +100,11 @@ public class QuickCapture extends Activity {
 	}
 	
 	@Override
+	public void onResume() {
+		super.onResume();
+	}
+	
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// You can use the requestCode to select between multiple child
 		// activities you may have started. Here there is only one thing
@@ -99,21 +115,18 @@ public class QuickCapture extends Activity {
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				new AlertDialog.Builder(QuickCapture.this)
 				.setTitle("Quit Camera")
-				.setMessage("Make Observation without photo?")
-				.setIcon(R.drawable.pbbicon_small)
+				.setMessage("Make Observation without a photo?")
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
-						
+
 						Intent intent = new Intent(QuickCapture.this, GetPhenophase.class);
 						intent.putExtra("camera_image_id", "");
 						intent.putExtra("latitude", latitude);
 						intent.putExtra("longitude", longitude);
-						intent.putExtra("dt_taken", currentDateTimeString);
-	
+						
 						finish();
 						
 						startActivity(intent);
@@ -124,7 +137,10 @@ public class QuickCapture extends Activity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						finish();
+						Log.i("K"," No Clicked!");
+						Intent service = new Intent(QuickCapture.this, BackgroundService.class);
+					    stopService(service);
+					    finish();
 					}
 				})
 				.show();
@@ -139,7 +155,6 @@ public class QuickCapture extends Activity {
 				
 				Log.i("K","CAMERA_IMAGE_ID : " + camera_image_id);
 				
-				String currentDateTimeString = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 				
 				Media media = new Media();
 				
@@ -154,7 +169,6 @@ public class QuickCapture extends Activity {
 				intent.putExtra("camera_image_id", camera_image_id);
 				intent.putExtra("latitude", latitude);
 				intent.putExtra("longitude", longitude);
-				intent.putExtra("dt_taken", currentDateTimeString);
 				
 				finish();
 				startActivity(intent);
@@ -163,7 +177,7 @@ public class QuickCapture extends Activity {
 		}			
 	}
 	
-	static private String hexEncode( byte[] aInput){
+	static private String hexEncode(byte[] aInput){
 		StringBuilder result = new StringBuilder();
 		char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};
 		for ( int idx = 0; idx < 5; ++idx) {
@@ -172,58 +186,5 @@ public class QuickCapture extends Activity {
 			result.append( digits[ b&0x0f] );
 		}
 		return result.toString();
-	}
-	
-    @Override
-    public void onDestroy() {
-    	// when user finish this activity, turn off the gps
-    	lm.removeUpdates(gpsListener);
-        super.onDestroy();
-    }
-	
-    // or when user press back button
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			finish();
-			lm.removeUpdates(gpsListener);
-			return true;
-		}
-		return false;
-	}
-	
-	private class GpsListener implements LocationListener {
-		
-		@Override
-		public void onLocationChanged(Location loc) {
-			// TODO Auto-generated method stub
-			if(loc != null) {
-				latitude = loc.getLatitude();
-				longitude = loc.getLongitude();
-				
-				if(latitude != 0.0) {
-					lm.removeUpdates(gpsListener);
-					//Toast.makeText(QuickCapture.this, getString(R.string.AddSite_gotGPS), Toast.LENGTH_SHORT).show();
-				}
-				
-				//String strLoc = String.format("Current Location : %10.5f, %10.5f", latitude, longitude);
-			
-				//myLoc.setText(strLoc);
-			}
-		}
-		@Override
-		public void onProviderDisabled(String arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public void onProviderEnabled(String arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-			// TODO Auto-generated method stub
-			
-		}	
 	}
 }

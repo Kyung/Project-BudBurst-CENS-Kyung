@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.mapview;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +20,14 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.OverlayItem;
+
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.helper.JSONHelper;
+import cens.ucla.edu.budburst.helper.MyLocOverlay;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -66,7 +73,7 @@ public class PBB_map extends MapActivity {
 	private static GpsListener gpsListener;
 	private LocationManager lm = null;
 	private MapView map=null;
-	private MyLocationOverlay me=null;
+	private MyLocOverlay me=null;
 	private MapController mc = null;
 	private String signalLevelString = null;
 	private String url = null;	
@@ -130,7 +137,7 @@ public class PBB_map extends MapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		  // set title bar
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.pbb_map);
@@ -141,11 +148,15 @@ public class PBB_map extends MapActivity {
 		v.setPadding(0, 0, 0, 0);
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(getString(R.string.PBBMap_title));
+		myTitleText.setText(" " + getString(R.string.PBBMap_title));
 		
 		startSignalLevelListener();
 		
+		// show toast for more information
+		Toast.makeText(PBB_map.this, getString(R.string.PBB_MAP_toast), Toast.LENGTH_LONG).show();
+		
 		gpsListener = new GpsListener();
+		
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		
 		// set update the location data in 3secs or 30meters
@@ -172,12 +183,16 @@ public class PBB_map extends MapActivity {
 		   			}
 		   		})
 		   		.show();
-		    }
+		}
 		
+		// set criteria
 		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		    
-		String provider = lm.getBestProvider(criteria, true);
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setAltitudeRequired(false);
+		criteria.setBearingRequired(false);
+		criteria.setCostAllowed(false);
+		criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+		String provider = lm.getBestProvider(criteria, true);    
 		    
 		Location loca = lm.getLastKnownLocation(provider);
 		if(loca.getLatitude() != 0.0) {
@@ -194,12 +209,13 @@ public class PBB_map extends MapActivity {
 		Log.i("K", "LAT : " + latitude + " LON : " + longitude);
 		
 		mc = map.getController();
-		me = new MyLocationOverlay(PBB_map.this, map);
+		me = new MyLocOverlay(PBB_map.this, map);
 		
 		url = "http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/PBB_social_list.php?lat=" + latitude + "&lon=" + longitude;
 	
 		new DoAsyncTask().execute(url);
 	}
+
 
 	@Override
 	public void onResume() {
@@ -274,7 +290,6 @@ public class PBB_map extends MapActivity {
 		}
 		return false;
 	}
-	/////////////////////////////////////////////////////////////////////////////////
 
 	protected boolean isRouteDisplayed() {
 		return(false);
@@ -296,6 +311,7 @@ public class PBB_map extends MapActivity {
 		super.onDestroy();
 	}
 	
+	// getting information of markers from the server
 	class DoAsyncTask extends AsyncTask<String, Integer, Void> {
 		ProgressDialog dialog;
 		
@@ -357,7 +373,7 @@ public class PBB_map extends MapActivity {
 							split[2] = split[2].replace("'", "");
 							
 							//insert into table
-							// common_name, science_name, phenophase, dt_taken, lat, lon, distance
+							//common_name, science_name, phenophase, dt_taken, lat, lon, distance
 							db.execSQL("INSERT INTO pbbFlickrLists VALUES("
 									+ "'" + split[0] + "',"
 									+ "'" + split[1] + "',"
@@ -367,7 +383,7 @@ public class PBB_map extends MapActivity {
 									+ "'" + split[5] + "',"
 									+ "" + split[6] + ");");
 							
-							Log.i("K", "inserted into the table....");
+							Log.i("K", "inserted into the pbbFlickrLists table....");
 			
 						}
 						
@@ -441,9 +457,8 @@ public class PBB_map extends MapActivity {
 			Drawable marker = getResources().getDrawable(R.drawable.marker);
 			marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 			
-			
-			map.getOverlays().add(new SitesOverlay(marker));
 			me.enableMyLocation();
+			map.getOverlays().add(new SitesOverlay(marker));
 			map.getOverlays().add(me);
 			
 			// get current location
@@ -494,6 +509,7 @@ public class PBB_map extends MapActivity {
 												(int)(lon*1000000.0)));
 	}
 	
+	// overlay class
 	private class SitesOverlay extends ItemizedOverlay<CustomItem> {
 		private List<CustomItem> item=new ArrayList<CustomItem>();
 		private	PopupPanel panel=new PopupPanel(R.layout.popup);
@@ -597,7 +613,7 @@ public class PBB_map extends MapActivity {
 			String[] split_temp = temp.split(";;");
 			
 			ImageView image = (ImageView)view.findViewById(R.id.imageView);
-			image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/pbbicon", null, null));
+			image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/plant", null, null));
 			
 			((TextView)view.findViewById(R.id.title))
 			.setText("" + item.getTitle() + "\n" + split_temp[0]);
@@ -623,7 +639,25 @@ public class PBB_map extends MapActivity {
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					Toast.makeText(PBB_map.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+					//Toast.makeText(PBB_map.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent(PBB_map.this, SpeciesDetail_inMapView.class);
+					
+					/*
+					 * we need common_name, latitude, longitude, dt_taken, pheno
+					 *
+					 * 
+					 * intent.putExtra("common_name", value);
+					intent.putExtra("latitude", value);
+					intent.putExtra("longitude", value);
+					intent.putExtra("dt_taken", value);
+					intent.putExtra("pheno", value);
+					 */
+					
+					
+					
+					
+					
+					//startActivity(intent);
 				}
 			});
 			
@@ -749,8 +783,5 @@ public class PBB_map extends MapActivity {
 		void toggleHeart() {
 			isHeart=!isHeart;
 		}
-	}
-
-
-	
+	}	
 }

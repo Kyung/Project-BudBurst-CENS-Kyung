@@ -8,17 +8,17 @@
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   	android:orientation="horizontal"
-  	android:paddingTop="7dip"
-  	android:paddingLeft="7dip"
-  	android:paddingRight="7dip"
-  	android:paddingBottom="12dip"
+  	android:paddingTop="7dp"
+  	android:paddingLeft="7dp"
+  	android:paddingRight="7dp"
+  	android:paddingBottom="12dp"
   	android:background="@drawable/bg_line"
   	android:weightSum="1"
   	>
 	<ImageView
-		android:paddingTop="3dip"
-		android:layout_width="60px" 
-		android:layout_height="60px"
+		android:paddingTop="3dp"
+		android:layout_width="60dp" 
+		android:layout_height="60dp"
 		android:id="@+id/species_image" 
 		android:adjustViewBounds="true"
 		android:layout_weight="0.005"
@@ -26,8 +26,8 @@
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:paddingTop="3dip"
-			android:paddingLeft="3dip"
+			android:paddingTop="3dp"
+			android:paddingLeft="3dp"
 			android:orientation="vertical"
 			android:gravity="center"
 			android:layout_gravity="center"
@@ -38,7 +38,7 @@
 				android:id="@+id/common_name"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
-				android:textSize="17dip" 
+				android:textSize="17sp" 
 				android:gravity="center"
 				android:layout_gravity="center"
 				android:textColor="@drawable/black" 
@@ -48,132 +48,159 @@
 				android:id="@+id/science_name"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
-				android:textSize="17dip"
+				android:textSize="16sp"
 				android:gravity="center"
 				android:layout_gravity="center"  
 				android:textColor="@drawable/black" 
-				android:textStyle="italic|bold"
+				android:textStyle="italic"
 				/>
 		</LinearLayout>
 	<ImageView
-		android:paddingTop="3dip"
-		android:paddingLeft="7dip"
-		android:layout_width="60px" 
-		android:layout_height="60px"
+		android:paddingTop="3dp"
+		android:paddingLeft="7dp"
+		android:layout_width="60dp" 
+		android:layout_height="60dp"
 		android:id="@+id/pheno_image" 
 		android:adjustViewBounds="true"
 		android:layout_weight="0.005"
 	/>			
 	</LinearLayout>
 	
-	<TextView
-		android:layout_width="fill_parent"
-		android:layout_height="15px"
-		android:background="@drawable/bg_line_top"
-		android:id="@+id/void_line"
-		android:layout_below="@+id/header_part"
-	/>
+	
 	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:paddingTop="7dp"
+		android:layout_below="@+id/header_part"
+		android:background="@color/BudBurstBackground"
+	>
+	<LinearLayout
 		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content" 
-		android:layout_below="@+id/void_line"
-		android:layout_marginLeft="5px"
-		android:layout_marginRight="5px"
-		android:id="@+id/scroll_view"
-		>
-
+		android:layout_height="fill_parent" 
+		android:gravity="center"
+		android:orientation="vertical"
+		android:padding="1dp"
+		android:weightSum="1"
+	>
 	<LinearLayout 
 		android:id="@+id/observation_linear_layout"
 		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content" 
+		android:layout_height="wrap_content"
+		android:layout_weight="0.95" 
 		android:gravity="center"
 		android:orientation="vertical"
-		android:background="@drawable/box_drawable_green"
+		android:background="@drawable/certificate"
 		>
 
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:orientation="horizontal"
+			android:paddingTop="20dp"
+			android:paddingLeft="10dp"
+			android:paddingRight="10dp"
+			android:weightSum="1"
+		>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_marginLeft="17dp"
+			android:paddingRight="10dp"
+			android:orientation="vertical"
+			android:layout_weight="0.5"
+		>
+		
 		<TextView
-			android:layout_marginTop="15px"
+			android:layout_marginTop="10dp"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" 
 			android:textColor="@drawable/black" 
 			android:gravity="center"
-			android:textStyle="bold|italic" 
+			android:textStyle="bold" 
 			android:id="@+id/pheno_title"
-			android:textSize="21dip"
+			android:textSize="19sp"
 			/>
+			
 		<TextView
 			android:id="@+id/timestamp_text"
-			android:layout_width="wrap_content" 
+			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
-			android:textSize="20dip" 
+			android:textSize="18sp" 
 			android:textColor="@drawable/black" 
 			android:textStyle="bold|italic"
 			android:layout_gravity="center"
+			android:gravity="center"
 			android:focusable="true"
 			android:focusableInTouchMode="true"
-			android:paddingLeft="7dip"
-			android:paddingRight="7dip"
-			android:layout_marginTop="5dip"
-			android:layout_marginBottom="5dip" />
-			
-		<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="15px"
-			android:gravity="left"		
-			android:orientation="horizontal"
-			android:paddingTop="2dip"
-			>
+			android:paddingLeft="7dp"
+			android:paddingRight="7dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginBottom="5dp" />
 		
-		
-		
-			
 		</LinearLayout>
+		
+		<com.google.android.maps.MapView 
+			android:layout_weight="0.56"
+			android:id="@+id/simpleGM_map"
+			android:layout_width="fill_parent"
+			android:layout_height="100dp"
+			android:apiKey="0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ"
+			android:clickable="true"
+			android:layout_marginTop="10dp"
+			android:layout_marginBottom="5dp"
+			android:layout_marginRight="15dp"
+		/>
 
+		</LinearLayout>
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:gravity="left"		
 			android:orientation="horizontal"
-			android:paddingTop="4dip"
-			android:paddingLeft="7dip"
-			android:paddingRight="7dip"
+			android:padding="10dp"
+			android:layout_marginBottom="20dp"
+			android:weightSum="1"
 		>
 		<ImageButton
 			android:scaleType="fitCenter"
-			android:paddingRight="13dip"
-			android:paddingLeft="13dip"
-			android:layout_width="110px"
-			android:layout_height="110px"
+			android:paddingRight="13dp"
+			android:paddingLeft="13dp"
+			android:layout_marginLeft="20dp"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
 			android:adjustViewBounds="true"
 			android:id="@+id/phone_image"
+			android:layout_weight="0.55"
 		/>
-		
 		<EditText
+			android:layout_weight="0.45"
 			android:id="@+id/mynotes"
+			android:background="@drawable/yellow_note"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
-			android:layout_marginBottom="10dip"
-			android:layout_marginLeft="10px"
-			android:paddingRight="7dip"
+			android:layout_marginLeft="8dp"
+			android:layout_marginRight="20dp"
+			android:paddingLeft="10dp"
+			android:paddingTop="22dp"
 			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
 			android:lines="5"
 			android:gravity="top" 
-			android:textSize="16dip"
+			android:textSize="16sp"
 			android:textStyle="italic"
 			android:textColor="@color/black" android:hint="@string/PlantInfo_addNotes"/>
-		
 		</LinearLayout>
-		<Button
-			android:id="@+id/edit" 
-			android:textColor="@drawable/black"
-			android:layout_width="250px" 
-			android:layout_height="wrap_content"
-			android:layout_marginTop="15px"
-			android:layout_marginBottom="20px"
-			android:textStyle="bold"
-			android:textSize="16dip"
-			android:focusable="true"
+	</LinearLayout>
+	<Button
+		android:layout_weight="0.05"
+		android:id="@+id/edit" 
+		android:textColor="@drawable/black"
+		android:layout_below="@+id/observation_linear_layout"
+		android:layout_width="250dp" 
+		android:layout_height="wrap_content"
+		android:layout_marginTop="10dp"
+		android:textStyle="bold"
+		android:textSize="16sp"
 		android:text="@string/Button_editObs"/>
 	
 	</LinearLayout>

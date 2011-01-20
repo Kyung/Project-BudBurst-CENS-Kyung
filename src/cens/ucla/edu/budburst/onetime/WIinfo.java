@@ -27,10 +27,7 @@ public class WIinfo extends Activity {
 	private OneTimeDBHelper otDBH;
 	private String area_id;
     private SharedPreferences pref = null;
-    public final String TEMP_PATH = "/sdcard/pbudburst/tmp/";
-    
-    private ViewFlipper vf;
-    private float oldTouchValue;
+    public final String TEMP_PATH = "/sdcard/pbudburst/wi_list/";
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -40,7 +37,7 @@ public class WIinfo extends Activity {
 	    // set title bar
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.wiinfo);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.flora_title);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
 		v = (ViewGroup)v.getChildAt(0);
@@ -48,11 +45,7 @@ public class WIinfo extends Activity {
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText("  Species Info");
-	    
-	    
-	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
-	    
-	    
+	     
 	    ImageView image = (ImageView) findViewById(R.id.species_image);
 	    TextView titleTxt = (TextView) findViewById(R.id.title);
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);
@@ -115,69 +108,4 @@ public class WIinfo extends Activity {
 		edit.putBoolean("visited", true);
 		edit.commit();
 	}
-	
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-	        //Intent intent = getIntent();
-	        //intent.putExtra("selected_park", area_id);
-	        //setResult(RESULT_OK, intent);
-	        finish();
-	        return true;
-	    }
-	    return false;
-	}
-	
-	public boolean onTouchEvent(MotionEvent touchevent) {
-		switch (touchevent.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-			{
-				oldTouchValue = touchevent.getX();
-				Log.i("K", "Action Started");
-				break;
-			}
-			
-			case MotionEvent.ACTION_MOVE:
-			{
-				float currentX = touchevent.getX();
-				if (oldTouchValue < currentX) {
-					vf.setInAnimation(AnimationHelper.inFromLeftAnimation());
-					vf.setOutAnimation(AnimationHelper.outToRightAnimation());
-					vf.showNext();
-					Log.i("K", "Right to Left");
-				}
-				
-				if (oldTouchValue > currentX) {
-					vf.setInAnimation(AnimationHelper.inFromRightAnimation());
-					vf.setOutAnimation(AnimationHelper.inFromLeftAnimation());
-					vf.showPrevious();
-					Log.i("K", "Left to Right");
-				}
-				
-				return true;
-			}
-
-			case MotionEvent.ACTION_UP:
-			{
-				float currentX = touchevent.getX();
-				if (oldTouchValue < currentX) {
-					vf.setInAnimation(AnimationHelper.inFromLeftAnimation());
-					vf.setOutAnimation(AnimationHelper.outToRightAnimation());
-					vf.showNext();
-					Log.i("K", "Right to Left");
-				}
-				
-				if (oldTouchValue > currentX) {
-					vf.setInAnimation(AnimationHelper.inFromRightAnimation());
-					vf.setOutAnimation(AnimationHelper.inFromLeftAnimation());
-					vf.showPrevious();
-					Log.i("K", "Left to Right");
-				}
-				
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
 }

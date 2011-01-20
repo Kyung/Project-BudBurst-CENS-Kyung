@@ -27,9 +27,6 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-
-import cens.ucla.edu.budburst.onetime.Queue;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -83,12 +80,12 @@ public class SyncNetworkHelper extends Activity{
 	}
 	
 	static public String upload_new_site(String username, String password, 
-			String site_id, String site_name, String latitude, String longitude, 
-			String state, String comments){
+			String site_id, String site_name, String latitude, String longitude, String accuracy,
+			String comments, String hdisturbance, String shading, String irrigation, String habitat){
 		
 		try{
 	        // Add your data  
-	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(6);
+	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(9);
 	        String result = null;
 
 			HttpClient httpclient = new DefaultHttpClient();  
@@ -103,8 +100,12 @@ public class SyncNetworkHelper extends Activity{
         	nameValuePairs.add(new BasicNameValuePair("site_name", site_name));
         	nameValuePairs.add(new BasicNameValuePair("latitude", latitude));
         	nameValuePairs.add(new BasicNameValuePair("longitude", longitude));
-        	nameValuePairs.add(new BasicNameValuePair("state", state));
+        	nameValuePairs.add(new BasicNameValuePair("accuracy", accuracy));
         	nameValuePairs.add(new BasicNameValuePair("comments", comments));
+        	nameValuePairs.add(new BasicNameValuePair("human_disturbance", hdisturbance));
+        	nameValuePairs.add(new BasicNameValuePair("shading", shading));
+        	nameValuePairs.add(new BasicNameValuePair("irrigation", irrigation));
+        	nameValuePairs.add(new BasicNameValuePair("habitat", habitat));
         	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
 	  
 	        // Execute HTTP Post Request  
@@ -176,7 +177,7 @@ public class SyncNetworkHelper extends Activity{
 	}
 	
 	static public String upload_new_plant(String username, String password, Context cont
-			,String species_id, String site_id, Integer active, String common_name){
+			,String species_id, String site_id, Integer active, String common_name, Integer protocol_id){
 		try{
 			
 	        // Add your data  
@@ -191,13 +192,15 @@ public class SyncNetworkHelper extends Activity{
 		    		username+"&password="+password);
 		    HttpPost httppost = new HttpPost(url);
 		    
-		    Log.i("K","@@@@@@@@@@species_id : " + species_id + " , @@@@@@@@site_id : " + site_id + ", ACTIVE : " + active + ", Common Name : " + common_name);
+		    Log.i("K","species_id : " + species_id + " , site_id : " + site_id + ", ACTIVE : " + active + ", Common Name : " + common_name + " Protocl_id : " + protocol_id);
 		    String active_str = active.toString();
+		    String protocol_id_str = protocol_id.toString();
 		    
         	nameValuePairs.add(new BasicNameValuePair("species_id", species_id));  
         	nameValuePairs.add(new BasicNameValuePair("site_id", site_id));  
         	nameValuePairs.add(new BasicNameValuePair("active", active_str));
         	nameValuePairs.add(new BasicNameValuePair("common_name", common_name));
+        	nameValuePairs.add(new BasicNameValuePair("protocol_id", protocol_id_str));
         	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
         	
         	
@@ -226,7 +229,7 @@ public class SyncNetworkHelper extends Activity{
 	
 	
 	static public String upload_quick_observations(String username, String password, Context context,
-			Integer plant_id, Integer phenophase_id, Double latitude, Double longitude, String image_id,
+			Integer plant_id, Integer phenophase_id, Double latitude, Double longitude, Float accuracy, String image_id,
 			String dt_taken, String notes) {
 		
 		try {
@@ -247,6 +250,7 @@ public class SyncNetworkHelper extends Activity{
         	entity.addPart("phenophase_id", new StringBody(Integer.toString(phenophase_id)));
         	entity.addPart("latitude", new StringBody(latitude.toString()));
         	entity.addPart("longitude", new StringBody(longitude.toString()));
+        	entity.addPart("accuracy", new StringBody(Float.toString(accuracy)));
         	entity.addPart("date", new StringBody(dt_taken));
         	entity.addPart("note", new StringBody(notes));
 
@@ -306,9 +310,10 @@ public class SyncNetworkHelper extends Activity{
         	entity.addPart("note", new StringBody(note));
         	
         	Log.i("K", "image_id.toString() : " + image_id.toString());
+        	
+        	File file = new File("/sdcard/pbudburst/" + image_id.toString() + ".jpg");
 
-		    if(!image_id.toString().equals("")){
-			    File file = new File("/sdcard/pbudburst/" + image_id.toString() + ".jpg");
+		    if(file.exists()){
 	        	entity.addPart("image", new FileBody(file));
 		    }
 		    

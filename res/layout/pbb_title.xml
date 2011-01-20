@@ -10,7 +10,7 @@
   	 android:layout_width="fill_parent"
   	 android:layout_height="fill_parent"
   	 android:background="@color/pbb_title_background"
-  	 android:textSize="15px"
+  	 android:textSize="15sp"
   	 android:textStyle="bold"
   	 android:textColor="@color/pbb_text_color"
 />

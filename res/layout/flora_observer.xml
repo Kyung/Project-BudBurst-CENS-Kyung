@@ -19,52 +19,57 @@
     	android:id="@+id/radio_group"
     	android:weightSum="1"
     >
+        <TextView
+    		android:checked="false"
+    		android:layout_weight="0.2"
+    	/>
     	<RadioButton
     		android:checked="true"
     		android:id="@+id/option1"
-    		android:layout_weight="0.3"
+    		android:layout_weight="0.26"
     	/>
     	<RadioButton
     		android:checked="false"
     		android:id="@+id/option2"
-    		android:layout_weight="0.3"
+    		android:layout_weight="0.26"
     	/>
     	<RadioButton
     		android:checked="false"
     		android:id="@+id/option3"
-    		android:layout_weight="0.1"
+    		android:layout_weight="0.26"
     	/>    	
     </RadioGroup>
     <LinearLayout
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_below="@+id/radio_group"
-    	android:paddingLeft="10px"
-    	android:paddingBottom="8px"
+    	android:paddingBottom="8dp"
     	android:orientation="horizontal"
-    	android:gravity="center"
-    	android:layout_marginTop="-10px"
+    	android:layout_marginTop="-10dp"
     	android:weightSum="1">
-    	<TextView
-    		android:layout_width="wrap_content"
-    		android:layout_height="wrap_content"
-    		android:layout_weight="0.3"
-    		android:textColor="@drawable/black"
-    	android:text="@string/BBList_top10"/>
-    	<TextView
-    		android:layout_width="wrap_content"
-    		android:layout_height="wrap_content"
-    		android:layout_weight="0.3"
-    		android:paddingLeft="18px"
-    		android:textColor="@drawable/black"
-    	android:text="@string/BBList_all"/>
-    	<TextView
+		<TextView
     		android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
     		android:layout_weight="0.2"
-    		android:paddingLeft="18px"
+    	/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.26"
     		android:textColor="@drawable/black"
-    	android:text="@string/BBList_group"/>
+    		android:text="@string/BBList_top10"/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.26"
+    		android:textColor="@drawable/black"
+    		android:text="@string/BBList_all"/>
+    	<TextView
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_weight="0.26"
+    		android:textColor="@drawable/black"
+    	    android:text="@string/BBList_group"/>
     
     </LinearLayout>
 	</LinearLayout>

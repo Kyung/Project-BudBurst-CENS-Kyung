@@ -12,18 +12,18 @@
 		android:orientation="horizontal"
 	>
 		<ImageView
-			android:layout_width="100px"
-			android:layout_height="100px"
+			android:layout_width="100dp"
+			android:layout_height="100dp"
 			android:id="@+id/imageView"
 		/>
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:layout_marginLeft="10dip"
+			android:layout_marginLeft="10dp"
 		>
 			<TextView
-			android:layout_marginRight="10dip"
+			android:layout_marginRight="10dp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content" 
 			android:id="@+id/title" 
@@ -48,16 +48,16 @@
 		android:orientation="horizontal"
 	>
 	<Button
-		android:layout_marginTop="5dip"
-		android:layout_width="120px"
+		android:layout_marginTop="5dp"
+		android:layout_width="120dp"
 		android:layout_height="wrap_content"
 		android:id="@+id/detailBtn"
 	 android:text="@string/Button_more"/>
 	
 	<Button
-		android:layout_marginLeft="5dip"
-		android:layout_marginTop="5dip"
-		android:layout_width="120px"
+		android:layout_marginLeft="5dp"
+		android:layout_marginTop="5dp"
+		android:layout_width="120dp"
 		android:layout_height="wrap_content"
 		android:id="@+id/okayBtn"
 	 android:text="@string/Button_OK"/>

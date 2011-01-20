@@ -16,7 +16,6 @@ import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.onetime.Whatsinvasive.DoAsyncTask;
-import cens.ucla.edu.budburst.onetime.Whatsinvasive.species;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;

@@ -21,9 +21,9 @@
             android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="marquee"
-            android:layout_marginBottom="2dip" />
+            android:layout_marginBottom="2dp" />
         <TextView android:id="@+id/distance"
-            android:layout_marginTop="-4dip"
+            android:layout_marginTop="-4dp"
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

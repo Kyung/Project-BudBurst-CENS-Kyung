@@ -71,8 +71,7 @@ public class Helloscr extends Activity{
 		
 		//Call SyncNetworkHelper
 		sync = new SyncNetworkHelper();
-		
-		//
+	
 		StaticDBHelper sDBHelper = new StaticDBHelper(Helloscr.this);
 		SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 		
@@ -80,6 +79,10 @@ public class Helloscr extends Activity{
 		pref = getSharedPreferences("userinfo",0);
 		username = pref.getString("Username","");
 		password = pref.getString("Password","");
+
+		if(pref.getBoolean("Preview", false)) {
+			username = "Preview";
+		}
 		
 		//Display instruction message
 		TextView textViewHello = (TextView)findViewById(R.id.hello_textview);

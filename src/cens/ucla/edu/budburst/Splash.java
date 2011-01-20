@@ -26,7 +26,7 @@ public class Splash extends Activity {
 			}
 			else{
 				Intent intent = new Intent(Splash.this, Sync.class);
-				intent.putExtra("from", FROM_MAIN_PAGE);
+				intent.putExtra("from", 0);
 				startActivity(intent);
 				finish();
 			}

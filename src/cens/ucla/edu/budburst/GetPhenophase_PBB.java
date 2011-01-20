@@ -42,17 +42,19 @@ public class GetPhenophase_PBB extends ListActivity {
 	private int protocol_ids	= 0;
 	private int species_ids 	= 0;
 	private int site_ids 	= 0;
-	private int wherefrom = 0;
-	private String common_name = null;
-	private String science_name = null;
+	private int previous_activity = 0;
+	private String cname = null;
+	private String sname = null;
 	private EditText et1 = null;
 	private EditText et2 = null;
 	private ImageView img = null;
 	private Dialog dialog = null;
-	private TextView species_name = null;
+	private TextView common_name = null;
+	private TextView science_name = null;
 	private String camera_image_id = "none";
 	protected static final int RETURN_FROM_PLANT_INFORMATION = 0;
 	protected static final int RETURN_FROM_PLANT_QUICK = 1;
+	protected static final int FROM_PBB_PHENOPHASE = 1000;
 	public final String BASE_PATH = "/sdcard/pbudburst/pbb/";
 	public final String CALL_IMAGE_PATH = "/sdcard/pbudburst/";
 	private int FROM_PLANT_LIST = 100;
@@ -76,18 +78,19 @@ public class GetPhenophase_PBB extends ListActivity {
 	    protocol_ids = intent.getExtras().getInt("protocol_id");
 	    species_ids = intent.getExtras().getInt("species_id");
 	    site_ids = intent.getExtras().getInt("site_id");
-	    common_name = intent.getExtras().getString("cname");
-	    science_name = intent.getExtras().getString("sname");
-	    wherefrom = intent.getExtras().getInt("from");
+	    cname = intent.getExtras().getString("cname");
+	    sname = intent.getExtras().getString("sname");
+	    previous_activity = intent.getExtras().getInt("from");
 	    camera_image_id = intent.getExtras().getString("camera_image_id");
 	    
 	    LinearLayout add_species_name = (LinearLayout)findViewById(R.id.add_species_name);
 	    
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    
-	    species_name = (TextView) findViewById(R.id.species_name);
+	    common_name = (TextView) findViewById(R.id.common_name);
+	    science_name = (TextView) findViewById(R.id.science_name);
 	    
-	    if(wherefrom == FROM_PLANT_LIST) {
+	    if(previous_activity == FROM_PLANT_LIST) {
 		    species_image.setVisibility(View.VISIBLE);
 		    if(species_ids > 76) {
 	    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
@@ -95,8 +98,8 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	else {
 	    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_ids, null, null));
 	    	}
-		    //species_name.setText(" " + getString(R.string.GetPhenophase_PBB_not_defined));
-		    species_name.setText(" " + common_name + "\n" + science_name);
+		    common_name.setText(cname);
+		    science_name.setText(sname);
 	    }
 	    else {
 	    	species_image.setVisibility(View.VISIBLE);
@@ -107,7 +110,8 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	else {
 	    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_ids, null, null));
 	    	}
-	    	species_name.setText(common_name + "\n" + science_name);
+	    	common_name.setText(cname);
+		    science_name.setText(sname);
 	    }
 	    
 	    species_image.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +129,8 @@ public class GetPhenophase_PBB extends ListActivity {
 	    pItem = new ArrayList<PlantItem>();
 	    PlantItem pi;
 	    
-	    ArrayList<Integer> phenophase = new ArrayList<Integer>();
+	    ArrayList<Integer> pheno_id = new ArrayList<Integer>();
+	    ArrayList<Integer> pheno_icon = new ArrayList<Integer>();
 	    ArrayList<Integer> protocol_id = new ArrayList<Integer>();
 	    ArrayList<String> pheno_name = new ArrayList<String>();
 	    ArrayList<String> description = new ArrayList<String>();
@@ -146,19 +151,16 @@ public class GetPhenophase_PBB extends ListActivity {
 		String query = null;
 		query = "SELECT Phenophase_Icon, description, Phenophase_ID, Phenophase_Name, Protocol_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID=" + protocol_ids + " ORDER BY Chrono_Order ASC";
 		
-		//Log.i("K", query);
-		
 	    Cursor cursor = sDB.rawQuery(query, null);
 		
 	    while(cursor.moveToNext()) {
 	    	
-	    	int pheno_id = cursor.getInt(2);
-	    	String pheno_existed = "SELECT species_id, site_id, phenophase_id, image_id, time, note FROM my_observation WHERE phenophase_id=" + pheno_id 
+	    	String pheno_existed = "SELECT species_id, site_id, phenophase_id, image_id, time, note FROM my_observation WHERE phenophase_id=" + cursor.getInt(2)
 	    				+ " AND species_id=" + species_ids
 	    				+ " AND site_id=" + site_ids 
 	    				+ " ORDER BY time DESC LIMIT 1";
-	    	
-	    	//Log.i("K", pheno_existed);
+	    
+	    	Log.i("K", "Pheno_existed : " + pheno_existed);
 	    	
 	    	Cursor cursor2 = syncDB.rawQuery(pheno_existed, null);
 	    	cursor2.moveToNext();
@@ -166,11 +168,12 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	Log.i("K", "CURSOR COUNT : " + cursor2.getCount());
 	    	
 	    	if(cursor2.getCount() > 0) {
-	    		Log.i("K", "IN THE TABLE!!!");
-	    		phenophase.add(cursor.getInt(0));
+	    		Log.i("K", "item already in the table...observed phenophase");
+	    		pheno_icon.add(cursor.getInt(0));
 	    		description.add(cursor.getString(1));
-	    		protocol_id.add(cursor.getInt(2));
+	    		pheno_id.add(cursor.getInt(2));
 	    		pheno_name.add(cursor.getString(3));
+	    		protocol_id.add(cursor.getInt(4));
 	    		
 	    		species_id.add(cursor2.getInt(0));
 	    		site_id.add(cursor2.getInt(1));
@@ -180,10 +183,12 @@ public class GetPhenophase_PBB extends ListActivity {
 	    		flag.add(true);
 	    	}
 	    	else {
-		    	phenophase.add(cursor.getInt(0));
-		    	description.add(cursor.getString(1));
-		    	protocol_id.add(cursor.getInt(2));
+	    		pheno_icon.add(cursor.getInt(0));
+	    		description.add(cursor.getString(1));
+	    		pheno_id.add(cursor.getInt(2));
 		    	pheno_name.add(cursor.getString(3));
+		    	protocol_id.add(cursor.getInt(4));
+		    	
 		    	species_id.add(0);
 	    		site_id.add(0);
 	    		image_id.add("");
@@ -193,11 +198,9 @@ public class GetPhenophase_PBB extends ListActivity {
 	    	}
 	    	cursor2.close();
 	    }
-	    
-	    Log.i("K", "SIZE : " + phenophase.size());
 	     
-	    for(int i = 0 ; i < phenophase.size() ; i++) {
-	    	pi = new PlantItem(phenophase.get(i), protocol_id.get(i), description.get(i), pheno_name.get(i), image_id.get(i), species_id.get(i), site_id.get(i), time.get(i), notes.get(i), flag.get(i));
+	    for(int i = 0 ; i < pheno_id.size() ; i++) {
+	    	pi = new PlantItem(pheno_id.get(i), pheno_icon.get(i), protocol_id.get(i), description.get(i), pheno_name.get(i), image_id.get(i), species_id.get(i), site_id.get(i), time.get(i), notes.get(i), flag.get(i));
 	    	pItem.add(pi);
 	    }
 	    
@@ -221,100 +224,48 @@ public class GetPhenophase_PBB extends ListActivity {
 		if(pItem.get(position).Flag) {
 			Intent intent = new Intent(GetPhenophase_PBB.this, PlantSummary.class);
 			intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
-			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
+			intent.putExtra("pheno_icon", pItem.get(position).Pheno_Icon);
 			intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
 			intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
+			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
+			
 			intent.putExtra("photo_name", pItem.get(position).Image_id);
 			intent.putExtra("species_id", species_ids);
 			intent.putExtra("site_id", site_ids);
 			intent.putExtra("dt_taken", pItem.get(position).Time);
 			intent.putExtra("notes", pItem.get(position).Notes);			
-			intent.putExtra("cname", common_name);
-			intent.putExtra("sname", science_name);
+			intent.putExtra("cname", cname);
+			intent.putExtra("sname", sname);
 			intent.putExtra("from", FROM_PLANT_LIST);
 			startActivityForResult(intent, RETURN_FROM_PLANT_INFORMATION);
 		}
 		else {
 			Intent intent = new Intent(GetPhenophase_PBB.this, PlantInformation_Direct.class);
 			intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
-			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
+			intent.putExtra("pheno_icon", pItem.get(position).Pheno_Icon);
 			intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
 			intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
+			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
+			
 			intent.putExtra("photo_name", pItem.get(position).Image_id);
 			intent.putExtra("species_id", species_ids);
 			intent.putExtra("site_id", site_ids);
 			intent.putExtra("dt_taken", pItem.get(position).Time);
 			intent.putExtra("notes", pItem.get(position).Notes);
-			intent.putExtra("cname", common_name);
-			intent.putExtra("sname", science_name);
+			intent.putExtra("cname", cname);
+			intent.putExtra("sname", sname);
 			intent.putExtra("camera_image_id", camera_image_id);
 			intent.putExtra("from", FROM_PLANT_LIST);
 			intent.putExtra("direct", true);
 			startActivityForResult(intent, RETURN_FROM_PLANT_QUICK);
 		}
-		/*
-		if(wherefrom == SELECT_PLANT_NAME) {
-			
-			Log.i("K", "SELECTED PLANT NAME");
-			
-			Intent intent = new Intent(GetPhenophase_PBB.this, PlantInformation_Direct.class);
-			intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
-			intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
-			intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
-			intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
-			intent.putExtra("photo_name", pItem.get(position).Image_id);
-			intent.putExtra("species_id", species_ids);
-			intent.putExtra("site_id", site_ids);
-			intent.putExtra("dt_taken", pItem.get(position).Time);
-			intent.putExtra("notes", pItem.get(position).Notes);
-			intent.putExtra("cname", common_name);
-			intent.putExtra("sname", science_name);
-			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("from", SELECT_PLANT_NAME);
-			intent.putExtra("direct", true);
-			startActivityForResult(intent, RETURN_FROM_PLANT_QUICK);
-		}
-		else {
-			if(get_time.length() > 0) {
-				Intent intent = new Intent(GetPhenophase_PBB.this, PlantSummary.class);
-				intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
-				intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
-				intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
-				intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
-				intent.putExtra("photo_name", pItem.get(position).Image_id);
-				intent.putExtra("species_id", species_ids);
-				intent.putExtra("site_id", site_ids);
-				intent.putExtra("dt_taken", pItem.get(position).Time);
-				intent.putExtra("notes", pItem.get(position).Notes);
-				intent.putExtra("cname", common_name);
-				intent.putExtra("sname", science_name);
-				startActivityForResult(intent, RETURN_FROM_PLANT_INFORMATION);
-			}
-			else {
-				Intent intent = new Intent(GetPhenophase_PBB.this, PlantInformation_Direct.class);
-				intent.putExtra("pheno_id", pItem.get(position).Pheno_id);
-				intent.putExtra("protocol_id", pItem.get(position).Protocol_id);
-				intent.putExtra("pheno_text", pItem.get(position).Pheno_Description);
-				intent.putExtra("pheno_name", pItem.get(position).Pheno_Name);
-				intent.putExtra("photo_name", pItem.get(position).Image_id);
-				intent.putExtra("species_id", species_ids);
-				intent.putExtra("site_id", site_ids);
-				intent.putExtra("dt_taken", pItem.get(position).Time);
-				intent.putExtra("notes", pItem.get(position).Notes);
-				intent.putExtra("cname", common_name);
-				intent.putExtra("sname", science_name);
-				intent.putExtra("direct", true);
-		
-				startActivityForResult(intent, RETURN_FROM_PLANT_INFORMATION);
-			}
-		}
-		*/
 	}
 	
 	class PlantItem{
-		PlantItem(int aPheno_id, int aProtocol_id, String aPheno_Description, String aPheno_Name, String image_id, int aSpecies_id, int aSite_id, String aTime, String aNotes, boolean aFlag){
+		PlantItem(int aPheno_id, int aPheno_Icon, int aProtocol_id, String aPheno_Description, String aPheno_Name, String image_id, int aSpecies_id, int aSite_id, String aTime, String aNotes, boolean aFlag){
 			
 			Pheno_id = aPheno_id;
+			Pheno_Icon = aPheno_Icon;
 			Protocol_id = aProtocol_id;
 			Pheno_Description = aPheno_Description;
 			Pheno_Name = aPheno_Name;
@@ -327,6 +278,7 @@ public class GetPhenophase_PBB extends ListActivity {
 		}
 		
 		int Pheno_id;
+		int Pheno_Icon;
 		int Protocol_id;
 		String Pheno_Description;
 		String Pheno_Name;
@@ -370,18 +322,11 @@ public class GetPhenophase_PBB extends ListActivity {
 			
 			String yes_or_no = "";
 			
-			//Log.i("K","POSITION_PHENO : " + position);
-			//Log.i("K","ID : " + getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).Pheno_id, null, null));
-			//Log.i("K",arSrc.get(position).Pheno_Name + " , " + arSrc.get(position).Pheno_id);
-			
-			int resId = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).Pheno_id, null, null);
-		
+			int resId = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).Pheno_Icon, null, null);
 			Bitmap icon = overlay(BitmapFactory.decodeResource(getResources(), resId));
 			if(arSrc.get(position).Flag == true) {
-				
-				//Log.i("K", "IMAGE_ID : " + arSrc.get(position).Image_id);
+			
 				File file_size = new File(CALL_IMAGE_PATH + arSrc.get(position).Image_id + ".jpg");
-				Log.i("K","IMAGE SIZE : " + file_size.toString() + " LENGTH : " + file_size.length());
 				
 			    // if there's a photo in the table show that with replace_photo_button
 			    if(file_size.length() != 0) {
@@ -396,6 +341,26 @@ public class GetPhenophase_PBB extends ListActivity {
 			img = (ImageView)convertView.findViewById(R.id.pheno_img);
 			img.setImageBitmap(icon);
 			
+			
+			// call View from the xml and link the view to current position.
+			// need to be fixed....
+			View thumbnail = convertView.findViewById(R.id.wrap_icon);
+			thumbnail.setTag(arSrc.get(position));
+			thumbnail.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					PlantItem pi = (PlantItem)v.getTag();
+					
+					Intent intent = new Intent(GetPhenophase_PBB.this, PhenophaseDetail.class);
+					intent.putExtra("id", pi.Pheno_id);
+					intent.putExtra("protocol_id", pi.Protocol_id);
+					intent.putExtra("from", FROM_PBB_PHENOPHASE);
+					startActivity(intent);
+				}
+			});
+			
 			TextView yesorno_photo = (TextView)convertView.findViewById(R.id.yesorno_photo);
 			TextView phenoName = (TextView)convertView.findViewById(R.id.pheno_name);
 			TextView textname = (TextView)convertView.findViewById(R.id.pheno_text);
@@ -409,7 +374,6 @@ public class GetPhenophase_PBB extends ListActivity {
 	}
 	
 	private Bitmap overlay(Bitmap... bitmaps) {
-		Log.i("K", " " + bitmaps);
 		
 		if (bitmaps[0].equals(null))
 			return null;
@@ -434,8 +398,8 @@ public class GetPhenophase_PBB extends ListActivity {
 				intent.putExtra("protocol_id", protocol_ids);
 				intent.putExtra("species_id", species_ids);
 			    intent.putExtra("site_id", site_ids);
-			    intent.putExtra("cname", common_name);
-			    intent.putExtra("sname", science_name);
+			    intent.putExtra("cname", cname);
+			    intent.putExtra("sname", sname);
 			    
 			    finish();
 			    startActivity(intent);

@@ -1,8 +1,8 @@
-package cens.ucla.edu.budburst.onetime;
+package cens.ucla.edu.budburst.helper;
 
 import java.util.ArrayList;
-
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.SpeciesDetail;
 
-//Adapters:MyListAdapter and SeparatedAdapter
-class MyListAdapter extends BaseAdapter{
+public class MyListAdapter extends BaseAdapter{
 	Context maincon;
 	LayoutInflater Inflater;
 	ArrayList<PlantItem> arSrc;
@@ -52,38 +52,30 @@ class MyListAdapter extends BaseAdapter{
 		
 		TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
 		
-		if(arSrc.get(position).SpeciesName.equals("Others")) {
-			textdesc.setText("Others");
+		if(arSrc.get(position).SpeciesName.equals("Unknown/Other")) {
+			textdesc.setText("Unknown/Other");
 		}
 		else {
 			String [] splits = arSrc.get(position).SpeciesName.split(" ");
 			textdesc.setText(splits[0] + " " + splits[1]);
 		}
-	
+		
+		// call View from the xml and link the view to current position.
+		View thumbnail = convertView.findViewById(R.id.wrap_icon);
+		thumbnail.setTag(arSrc.get(position));
+		thumbnail.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				PlantItem pi = (PlantItem)v.getTag();
+				
+				Intent intent = new Intent(maincon, SpeciesDetail.class);
+				intent.putExtra("id", pi.SpeciesID);
+				intent.putExtra("site_id", "");
+				maincon.startActivity(intent);
+			}
+		});
 		return convertView;
 	}
-
-}
-	
-class PlantItem{
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-	}
-
-	PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aProtocolID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-		protocolID = aProtocolID;
-	}
-	
-	int Picture;
-	String CommonName;
-	String SpeciesName;
-	int SpeciesID;
-	int protocolID;
 }

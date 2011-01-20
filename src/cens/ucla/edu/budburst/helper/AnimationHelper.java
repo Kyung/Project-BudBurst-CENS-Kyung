@@ -11,7 +11,7 @@ public class AnimationHelper {
     	Animation.RELATIVE_TO_PARENT,  +1.0f, Animation.RELATIVE_TO_PARENT,  0.0f,
     	Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,   0.0f
     	);
-    	inFromRight.setDuration(600);
+    	inFromRight.setDuration(450);
     	inFromRight.setInterpolator(new AccelerateInterpolator());
     	return inFromRight;
     	}
@@ -20,7 +20,7 @@ public class AnimationHelper {
     	 Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,  -1.0f,
     	 Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,   0.0f
     	);
-    	outtoLeft.setDuration(600);
+    	outtoLeft.setDuration(450);
     	outtoLeft.setInterpolator(new AccelerateInterpolator());
     	return outtoLeft;
     	}    
@@ -30,7 +30,7 @@ public class AnimationHelper {
     	Animation.RELATIVE_TO_PARENT,  -1.0f, Animation.RELATIVE_TO_PARENT,  0.0f,
     	Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,   0.0f
     	);
-    	inFromLeft.setDuration(600);
+    	inFromLeft.setDuration(450);
     	inFromLeft.setInterpolator(new AccelerateInterpolator());
     	return inFromLeft;
     	}
@@ -39,7 +39,7 @@ public class AnimationHelper {
     	 Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,  +1.0f,
     	 Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,   0.0f
     	);
-    	outtoRight.setDuration(600);
+    	outtoRight.setDuration(450);
     	outtoRight.setInterpolator(new AccelerateInterpolator());
     	return outtoRight;
     	}

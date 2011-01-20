@@ -233,7 +233,7 @@ public class SummarySpecies extends MapActivity {
 				
 				// add vibration when done
 				Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-				vibrator.vibrate(1000);
+				vibrator.vibrate(500);
 				
 				Log.i("K", "info saved in the QUEUE.");
 				Toast.makeText(SummarySpecies.this, "Your observation is in the Queue!", Toast.LENGTH_SHORT).show();
