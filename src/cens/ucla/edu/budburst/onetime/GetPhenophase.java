@@ -13,7 +13,9 @@ import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
+import cens.ucla.edu.budburst.helper.MyListAdapter2;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
@@ -51,8 +53,8 @@ import android.widget.Toast;
 public class GetPhenophase extends ListActivity {
 	
 	private ArrayList<PlantItem> pItem;
-	private String cname = null;
-	private String sname = null;
+	private String common_name = null;
+	private String science_name = null;
 	private String dt_taken = null;
 	private String camera_image_id = null;
 	
@@ -63,14 +65,12 @@ public class GetPhenophase extends ListActivity {
 	
 	private Button submitBtn = null;
 	private TextView myTitleText = null;
-	private MyListAdapter MyAdapter = null;
+	private MyListAdapter2 MyAdapter = null;
 	private ListView myList = null;
 	
 	private double latitude = 0.0;
 	private double longitude = 0.0;
-	
 
-	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -89,17 +89,19 @@ public class GetPhenophase extends ListActivity {
 
 		Intent intent = getIntent();
 	    camera_image_id = intent.getExtras().getString("camera_image_id");
-		//latitude = intent.getExtras().getDouble("latitude");
-		//longitude = intent.getExtras().getDouble("longitude");
 		dt_taken = intent.getExtras().getString("dt_taken");
-		
-		
-		SharedPreferences pref = getSharedPreferences("userinfo", 0);
-		if(pref.getBoolean("new", false)) {
-		    latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
-		    
-		    longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+		previous_activity = intent.getExtras().getInt("from");
+		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+			common_name = intent.getExtras().getString("cname");
+			science_name = intent.getExtras().getString("sname");
+			species_id = intent.getExtras().getInt("tree_id");
 		}
+		
+		
+		// retrieve latitude and longitude from SharedPreferences
+		SharedPreferences pref = getSharedPreferences("userinfo", 0);
+		latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
+		longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
 		
 		pItem = new ArrayList<PlantItem>();
 
@@ -124,118 +126,42 @@ public class GetPhenophase extends ListActivity {
 		cursor.close();
 		db.close();
 
-		MyAdapter = new MyListAdapter(GetPhenophase.this, R.layout.phenophaselist, pItem);
+		MyAdapter = new MyListAdapter2(GetPhenophase.this, R.layout.phenophaselist, pItem);
 		myList = getListView(); 
 		myList.setAdapter(MyAdapter);
-	}
-	
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-		Intent service = new Intent(GetPhenophase.this, BackgroundService.class);
-	    stopService(service);
 	}
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
 		//GetPhenophase.this.unregisterReceiver(receiver);
-		
-		Intent intent = new Intent(GetPhenophase.this, OneTimeMain.class);
-		
-		intent.putExtra("camera_image_id", camera_image_id);
-		intent.putExtra("latitude", latitude);
-		intent.putExtra("longitude", longitude);
-		intent.putExtra("dt_taken", dt_taken);
-		intent.putExtra("pheno_id", position + 1);
-		intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
-		
-		startActivity(intent);
-	}
-	
-	class PlantItem{
-		PlantItem(int aPicture, String aNote, int pheno_img_id, String aPheno_name, int aPheno_id, Boolean aHeader){
-			Picture = aPicture;
-			Note = aNote;
-			Pheno_image = pheno_img_id;
-			Pheno_name = aPheno_name;
-			Header = aHeader;
-			Pheno_id = aPheno_id;
+		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+			Intent intent = new Intent(GetPhenophase.this, AddSite.class);
+			intent.putExtra("cname", common_name);
+			intent.putExtra("sname", science_name);
+			intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
+			intent.putExtra("camera_image_id", camera_image_id);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
+			intent.putExtra("dt_taken", dt_taken);
+			intent.putExtra("pheno_id", position + 1);
+			intent.putExtra("species_id", species_id);
+			intent.putExtra("notes", "");
+			// for the from value, as the parameters passed are the same as FROM_ONETIME_DIRECT, let's use that.
+			intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
+			startActivity(intent);
 		}
-		int Picture;
-		String Note;
-		int Pheno_image;
-		int Pheno_id;
-		String Pheno_name;
-		Boolean Header;
-	}
-	
-	class MyListAdapter extends BaseAdapter{
-		Context maincon;
-		LayoutInflater Inflater;
-		ArrayList<PlantItem> arSrc;
-		int layout;
-		
-		public MyListAdapter(Context context, int alayout, ArrayList<PlantItem> aarSrc){
-			maincon = context;
-			Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			arSrc = aarSrc;
-			layout = alayout;
-		}
-		
-		public int getCount(){
-			return arSrc.size();
-		}
-		
-		public String getItem(int position){
-			return arSrc.get(position).Note;
-		}
-		
-		public long getItemId(int position){
-			return position;
-		}
-		
-		public View getView(int position, View convertView, ViewGroup parent){
-			if(convertView == null)
-				convertView = Inflater.inflate(layout, parent, false);
+		else {
+			Intent intent = new Intent(GetPhenophase.this, OneTimeMain.class);
 			
-			ImageView img = (ImageView)convertView.findViewById(R.id.pheno_img);
-			img.setImageResource(arSrc.get(position).Picture);
-
-			TextView header = (TextView)convertView.findViewById(R.id.list_header);
-			if(arSrc.get(position).Header) {
-				header.setVisibility(View.VISIBLE);
-				header.setText(arSrc.get(position).Pheno_name);
-			}
-			else {
-				header.setVisibility(View.GONE);
-			}
+			intent.putExtra("camera_image_id", camera_image_id);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
+			intent.putExtra("dt_taken", dt_taken);
+			intent.putExtra("pheno_id", position + 1);
+			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
 			
-			
-			View thumbnail = convertView.findViewById(R.id.wrap_icon);
-			thumbnail.setTag(arSrc.get(position));
-			thumbnail.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					PlantItem pi = (PlantItem)v.getTag();
-					
-					Intent intent = new Intent(GetPhenophase.this, PhenophaseDetail.class);
-					intent.putExtra("id", pi.Pheno_id);
-					intent.putExtra("frome", Values.FROM_QC_PHENOPHASE);
-					startActivity(intent);
-				}
-			});
-			
-			
-			TextView pheno_name = (TextView)convertView.findViewById(R.id.pheno_name);
-			pheno_name.setVisibility(View.GONE);
-			
-			TextView textname = (TextView)convertView.findViewById(R.id.pheno_text);
-			textname.setText(arSrc.get(position).Note);
-
-			return convertView;
+			startActivity(intent);
 		}
 	}
 }

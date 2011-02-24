@@ -2,6 +2,10 @@ package cens.ucla.edu.budburst.helper;
 
 import java.util.Date;
 
+import cens.ucla.edu.budburst.MainPage;
+import cens.ucla.edu.budburst.lists.DownloadListByService;
+import cens.ucla.edu.budburst.lists.GetUserPlantLists;
+import cens.ucla.edu.budburst.lists.Items;
 import cens.ucla.edu.budburst.mapview.PBB_map;
 import android.R;
 import android.app.AlertDialog;
@@ -17,6 +21,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -36,16 +41,17 @@ public class BackgroundService extends Service{
 	private Criteria criteria;
 	private String provider;
 	private boolean mQuit;
+	private Context mContext;
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.i("K", "onCreate");
 		
+		Log.i("K", "********************Start Lists as Background Service***********************");
+		
+		mContext = this;
 		
 		mQuit = false;
-		
-		
 		pref = getSharedPreferences("userinfo", 0);
 		SharedPreferences.Editor edit = pref.edit();
 		edit.putBoolean("new", false);
@@ -58,25 +64,34 @@ public class BackgroundService extends Service{
 		gpsListener = new GpsListener();
 		
 	    lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
+	    
+	    /*
+	     * Set criteria
+	     */
+	    Criteria criteria = new Criteria();
+	    criteria.setAccuracy(Criteria.ACCURACY_FINE);
+	    criteria.setAltitudeRequired(false);
+	    criteria.setBearingRequired(false);
+	    criteria.setCostAllowed(true);
+	    criteria.setPowerRequirement(Criteria.POWER_LOW);
+	    
+	    String provider = lm.getBestProvider(criteria, true);
+	    
 		int minTimeBetweenUpdatesms = 1000;
 		int minDistanceBetweenUpdatesMeters = 0;
-	    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, gpsListener);
+	    //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, gpsListener);
+		lm.requestLocationUpdates(provider, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, gpsListener);		
 	}
 	
 	@Override
 	public void onDestroy() {
-		Log.i("K", "onDestory1");
-		
 		if(lm != null) {
 			lm.removeUpdates(gpsListener);
-			//Toast.makeText(this, "Removed GPS Listner", Toast.LENGTH_SHORT).show();
 			lm = null;
 		}
-		super.onDestroy();
-		Log.i("K", "onDestory2");
-		mQuit = true;
 		
+		super.onDestroy();
+		mQuit = true;
 	}
 	
 	@Override
@@ -102,6 +117,40 @@ public class BackgroundService extends Service{
 				stopSelf();
 			}
 			if(loc != null) {
+				
+				/*
+				 * Getting local species lists from the server
+				 * This is called only once when the app firstly receives GPS data.
+				 * 
+				 */
+				
+				if(!pref.getBoolean("listDownloaded", false)) {
+					/*
+					 * Get USDA Plant Lists
+					 * 
+					 */
+					Items item = new Items(mContext, loc.getLatitude(), loc.getLongitude(), Values.BUDBURST_LIST);
+					new DownloadListByService().execute(item);
+					
+					item = new Items(mContext, loc.getLatitude(), loc.getLongitude(), Values.WHATSINVASIVE_LIST);
+					new DownloadListByService().execute(item);
+					
+					/*
+					 * Get User Plant Tree Lists - UCLA
+					 * 
+					 */
+					new GetUserPlantLists().execute(mContext);
+					
+					/*
+					 * The list download process should be done only once.
+					 * So, we are using preference value to guarantee this process happens only once.
+					 * 
+					 */
+					SharedPreferences.Editor edit = pref.edit();
+					edit.putBoolean("listDownloaded", true);
+					edit.commit();
+				}
+				
 				latitude = loc.getLatitude();
 				longitude = loc.getLongitude();
 				accuracy = loc.getAccuracy();
@@ -111,8 +160,15 @@ public class BackgroundService extends Service{
 				Log.i("K", "Date : " + date.getTime() + "=> lat : " + latitude.toString() + " lng : " + longitude.toString() + " accuracy : " + loc.getAccuracy());
 				pref = getSharedPreferences("userinfo", 0);
 				SharedPreferences.Editor edit = pref.edit();
-				// if the accuracy is less than 10 meters
-				if(loc.getAccuracy() <= 10) {
+				
+				/*
+				 * 
+				 *  If the accuracy is less than 20 meters,
+				 *  turn off the GPS.
+				 *  
+				 */
+				
+				if(loc.getAccuracy() <= 20) {
 					edit.putBoolean("new", true);
 					edit.putBoolean("highly", true);
 					edit.putString("latitude",latitude.toString());
@@ -145,9 +201,20 @@ public class BackgroundService extends Service{
 			
 		}
 		@Override
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+		public void onStatusChanged(String provider, int status, Bundle extras) {
 			// TODO Auto-generated method stub
 			
+			switch(status) {
+			case LocationProvider.OUT_OF_SERVICE:
+				Log.v("K", "Status Changed: Out of Service");
+				break;
+			case LocationProvider.TEMPORARILY_UNAVAILABLE:
+				Log.v("K", "Status Changed: Temporarily Unavailable");
+				break;
+			case LocationProvider.AVAILABLE:
+				Log.v("K", "Status Changed: Available");
+				break;
+			}
 		}	
 	}
 }

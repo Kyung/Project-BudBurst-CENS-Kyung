@@ -2,10 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
-	<com.google.android.maps.MapView android:id="@+id/map"
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/myloc_accuracy"
+		android:padding="2dp"
+		android:textStyle="bold"
+	/>
+	<com.google.android.maps.MapView
+		android:layout_below="@+id/myloc_accuracy" 
+		android:id="@+id/map"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:apiKey="0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ"
+		android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ"
 		android:clickable="true" />
 </RelativeLayout>
 <!-- android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ" -->

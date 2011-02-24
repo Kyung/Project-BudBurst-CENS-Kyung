@@ -13,7 +13,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 	public static final int SYNCED_NO = 9;
 	
 	public SyncDBHelper(Context context){
-		super(context, "syncBudburst.db", null, 12);
+		super(context, "syncBudburst.db", null, 29);
 	}
 	
 	public void onCreate(SQLiteDatabase db){

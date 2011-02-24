@@ -307,7 +307,7 @@ public class OneTimeMain extends ListActivity {
 					common_name = "Unknown/Other";
 				}
 				
-				helper.insertNewPlantToDB(OneTimeMain.this, Values.UNKNOWN_SPECIES, 0, 9, common_name, "");
+				helper.insertNewPlantToDB(OneTimeMain.this, Values.UNKNOWN_SPECIES, 0, 9, common_name, "Unknown/Other", Values.NORMAL_QC);
 				int getID = helper.getID(OneTimeMain.this);
 				helper.insertNewObservation(OneTimeMain.this, getID, pheno_id, latitude, longitude, accuracy, camera_image_id, notes);
 				

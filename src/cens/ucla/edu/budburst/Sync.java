@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.First_Help;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -106,6 +108,7 @@ public class Sync extends Activity{
 			otDB.execSQL("UPDATE onetimeob SET synced = 5;");
 			otDB.execSQL("UPDATE onetimeob_observation SET synced = 5;");
 			
+			syncDB.execSQL("UPDATE my_sites SET synced = 5;");
 			syncDB.execSQL("UPDATE my_plants SET synced = 5;");
 			syncDB.execSQL("UPDATE my_observation SET synced = 5;");
 			
@@ -126,11 +129,7 @@ public class Sync extends Activity{
 	
 		//If the previous activity is not plant list, then start sync instantly.  
 		Intent parent_intent = getIntent();
-		
 		previous_activity = parent_intent.getExtras().getInt("from");
-		
-		Log.i("K", "previous_activity == " + previous_activity);
-		
 		if(previous_activity == Values.FROM_PLANT_LIST || previous_activity == Values.FROM_MAIN_PAGE) {
 			textViewHello.setText(getString(R.string.instruction2));
 		}
@@ -156,8 +155,25 @@ public class Sync extends Activity{
 		showDialog(0);
 		mProgress.setProgress(0);
 	}
-	
-	
+
+    @Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == event.KEYCODE_BACK) {
+			boolean flag = false;
+			if(event.getRepeatCount() == 3) {
+				Intent service = new Intent(Sync.this, BackgroundService.class);
+			    stopService(service);
+				finish();
+				return true;
+			}
+			else if(event.getRepeatCount() == 0 && flag == false){
+				Toast.makeText(Sync.this, getString(R.string.Alert_holdBackExit), Toast.LENGTH_SHORT).show();
+				flag = true;
+			}
+		}
+		return false;
+	}
+    
 	/////////////////////////////////////////////////////////////
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
@@ -644,7 +660,7 @@ class doSyncThread extends Thread{
 				SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
 		    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 				
-				query = "SELECT site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat " +
+				query = "SELECT site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat, official " +
 						"FROM my_sites WHERE synced=" + SyncDBHelper.SYNCED_NO;
 				cursor = syncRDB.rawQuery(query, null);
 				
@@ -664,9 +680,10 @@ class doSyncThread extends Thread{
 					String shading = cursor.getString(7);
 					String irrigation = cursor.getString(8);
 					String habitat = cursor.getString(9);
+					String official = cursor.getString(10);
 					
 					serverResponse = SyncNetworkHelper.upload_new_site(username, password, 
-							site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat);
+							site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat, official);
 					
 					if(serverResponse == null){
 						msgToMain.what = UPLOAD_ADDED_SITE* -1;
@@ -782,7 +799,7 @@ class doSyncThread extends Thread{
 				SQLiteDatabase otRDB = otDBHelper.getReadableDatabase();
 		    	//SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
 				
-				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname, active FROM onetimeob " +
+				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname, active, category FROM onetimeob " +
 						"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = otRDB.rawQuery(query, null);
 				
@@ -801,9 +818,10 @@ class doSyncThread extends Thread{
 						String cname = cursor.getString(4);
 						String sname = cursor.getString(5);
 						int active = cursor.getInt(6);
+						int category = cursor.getInt(7);
 						
 						serverResponse = 
-							SyncNetworkHelper.upload_onetime_ob(username, password, plant_id, species_id, site_id, protocol_id, cname, sname, active);
+							SyncNetworkHelper.upload_onetime_ob(username, password, plant_id, species_id, site_id, protocol_id, cname, sname, active, category);
 						
 						if(!serverResponse.equals("UPLOADED_OK")) {
 							msgToMain.what = Sync.SERVER_ERROR;
@@ -1208,7 +1226,7 @@ class doSyncThread extends Thread{
 					for(int i=0; i<jsonresult.length(); i++){
 						
 						onetime.execSQL("INSERT INTO onetimeob " +
-								"(plant_id, species_id, site_id, protocol_id, cname, sname, active, synced)" +
+								"(plant_id, species_id, site_id, protocol_id, cname, sname, active, category, synced)" +
 								"VALUES(" +
 								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
 								jsonresult.getJSONObject(i).getString("Species_ID") + "," +
@@ -1217,6 +1235,7 @@ class doSyncThread extends Thread{
 								jsonresult.getJSONObject(i).getString("Common_Name") + "','" +
 								jsonresult.getJSONObject(i).getString("Science_Name") + "'," +
 								1 + "," + // set active to 1
+								jsonresult.getJSONObject(i).getString("Category") + "," +
 								SyncDBHelper.SYNCED_YES + ");");
 					}
 					onetime.close();
@@ -1389,5 +1408,4 @@ class doSyncThread extends Thread{
 			syncDBHelper.close();
 		}
 	};
-
 }

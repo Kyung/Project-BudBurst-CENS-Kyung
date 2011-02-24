@@ -98,10 +98,10 @@ public class HelloItemizedOverlay extends ItemizedOverlay {
 		edit.putString("lng", eachValue[4]);
 		edit.commit();
 		
-	//	cname.setText(" Science name : " + eachValue[1]);
-     //   sname.setText(" Common name : " + eachValue[2]);
+		// cname.setText(" Science name : " + eachValue[1]);
+		// sname.setText(" Common name : " + eachValue[2]);
         dt_taken.setText(" Date&Time : " + eachValue[5]);
-     //   n_comments.setText(" " + eachValue[6] + " comment(s)");
+        // n_comments.setText(" " + eachValue[6] + " comment(s)");
         
         //Bitmap bit = BitmapFactory.decodeResource(getContext()., id)
         

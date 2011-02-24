@@ -24,18 +24,28 @@
 		android:paddingRight="7dp"
 		
 		android:orientation="vertical">
-
-		<ImageView 
-			android:scaleType="fitCenter"
-			android:paddingLeft="5dp"
-			android:paddingRight="5dp"
-			android:layout_width="fill_parent" 
-			android:layout_height="200dp"
-			android:layout_marginTop="10dp" 
-			android:id="@+id/species_image" 
-			android:adjustViewBounds="true"
-			/>		
-			
+		
+		<ProgressBar
+  		android:gravity="center"
+  		android:layout_width="wrap_content"
+  		android:layout_height="wrap_content"
+  		android:id="@+id/progressbar"
+  		android:layout_marginTop="30dp"
+  		android:layout_marginBottom="30dp"
+  		android:layout_marginLeft="3dp"
+  		android:layout_marginRight="3dp"
+	  	/>
+	  	
+	  	<ImageView
+	  		android:gravity="center"
+	  		android:layout_width="fill_parent"
+	  		android:layout_height="300dp"
+	  		android:id="@+id/species_image"
+	  		android:layout_marginTop="5dp"
+	  		android:layout_marginLeft="3dp"
+	  		android:layout_marginRight="3dp"
+	  		android:scaleType="centerCrop"
+	  	/>
 		<TextView
 			android:id="@+id/title"
 			android:layout_width="wrap_content" 
@@ -46,7 +56,7 @@
 			android:textStyle="italic|bold" 
 			android:layout_marginTop="10dp"
 			/>			
-	
+			
 		<TextView
 			android:id="@+id/science_name"
 			android:layout_width="wrap_content" 
@@ -55,7 +65,8 @@
 			android:textColor="@drawable/black" 
 			android:layout_gravity="center"
 			android:textStyle="italic|bold" 
-			/>		
+			/>
+		
 
 		<TextView
 			android:paddingTop="10dp"

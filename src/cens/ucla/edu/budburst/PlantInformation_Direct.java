@@ -49,6 +49,7 @@ public class PlantInformation_Direct extends Activity {
 	private int protocol_id = 0;
 	private int onetimeplant_id = 0;
 	private int previous_activity;
+	private int category;
 	
 	private String pheno_name = null;
 	private String photo_name	= null;
@@ -99,6 +100,7 @@ public class PlantInformation_Direct extends Activity {
 		pheno_text = p_intent.getExtras().getString("pheno_text");
 		photo_name = p_intent.getExtras().getString("photo_name");
 		pheno_name = p_intent.getExtras().getString("pheno_name");
+		category = p_intent.getExtras().getInt("category", 0);
 		site_id = p_intent.getExtras().getInt("site_id",0);
 		cname = p_intent.getExtras().getString("cname");
 		sname = p_intent.getExtras().getString("sname");
@@ -114,6 +116,7 @@ public class PlantInformation_Direct extends Activity {
 		// set the layout
 		ImageView species_image = (ImageView) findViewById(R.id.species_image);
 	    TextView species_name = (TextView) findViewById(R.id.species_name);
+	    TextView science_name = (TextView) findViewById(R.id.science_name);
 		ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
 		TextView phenoTxt = (TextView) findViewById(R.id.pheno_text);
 		TextView phenoName = (TextView) findViewById(R.id.pheno_name);
@@ -124,16 +127,26 @@ public class PlantInformation_Direct extends Activity {
 			species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 			species_image.setBackgroundResource(R.drawable.shapedrawable);
 		    species_name.setText(cname + " ");
+		    science_name.setText(sname + " ");
 		}
 		else {
-		    if(species_id > 76) {
-		    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+		    if(species_id > 76 || category == Values.TREE_LISTS_QC) {
+		    	// check out for the tree_list
+		    	if(category == Values.TREE_LISTS_QC) {
+		    		String imagePath = Values.TREE_PATH + species_id + ".jpg";
+		    		FunctionsHelper helper = new FunctionsHelper();
+		    		species_image.setImageBitmap(helper.showImage(PlantInformation_Direct.this, imagePath));
+		    	}
+		    	else {
+		    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+		    	}
 		    }
 		    else {
 		    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
 		    }
 		    species_image.setBackgroundResource(R.drawable.shapedrawable);
 		    species_name.setText(cname + " ");
+		    science_name.setText(sname + " ");
 		}
 		
 		// set xml
@@ -181,6 +194,7 @@ public class PlantInformation_Direct extends Activity {
 				Intent intent = new Intent(PlantInformation_Direct.this, SpeciesDetail.class);
 				intent.putExtra("id", species_id);
 				intent.putExtra("site_id", "");
+				intent.putExtra("category", category);
 				startActivity(intent);
 			}
 		});
@@ -424,10 +438,6 @@ public class PlantInformation_Direct extends Activity {
 	
 	
 	private void add_species_from_plantlist() {
-		
-		Log.i("K", "ADD SPECIES FROM PLANTLIST");
-		Log.i("K", "@@@ - camera_image_id : " + camera_image_id);
-		
 		
 		SyncDBHelper syncDBHelper = new SyncDBHelper(PlantInformation_Direct.this);
 

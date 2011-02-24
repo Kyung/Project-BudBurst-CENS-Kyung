@@ -1,19 +1,21 @@
 package cens.ucla.edu.budburst;
 
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 public class Splash extends Activity {
 
-	final private int FROM_MAIN_PAGE = 103;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-
+	    
 		SharedPreferences pref = getSharedPreferences("userinfo",0);
 		String synced = pref.getString("Synced", "false");
 		
@@ -37,14 +39,5 @@ public class Splash extends Activity {
 			finish();
 		}
 	    
-	}
-	
-    // or when user press back button
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == event.KEYCODE_BACK) {
-			finish();
-			return true;
-		}
-		return false;
 	}
 }

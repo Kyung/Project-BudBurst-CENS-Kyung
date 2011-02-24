@@ -48,7 +48,7 @@
 				android:id="@+id/science_name"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
-				android:textSize="16sp"
+				android:textSize="15sp"
 				android:gravity="center"
 				android:layout_gravity="center"  
 				android:textColor="@drawable/black" 
@@ -119,14 +119,14 @@
 			android:gravity="center"
 			android:textStyle="bold" 
 			android:id="@+id/pheno_title"
-			android:textSize="19sp"
+			android:textSize="18sp"
 			/>
 			
 		<TextView
 			android:id="@+id/timestamp_text"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
-			android:textSize="18sp" 
+			android:textSize="17sp" 
 			android:textColor="@drawable/black" 
 			android:textStyle="bold|italic"
 			android:layout_gravity="center"
@@ -135,8 +135,8 @@
 			android:focusableInTouchMode="true"
 			android:paddingLeft="7dp"
 			android:paddingRight="7dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginBottom="5dp" />
+			android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp" />
 		
 		</LinearLayout>
 		

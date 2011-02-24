@@ -12,6 +12,7 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -45,7 +46,6 @@ import android.widget.Toast;
 
 public class PlantSummary extends MapActivity {
 
-	public final String BASE_PATH = "/sdcard/pbudburst/";
 	private OneTimeDBHelper otDBH = null;
 	private String cname = null;
 	private String sname = null;
@@ -61,6 +61,7 @@ public class PlantSummary extends MapActivity {
 	private int species_id = 0;
 	private int site_id = 0;
 	private int protocol_id = 0;
+	private int category;
 	private double latitude = 0.0;
 	private double longitude = 0.0;
 	protected static final int GET_CHANGE_CODE = 1;
@@ -95,6 +96,7 @@ public class PlantSummary extends MapActivity {
 	    dt_taken = intent.getExtras().getString("dt_taken");
 	    notes = intent.getExtras().getString("notes");
 	    photo_name = intent.getExtras().getString("photo_name");
+	    category = intent.getExtras().getInt("category");
 	    
 	    // get phenophase information
 	    pheno_name = intent.getExtras().getString("pheno_name");
@@ -130,6 +132,8 @@ public class PlantSummary extends MapActivity {
 			while(cur.moveToNext()) {
 				latitude = cur.getDouble(0);
 				longitude = cur.getDouble(1);
+				if(latitude != 0.0)
+					break;
 			}
 			
 			cur.close();
@@ -180,8 +184,17 @@ public class PlantSummary extends MapActivity {
 	    cnameTxt.setText(cname + " ");
 	    snameTxt.setText(sname + " ");
 	    
-	    if(species_id > 76) {
-	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    if(species_id > 76 || category == Values.TREE_LISTS_QC) {
+	    	// check out for the tree_list
+	    	if(category == Values.TREE_LISTS_QC) {
+	    		String imagePath = Values.TREE_PATH + species_id + ".jpg";
+	    		FunctionsHelper helper = new FunctionsHelper();
+	    		species_image.setImageBitmap(helper.showImage(PlantSummary.this, imagePath));
+	    	}
+	    	else {
+	    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+	    	}
+	    	
 	    }
 	    else {
 	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
@@ -208,6 +221,7 @@ public class PlantSummary extends MapActivity {
 				Intent intent = new Intent(PlantSummary.this, SpeciesDetail.class);
 				intent.putExtra("id", species_id);
 				intent.putExtra("site_id", "");
+				intent.putExtra("category", category);
 				startActivity(intent);
 			}
 		});
@@ -233,7 +247,7 @@ public class PlantSummary extends MapActivity {
 		});
 	    
 	    String imagePath = null;
-	    File file = new File(BASE_PATH + photo_name + ".jpg");
+	    File file = new File(Values.BASE_PATH + photo_name + ".jpg");
 	    Bitmap bitmap = null;
 	    Bitmap resized_bitmap = null;
 	    
@@ -242,7 +256,8 @@ public class PlantSummary extends MapActivity {
 	    int new_height = 110;
 	   
 	    if(file.exists()) {
-	    	imagePath = BASE_PATH + photo_name + ".jpg";
+	    	imagePath = Values.BASE_PATH + photo_name + ".jpg";
+	    	Log.i("K", "imagePath : " + imagePath);
 	    	bitmap = BitmapFactory.decodeFile(imagePath);
 	    	
 		   	int width = bitmap.getWidth();
@@ -331,6 +346,7 @@ public class PlantSummary extends MapActivity {
 				intent.putExtra("photo_name", photo_name);
 				intent.putExtra("cname", cname);
 				intent.putExtra("sname", sname);
+				intent.putExtra("category", category);
 				
 				if(previous_activity == Values.FROM_QUICK_CAPTURE) {
 					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);

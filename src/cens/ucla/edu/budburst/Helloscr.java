@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -27,9 +28,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.SyncNetworkHelper;
+import cens.ucla.edu.budburst.helper.Values;
 
 public class Helloscr extends Activity{
 
@@ -58,11 +61,6 @@ public class Helloscr extends Activity{
 	final private int NETWORK_COMPLETED = 7;
 	
 	public SyncDBHelper syncDBHelper;
-	
-	ProgressDialog mProgress;
-	boolean mQuit;
-	UpdateThread mThread;
-	private boolean cancelBtnClickedFlag = false;
 			
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -87,47 +85,7 @@ public class Helloscr extends Activity{
 		//Display instruction message
 		TextView textViewHello = (TextView)findViewById(R.id.hello_textview);
 		textViewHello.setText(getString(R.string.hello) + username + "!" + getString(R.string.instruction));
-		
-		StaticDBHelper staticDBHelper = new StaticDBHelper(Helloscr.this);
-		
-		try {
-        	staticDBHelper.createDataBase();
-	 	} catch (IOException ioe) {
-	 		Log.e("K", "CREATE DATABASE : " + ioe.toString());
-	 		throw new Error("Unable to create database");
-	 	}
- 
-	 	try {
-	 		staticDBHelper.openDataBase();
-	 	}catch(SQLException sqle){
-	 		Log.e("K", "OPEN DATABASE : " + sqle.toString());
-	 		throw sqle;
-	 	}
-	 	
-	 	staticDBHelper.close();
-
-		/*
-		//My plant button
-		Button buttonMyplant = (Button)findViewById(R.id.myplant);
-		buttonMyplant.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				
-			}
-		}
-		);
-		
-		//Shared plant button
-		Button buttonSharedplant = (Button)findViewById(R.id.sharedplant);
-		buttonSharedplant.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(Helloscr.this,"Please do sync first",Toast.LENGTH_SHORT).show();
-			}
-			}
-		);
-		*/
-		
+	
 		//Sync button
 		Button buttonSync = (Button)findViewById(R.id.sync);
 		buttonSync.setOnClickListener(new View.OnClickListener(){
@@ -140,47 +98,19 @@ public class Helloscr extends Activity{
 				edit.putString("First", "true");
 				edit.commit();
 				
-				//Show progress
-				showDialog(0);
-				mProgress.setProgress(0);
-				
-				//Call a thread to transfer data
-				mQuit = false;
-				mThread = new UpdateThread();
-				mThread.start();
-				
+				Intent intent = new Intent(Helloscr.this, Sync.class);
+				intent.putExtra("sync_instantly", true);
+				intent.putExtra("from", Values.FROM_MAIN_PAGE);
+				startActivity(intent);
+				finish();
 			}
-			}
-		);
-		
-		//buttonMyplant.setSelected(true);
-		syncDBHelper = new SyncDBHelper(Helloscr.this);
-		
-		Intent parent_intent = getIntent();
-		if(parent_intent.getExtras() != null &&
-				parent_intent.getExtras().getBoolean("sync_instantly",false)){
-			//Display pregress dialog
-			showDialog(0);
-			mProgress.setProgress(0);
-			
-			//Run thread
-			mQuit = false;
-			mThread = new UpdateThread();
-			mThread.start();
-		}
+		});
 	}
 	
 	/////////////////////////////////////////////////////////////
 	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
-		
-		SubMenu addButton = menu.addSubMenu("Add")
-			.setIcon(android.R.drawable.ic_menu_add);
-		addButton.add(0,MENU_ADD_PLANT,0,getString(R.string.Menu_addPlant));
-		addButton.add(0,MENU_ADD_SITE,0,getString(R.string.Menu_addSite));		
-		
-		menu.add(0,MENU_SYNC,0,"Sync").setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0,MENU_LOGOUT,0,"Log out").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 			
 		return true;
@@ -190,34 +120,6 @@ public class Helloscr extends Activity{
 	public boolean onOptionsItemSelected(MenuItem item){
 		Intent intent;
 		switch(item.getItemId()){
-			case MENU_ADD_PLANT:
-				intent = new Intent(Helloscr.this, AddPlant.class);
-				startActivity(intent);
-				finish();
-				return true;
-			case MENU_ADD_SITE:
-				intent = new Intent (Intent.ACTION_VIEW);
-				intent.setData(Uri.parse(getString(R.string.add_site_URL)));
-				startActivity(intent);
-				finish();
-				return true;
-			case MENU_SYNC:
-				SharedPreferences.Editor edit = pref.edit();				
-				edit.putString("Synced","true");
-				edit.putString("First", "true");
-				edit.commit();
-				
-				//Display pregress dialog
-				showDialog(0);
-				mProgress.setProgress(0);
-				
-				//Run thread
-				mQuit = false;
-				mThread = new UpdateThread();
-				mThread.start();
-				
-				return true;
-	
 			case MENU_LOGOUT:
 				new AlertDialog.Builder(Helloscr.this)
 					.setTitle(getString(R.string.Alert_titleQuestion))
@@ -229,6 +131,8 @@ public class Helloscr extends Activity{
 		}
 		return false;
 	}
+	
+
 	
 	//Dialog confirm message if user clicks logout button
 	DialogInterface.OnClickListener mClick =
@@ -263,329 +167,4 @@ public class Helloscr extends Activity{
 			}
 		}
 	};
-	//Menu option
-	/////////////////////////////////////////////////////////////
-	
-	//Thread
-	class UpdateThread extends Thread{
-
-		boolean continueFlag=true;
-
-		public void run(){
-			String json_result;
-			
-		//1.Upload user newly added plant
-//			if(continueFlag){
-//				//json_result = sync.upload_new_plant(username, password, Helloscr.this);
-//				if(json_result.equals("No new plant")){
-//					Log.d(TAG,"No new plant");
-//				}
-//				else if(json_result != null){
-//					Message msg = mHandler.obtainMessage();
-//					msg.arg1 = 10;
-//					msg.arg2 = UPLOAD_ADDED_PLANT;
-//					msg.obj = json_result;
-//					mHandler.sendMessage(msg);
-//					try{Thread.sleep(80);}catch(Exception e){;}
-//				}
-//			}else{
-//				Message msg = mHandler.obtainMessage();
-//				msg.arg1 = -1;
-//				msg.obj = new String("Error occurs while uploading new plant.");
-//				mHandler.sendMessage(msg);
-//				continueFlag = false;
-//				return;
-//			}
-			
-		//2.UPLOAD_OBSERVATION
-//			if(continueFlag){
-//				//json_result = sync.upload_new_obs(username, password, Helloscr.this);
-//				if(json_result.equals("No new obs")){
-//					Log.d(TAG,"No new obs");
-//				}
-//				else if(json_result != null){
-//					Message msg = mHandler.obtainMessage();
-//					msg.arg1 = 20;
-//					msg.arg2 = UPLOAD_OBSERVATION;
-//					msg.obj = json_result;
-//					mHandler.sendMessage(msg);
-//					try{Thread.sleep(80);}catch(Exception e){;}
-//				}
-//			}else{
-//				Message msg = mHandler.obtainMessage();
-//				msg.arg1 = -1;
-//				msg.obj = new String("Error occurs while uploading new observation.");
-//				mHandler.sendMessage(msg);
-//				continueFlag = false;
-//				return;
-//			}
-			
-			
-		//3.Download user species in user's station
-			if(continueFlag && 
-					(json_result = sync.download_json(
-					getString(R.string.get_my_species_in_my_station_URL)
-					+"&username="+ username	+"&password="+ password)) != null
-					){
-				
-				//Send Message to handler to show progress
-				Message msg = mHandler.obtainMessage();
-				msg.arg1 = 30;
-				msg.arg2 = DOWNLOAD_MY_SPECIES_IN_MY_STATION;
-				msg.obj = json_result; 
-				mHandler.sendMessage(msg);
-				try{Thread.sleep(80);}catch(Exception e){;}
-
-			}else{
-				Message msg = mHandler.obtainMessage();
-				msg.arg1 = -1;
-				msg.obj = new String(getString(R.string.Alert_errorSpecies));
-				mHandler.sendMessage(msg);
-				continueFlag = false;
-				return;
-			}
-
-		//4.Download user observation table
-			if(continueFlag && 
-					(json_result = sync.download_json(
-					getString(R.string.get_observation_URL)
-					+"&username="+ username	+"&password="+ password)) != null
-					){
-				
-				//Send Message to handler to show progress
-				Message msg = mHandler.obtainMessage();
-				msg.arg1 = 50;
-				msg.arg2 = DOWNLOAD_OBSERVATION;
-				msg.obj = json_result;
-				mHandler.sendMessage(msg);
-				try{Thread.sleep(80);}catch(Exception e){;}
-				
-			}else{
-				Message msg = mHandler.obtainMessage();
-				msg.arg1 = -1;
-				msg.obj = new String(getString(R.string.Alert_errorDownload));
-				mHandler.sendMessage(msg);
-				try{Thread.sleep(80);}catch(Exception e){;}
-				continueFlag = false;
-				return;
-			}
-
-		//5.Download observation image files
-//			if(continueFlag && sync.download_image(
-//				getString(R.string.download_obs_image_URL), Helloscr.this)
-//				){
-//			
-//				//Send Message to handler to show progress
-//				Message msg = mHandler.obtainMessage();
-//				msg.arg1 = 70;
-//				msg.arg2 = DOWNLOAD_OBSERVATION_IMG;
-//				msg.obj = new String("{\"success\":true}");
-//				mHandler.sendMessage(msg);	
-//				try{Thread.sleep(80);}catch(Exception e){;}
-//			
-//			}else{
-//				Message msg = mHandler.obtainMessage();
-//				msg.arg1 = -1;
-//				msg.obj = new String("Error occurs while downloading image files.");
-//
-//				mHandler.sendMessage(msg);
-//				try{Thread.sleep(80);}catch(Exception e){;}
-//				continueFlag = false;
-//				return;
-//			}
-			
-		//Send 100% progress message
-			if(continueFlag){
-				Message msg = mHandler.obtainMessage();
-				msg.arg1 = 100;
-				msg.arg2 = NETWORK_COMPLETED;
-				mHandler.sendMessage(msg);
-				try{Thread.sleep(80);}catch(Exception e){;}
-				return;
-			}
-		}
-	}
-	
-	//Message handler for download thread
-	Handler mHandler = new Handler(){
-		public void handleMessage(Message msg){
-
-			progressValue = msg.arg1;
-			SQLiteDatabase db;
-
-			if(progressValue == -1){//Download fails
-				mQuit = true;
-				try{
-					dismissDialog(0);
-				}catch(Exception e){
-					Log.e(TAG, e.toString());
-				}
-				Toast.makeText(Helloscr.this,msg.obj + " " + 
-						getString(R.string.Alert_checkConnectivity),Toast.LENGTH_SHORT).show();
-				progressValue = 0;
-			}
-			else if(progressValue < 100){
-				mProgress.setProgress(progressValue);
-				
-				try{
-
-					JSONObject jsonobj = new JSONObject((String)msg.obj);
-					if(jsonobj.getBoolean("success")){
-						//result = jsonresult.toString();
-						db = syncDBHelper.getWritableDatabase();
-						
-						switch(msg.arg2){
-						case UPLOAD_ADDED_SITE:
-							break;
-						case UPLOAD_ADDED_PLANT:
-							mProgress.setMessage(getString(R.string.Alert_uploadingPlants));
-							break;
-						case UPLOAD_OBSERVATION:
-							mProgress.setMessage(getString(R.string.Alert_uploadingObs));
-
-							break;
-						case DOWNLOAD_MY_SPECIES_IN_MY_STATION:
-							mProgress.setMessage(getString(R.string.Alert_downloadingPlants));
-							try{
-								jsonobj = new JSONObject((String)msg.obj);
-								JSONArray jsonresult = new JSONArray(jsonobj.getString("results"));
-								db.execSQL("DELETE FROM my_plants;");
-								for(int i=0; i<jsonresult.length(); i++){
-									db.execSQL("INSERT INTO my_plants " +
-											"(species_id, site_id, site_name, protocol_id)" +
-											"VALUES(" +
-											jsonresult.getJSONObject(i).getString("spc_id") + "," +
-											jsonresult.getJSONObject(i).getString("st_id") + "," +
-											"'"+
-											jsonresult.getJSONObject(i).getString("st_name") + "'," +
-											jsonresult.getJSONObject(i).getString("pro_id")
-											+ ");");
-								}
-								
-								Log.d(TAG, "DOWNLOAD_MY_SPECIES_IN_MY_STATION: success to store into db");
-
-							}catch(Exception e){
-								Log.e(TAG, e.toString());
-								Log.d(TAG, "DOWNLOAD_MY_SPECIES_IN_MY_STATION: failed to store into db");
-							}
-							break;
-						case DOWNLOAD_OBSERVATION:
-							mProgress.setMessage(getString(R.string.Alert_downloadingObs));
-							try{
-								jsonobj = new JSONObject((String)msg.obj);
-								JSONArray jsonresult = new JSONArray(jsonobj.getString("results"));
-								db.execSQL("DELETE FROM my_observation;");
-								for(int i=0; i<jsonresult.length(); i++){
-									String query = "INSERT INTO my_observation " +
-									"(species_id, site_id, phenophase_id, image_id, time, note)" +
-									"VALUES(" +
-									jsonresult.getJSONObject(i).getString("species_id") + "," +
-									jsonresult.getJSONObject(i).getString("site_id") + "," +
-									jsonresult.getJSONObject(i).getString("phenophase_id") + "," +
-									"'"+
-									jsonresult.getJSONObject(i).getString("image_id") + "'," +
-									"'"+
-									jsonresult.getJSONObject(i).getString("time") + "'," +
-									"'"+
-									jsonresult.getJSONObject(i).getString("note") + "');";
-									db.execSQL(query);
-								}
-								
-								Log.d(TAG, "DOWNLOAD_OBSERVATION: success to store into db");
-							}catch(Exception e){
-								Log.e(TAG, e.toString());
-								Log.d(TAG, "DOWNLOAD_OBSERVATION: failed to store into db");
-							}							
-							break;
-						case DOWNLOAD_OBSERVATION_IMG:
-							mProgress.setMessage(getString(R.string.Alert_downloadingImages));
-							try{
-								Log.d(TAG, "DOWNLOAD_OBS_IMAGE: success to store into db");
-							}catch(Exception e){
-								Log.e(TAG, e.toString());
-								Log.d(TAG, "DOWNLOAD_OBSERVATION: failed to store into db");
-							}		
-							break;
-						case NETWORK_COMPLETED:
-							break;
-						}
-						db.close();
-					}
-					else{ //Server rejects client request
-						error_message = jsonobj.getString("error_message");
-						mQuit = true;
-						try{
-							dismissDialog(0);
-						}catch(Exception e){
-							Log.e(TAG, e.toString());
-						}
-						
-						//Error message handling
-						if(error_message.equals(getString(R.string.Alert_wrongUserPass)))
-						{
-							SharedPreferences.Editor edit = pref.edit();				
-							edit.putString("Username","");
-							edit.putString("Password","");
-							edit.commit();
-						
-			
-							Intent intent = new Intent(Helloscr.this,Login.class);
-							startActivity(intent);
-							finish();
-							return;
-						}
-						Toast.makeText(Helloscr.this, getString(R.string.Alert_messageServer) + error_message, Toast.LENGTH_LONG).show();
-					}
-
-				}
-				catch(Exception e){
-					Log.e(TAG, e.toString());
-				}
-			}
-			else{ //Download completed.
-				mProgress.setMessage(getString(R.string.Alert_downloadComplete));
-				mProgress.setProgress(100);
-				mQuit = true;
-				try{
-					dismissDialog(0);
-				}catch(Exception e){
-					Log.e(TAG, e.toString());
-				}
-				if(cancelBtnClickedFlag == true){
-					//Toast.makeText(Helloscr.this, "Sync canceled.", Toast.LENGTH_SHORT).show();
-				}
-				else{
-					Intent intent = new Intent(Helloscr.this, MainPage.class);
-					startActivity(intent);
-					//Toast.makeText(Helloscr.this, "Sync done.",Toast.LENGTH_SHORT).show();
-					finish();
-				}
-				syncDBHelper.close();
-			}
-		}
-	};
-	
-	//Dialog for download thread
-	protected Dialog onCreateDialog(int id){
-		switch(id){
-		case 0:
-			mProgress = new ProgressDialog(this);
-			mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			mProgress.setTitle(getString(R.string.Alert_synchronizing));
-			mProgress.setMessage(getString(R.string.Alert_pleaseWait));
-			mProgress.setCancelable(false);
-			mProgress.setButton(getString(R.string.Button_cancel), new DialogInterface.OnClickListener(){
-				public void onClick(DialogInterface dialog, int wchihButton){
-					mQuit = true;
-					cancelBtnClickedFlag = true;
-					SharedPreferences.Editor edit = pref.edit();				
-					edit.putString("Synced","false");
-					edit.commit();
-					//dismissDialog(0);
-				}
-			});
-			return mProgress;
-		}
-		return null;
-	}
 }

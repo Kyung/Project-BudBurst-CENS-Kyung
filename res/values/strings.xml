@@ -11,6 +11,7 @@
     <string name="get_onetime_observation_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_observation_download.php</string>
     <string name="get_observation_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_obs</string>
     <string name="authentication_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?authentication</string>
+    <string name="authentication">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_authorization</string>
     <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below.\n \n (1) Add a plant. \nClick MENU-&gt;ADD-&gt;ADD PLANT \n\n (2) Your quick capture. \nClick BACK-&gt;QUICK CAPTURE \n\n\n If you already have the species lists, Click MENU-&gt;SYNC\n\n</string>
     <string name="get_user_spcies_URL">http://www.google.com</string>
     <string name="upload_observation_URL">http://www.naver.com</string>
@@ -118,7 +119,6 @@
 <string name="Alert_logout">You might lose your unsynced data if you log out.  Are you sure you want to log out?</string>
 <string name="Button_yes">Yes</string>
 <string name="Button_no">No</string>
-<string name="Alert_errorSpecies">An error occured while downloading species.  Please try again.</string>
 <string name="Alert_checkConnectivity">Please check your network connectivity and try again.</string>
 <string name="Alert_uploadingPlants">Uploading plants...</string>
 <string name="Alert_uploadingObs">Uploading obseravtions...</string>
@@ -139,6 +139,7 @@
 <string name="Menu_about">About</string>
 <string name="PBBMap_title">Project Budburst Map View</string>
 <string name="Message_locationDisabledTurnOn">Your location service is disabled.  Would you like to go to the setting page?</string>
+<string name="Message_Save_GPS">Want to save your location?</string>
 <string name="PBBMapMenu_myLocation">My Location</string>
 <string name="PBBMapMenu_changeView">Change View</string>
 <string name="PBBMapMenu_refresh">Refresh</string>
@@ -186,6 +187,7 @@
 <string name="AddSite_optional">(optional) Add Notes</string>
 <string name="Button_save">Add Info</string>
 <string name="Button_update_GPS">Update GPS</string>
+<string name="Button_switch_to_map">Mapview</string>
 <string name="WI_Area">Areas with official invasive species lists</string>
 <string name="WI_parks">The seven nearest parks</string>
 <string name="BBList_top10">&#160;Top 10</string>
@@ -265,14 +267,14 @@
 <string name="Move_To_Site">Site</string>
 <string name="Help_About_this_project">About this Project</string>
 <string name="Help_About_Version">Version 0.1 Beta</string>
-<string name="Help_About_para1">Project BudBurst is a citizen science campaign for the study of the timing of life cycle events in plants as they relate to the environment.  With the help of volunteers, we wish to understand what \"calendar\" plants use to begin flowering, leafing or reproducing.\n\nPlants respond to their local climate and according to scientists the Earth is warming more quickly than it has in the past.  Project BudBurst Mobile helps you monitor the trees, shrubs, and grasses that help scientists determine how life is changing in response to a globally changing climate.</string>
+<string name="Help_About_para1">Project BudBurst is a citizen science campaign for the study of the timing of life cycle events in plants as they relate to the environment.  With the help of volunteers, we wish to understand what \&quot;calendar\&quot; plants use to begin flowering, leafing or reproducing.\n\nPlants respond to their local climate and according to scientists the Earth is warming more quickly than it has in the past.  Project BudBurst Mobile helps you monitor the trees, shrubs, and grasses that help scientists determine how life is changing in response to a globally changing climate.</string>
 <string name="Help_About_budburst_link">http://BudBurst.org</string>
-<string name="Help_About_para2">Project BudBurst Mobile is a partnership with the Center for Embedded Networked Sensing (CENS) at UCLA.</string>
+<string name="Help_About_para2">Project BudBurst Mobile is a partnership between the National Environmental Observatory Network (NEON) and the Center for Embedded Networked Sensing (CENS) at UCLA.</string>
 <string name="Help_About_cens_link">http://cens.ucla.edu</string>
 <string name="Help_About_para3">If you would like to comment on this app, if you find any bugs, or would like to offer suggestions, please send us a message:</string>
 <string name="Help_About_netnat_link">mobile@NetworkedNaturalist.org</string>
 <string name="Help_About_para4">Some of the people who have contributed to this mobile project include:</string>
-<string name="Help_About_people">Jameel Al-Aziz\nDeborah Estrin\nLisa Gardiner\nEricGraham\nKyung Han\nSandra Henderson\nJinha Kang\nKeith Mayoral\nDylanVassallo\nDennis Ward\nEric Yuen\n</string>
+<string name="Help_About_people">Jameel Al-Aziz\nDeborah Estrin\nLisa Gardiner\nEric Graham\nKyung Han\nSandra Henderson\nJinha Kang\nKeith Mayoral\nDylan Vassallo\nDennis Ward\nEric Yuen\n</string>
 <string name="Help_Main">Main Page Help</string>
 <string name="Help_Main_para1">Main Page Icons are the links to the main functions of the Project BudBurst Mobile app:</string>
 <string name="Help_Main_My_BudBurst_List">My BudBurst List:  A record of all your observed plants.  From this page, you can review your plants, add new plants, and make new observations.</string>
@@ -319,4 +321,15 @@
 <string name="Done_Quick_Capture">Done Quick Capture</string>
 <string name="AddSite_Finish_GPS">Finish GPS</string>
 <item type="id" name="app_notification_id">19820713</item>
+<string name="Help_About_NEON_url">http://www.neoninc.org</string>
+<string name="Help_About_para0">Please note: data collected using this mobile app is being temporarily sent to a different location than the official Project BudBurst site!\n\nIf you would like to manage and download your collected data, please visit this link:</string>
+<string name="Help_About_para0_url">http://bit.ly/mobilePBB</string>
+<string name="InValid_ID_PW">Incorrect Username/Password. Please try again.</string>
+<string name="Menu_Lists">Plant Lists</string>
+<string name="Menu_Maps">Map View</string>
+<string name="Menu_Refresh">Refresh the lists</string>
+<string name="Local_BudBurst">Local budburst plants</string>
+<string name="Local_Invasive">Local invasive plants</string>
+<string name="Local_Native">Local native plants</string>
+<string name="Help_Main_Floracaching">Floracaching: A set of games designed around your Monitored and Quick Capture plants.</string>
 </resources>

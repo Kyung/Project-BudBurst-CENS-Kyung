@@ -18,7 +18,6 @@ import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
-import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.OverlayItem;
 
 import cens.ucla.edu.budburst.R;
@@ -152,9 +151,6 @@ public class PBB_map extends MapActivity {
 		
 		startSignalLevelListener();
 		
-		// show toast for more information
-		Toast.makeText(PBB_map.this, getString(R.string.PBB_MAP_toast), Toast.LENGTH_LONG).show();
-		
 		gpsListener = new GpsListener();
 		
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -205,8 +201,11 @@ public class PBB_map extends MapActivity {
 		// TODO Auto-generated method stub
 		otDBH = new OneTimeDBHelper(PBB_map.this);
 		map=(MapView)findViewById(R.id.map);
+	
+		GeoPoint gPoint = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
 		
-		Log.i("K", "LAT : " + latitude + " LON : " + longitude);
+		ClickReceiver clickRecvr = new ClickReceiver(PBB_map.this, gPoint);
+		map.getOverlays().add(clickRecvr);
 		
 		mc = map.getController();
 		me = new MyLocOverlay(PBB_map.this, map);
@@ -273,16 +272,6 @@ public class PBB_map extends MapActivity {
 				SharedPreferences.Editor edit = pref.edit();				
 				edit.putBoolean("Update", false);
 				edit.commit();
-				
-				// delete all components in PopularLists
-				SQLiteDatabase db;
-				db = otDBH.getWritableDatabase();
-				
-				OneTimeDBHelper onehelper = new OneTimeDBHelper(PBB_map.this);
-				onehelper.clearFlickr(PBB_map.this);
-				
-				db.close();
-				onehelper.close();
 	
 				new DoAsyncTask().execute(url);
 
@@ -361,9 +350,6 @@ public class PBB_map extends MapActivity {
 						SQLiteDatabase db;
 						db = otDBH.getWritableDatabase();
 						
-						OneTimeDBHelper onehelper = new OneTimeDBHelper(PBB_map.this);
-						onehelper.clearPopularLists(PBB_map.this);
-
 						for(int i = 0 ; i < str.length ; i++) {
 							String[] split = str[i].split(";;");
 
@@ -411,7 +397,7 @@ public class PBB_map extends MapActivity {
 		    // show some text on the map
 		    int x = 10;
 		    int y = 10;
-		  
+
 		    TextView et1 = new TextView(getApplicationContext());
 		    et1.setText(getString(R.string.PBBMap_touchMarker));
 		    et1.setTextColor(Color.BLACK);
@@ -738,9 +724,6 @@ public class PBB_map extends MapActivity {
 			if(loc != null) {
 				latitude = loc.getLatitude();
 				longitude = loc.getLongitude();
-				String strLoc = String.format(getString(R.string.PBBMap_currentLocation) + "%10.5f, %10.5f", latitude, longitude);
-				
-				//geo.setText(strLoc);
 			}
 		}
 		@Override

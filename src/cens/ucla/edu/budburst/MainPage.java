@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.lists.ListMain;
+import cens.ucla.edu.budburst.lists.UserDefinedTreeLists;
 import cens.ucla.edu.budburst.mapview.PBB_map;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
 import cens.ucla.edu.budburst.onetime.QuickCapture;
@@ -41,7 +44,7 @@ public class MainPage extends Activity {
 	private Button newsBtn = null;
 	private Button weeklyBtn = null;
 	private SharedPreferences pref;
-	private StaticDBHelper staticDBHelper = null;
+	private String username;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,10 @@ public class MainPage extends Activity {
 	    setContentView(R.layout.mainpage);
 	    
 	    pref = getSharedPreferences("userinfo",0);
+	    username = pref.getString("Username", "");
+	    if(username.equals("test10")){
+	    	username = "Preview";
+	    }
 	    SharedPreferences.Editor edit = pref.edit();	
 	    edit.putBoolean("new", false);
 		edit.putString("visited","false");
@@ -65,24 +72,6 @@ public class MainPage extends Activity {
 		*/
 		
 		int synced = checkSync();
-		
-		staticDBHelper = new StaticDBHelper(MainPage.this);
-
-		try {
-        	staticDBHelper.createDataBase();
-	 	} catch (IOException ioe) {
-	 		Log.e("K", "CREATE DATABASE : " + ioe.toString());
-	 		throw new Error("Unable to create database");
-	 	}
- 
-	 	try {
-	 		staticDBHelper.openDataBase();
-	 	}catch(SQLException sqle){
-	 		Log.e("K", "OPEN DATABASE : " + sqle.toString());
-	 		throw sqle;
-	 	}
-	 	
-	 	staticDBHelper.close();
  
 	    myPlantBtn = (ImageButton)findViewById(R.id.my_plant);
 	    
@@ -122,6 +111,7 @@ public class MainPage extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(MainPage.this, QuickCapture.class);
+				intent.putExtra("from", Values.FROM_MAIN_PAGE);
 				startActivity(intent);
 				
 			}
@@ -134,9 +124,9 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				//Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				startActivity(new Intent(MainPage.this, ListMain.class));
 			}
-	    	
 	    });
 	    
 	    mapBtn = (Button)findViewById(R.id.map);
@@ -145,8 +135,9 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(MainPage.this, PBB_map.class);
-				startActivity(intent);
+				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				//Intent intent = new Intent(MainPage.this, PBB_map.class);
+				//startActivity(intent);
 			}
 	    	
 	    });
@@ -176,17 +167,21 @@ public class MainPage extends Activity {
 	    // TODO Auto-generated method stub
 	}
 	
-	
-	
     // or when user press back button
 	// when you hold the button for 3 sec, the app will be exited
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
 			boolean flag = false;
 			if(event.getRepeatCount() == 3) {
-				//Toast.makeText(MainPage.this, getString(R.string.Alert_thanks), Toast.LENGTH_SHORT).show();
+
+				/*
+				 * Stop the service if it is still working
+				 */
+				Intent service = new Intent(MainPage.this, BackgroundService.class);
+			    stopService(service);
+			    
 				finish();
-				
 				return true;
 			}
 			else if(event.getRepeatCount() == 0 && flag == false){
@@ -275,7 +270,7 @@ public class MainPage extends Activity {
 				return true;
 			case 4:
 				new AlertDialog.Builder(MainPage.this)
-				.setTitle(getString(R.string.Menu_logout))
+				.setTitle(getString(R.string.Menu_logout) + " - " + username)
 				.setMessage(getString(R.string.Alert_logout))
 				.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
 					
@@ -287,7 +282,13 @@ public class MainPage extends Activity {
 						edit.putString("Username","");
 						edit.putString("Password","");
 						edit.putString("synced", "false");
+						edit.putBoolean("getTreeLists", false);
 						edit.putBoolean("Update", false);
+						edit.putBoolean("localbudburst", false);
+						edit.putBoolean("localwhatsinvasive", false);
+						edit.putBoolean("localnative", false);
+						edit.putBoolean("localpoisonous", false);
+						edit.putBoolean("listDownloaded", false);
 						edit.commit();
 						
 						//Drop user table in database
@@ -295,12 +296,14 @@ public class MainPage extends Activity {
 						OneTimeDBHelper onehelper = new OneTimeDBHelper(MainPage.this);
 						dbhelper.clearAllTable(MainPage.this);
 						onehelper.clearAllTable(MainPage.this);
+						//onehelper.clearUCLAtreeLists(MainPage.this);
 						dbhelper.close();
 						onehelper.close();
 						
-						deleteContents("/sdcard/pbudburst/tmp/");
-						deleteContents("/sdcard/pbudburst/wi_list/");
-						deleteContents("/sdcard/pbudburst/");
+						deleteContents(Values.TEMP_PATH);
+						deleteContents(Values.WI_PATH);
+						//deleteContents(Values.TREE_PATH);
+						deleteContents(Values.BASE_PATH);
 						
 						Intent intent = new Intent(MainPage.this, Login.class);
 						startActivity(intent);
@@ -328,7 +331,7 @@ public class MainPage extends Activity {
 			String[] fileList = file.list();
 			
 			for(int i = 0 ; i < fileList.length ; i++) {
-				Log.i("K", "FILE NAME : " + "/sdcard/pbudburst/tmp/" + fileList[i] + " IS DELETED.");
+				Log.i("K", "FILE NAME : " + path + fileList[i] + " IS DELETED.");
 				new File(path + fileList[i]).delete();
 			}
 		}

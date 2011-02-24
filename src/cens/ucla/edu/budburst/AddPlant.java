@@ -203,27 +203,27 @@ public class AddPlant extends ListActivity{
 
 						if(category[which].equals("Wild Flowers and Herbs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.WILD_FLOWERS + " ORDER BY common_name;",null);
-							myTitleText.setText(getString(R.string.AddPlant_addFlowers));
+							myTitleText.setText(" " + getString(R.string.AddPlant_addFlowers));
 							protocol_id = Values.WILD_FLOWERS;
 						}
 						else if(category[which].equals("Grass")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.GRASSES + " ORDER BY common_name;",null);
-							myTitleText.setText(getString(R.string.AddPlant_addGrass));
+							myTitleText.setText(" " + getString(R.string.AddPlant_addGrass));
 							protocol_id = Values.GRASSES;
 						}
 						else if(category[which].equals("Deciduous Trees and Shrubs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.DECIDUOUS_TREES + " ORDER BY common_name;",null);
-							myTitleText.setText(getString(R.string.AddPlant_addDecid));
+							myTitleText.setText(" " + getString(R.string.AddPlant_addDecid));
 							protocol_id = Values.DECIDUOUS_TREES;
 						}
 						else if(category[which].equals("Evergreen Trees and Shrubs")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.EVERGREEN_TREES + " ORDER BY common_name;",null);
-							myTitleText.setText(getString(R.string.AddPlant_addEvergreen));
+							myTitleText.setText(" " + getString(R.string.AddPlant_addEvergreen));
 							protocol_id = Values.EVERGREEN_TREES;
 						}
 						else if(category[which].equals("Conifer")) {
 							cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.CONIFERS + " ORDER BY common_name;",null);
-							myTitleText.setText(getString(R.string.AddPlant_addConifer));
+							myTitleText.setText(" " + getString(R.string.AddPlant_addConifer));
 							protocol_id = Values.CONIFERS;
 						}
 						else {
@@ -356,7 +356,7 @@ public class AddPlant extends ListActivity{
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(AddPlant.this, AddSite.class);
 					intent.putExtra("species_id", new_plant_species_id);
-					intent.putExtra("species_name", new_plant_species_name);
+					intent.putExtra("common_name", new_plant_species_name);
 					intent.putExtra("protocol_id", protocol_id);
 					intent.putExtra("from", Values.FROM_PLANT_LIST);
 					startActivity(intent);

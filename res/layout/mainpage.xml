@@ -290,7 +290,7 @@
 				<Button
 					android:layout_width="75dp"
 					android:layout_height="75dp"
-					android:background="@drawable/icon_weekly"
+					android:background="@drawable/icon_compass"
 					android:id="@+id/weekly"
 				/>
 				</LinearLayout>
@@ -299,7 +299,7 @@
 					android:layout_height="fill_parent"
 					android:layout_weight="0.7"
 					android:gravity="center"
-					android:text="Weekly Plant"
+					android:text="Floracaching"
 					android:textColor="@color/main_text"
 					android:textStyle="bold"
 					android:textSize="16sp"

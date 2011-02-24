@@ -4,18 +4,27 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import android.R;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -144,7 +153,7 @@ public class FunctionsHelper {
 		}
 	}
 	
-	public boolean insertNewPlantToDB(Context context, int speciesid, int siteid, int protocolid, String cname, String sname){
+	public boolean insertNewPlantToDB(Context context, int speciesid, int siteid, int protocolid, String cname, String sname, int category){
 		
 		try{
 			Log.i("K", "INSIDE THE insertNewPlantDB function");
@@ -166,7 +175,8 @@ public class FunctionsHelper {
 					protocolid + "," +
 					"'" + cname + "',"+
 					"'" + sname + "',"+
-					1 + "," + // active
+					Values.ACTIVE_SPECIES + "," + // active
+					category + "," + 
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			onetime.close();
@@ -192,8 +202,8 @@ public class FunctionsHelper {
 		while(cursor.moveToNext()){
 			localMapUserSiteNameID.put(cursor.getString(0), cursor.getInt(1));
 		}
-		
-		
+		localMapUserSiteNameID.put("Add New Site", 10000);
+
 		//Close DB and cursor
 		cursor.close();
 		//syncDB.close();
@@ -210,7 +220,7 @@ public class FunctionsHelper {
 	}
 	
 	
-	public String hexEncode(byte[] aInput){
+	public String hexEncode(Context context, byte[] aInput){
 		   StringBuilder result = new StringBuilder();
 		   char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};
 		   for ( int idx = 0; idx < 4; ++idx) {
@@ -218,7 +228,31 @@ public class FunctionsHelper {
 			   result.append( digits[ (b&0xf0) >> 4 ] );
 			   result.append( digits[ b&0x0f] );
 		   }
+		   
 		   return result.toString();
+	}
+	
+	public Bitmap showImage(Context context, String path) {
+		FileInputStream fin = null;
+		BufferedInputStream buf = null;
+		
+		File existFile = new File(path);
+		if(!existFile.exists()) {
+			return null;
+		}
+    	
+		try {
+			fin = new FileInputStream(path);
+			buf = new BufferedInputStream(fin);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(buf));
+
+    	return bitmap;
 	}
 	
 	public Bitmap resizeImage(Context context, String path){
@@ -227,7 +261,6 @@ public class FunctionsHelper {
 		
 		File existFile = new File(path);
 		if(!existFile.exists()) {
-			Toast.makeText(context, "Error occurs while processing the species list. ", Toast.LENGTH_SHORT).show();
 			return null;
 		}
 		
@@ -235,9 +268,6 @@ public class FunctionsHelper {
     	
 		try {
 			fin = new FileInputStream(path);
-			Log.i("K", "FILE INPUT : " + fin);
-			
-			
 			buf = new BufferedInputStream(fin);
 			
 		} catch (FileNotFoundException e) {
@@ -245,10 +275,22 @@ public class FunctionsHelper {
 			e.printStackTrace();
 		}
 		
-		Bitmap bitmap = BitmapFactory.decodeStream(buf);
+		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(buf));
 		
-		Log.i("K", "" + bitmap);
+		/*
+		Log.i("K", "" + bitmap.getHeight());
 		
+		if(bitmap.getHeight() == 0) {
+			
+			Log.i("K", "@@@@@@@@@@");
+			
+			Resources res = context.getResources();
+			int resID = context.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null);
+			Bitmap resBit = BitmapFactory.decodeResource(res,resID);
+			
+			return resBit;
+		}
+		*/
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
 		int newWidth = 60;
@@ -259,9 +301,6 @@ public class FunctionsHelper {
 		float scaleWidth = ((float) newWidth) / width;
 		float scaleHeight = ((float) newHeight) / height;
 		
-		Log.i("K", "SCALE WIDTH : " + scaleWidth);
-		Log.i("K", "SCALE HEIGHT : " + scaleHeight);
-		
 		Matrix matrix = new Matrix();
 		matrix.postScale(scaleWidth, scaleHeight);
 		
@@ -269,5 +308,73 @@ public class FunctionsHelper {
 
     	return resized;
     }
+	
+	class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
+		
+		@Override
+		protected Bitmap doInBackground(String... arg0) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}
+	
+    /*
+     * An InputStream that skips the exact number of bytes provided, unless it reaches EOF.
+     * Source from : http://code.google.com/p/android-imagedownloader/source/checkout
+     */
+	
+	static class FlushedInputStream extends FilterInputStream {
 
+		protected FlushedInputStream(InputStream inputStream) {
+			super(inputStream);
+			// TODO Auto-generated constructor stub
+		}
+		
+		@Override
+		public long skip(long n) throws IOException {
+			long totalBytesSkipped = 0L;
+			while(totalBytesSkipped < n) {
+				long bytesSkipped = in.skip(n - totalBytesSkipped);
+				if(bytesSkipped == 0L) {
+					int b = read();
+					if(b < 0) {
+						break; // we reached EOF
+					}
+					else {
+						bytesSkipped = 1; // we read one byte
+					}
+				}
+				totalBytesSkipped += bytesSkipped;
+			}
+			return totalBytesSkipped;
+		}
+	}
+	
+	public void download_image(String url, String fileName, String path) {
+		
+		URL imageURL;
+		int read;
+		
+		try {
+			imageURL = new URL(url);
+			Log.i("K", "IMAGE URL : " + imageURL);
+			HttpURLConnection conn = (HttpURLConnection)imageURL.openConnection();
+			conn.connect();
+
+			int len = conn.getContentLength();
+			byte[] buffer = new byte[len];
+			InputStream is = conn.getInputStream();
+			FileOutputStream fos = new FileOutputStream(path + fileName + ".jpg");
+			
+			while ((read = is.read(buffer)) > 0) {
+				fos.write(buffer, 0, read);
+			}
+			fos.close();
+			is.close();
+		}
+		catch(Exception e) {
+			
+		}
+	}
 }

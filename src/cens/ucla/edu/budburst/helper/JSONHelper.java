@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 public class JSONHelper {
@@ -148,23 +149,38 @@ public String getFlickrPBBTags(String string) throws Exception {
 		return getJSON;
 	}
 	
+	public String getSiteName(String string) throws Exception {
+		
+		JSONObject jObj = new JSONObject(new JSONTokener(string));
+		JSONObject jsonTag = jObj.getJSONObject("tag");
+		
+		return jsonTag.getString("area_name");
+	}
+	
+	public String getSiteId(String string) throws Exception {
+		
+		JSONObject jObj = new JSONObject(new JSONTokener(string));
+		JSONObject jsonTag = jObj.getJSONObject("tag");
+		
+		return jsonTag.getString("area_id");
+	}
+	
 	public String getPlantTags(String string) throws Exception {
-		JSONObject json = new JSONObject(new JSONTokener(string));
-		JSONArray jarray = json.getJSONArray("tag");
+		JSONObject jObj1 = new JSONObject(new JSONTokener(string));
+		JSONObject jObj2 = jObj1.getJSONObject("tag");
+		JSONArray jArray = jObj2.getJSONArray("tags");
 		
 		String getJSON = "";
 		
-		for(int i = 0 ; i < jarray.length() ; i++) {
-			JSONObject obj = jarray.getJSONObject(i);
-			getJSON += obj.getString("title");
-			getJSON += ";;";
+		for(int i = 0 ; i < jArray.length() ; i++) {
+			JSONObject obj = jArray.getJSONObject(i);
 			getJSON += obj.getString("common");
 			getJSON += ";;";
 			getJSON += obj.getString("science");
 			getJSON += ";;";
 			getJSON += obj.getString("text");
 			getJSON += ";;";
-			getJSON += obj.getString("imageUrl");
+			getJSON += obj.getString("imageName");
 			getJSON += "\n\n\n\n";
 		}
 

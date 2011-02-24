@@ -8,7 +8,7 @@ import android.util.Log;
 public class OneTimeDBHelper extends SQLiteOpenHelper {
 
 	public OneTimeDBHelper(Context context){
-		super(context, "onetimeBudburst.db", null, 1);
+		super(context, "onetimeBudburst.db", null, 33);
 	}
 	
 	@Override
@@ -24,7 +24,18 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"protocol_id NUMERIC," +
 				"cname TEXT," +
 				"sname TEXT," +
-				"active NUMERIC," +
+				"active NUMERIC," + // deleted(0) or not(1)
+				"category NUMERIC, " +
+				/*
+				 * 0 - normal QC, 
+				 * 1 - tree_lists,
+				 * 2 - local budburst
+				 * 3 - local invasive
+				 * 4 - local native
+				 * 
+				 * 
+				 * 
+				 */
 				"synced NUMERIC);");
 		
 		db.execSQL("CREATE TABLE onetimeob_observation (" +
@@ -41,34 +52,11 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		
 		db.execSQL("CREATE TABLE speciesLists (" +
 				"id NUMERIC, " +
-				"title TEXT, " +
 				"cname TEXT, " +
 				"sname TEXT, " +
 				"text TEXT, " + 
+				"image_name TEXT, " +
 				"image_url TEXT);");
-		
-		db.execSQL("CREATE TABLE popularLists (" +
-				"pheno TEXT, " +
-				"cname TEXT, " +
-				"sname TEXT, " +
-				"lat TEXT, " +
-				"lng TEXT, " +
-				"dt_taken TEXT, " +
-				"c_count TEXT, " +
-				"comments TEXT );");
-		
-		db.execSQL("CREATE TABLE flickrLists (" +
-				"id NUMERIC, " +
-				"secret TEXT, " +
-				"farm TEXT, " +
-				"title TEXT, " + 
-				"dt_taken TEXT, " +
-				"lat TEXT, " + 
-				"lon TEXT, " + 
-				"owner TEXT, " +
-				"server TEXT, " +
-				"distance NUMERIC, " +
-				"category NUMERIC);");
 		
 		db.execSQL("CREATE TABLE pbbFlickrLists (" +
 				"common_name TEXT, " +
@@ -78,65 +66,75 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"lat TEXT, " + 
 				"lon TEXT, " + 
 				"distance NUMERIC);");
+		
+		db.execSQL("CREATE TABLE uclaTreeLists (" + 
+				"id INTEGER PRIMARY KEY, " +
+				"common_name TEXT, " +
+				"science_name TEXT, " +
+				"credit TEXT " +
+				"); ");
+		
+		db.execSQL("CREATE TABLE localPlantLists (" +
+				"category INTEGER, " +
+				"common_name TEXT, " +
+				"science_name TEXT, " +
+				"county TEXT, " +
+				"state TEXT, " +
+				"usda_url TEXT, " +
+				"photo_url TEXT, " +
+				"copy_right TEXT); ");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+				
 		// TODO Auto-generated method stub
 		db.execSQL("DROP TABLE IF EXISTS onetimeob");
 		db.execSQL("DROP TABLE IF EXISTS onetimeob_observation");
+		db.execSQL("DROP TABLE IF EXISTS speciesLists");
+		db.execSQL("DROP TABLE IF EXISTS pbbFlickrLists");
+		db.execSQL("DROP TABLE IF EXISTS uclaTreeLists");
+		db.execSQL("DROP TABLE IF EXISTS localPlantLists");
 		
 		onCreate(db);
-	}
-	
-	public void clearOneTimeTable(Context cont) {
-		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
-		SQLiteDatabase db = dbhelper.getWritableDatabase();
-		
-		db.execSQL("DELETE FROM onetimeob");
-		db.execSQL("DELETE FROM onetimeob_observation");
-		
-		db.close();
 	}
 	
 	public void clearAllTable(Context cont){
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
-		db.execSQL("DROP TABLE IF EXISTS onetimeob");
-		db.execSQL("DROP TABLE IF EXISTS onetimeob_observation");
-		db.execSQL("DROP TABLE IF EXISTS speciesLists");
-		db.execSQL("DROP TABLE IF EXISTS flickrLists");
-		db.execSQL("DROP TABLE IF EXISTS popularLists");
-		db.execSQL("DROP TABLE IF EXISTS pbbFlickrLists");
-		
-		onCreate(db);
-		
-		//db.execSQL("DELETE FROM onetimeob;");
-		//db.execSQL("DELETE FROM speciesLists;");
-		//db.execSQL("DELETE FROM popularLists;");
-		//db.execSQL("DELETE FROM flickrLists;");
-		//db.execSQL("DELETE FROM onetimeob_observation;");
+		db.execSQL("DELETE FROM onetimeob;");
+		db.execSQL("DELETE FROM speciesLists;");
+		db.execSQL("DELETE FROM onetimeob_observation;");
+		db.execSQL("DELETE FROM localPlantLists;");
 		
 	 	dbhelper.close();
  	}
 	
-	public void clearPopularLists(Context cont) {
+	public void clearUCLAtreeLists(Context cont) {
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
-		db.execSQL("DELETE FROM popularLists;");
+		db.execSQL("DELETE FROM uclaTreeLists;");
 		
 	 	dbhelper.close();
 	}
 	
-	public void clearFlickr(Context cont) {
+	public void clearLocalListsByCategory(Context cont, int category) {
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
-		db.execSQL("DELETE FROM flickrLists;");
+		db.execSQL("DELETE FROM localPlantLists WHERE category=" + category + ";");
 		
 	 	dbhelper.close();
 	}
-
+	
+	public void clearLocalLists(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		
+		db.execSQL("DELETE FROM localPlantLists;");
+		
+	 	dbhelper.close();
+	}
 }

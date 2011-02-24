@@ -2,12 +2,16 @@ package cens.ucla.edu.budburst;
 
 
 import cens.ucla.edu.budburst.helper.AnimationHelper;
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,6 +37,7 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 	private SyncDBHelper syncDBH;
 	private int species_id;
 	private int site_id;
+	private int category = 0;
     private ViewFlipper vf;
     private float oldTouchValue;
     private float oldTouchValue2;
@@ -61,6 +66,7 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 		Intent intent = getIntent();
 	    species_id = intent.getExtras().getInt("id");
 	    site_id = intent.getExtras().getInt("site_id");
+	    category = intent.getExtras().getInt("category");
 	    
 	    // declare ViewFlipper
 	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
@@ -80,11 +86,44 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 	    
 	    db = sDBH.getReadableDatabase();
 	    
-	    if(species_id > 76) {
-	    	image.setBackgroundResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-	    	snameTxt.setText(" Unknown / Other ");
-	    	notesTxt.setText("This plant has been chosen from a list that does not contain an associated description of the plant.");
+	    if(species_id > 76 || category == Values.TREE_LISTS_QC) {
+	    	// tree lists
+	    	if(category == Values.TREE_LISTS_QC) {
+	    		
+	    		OneTimeDBHelper oDB = new OneTimeDBHelper(SpeciesDetail.this);
+	    	    db = oDB.getReadableDatabase();
+	    	    
+	    	    Log.i("K", "SELECT common_name, science_name FROM uclaTreeLists WHERE id=" + species_id);
+	    	    
+	    		Cursor cursorTree = db.rawQuery("SELECT common_name, science_name, credit FROM uclaTreeLists WHERE id=" + species_id, null);
+	    		while(cursorTree.moveToNext()) {
+	    			String imagePath = Values.TREE_PATH + species_id + ".jpg";
+	    			Log.i("K", "image Path : " + imagePath);
+		    		FunctionsHelper helper = new FunctionsHelper();
+		    		image.setImageBitmap(helper.showImage(SpeciesDetail.this, imagePath));
+		    		
+		    		snameTxt.setText(" " + cursorTree.getString(0) + " ");
+		    		notesTxt.setText("Photo By " + cursorTree.getString(2));
+	    		}
+
+	    		cursorTree.close();
+	    		oDB.close();
+	    	}
+	    	// unknown species
+	    	else {
+	    		cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + 999 + ";", null);
+
+			    while(cursor.moveToNext()) {
+			    	//snameTxt.setText(" " + cursor.getString(2) + " ");
+			    	cnameTxt.setText(" " + cursor.getString(1) + " ");
+			    	notesTxt.setText("" + cursor.getString(3) + " ");
+					int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
+					image.setImageResource(resID);
+			    }
+			    cursor.close();
+	    	}
 	    }
+	    // official species
 	    else {
 	    	cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + species_id + ";", null);
 
@@ -92,9 +131,7 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 		    	snameTxt.setText(" " + cursor.getString(2) + " ");
 		    	cnameTxt.setText(" " + cursor.getString(1) + " ");
 		    	notesTxt.setText("" + cursor.getString(3) + " ");
-		    	
 				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
-			
 				image.setImageResource(resID);
 		    }
 		    

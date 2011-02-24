@@ -314,7 +314,7 @@ public class Flora_Observer extends ListActivity{
 					intent.putExtra("cname", cname);
 					intent.putExtra("sname", "Unknown/Other");
 					intent.putExtra("dt_taken", dt_taken);
-					intent.putExtra("protocol_id", arPlantList.get(current_position).protocolID);
+					intent.putExtra("protocol_id", arPlantList.get(current_position).ProtocolID);
 					intent.putExtra("pheno_id", pheno_id);
 					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
 					intent.putExtra("camera_image_id", camera_image_id);
@@ -334,7 +334,7 @@ public class Flora_Observer extends ListActivity{
 			intent.putExtra("cname", arPlantList.get(position).CommonName);
 			intent.putExtra("sname", arPlantList.get(position).SpeciesName);
 			intent.putExtra("dt_taken", dt_taken);
-			intent.putExtra("protocol_id", arPlantList.get(position).protocolID);
+			intent.putExtra("protocol_id", arPlantList.get(position).ProtocolID);
 			intent.putExtra("pheno_id", pheno_id);
 			intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
 			intent.putExtra("camera_image_id", camera_image_id);

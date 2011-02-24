@@ -3,6 +3,7 @@ package cens.ucla.edu.budburst.helper;
 import android.R;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Paint.Style;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Projection;
@@ -21,22 +23,30 @@ public class MyLocOverlay extends MyLocationOverlay{
 
 	private Context mContext;
 	private MapView mMap;
+	private MapController mc = null;
 	private LocationManager mLocManager;
-	private Drawable drawable;
+	private Drawable drawable = null;
 	private Paint accuracyPaint;
 	private int width;
 	private int height;
 	private Point center;
 	private Point left;
+	private double latitude;
+	private double longitude;
+	private int previousZoomLevel = 9;
+	private float radius = 1;
+	private float previousRadius = 1;
 	
 	public MyLocOverlay(Context context, MapView mapView) {
 		super(context, mapView);
 		
 		mContext = context;
 		mMap = mapView;
-		// TODO Auto-generated constructor stub
+		mc = mMap.getController();
+		// TODO Auto-generated constructor stub	
 	}
-	
+
+	@Override
 	protected void drawMyLocation(Canvas canvas, MapView mapView, Location lastFix, GeoPoint myLoc, long when) {
 		if(drawable == null) {
 			accuracyPaint = new Paint();
@@ -50,15 +60,23 @@ public class MyLocOverlay extends MyLocationOverlay{
 			height = drawable.getIntrinsicHeight();
 			center = new Point();
 			left = new Point();
-		
 		}
 		
 		Projection projection = mapView.getProjection();
 		
-		double latitude = lastFix.getLatitude();
-		double longitude = lastFix.getLongitude();
+		latitude = lastFix.getLatitude();
+		longitude = lastFix.getLongitude();
 		float accuracy = lastFix.getAccuracy();
 		
+		float[] result = new float[1];
+		Location.distanceBetween(latitude, longitude, latitude, longitude+1, result);
+		float longitudeLineDistance = result[0];
+		
+		GeoPoint leftGeo = new GeoPoint((int)(latitude * 1e6), (int)(longitude - accuracy / longitudeLineDistance * 1e6));
+		projection.toPixels(leftGeo, left);
+		projection.toPixels(myLoc, center);
+		
+		/*
 		float[] result = new float[1];
 		
 		Location.distanceBetween(latitude, longitude, latitude, longitude+1, result);
@@ -67,15 +85,28 @@ public class MyLocOverlay extends MyLocationOverlay{
 		GeoPoint leftGeo = new GeoPoint((int)(latitude * 1e6), (int)(longitude - accuracy / longitudeLineDistance * 1e6));
 		projection.toPixels(leftGeo, left);
 		projection.toPixels(myLoc, center);
-        int radius = center.x - left.x;
+        //int radius = center.x - left.x;
+		
+		// we set radius to 1 when when the zoom level is 9.
+		int zoomLevel = mMap.getZoomLevel();
+		if(zoomLevel != previousZoomLevel) {
+			previousZoomLevel = zoomLevel;
+		}
+		
+		if(zoomLevel > 9) {
+			radius = (float)(Math.pow(2, (zoomLevel - 9)) * previousRadius); 
+		}
+		//Toast.makeText(mContext, "" + zoomLevel, Toast.LENGTH_SHORT).show();
+		//double levelToMeters = (20-zoomLevel) * 38.31482042;
+		 */
 
         accuracyPaint.setColor(0xff6666ff);
         accuracyPaint.setStyle(Style.STROKE);
-        canvas.drawCircle(center.x, center.y, radius, accuracyPaint);
+        canvas.drawCircle(center.x, center.y, accuracy, accuracyPaint);
 
         accuracyPaint.setColor(0x186666ff);
         accuracyPaint.setStyle(Style.FILL);
-        canvas.drawCircle(center.x, center.y, radius, accuracyPaint);
+        canvas.drawCircle(center.x, center.y, accuracy, accuracyPaint);
 
         drawable.setBounds(center.x - width / 2, center.y - height / 2, center.x + width / 2, center.y + height / 2);
         drawable.draw(canvas);
@@ -84,7 +115,10 @@ public class MyLocOverlay extends MyLocationOverlay{
 	
 	@Override
 	protected boolean dispatchTap() {
-		Toast.makeText(mContext, "This is my Location!", Toast.LENGTH_SHORT).show();
+		GeoPoint current_point = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
+		mc.setCenter(current_point);
+		Toast.makeText(mContext, "Hello", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(mContext, "Current radius : " + radius + "m" , Toast.LENGTH_SHORT).show();
 		return true;
 	}
 }

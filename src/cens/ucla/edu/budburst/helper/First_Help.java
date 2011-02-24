@@ -2,9 +2,11 @@ package cens.ucla.edu.budburst.helper;
 
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.Splash;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -59,6 +61,10 @@ public class First_Help extends Activity implements OnClickListener{
 			}
 			if(page_num == 2) {
 				previous.setEnabled(true);
+				next.setEnabled(true);
+			}
+			if(page_num == 3) {
+				previous.setEnabled(true);
 				next.setEnabled(false);
 			}
 			
@@ -79,6 +85,10 @@ public class First_Help extends Activity implements OnClickListener{
 			}
 			if(page_num == 2) {
 				previous.setEnabled(true);
+				next.setEnabled(true);
+			}
+			if(page_num == 3) {
+				previous.setEnabled(true);
 				next.setEnabled(false);
 			}
 			//vf.setAnimation(AnimationHelper.inFromLeftAnimation());
@@ -91,5 +101,14 @@ public class First_Help extends Activity implements OnClickListener{
 			finish();
 		}
 	}
-
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == event.KEYCODE_BACK) {
+			stopService(new Intent(First_Help.this, BackgroundService.class));
+			finish();
+		    return true;
+		}
+		return false;
+	}
 }

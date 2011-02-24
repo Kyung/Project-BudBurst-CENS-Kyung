@@ -1,6 +1,10 @@
 package cens.ucla.edu.budburst.onetime;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -23,6 +27,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap.CompressFormat;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -37,29 +43,30 @@ import android.widget.Toast;
 public class QuickCapture extends Activity {
 
 	protected static final int PHOTO_CAPTURE_CODE = 0;
-	public final String BASE_PATH = "/sdcard/pbudburst/";
 	private String camera_image_id 	= null;
 	private SharedPreferences pref;
 	private LocationManager lm		= null;
-	private double latitude 		= 0.0;
-	private double longitude 		= 0.0;
+	private int previous_activity = 0;
+	private String common_name = "";
+	private String science_name = "";
+	private int tree_id;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    
-	    // start BackgroundService
-	    Intent service = new Intent(QuickCapture.this, BackgroundService.class);
-	    startService(service);
-	    
-	    pref = getSharedPreferences("userinfo", 0);
-	    latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
-	    longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
-	    
-	 
+	    // check if there is any attributes....
+	    Intent p_intent = getIntent();
+		previous_activity = p_intent.getExtras().getInt("from");
+		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+			common_name = p_intent.getExtras().getString("cname");
+			science_name = p_intent.getExtras().getString("sname");
+			tree_id = p_intent.getExtras().getInt("tree_id");
+		}
+
 		try {
-			File ld = new File(BASE_PATH);
+			File ld = new File(Values.BASE_PATH);
 			if(ld.exists()) {
 				if (!ld.isDirectory()) {
 					// Should probably inform user ... hmm!
@@ -88,7 +95,7 @@ public class QuickCapture extends Activity {
 			
 			Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
-					Uri.fromFile(new File(BASE_PATH, camera_image_id + ".jpg")));
+					Uri.fromFile(new File(Values.BASE_PATH, camera_image_id + ".jpg")));
 			startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
 			
 		}
@@ -109,7 +116,6 @@ public class QuickCapture extends Activity {
 		// You can use the requestCode to select between multiple child
 		// activities you may have started. Here there is only one thing
 		// we launch.
-		Log.d("K", "onActivityResult");
 		
 		if(resultCode == Activity.RESULT_CANCELED) {
 			if (requestCode == PHOTO_CAPTURE_CODE) {
@@ -124,9 +130,13 @@ public class QuickCapture extends Activity {
 
 						Intent intent = new Intent(QuickCapture.this, GetPhenophase.class);
 						intent.putExtra("camera_image_id", "");
-						intent.putExtra("latitude", latitude);
-						intent.putExtra("longitude", longitude);
-						
+						if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+							intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
+							intent.putExtra("cname", common_name);
+							intent.putExtra("sname", science_name);
+							intent.putExtra("tree_id", tree_id);
+						}
+
 						finish();
 						
 						startActivity(intent);
@@ -138,8 +148,6 @@ public class QuickCapture extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
 						Log.i("K"," No Clicked!");
-						Intent service = new Intent(QuickCapture.this, BackgroundService.class);
-					    stopService(service);
 					    finish();
 					}
 				})
@@ -155,20 +163,18 @@ public class QuickCapture extends Activity {
 				
 				Log.i("K","CAMERA_IMAGE_ID : " + camera_image_id);
 				
-				
 				Media media = new Media();
-				
-				if(camera_image_id.equals(null)) {
-					Toast.makeText(QuickCapture.this, "Please start again", Toast.LENGTH_SHORT).show();
-					finish();
-				}
-				
-				Bitmap bitmap = media.ShowPhotoTaken(BASE_PATH + camera_image_id + ".jpg");
+
+				Bitmap bitmap = media.ShowPhotoTaken(Values.BASE_PATH + camera_image_id + ".jpg");
 				
 				Intent intent = new Intent(QuickCapture.this, GetPhenophase.class);
 				intent.putExtra("camera_image_id", camera_image_id);
-				intent.putExtra("latitude", latitude);
-				intent.putExtra("longitude", longitude);
+				if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+					intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
+					intent.putExtra("cname", common_name);
+					intent.putExtra("sname", science_name);
+					intent.putExtra("tree_id", tree_id);
+				}
 				
 				finish();
 				startActivity(intent);

@@ -27,28 +27,21 @@ public class StaticDBHelper extends SQLiteOpenHelper{
  
     public StaticDBHelper(Context context) {
     	 
-    	super(context, DB_NAME, null, 1);
+    	super(context, DB_NAME, null, 14);
         this.myContext = context;
     }	
     
     public void createDataBase() throws IOException{
+    	// when called drop the previous one and call the new one.
+    	
+    	this.getReadableDatabase();
     	 
-    	boolean dbExist = checkDataBase();
- 
-    	if(dbExist){
-    		//do nothing - database already exist
-    	}else{
-     		//By calling this method and empty database will be created into the default system path
-            //of your application so we are gonna be able to overwrite that database with our database.
-        	this.getReadableDatabase();
- 
-        	try {
-     			copyDataBase();
-     		} catch (IOException e) {
-     			Log.e(TAG, e.toString());
-         		throw new Error("Error copying database");
-         	}
-    	}
+    	try {
+ 			copyDataBase();
+ 		} catch (IOException e) {
+ 			Log.e(TAG, e.toString());
+     		throw new Error("Error copying database");
+     	}
      }
     
 
@@ -59,7 +52,7 @@ public class StaticDBHelper extends SQLiteOpenHelper{
 	
 		try{
 			String myPath = DB_PATH + DB_NAME;
-			checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+			checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
 	
 		}catch(SQLiteException e){
 	
@@ -103,18 +96,15 @@ public class StaticDBHelper extends SQLiteOpenHelper{
     	 
     	//Open the database
         String myPath = DB_PATH + DB_NAME;
-    	myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+    	myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
  
     }
  
     @Override
 	public synchronized void close() {
- 
-    	    if(myDataBase != null)
-    		    myDataBase.close();
- 
-    	    super.close();
- 
+       	super.close();
+    	if(myDataBase != null)
+    		myDataBase.close();
 	}
     
 	@Override
@@ -124,7 +114,6 @@ public class StaticDBHelper extends SQLiteOpenHelper{
  
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
- 
-	}
 
+	}
 }

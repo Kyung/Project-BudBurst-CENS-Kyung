@@ -27,6 +27,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.ByteArrayBuffer;
+
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -81,7 +83,7 @@ public class SyncNetworkHelper extends Activity{
 	
 	static public String upload_new_site(String username, String password, 
 			String site_id, String site_name, String latitude, String longitude, String accuracy,
-			String comments, String hdisturbance, String shading, String irrigation, String habitat){
+			String comments, String hdisturbance, String shading, String irrigation, String habitat, String official){
 		
 		try{
 	        // Add your data  
@@ -106,6 +108,7 @@ public class SyncNetworkHelper extends Activity{
         	nameValuePairs.add(new BasicNameValuePair("shading", shading));
         	nameValuePairs.add(new BasicNameValuePair("irrigation", irrigation));
         	nameValuePairs.add(new BasicNameValuePair("habitat", habitat));
+        	nameValuePairs.add(new BasicNameValuePair("official", official));
         	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
 	  
 	        // Execute HTTP Post Request  
@@ -130,7 +133,7 @@ public class SyncNetworkHelper extends Activity{
 	}
 
 	static public String upload_onetime_ob(String username, String password, int plant_id, int species_id, int site_id,
-			int protocol_id, String cname, String sname, int active) {
+			int protocol_id, String cname, String sname, int active, int category) {
 		try{
 			
 			Log.i("K", "plant id : " + plant_id + " species_id : " + species_id + " site_id : " + site_id + " protocol_id : " + protocol_id + " cname : " + cname + " sname : " + sname + " active : " + active);
@@ -150,6 +153,7 @@ public class SyncNetworkHelper extends Activity{
         	nameValuePairs.add(new BasicNameValuePair("cname", cname));
         	nameValuePairs.add(new BasicNameValuePair("sname", sname));
         	nameValuePairs.add(new BasicNameValuePair("active", Integer.toString(active)));
+        	nameValuePairs.add(new BasicNameValuePair("category", Integer.toString(category)));
         	httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 
@@ -424,7 +428,6 @@ class ContentDownloader {
 	final private String TAG = "ContentDownloader"; 
 	
     private String url;
-    private static final int SIZE = 1024; 
     private String destinationFile;
 
     public ContentDownloader(String url){
@@ -445,59 +448,37 @@ class ContentDownloader {
             return false;
         }
 
-        URLConnection urlConnection = null;
-        InputStream inputStream = null;
-        BufferedInputStream bufferedInput = null; 
-
-        FileOutputStream outputStream = null;
+        Log.i("K", "destinationFile : " + destinationFile);
+        
+        
         BufferedOutputStream bufferedOutput = null;
 
         try{
-            urlConnection = urlObject.openConnection();
-            inputStream = urlConnection.getInputStream();
-            bufferedInput = new BufferedInputStream(inputStream);
-
-            outputStream = new FileOutputStream(this.destinationFile);
-            bufferedOutput = new BufferedOutputStream(outputStream);
-
-            byte[] buffer = new byte[SIZE];
-            while (true){
-                int noOfBytesRead = bufferedInput.read(buffer, 0, buffer.length);
-                if (noOfBytesRead == -1){
-                    break;
-                }
-                bufferedOutput.write(buffer, 0, noOfBytesRead);
-            }	
+        	URLConnection conn = urlObject.openConnection();
+        	conn.connect();
+        	
+        	InputStream is = conn.getInputStream();
+        	BufferedInputStream bufferedInput = new BufferedInputStream(is);
+            
+            ByteArrayBuffer baf = new ByteArrayBuffer(50);
+            
+            int current = 0;
+            while((current = bufferedInput.read()) != -1) {
+            	baf.append((byte)current);
+            }
+            
+            FileOutputStream fos = new FileOutputStream(this.destinationFile);
+            fos.write(baf.toByteArray());
+            fos.close();
+            is.close();
+	
         }catch (IOException e) {
         	Log.e(TAG, e.toString());
             e.printStackTrace();
             return false;
-        }finally{
-            closeStreams(new InputStream[]{bufferedInput, inputStream}, 
-                new OutputStream[]{bufferedOutput, outputStream});
         }
         System.out.println("Downloading completed");
         return true;
-    }
-
-    private void closeStreams(
-        InputStream[] inputStreams, OutputStream[] outputStreams){
-
-        try{
-            for (InputStream inputStream : inputStreams){
-                if (inputStream != null){
-                    inputStream.close();
-                }
-            }
-            for (OutputStream outputStream : outputStreams){
-                if (outputStream != null){
-                    outputStream.close();
-                }
-            }
-        }catch(IOException exception){
-        	Log.e(TAG, exception.toString());
-            exception.printStackTrace();
-        }
     }
 }
 

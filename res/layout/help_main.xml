@@ -30,31 +30,14 @@
 <TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView05" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:text="@string/Help_Main_Local_Maps" android:textColor="@color/black"></TextView>
 </LinearLayout>
 
-
-	
 	
 	<LinearLayout android:id="@+id/LinearLayout03" android:layout_height="wrap_content" android:layout_width="wrap_content"><ImageView android:maxWidth="50dp" android:layout_marginLeft="10dp" android:adjustViewBounds="true" android:scaleType="fitXY" android:maxHeight="50dp" android:layout_marginTop="10dp" android:layout_height="50dp" android:id="@+id/ImageView03" android:layout_width="50dp" android:src="@drawable/news_default"></ImageView>
 <TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView04" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:text="@string/Help_Main_News" android:textColor="@color/black"></TextView>
 
 </LinearLayout><LinearLayout android:id="@+id/LinearLayout02" android:layout_width="wrap_content" android:layout_height="wrap_content">
-		<ImageView android:id="@+id/ImageView02" android:adjustViewBounds="true" android:maxHeight="50dp" android:maxWidth="50dp" android:layout_height="50dp" android:layout_width="50dp" android:scaleType="fitXY" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:src="@drawable/weekly_default"></ImageView>
-		<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView03" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:text="@string/Help_Main_PotW" android:textColor="@color/black"></TextView>
-		
-	
+		<ImageView android:id="@+id/ImageView02" android:adjustViewBounds="true" android:maxHeight="50dp" android:maxWidth="50dp" android:layout_height="50dp" android:layout_width="50dp" android:scaleType="fitXY" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:src="@drawable/compass_default"></ImageView>
+		<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView03" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:textColor="@color/black" android:text="@string/Help_Main_Floracaching"></TextView>
 </LinearLayout>
-	
-	
-	
-	
-	
-
-
-
-
-
-
-
-
 
 </LinearLayout>
 </ScrollView>

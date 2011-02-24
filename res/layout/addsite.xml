@@ -61,19 +61,20 @@
 	</LinearLayout>
 
 	<TextView
-	android:id="@+id/instruction"
-	android:layout_below="@+id/header_item"
-	android:layout_height="wrap_content"
-	android:layout_width="fill_parent"
-	android:layout_marginTop="10dp"
-	android:layout_marginBottom="10dp"
-	android:layout_marginLeft="5dp"
-	android:layout_marginRight="5dp"
-	android:textSize="17sp"
-	android:textStyle="bold"
-	android:focusableInTouchMode="true"
-	android:focusable="true"
-	android:text="@string/AddSite_intro" android:gravity="center_horizontal">
+		android:id="@+id/instruction"
+		android:layout_below="@+id/header_item"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:layout_marginTop="10dp"
+		android:layout_marginBottom="10dp"
+		android:layout_marginLeft="5dp"
+		android:layout_marginRight="5dp"
+		android:textSize="17sp"
+		android:textStyle="bold"
+		android:focusableInTouchMode="true"
+		android:focusable="true"
+		android:text="@string/AddSite_intro" 
+		android:gravity="center_horizontal">
 	</TextView>
 	<!-- 
 	<TextView
@@ -224,7 +225,7 @@
 	
 	<Button
 		android:layout_weight="0.5"
-		android:id="@+id/updates_gps"
+		android:id="@+id/switch_to_mapview"
 		android:textColor="@drawable/black"
 		android:layout_width="105dp"
 		android:layout_height="wrap_content"
@@ -235,7 +236,7 @@
 		android:layout_marginBottom="20dp"
 		android:textSize="16sp"
 		android:focusable="true"
-		android:text="@string/Button_update_GPS"/>
+		android:text="@string/Button_switch_to_map"/>
 	</LinearLayout>
 </RelativeLayout>
 </ScrollView>
