@@ -105,10 +105,24 @@ public class First_Help extends Activity implements OnClickListener{
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
-			stopService(new Intent(First_Help.this, BackgroundService.class));
-			finish();
-		    return true;
+			boolean flag = false;
+			if(event.getRepeatCount() == 3) {
+
+				/*
+				 * Stop the service if it is still working
+				 */
+				Intent service = new Intent(First_Help.this, BackgroundService.class);
+			    stopService(service);
+			    
+				finish();
+				return true;
+			}
+			else if(event.getRepeatCount() == 0 && flag == false){
+				Toast.makeText(First_Help.this, getString(R.string.Alert_holdBackExit), Toast.LENGTH_SHORT).show();
+				flag = true;
+			}
 		}
+		
 		return false;
 	}
 }

@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.MyListAdapter;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -54,9 +55,10 @@ public class AddPlant extends ListActivity{
 	private MyListAdapter mylistapdater = null;
 	private ListView MyList = null;
 	
-	private RadioButton rb1 = null;
-	private RadioButton rb2 = null;
-	private RadioButton rb3 = null;
+	private Button rb1 = null;
+	private Button rb2 = null;
+	private Button rb3 = null;
+	private Button rb4 = null;
 	
 	private EditText et1;
 	
@@ -85,13 +87,15 @@ public class AddPlant extends ListActivity{
 		
 		helper = new FunctionsHelper();
 		
-		rb1 = (RadioButton)findViewById(R.id.option1);
-		rb2 = (RadioButton)findViewById(R.id.option2);
-		rb3 = (RadioButton)findViewById(R.id.option3);
+		rb1 = (Button)findViewById(R.id.option1);
+		rb2 = (Button)findViewById(R.id.option2);
+		rb3 = (Button)findViewById(R.id.option3);
+		rb4 = (Button)findViewById(R.id.option4);
 		
 		rb1.setOnClickListener(radio_listener);
 		rb2.setOnClickListener(radio_listener);
 		rb3.setOnClickListener(radio_listener);
+		rb4.setOnClickListener(radio_listener);
 	
 		
 		// show the top 10 lists first
@@ -187,7 +191,7 @@ public class AddPlant extends ListActivity{
 				MyList.setAdapter(mylistapdater);
 				cursor.close();
 			}
-			else {
+			else if(v == rb3){
 				selectCategory = true;
 				new AlertDialog.Builder(AddPlant.this)
 				.setTitle(getString(R.string.AddPlant_SelectCategory))
@@ -262,6 +266,44 @@ public class AddPlant extends ListActivity{
 				.show();
 				
 			}
+			else {
+				selectCategory = false;
+				myTitleText.setText(" " + getString(R.string.AddPlant_local));
+				
+				arPlantList = new ArrayList<PlantItem>();
+				
+				OneTimeDBHelper otDBH = new OneTimeDBHelper(AddPlant.this);
+				SQLiteDatabase otDB = otDBH.getReadableDatabase();
+				Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
+				
+				while(cursor.moveToNext()) {
+					String sName = cursor.getString(1);
+					
+					Cursor cursor2 = otDB.rawQuery("SELECT science_name FROM localPlantLists WHERE category=1 AND science_name=\"" + sName + "\"", null);
+					if(cursor2.getCount() > 0) {
+						int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
+						
+						String species_name = cursor.getString(1);
+						String common_name = cursor.getString(2);
+						
+						PlantItem pi;
+						//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+						pi = new PlantItem(resID, common_name, species_name, cursor.getInt(0));
+						arPlantList.add(pi);
+					}
+					
+					cursor2.close();
+				}
+				
+				otDBH.close();
+				otDB.close();
+								
+				mylistapdater = new MyListAdapter(AddPlant.this, R.layout.plantlist_item2, arPlantList);
+				MyList = getListView(); 
+				MyList.setAdapter(mylistapdater);
+				cursor.close();
+			}
+			
 			staticDB.close();
 			staticDBHelper.close();
 		}
@@ -366,7 +408,7 @@ public class AddPlant extends ListActivity{
 						Toast.makeText(AddPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
 
-						if(insertNewPlantToDB(new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocol_id)){
+						if(helper.insertNewMyPlantToDB(AddPlant.this, new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocol_id)){
 							Intent intent = new Intent(AddPlant.this, PlantList.class);
 							Toast.makeText(AddPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							
@@ -418,58 +460,6 @@ public class AddPlant extends ListActivity{
 		});
 		
 		
-	}
-
-	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename, int protocol_id){
-
-		int s_id = speciesid;
-		SharedPreferences pref = getSharedPreferences("userinfo",0);
-		
-		if(speciesid == Values.UNKNOWN_SPECIES) {
-			s_id = pref.getInt("other_species_id", 0);
-			s_id++;
-		}
-		
-		Log.i("K", "INSERT PROTOCOL_ID : " + protocol_id);
-		
-		try{
-			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
-			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
-			
-			Log.i("K", "INSERTED STRING : " + "INSERT INTO my_plants VALUES(" +
-					"null," +
-					speciesid + "," +
-					siteid + "," +
-					"'" + sitename + "',"+
-					protocol_id + "," + 
-					"'" + speciesname + "'," +
-					"1, " + // active 0(need to be removed), 1(nothing), 2(update the species)
-					SyncDBHelper.SYNCED_NO + ");");
-			
-			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
-					"null," +
-					speciesid + "," +
-					siteid + "," +
-					"'" + sitename + "',"+
-					protocol_id + "," + 
-					"'" + speciesname + "'," +
-					"1, " + // active 0(need to be removed), 1(nothing), 2(update the species)
-					SyncDBHelper.SYNCED_NO + ");"
-					);
-			
-			if(speciesid == Values.UNKNOWN_SPECIES) {
-				SharedPreferences.Editor edit = pref.edit();				
-				edit.putInt("other_species_id", s_id);
-				edit.commit();
-			}
-			
-			syncDBHelper.close();
-			return true;
-		}
-		catch(Exception e){
-			Log.e(TAG,e.toString());
-			return false;
-		}
 	}
 
 	@Override

@@ -81,6 +81,7 @@ public class LazyAdapter extends BaseAdapter {
         holder.image.setTag(localArray.get(position).imageUrl);
         imageLoader.DisplayImage(localArray.get(position).imageUrl, context, holder.image);
         
+        /*
         holder.thumbnail.setTag(localArray.get(position));
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {
 			
@@ -96,9 +97,7 @@ public class LazyAdapter extends BaseAdapter {
 				context.startActivity(intent);
 			}
 		});
-        
-        
+		*/
         return vi;
 	}
-
 }

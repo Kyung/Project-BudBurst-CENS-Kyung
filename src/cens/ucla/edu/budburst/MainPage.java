@@ -25,6 +25,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -60,6 +61,18 @@ public class MainPage extends Activity {
 	    edit.putBoolean("new", false);
 		edit.putString("visited","false");
 		edit.commit();
+		
+		LinearLayout ll = (LinearLayout) findViewById(R.id.header);
+		ll.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(MainPage.this, firstActivity.class);
+				finish();
+				startActivity(intent);
+			}
+		});
 		
 		/*
 		Intent intent = getIntent();
@@ -104,6 +117,7 @@ public class MainPage extends Activity {
 			}
 	    });
 	    
+	    /*
 	    oneTimeBtn = (Button)findViewById(R.id.onetimeobservation);
 	    oneTimeBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -117,6 +131,7 @@ public class MainPage extends Activity {
 			}
 	    	
 	    });
+	    */
 	    
 	    myResultBtn = (Button) findViewById(R.id.myresults);
 	    myResultBtn.setOnClickListener(new View.OnClickListener(){
@@ -202,7 +217,7 @@ public class MainPage extends Activity {
 		
 		int synced = SyncDBHelper.SYNCED_YES;
 		
-		Cursor syncCheck = ot.rawQuery("SELECT synced FROM onetimeob_observation", null);
+		Cursor syncCheck = ot.rawQuery("SELECT synced FROM oneTimeObservation", null);
 		while(syncCheck.moveToNext()) {
 			if(syncCheck.getInt(0) == SyncDBHelper.SYNCED_NO) {
 				synced = SyncDBHelper.SYNCED_NO;
@@ -210,7 +225,7 @@ public class MainPage extends Activity {
 		}
 		syncCheck.close();
 		
-		syncCheck = ot.rawQuery("SELECT synced FROM onetimeob", null);
+		syncCheck = ot.rawQuery("SELECT synced FROM oneTimePlant", null);
 		while(syncCheck.moveToNext()) {
 			if(syncCheck.getInt(0) == SyncDBHelper.SYNCED_NO) {
 				synced = SyncDBHelper.SYNCED_NO;
@@ -233,8 +248,10 @@ public class MainPage extends Activity {
 		return synced;
 	}
 	
-		///////////////////////////////////////////////////////////
-	//Menu option
+	/*
+	 * Menu option(non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
@@ -246,7 +263,10 @@ public class MainPage extends Activity {
 		return true;
 	}
 	
-	//Menu option selection handling
+	/*
+	 * Menu option selection handling(non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	public boolean onOptionsItemSelected(MenuItem item){
 
 		Intent intent;
@@ -296,7 +316,7 @@ public class MainPage extends Activity {
 						OneTimeDBHelper onehelper = new OneTimeDBHelper(MainPage.this);
 						dbhelper.clearAllTable(MainPage.this);
 						onehelper.clearAllTable(MainPage.this);
-						//onehelper.clearUCLAtreeLists(MainPage.this);
+						onehelper.clearLocalListAll(MainPage.this);
 						dbhelper.close();
 						onehelper.close();
 						
@@ -323,7 +343,6 @@ public class MainPage extends Activity {
 		}
 		return false;
 	}
-	/////////////////////////////////////////////////////////////////////////////////
 	
 	void deleteContents(String path) {
 		File file = new File(path);

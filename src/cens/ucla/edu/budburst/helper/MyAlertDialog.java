@@ -4,6 +4,7 @@ import cens.ucla.edu.budburst.MainPage;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 public class MyAlertDialog extends Activity {
@@ -16,12 +17,14 @@ public class MyAlertDialog extends Activity {
 	    
 	    new AlertDialog.Builder(MyAlertDialog.this)
 	    .setTitle("Message")
-	    .setMessage("Download Complete - Tree Lists")
+	    .setMessage("No GPS signal received. Turn off GPS.")
 	    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
+				Intent intent = new Intent(MyAlertDialog.this, BackgroundService.class);
+				stopService(intent);
 				finish();
 			}
 		})

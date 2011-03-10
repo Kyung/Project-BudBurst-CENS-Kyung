@@ -158,7 +158,9 @@ public class ListMain extends ListActivity {
 			TextView title_view = (TextView) convertView.findViewById(R.id.list_name);
 			TextView title_desc = (TextView) convertView.findViewById(R.id.list_name_detail);
 			
-			// if the header is not "none", show the header on the screen.
+			/*
+			 *  If the header is not "none", show the header on the screen.
+			 */
 			if(!arSrc.get(position).Header.equals("none")) {
 				header_view.setText(" " + arSrc.get(position).Header);
 				header_view.setVisibility(View.VISIBLE);
@@ -197,13 +199,21 @@ public class ListMain extends ListActivity {
 		double latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
 		double longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
 		
-		if(latitude == 0.0 || longitude == 0.0) {
-			Toast.makeText(ListMain.this, "Wait until GPS data received...", Toast.LENGTH_SHORT).show();
+		if(!pref.getBoolean("listDownloaded", false)) {
+			Toast.makeText(ListMain.this, "Local lists are still downloading...", Toast.LENGTH_SHORT).show();
 		}
 		else {
+			/*
+			 *  0 : Project Budburst
+			 *  1 : What's Invasive
+			 *  2 : Native
+			 *  3 : Local Plants
+			 *  4 : What's Blooming
+			 *  and more later.
+			 */
 			switch(position) {
 			case 0:
-				// Project Budburst
+				
 				//Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				intent = new Intent(ListMain.this, ListSubCategory.class);
 				intent.putExtra("category", Values.BUDBURST_LIST);
@@ -228,6 +238,7 @@ public class ListMain extends ListActivity {
 
 				if(pref.getBoolean("getTreeLists", false)) {
 					intent = new Intent(ListMain.this, UserDefinedTreeLists.class);
+					intent.putExtra("from", 0);
 					startActivity(intent);
 				}
 				else {

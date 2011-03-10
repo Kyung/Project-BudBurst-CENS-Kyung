@@ -55,6 +55,18 @@ public class Login extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 		
+		/*
+    	 * 
+    	 * Start two services
+    	 *  - 1. Tree Lists service
+    	 *  - 2. Local Lists from USDA
+    	 * 
+    	 */
+    	
+	    Intent service = new Intent(Login.this, BackgroundService.class);
+	    startService(service);
+		
+		
 		OneTimeDBHelper onetime = new OneTimeDBHelper(Login.this);
 		
 		textUsername = (TextView)findViewById(R.id.username_text);

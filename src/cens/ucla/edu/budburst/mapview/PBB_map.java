@@ -137,17 +137,17 @@ public class PBB_map extends MapActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		  // set title bar
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		// set title bar
+		//requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.pbb_map);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		//getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
-		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
-		v = (ViewGroup)v.getChildAt(0);
-		v.setPadding(0, 0, 0, 0);
+		//ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		//v = (ViewGroup)v.getChildAt(0);
+		//v.setPadding(0, 0, 0, 0);
 
-		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" " + getString(R.string.PBBMap_title));
+		//TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		//myTitleText.setText(" " + getString(R.string.PBBMap_title));
 		
 		startSignalLevelListener();
 		
@@ -155,8 +155,8 @@ public class PBB_map extends MapActivity {
 		
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		
-		// set update the location data in 3secs or 30meters
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 30, gpsListener);
+		// set update the location data in 3secs or 10meters
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, gpsListener);
 		       
 		// check if GPS is turned on...
 		if (lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
@@ -638,11 +638,7 @@ public class PBB_map extends MapActivity {
 					intent.putExtra("dt_taken", value);
 					intent.putExtra("pheno", value);
 					 */
-					
-					
-					
-					
-					
+
 					//startActivity(intent);
 				}
 			});

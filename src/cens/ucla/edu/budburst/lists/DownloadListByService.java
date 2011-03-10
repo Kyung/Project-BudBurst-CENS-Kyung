@@ -11,6 +11,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -31,6 +32,35 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 	@Override
 	protected Void doInBackground(Items... item) {
 		// TODO Auto-generated method stub
+		
+		/*
+		 * Change the boolean value of the category to TRUE
+		 * 
+		 */
+		
+		SharedPreferences pref = item[0].context.getSharedPreferences("userinfo", 0);
+		SharedPreferences.Editor edit = pref.edit();
+		
+		Log.i("K", "Downloading complete - category : " + item[0].category);
+		
+		switch(item[0].category) {
+		case 1:
+			edit.putBoolean("localbudburst", true);
+			break;
+		case 2:
+			edit.putBoolean("localwhatsinvasive", true);
+			break;
+		case 3:
+			edit.putBoolean("localnative", true);
+			break;
+		case 4:
+			edit.putBoolean("localpoisonous", true);
+			break;
+		}
+	
+		edit.commit();
+		
+		
 		
 		String url = "http://networkednaturalist.org/python_scripts/cens-dylan/list.py?lat=" 
 			+ item[0].latitude
@@ -58,7 +88,19 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 				
 				result = result_str.toString();
 				
-				JSONArray jsonAry = new JSONArray(result);
+				JSONObject jsonObj = new JSONObject(result);
+				String county = jsonObj.getString("county");
+				String state = jsonObj.getString("state");
+				
+				/*
+				 * Save state and county values into SharedPreferences.
+				 */
+				edit = pref.edit();
+				edit.putString("state", state);
+				edit.putString("county", county);
+				edit.commit();
+				
+				JSONArray jsonAry = jsonObj.getJSONArray("results");
 				
 				/*
 				 * Open OneTime Database and delete the list first - by category
@@ -72,16 +114,33 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 				// Delete the list first - by category
 				otDBH.clearLocalListsByCategory(item[0].context, item[0].category);
 				
-					
+				Log.i("K", "Json Array Length : " + jsonAry.length());	
+				
 				// ReINSERT the values
 				for(int i = 0 ; i < jsonAry.length() ; i++) {
+					
+					/*
+					 * Set the first char to upper case.
+					 */
+					String commonName = jsonAry.getJSONObject(i).getString("common");
+					Log.i("K", "commonName : " + commonName);
+					
+					/*
+					 * If there's a common name, change the first char to upper case.
+					 */
+					if(!commonName.equals("")) {
+						commonName = commonName.substring(0,1).toUpperCase() + commonName.substring(1);
+					}
+					else {
+						commonName = "Unknown/Other";
+					}
 				
 					otDB.execSQL("INSERT INTO localPlantLists VALUES(" +
 							item[0].category + ",\"" +
-							jsonAry.getJSONObject(i).getString("common") + "\",\"" +
+							commonName + "\",\"" +
 							jsonAry.getJSONObject(i).getString("scientific") + "\",\"" +
-							jsonAry.getJSONObject(i).getString("county") + "\",\"" +
-							jsonAry.getJSONObject(i).getString("state") + "\",\"" +
+							county + "\",\"" +
+							state + "\",\"" +
 							jsonAry.getJSONObject(i).getString("usda_url") + "\",\"" +
 							jsonAry.getJSONObject(i).getString("image_url") + "\",\"" +
 							jsonAry.getJSONObject(i).getString("image_copyright") + "\");"
@@ -94,35 +153,6 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 					otDBH.close();
 
 				}
-			
-			
-			/*
-			 * Change the boolean value of the category to TRUE
-			 * 
-			 */
-			String stringCategory = "";
-			
-			switch(item[0].category) {
-			case 1:
-				stringCategory = "localbudburst";
-				break;
-			case 2:
-				stringCategory = "localwhatsinvasive";
-				break;
-			case 3:
-				stringCategory = "localnative";
-				break;
-			case 4:
-				stringCategory = "localpoisonous";
-				break;
-			}
-			
-			SharedPreferences pref = item[0].context.getSharedPreferences("userinfo", 0);
-			SharedPreferences.Editor edit = pref.edit();
-			
-			edit.putBoolean(stringCategory, true);
-			edit.commit();
-			
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

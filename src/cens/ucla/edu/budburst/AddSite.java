@@ -48,6 +48,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
+import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
@@ -66,6 +67,8 @@ public class AddSite extends Activity{
 	private Integer protocol_id;
 	private Integer previous_activity;
 	private Integer category = 0;
+	
+	private long epoch;
 	
 	private Double latitude = 0.0;
 	private Double longitude = 0.0;
@@ -87,6 +90,7 @@ public class AddSite extends Activity{
 	private Button Irrigation;
 	private Button Habitat;
 	private Button SwitchToMap;
+	private Button UpdateGPS;
 	private Dialog noteDialog = null;
 	private boolean fromUpdateGPS = false;
 	
@@ -100,6 +104,8 @@ public class AddSite extends Activity{
 	private SharedPreferences pref;
 	private Handler mHandler = new Handler();
 	private Thread thread;
+	
+	private Dialog dialog;
 	
 	//protected String[] list_hdistance = {getString(R.string.AddSite_Urban_Highly_Modified), getString(R.string.AddSite_Suburban), getString(R.string.AddSite_Rural), getString(R.string.AddSite_Wildland_or_natural_area)};
 	//protected String[] list_shading = {getString(R.string.AddSite_Open), getString(R.string.AddSite_Partially_Shaded), getString(R.string.AddSite_Shaded)};
@@ -127,23 +133,24 @@ public class AddSite extends Activity{
 
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		geolocationEdit = (EditText)this.findViewById(R.id.geo_location);
-		//lngEdit = (EditText)this.findViewById(R.id.longitude);
-		myTitleText.setText("  " + getString(R.string.AddSite_addSite));
+		myTitleText.setText(" " + getString(R.string.AddSite_addSite));
 		
 		lmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		
-		// if the gps is off, let's turn it on!
+		/*
+		 *  If GPS is off, let's turn it on!
+		 */
 		if (!(lmanager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 		    	 || lmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))){  
 		         createLocationServiceDisabledAlert();  
 		}
-		
-		ll = (LinearLayout)findViewById(R.id.header_item);
-		ll.setVisibility(View.GONE);
+
 		
 		helper = new FunctionsHelper();
 		
-		// initialize the layout
+		/*
+		 * Initialize the layouts
+		 */
 		sitename = (EditText)this.findViewById(R.id.sitename);
 		comment = (EditText)this.findViewById(R.id.comment);
 		Human_Disturbance = (Button)findViewById(R.id.human_distance_text);
@@ -152,122 +159,22 @@ public class AddSite extends Activity{
 		Habitat = (Button)findViewById(R.id.habitat_text);
 		SwitchToMap = (Button)findViewById(R.id.switch_to_mapview);
 		
-		Button noteBtn = (Button) findViewById(R.id.notes);
-		
-		noteBtn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				gpsUpdate();
-				noteDialog = new Dialog(AddSite.this);
-				
-				noteDialog.setContentView(R.layout.add_note_custom_dialog);
-				noteDialog.setCancelable(true);
-				noteDialog.show();
-				
-				et1 = (EditText)noteDialog.findViewById(R.id.custom_notes);
-				if(notes != "") {
-					et1.setText(notes);
-				}
-				Button doneBtn = (Button)noteDialog.findViewById(R.id.custom_done);
-				
-				doneBtn.setOnClickListener(new View.OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						// TODO Auto-generated method stub
-						if(!notes.equals("")) {
-							Toast.makeText(AddSite.this, "Updated Notes", Toast.LENGTH_SHORT).show();
-						}
-						else {
-							Toast.makeText(AddSite.this, "Added Notes", Toast.LENGTH_SHORT).show();
-						}
-						notes = et1.getText().toString();
-						noteDialog.dismiss();
-					}
-				});
-			}
-		});
-
-		// when user press the done button...
-		Button saveBtnWithoutSiteInfo = (Button) findViewById(R.id.submit);
-		saveBtnWithoutSiteInfo.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				gpsUpdate();
-				// TODO Auto-generated method stub
-				
-				pref = getSharedPreferences("userinfo", 0);
-					
-				boolean highly = pref.getBoolean("highly", false);
-				
-				if(latitude == 0.0 || longitude == 0.0 || accuracy == 0) {
-					new AlertDialog.Builder(AddSite.this)
-					.setTitle(getString(R.string.Done_Quick_Capture))
-					.setMessage("Save without GeoLocation?")
-					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if((previous_activity == Values.FROM_ONETIME_DIRECT && common_name.equals("Unknown/Other")) 
-									|| (previous_activity == Values.FROM_QUICK_CAPTURE && common_name.equals("Unknown/Other"))) {
-								addCustomName();
-							}
-							else {
-								insertToOneTimeWithoutSite();
-							}
-						}
-					})
-					.setNegativeButton("No", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
-						}
-					})
-					.show();
-				}
-				else {
-					if(highly == false){
-						new AlertDialog.Builder(AddSite.this)
-						.setTitle(getString(R.string.Done_Quick_Capture))
-						.setMessage("Save with GPS info - \n" + String.format("%6.3f / %6.3f \u00b1 %3.1fm", latitude, longitude, accuracy) + "?")
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								if((previous_activity == Values.FROM_ONETIME_DIRECT && common_name.equals("Unknown/Other")) 
-										|| (previous_activity == Values.FROM_QUICK_CAPTURE && common_name.equals("Unknown/Other"))) {
-									addCustomName();
-								}
-								else {
-									insertToOneTimeWithoutSite();
-								}
-							}
-						})
-						.setNegativeButton("No", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								// TODO Auto-generated method stub
-							}
-						})
-						.show();
-					}
-					else{
-						if((previous_activity == Values.FROM_ONETIME_DIRECT && common_name.equals("Unknown/Other")) 
-								|| (previous_activity == Values.FROM_QUICK_CAPTURE && common_name.equals("Unknown/Other"))) {
-							addCustomName();
-						}
-						else {
-							insertToOneTimeWithoutSite();
-						}
-					}
-				}
-			}
-		});
 	}
 	
 	public void onResume(){
 		super.onResume();
+		
+		/*
+		 *  Get GPS - Latitude / Longitude / Accuracy
+		 */
+		pref = getSharedPreferences("userinfo", 0);
+		latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
+		longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+		accuracy = Float.parseFloat(pref.getString("accuracy", "0"));
+		
+		String strLoc = String.format("%10.6f / %10.6f \u00b1 %4.1fm", latitude, longitude, accuracy);
+		
+		geolocationEdit.setText(strLoc);
 		
 		
 		Intent p_intent = getIntent();
@@ -281,17 +188,8 @@ public class AddSite extends Activity{
 			camera_image_id = p_intent.getExtras().getString("camera_image_id");
 			notes = p_intent.getExtras().getString("notes");
 
-			// get gps information
-			pref = getSharedPreferences("userinfo", 0);
-			latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
-			longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
-			accuracy = Float.parseFloat(pref.getString("accuracy", "0"));
-			
-			String strLoc = String.format("%8.4f / %8.4f \u00b1 %4.1fm", latitude, longitude, accuracy);
-			
-			geolocationEdit.setText(strLoc);
 		}
-		else if(previous_activity == Values.FROM_QUICK_CAPTURE || previous_activity == Values.FROM_ONETIME_DIRECT || previous_activity == Values.FROM_UCLA_TREE_LISTS){
+		else if(previous_activity == Values.FROM_QUICK_CAPTURE || previous_activity == Values.FROM_UCLA_TREE_LISTS || previous_activity == Values.FROM_LOCAL_PLANT_LISTS){
 			species_id = p_intent.getExtras().getInt("species_id");
 			common_name = p_intent.getExtras().getString("cname");
 			science_name = p_intent.getExtras().getString("sname");
@@ -299,14 +197,23 @@ public class AddSite extends Activity{
 			pheno_id = p_intent.getExtras().getInt("pheno_id");
 			camera_image_id = p_intent.getExtras().getString("camera_image_id");
 			notes = p_intent.getExtras().getString("notes");
-			ll.setVisibility(View.VISIBLE);
+			category = p_intent.getExtras().getInt("category");
 			
 			sitename.setVisibility(View.GONE);
 			
 			gpsUpdate();
 			
+			/*
+			 * Set the category to TREE_LIST_QC
+			 */
 			if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
 				category = Values.TREE_LISTS_QC;
+			}
+			/*
+			 * If from LOCAL_PLANT_LISTS, Increase the category +1
+			 */
+			if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
+				category += 1;
 			}
 		}
 		else {
@@ -314,13 +221,6 @@ public class AddSite extends Activity{
 			common_name = p_intent.getExtras().getString("species_name");
 		}
 		
-
-		
-		
-		
-		
-		
-				
 		Human_Disturbance.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -419,7 +319,7 @@ public class AddSite extends Activity{
 		});
 		
 		// updateGPS button
-		/*
+		UpdateGPS = (Button) findViewById(R.id.update_gps);
 		UpdateGPS.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -436,6 +336,7 @@ public class AddSite extends Activity{
 					Toast.makeText(AddSite.this, "GPS on", Toast.LENGTH_SHORT).show();
 					fromUpdateGPS = true;
 					gpsListener = new GpsListener();
+					
 				    // set update the location data in 1secs or 1meter
 					int minTimeBetweenUpdatesms = 1000 * 1;
 					int minDistanceBetweenUpdatesMeters = 1;
@@ -450,7 +351,6 @@ public class AddSite extends Activity{
 				
 			}
 		});
-		*/
 
 		//Save button with Site Information
 		Button saveBtnWithSiteInfo = (Button)this.findViewById(R.id.save);	
@@ -481,7 +381,7 @@ public class AddSite extends Activity{
 						public void onClick(DialogInterface dialog, int which) {
 							// TODO Auto-generated method stub
 							insertIntoSite(sitename.getText().toString());
-							insertToOneTimeTable();
+							insertPlantAndObservation();
 						}
 					})
 					.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -515,7 +415,7 @@ public class AddSite extends Activity{
 						//Insert user typed site name into database
 						insertIntoSite(usertype_stname);
 						//Insert into onetime tables
-						insertToOneTimeTable();
+						insertPlantAndObservation();
 						
 					}catch(Exception e){
 						Log.e(TAG, e.toString());
@@ -526,7 +426,7 @@ public class AddSite extends Activity{
 	}
 	
 	public void addCustomName() {
-		Dialog dialog = new Dialog(AddSite.this);
+		dialog = new Dialog(AddSite.this);
 		
 		dialog.setContentView(R.layout.species_name_custom_dialog);
 		dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
@@ -546,7 +446,10 @@ public class AddSite extends Activity{
 					common_name = "Unknown/Other";
 				}
 				
-				helper.insertNewPlantToDB(AddSite.this, Values.UNKNOWN_SPECIES, 0, 9, common_name, "", category);
+				String epochStr = Long.toString(epoch);
+				int epochInt = Integer.parseInt(epochStr);
+				
+				helper.insertNewSharedPlantToDB(AddSite.this, Values.UNKNOWN_SPECIES, epochInt, 9, common_name, "", category);
 				int getID = helper.getID(AddSite.this);
 				helper.insertNewObservation(AddSite.this, getID, pheno_id, latitude, longitude, accuracy, camera_image_id, notes);
 				
@@ -554,10 +457,15 @@ public class AddSite extends Activity{
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				
-				// add vibration when done
+				/*
+				 *  Add vibration when done
+				 */
 				Toast.makeText(AddSite.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
 				Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 				vibrator.vibrate(500);
+				
+				dialog.cancel();
+				
 				finish();
 			}
 		});
@@ -573,7 +481,7 @@ public class AddSite extends Activity{
 			accuracy = Float.parseFloat(pref.getString("accuracy", "0"));
 		}
 		
-		String strLoc = String.format("%8.4f / %8.4f \u00b1 %4.1fm", latitude, longitude, accuracy);
+		String strLoc = String.format("%10.6f / %10.6f \u00b1 %4.1fm", latitude, longitude, accuracy);
 		geolocationEdit.setText(strLoc);
 	}
 	
@@ -582,7 +490,9 @@ public class AddSite extends Activity{
 		SyncDBHelper syncDBHelper = new SyncDBHelper(AddSite.this);
 		SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 		
-		//Check if site name is duplicated
+		/*
+		 * Check if site name is duplicated
+		 */
 		String query = "SELECT site_id FROM my_sites WHERE site_name='" 
 			+ sitename.getText().toString() + "';";
 		Cursor cursor = syncWDB.rawQuery(query, null);
@@ -601,7 +511,7 @@ public class AddSite extends Activity{
 		SyncDBHelper syncDBHelper = new SyncDBHelper(AddSite.this);
 		SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
 		
-		long epoch = System.currentTimeMillis()/1000;
+		epoch = System.currentTimeMillis()/1000;
 		
 		int official = Values.OFFICIAL;
 		int synced = SyncDBHelper.SYNCED_NO;
@@ -638,6 +548,8 @@ public class AddSite extends Activity{
 		
 	}
 	
+	/*
+	 * 
 	public void insertToOneTimeWithoutSite() {
 		FunctionsHelper helper = new FunctionsHelper();
 		helper.insertNewPlantToDB(AddSite.this, species_id, 0, 9, common_name, science_name, category);
@@ -659,10 +571,14 @@ public class AddSite extends Activity{
 		finish();
 
 	}
+	*
+	*/
 	
-	public void insertToOneTimeTable() {
+	public void insertPlantAndObservation() {
 		
-		// turn off the gps...
+		/*
+		 *  Turn off GPS...
+		 */
 		if(gpsListener != null) {
 			lmanager.removeUpdates(gpsListener);
 		}
@@ -677,41 +593,82 @@ public class AddSite extends Activity{
 				+ latitude + "' LIMIT 1;", null);
 		while(c.moveToNext()) {
 			
-			// if the activity is from QUICK_CAPTURE or FROM_ONETIME_DIRECT
-			if(previous_activity == Values.FROM_QUICK_CAPTURE || previous_activity == Values.FROM_ONETIME_DIRECT || previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+			/*
+			 *  If the activity is from SHARED_PLANTS
+			 */
+			if(previous_activity == Values.FROM_QUICK_CAPTURE || previous_activity == Values.FROM_UCLA_TREE_LISTS || previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
 
-				if((previous_activity == Values.FROM_ONETIME_DIRECT && common_name.equals("Unknown/Other")) 
-						|| (previous_activity == Values.FROM_QUICK_CAPTURE && common_name.equals("Unknown/Other"))) {
+				if(common_name.equals("Unknown/Other")) {
 					addCustomName();
 				}
 				else {
 					FunctionsHelper helper = new FunctionsHelper();
-					helper.insertNewPlantToDB(AddSite.this, species_id, Integer.parseInt(c.getString(0)), 9, common_name, science_name, category);
-					int getID = helper.getID(AddSite.this);
+					
+					/*
+					 *  Get speciesID if the activity is from LOCAL_BUDBURST_LISTS
+					 * 
+					 */
+					
+					if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS && (category == 2 || category == 3 || category == 4 || category == 5)) {
+						StaticDBHelper staticDB = new StaticDBHelper(AddSite.this);
+						SQLiteDatabase sDBH = staticDB.getReadableDatabase();
+						
+						Cursor cursorGetSpeciesID = sDBH.rawQuery("SELECT _id FROM species WHERE species_name=\"" 
+								+ science_name + "\";", null);
+						
+						int getSpeciesID = 999;
+						species_id = getSpeciesID;
+						
+						while(cursorGetSpeciesID.moveToNext()) {
+							getSpeciesID = cursorGetSpeciesID.getInt(0);
+						}
+						
+						species_id = getSpeciesID;
+						
+						cursorGetSpeciesID.close();
+						sDBH.close();
+					}
+					
+					if(helper.insertNewSharedPlantToDB(AddSite.this, species_id, Integer.parseInt(c.getString(0)), 9, common_name, science_name, category)) {
+						int getID = helper.getID(AddSite.this);
 
-					helper.insertNewObservation(AddSite.this, getID, pheno_id, latitude, longitude, accuracy, camera_image_id, notes);
-					
-					Intent intent = new Intent(AddSite.this, PlantList.class);
-					Toast.makeText(AddSite.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
-					//clear all stacked activities.
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(intent);
-					
-					// add vibration when done
-					//Toast.makeText(AddSite.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
-					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-					vibrator.vibrate(500);
-					
-					finish();
+						helper.insertNewObservation(AddSite.this, getID, pheno_id, latitude, longitude, accuracy, camera_image_id, notes);
+						
+						Intent intent = new Intent(AddSite.this, PlantList.class);
+						Toast.makeText(AddSite.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
+						
+						/*
+						 * Clear all stacked activities.
+						 */
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						
+						/*
+						 *  Add vibration when done
+						 */
+
+						Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+						vibrator.vibrate(500);
+						
+						finish();
+						
+					}
+					else {
+						Log.i("K", "Database insertion failed...");
+					}
 				}
 			}
-			// if other previous activities
+			/*
+			 *  If other previous activities
+			 */
 			else {
-				if(insertNewPlantToDB(species_id, common_name, Integer.parseInt(c.getString(0)), c.getString(1))){
+				if(helper.insertNewMyPlantToDB(AddSite.this, species_id, common_name, Integer.parseInt(c.getString(0)), c.getString(1), protocol_id)){
 					Intent intent = new Intent(AddSite.this, PlantList.class);
 					Toast.makeText(AddSite.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 					
-					//clear all stacked activities.
+					/*
+					 * Clear all stacked activities.
+					 */
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
 					
@@ -729,48 +686,7 @@ public class AddSite extends Activity{
 		syncDB.close();
 		
 	}
-	
-	// this is used for budburst lists. (not in QC mode)
-	public boolean insertNewPlantToDB(int speciesid, String speciesname, int siteid, String sitename){
-
-		int s_id = speciesid;
-		SharedPreferences pref = getSharedPreferences("userinfo",0);
 		
-		if(speciesid == Values.UNKNOWN_SPECIES) {
-			s_id = pref.getInt("other_species_id", 0);
-			s_id++;
-		}
-		
-		try{
-			SyncDBHelper syncDBHelper = new SyncDBHelper(this);
-			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
-			
-			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
-					"null," +
-					speciesid + "," +
-					siteid + "," +
-					"'" + sitename + "',"+
-					protocol_id + ","+
-					"'" + speciesname + "'," +
-					"1, " +
-					SyncDBHelper.SYNCED_NO + ");"
-					);
-			
-			if(speciesid == Values.UNKNOWN_SPECIES) {
-				SharedPreferences.Editor edit = pref.edit();				
-				edit.putInt("other_species_id", s_id);
-				edit.commit();
-			}
-			
-			syncDBHelper.close();
-			return true;
-		}
-		catch(Exception e){
-			Log.e(TAG,e.toString());
-			return false;
-		}
-	}
-	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -812,13 +728,15 @@ public class AddSite extends Activity{
 
 			// TODO Auto-generated method stub
 			if(loc != null) {
-				// get current location value
+				/*
+				 *  Get current location value
+				 */
 				latitude = loc.getLatitude();
 				longitude = loc.getLongitude();
 				accuracy = loc.getAccuracy();
 				//getReverseGeo(latitude, longitude);
 				
-				String strLoc = String.format("%8.4f / %8.4f \u00b1 %4.1fm", latitude, longitude, accuracy);
+				String strLoc = String.format("%10.6f / %10.6f \u00b1 %4.1fm", latitude, longitude, accuracy);
 				geolocationEdit.setText("" + strLoc);
 				
 				if(fromUpdateGPS) {
@@ -827,7 +745,9 @@ public class AddSite extends Activity{
 					}
 				}
 				else {
-					// when get the data, stop GPS
+					/*
+					 *  When get the data, stop GPS
+					 */
 					lmanager.removeUpdates(gpsListener);
 				}
 			} 
@@ -850,7 +770,10 @@ public class AddSite extends Activity{
 		}	
 	}
 
-    // or when user press back button
+    /*
+     *  Or when user press back button(non-Javadoc)
+     * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
+     */
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 			finish();
@@ -861,24 +784,4 @@ public class AddSite extends Activity{
 		}
 		return false;
 	}
-	
-/*	
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		
-		menu.add(0, 1, 0, getString(R.string.Menu_Maps)).setIcon(android.R.drawable.ic_menu_mapmode);
-		
-		return true;
-	}
-	
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()) {
-		case 1:
-			startActivity(new Intent(AddSite.this, MyLocation.class));
-			return true;
-		}
-		
-		return false;
-	}
-*/
 }

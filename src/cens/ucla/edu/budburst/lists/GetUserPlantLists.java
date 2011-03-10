@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
+import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
@@ -28,6 +29,8 @@ public class GetUserPlantLists extends AsyncTask<Context, Void, Void>{
 	protected Void doInBackground(Context... context) {
 		
 
+		Log.i("K", "Start Downloading User-Defined-Lists : UCLA Tree List.");
+		
 		HttpClient httpClient = new DefaultHttpClient();
 		String url = new String("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_tree_lists.php");
 		HttpPost httpPost = new HttpPost(url);
@@ -37,13 +40,25 @@ public class GetUserPlantLists extends AsyncTask<Context, Void, Void>{
 			
 			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				
+				/*
+				 * Set the boolean variable to TRUE
+				 */
+				SharedPreferences pref = context[0].getSharedPreferences("userinfo", 0);
+				SharedPreferences.Editor edit = pref.edit();
+				edit.putBoolean("getTreeLists", true);
+				edit.commit();
 				
+				/*
+				 * Make the folder 
+				 */
 				File f = new File(Values.TREE_PATH);
 				if(!f.exists()) {
 					f.mkdir();
 				}
 				
-				// delete values in UCLAtreeLists table
+				/*
+				 * Delete values in UCLAtreeLists table
+				 */
 				OneTimeDBHelper onehelper = new OneTimeDBHelper(context[0]);
 				onehelper.clearUCLAtreeLists(context[0]);
 				onehelper.close();
@@ -63,7 +78,7 @@ public class GetUserPlantLists extends AsyncTask<Context, Void, Void>{
 						OneTimeDBHelper otDBH = new OneTimeDBHelper(context[0]);
 						SQLiteDatabase otDB = otDBH.getWritableDatabase();
 						
-						otDB.execSQL("INSERT INTO uclaTreeLists VALUES(" +
+						otDB.execSQL("INSERT INTO userDefineLists VALUES(" +
 								jsonAry.getJSONObject(i).getString("Tree_ID") + "," +
 								"'" + jsonAry.getJSONObject(i).getString("Common_Name") + "'," +
 								"'" + jsonAry.getJSONObject(i).getString("Science_Name") + "'," + 
@@ -75,13 +90,9 @@ public class GetUserPlantLists extends AsyncTask<Context, Void, Void>{
 						otDB.close();
 						
 						FunctionsHelper helper = new FunctionsHelper();
-						helper.download_image("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/images/treelists/" + (i+1) + "_thumb.jpg", (i+1) + "", Values.TREE_PATH);
+						helper.download_image(R.string.user_plant_lists_image + (i+1) + "_thumb.jpg", (i+1) + "", Values.TREE_PATH);
 					}
-					
-					SharedPreferences pref = context[0].getSharedPreferences("userinfo", 0);
-					SharedPreferences.Editor edit = pref.edit();
-					edit.putBoolean("getTreeLists", true);
-					edit.commit();
+
 				}
 			}
 			

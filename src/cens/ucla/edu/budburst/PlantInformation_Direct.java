@@ -74,7 +74,6 @@ public class PlantInformation_Direct extends Activity {
 	
 	protected static final int PHOTO_CAPTURE_CODE = 0;
 	protected static final int GET_SUMMARY_CODE = 1;
-	public final String BASE_PATH = "/sdcard/pbudburst/";
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -170,10 +169,10 @@ public class PlantInformation_Direct extends Activity {
 	    replace_photo.setVisibility(View.GONE);
 
 	    		
-	    File file = new File(BASE_PATH + camera_image_id + ".jpg");
+	    File file = new File(Values.BASE_PATH + camera_image_id + ".jpg");
 		
 		if(file.exists()) {
-			Bitmap bitmap = BitmapFactory.decodeFile(BASE_PATH + camera_image_id + ".jpg");
+			Bitmap bitmap = BitmapFactory.decodeFile(Values.BASE_PATH + camera_image_id + ".jpg");
 			photo_image.setImageBitmap(bitmap);
 			take_photo.setVisibility(View.GONE);
 		    replace_photo.setVisibility(View.VISIBLE);
@@ -230,14 +229,14 @@ public class PlantInformation_Direct extends Activity {
 				AlertDialog.Builder dialog = new AlertDialog.Builder(PlantInformation_Direct.this);
 				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
 				
-			    String imagePath = BASE_PATH + camera_image_id + ".jpg";
+			    String imagePath = Values.BASE_PATH + camera_image_id + ".jpg";
 
 			    File file = new File(imagePath);
 			    Bitmap bitmap = null;
 			    
 			    // if file exists show the photo on the ImageButton
 			    if(file.exists()) {
-			    	imagePath = BASE_PATH + camera_image_id + ".jpg";
+			    	imagePath = Values.BASE_PATH + camera_image_id + ".jpg";
 				   	bitmap = BitmapFactory.decodeFile(imagePath);
 				   	image_view.setImageBitmap(bitmap);
 			    }
@@ -266,7 +265,7 @@ public class PlantInformation_Direct extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				try {
-					File file = new File(BASE_PATH);
+					File file = new File(Values.BASE_PATH);
 					if (file.exists()) {
 						if(!file.isDirectory()) {
 							Toast.makeText(PlantInformation_Direct.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
@@ -294,7 +293,7 @@ public class PlantInformation_Direct extends Activity {
 					
 					Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 					mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
-							Uri.fromFile(new File(BASE_PATH, camera_image_id + ".jpg")));
+							Uri.fromFile(new File(Values.BASE_PATH, camera_image_id + ".jpg")));
 					startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
 				
 				}
@@ -309,7 +308,7 @@ public class PlantInformation_Direct extends Activity {
 		replace_photo.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				File ld = new File(BASE_PATH);
+				File ld = new File(Values.BASE_PATH);
 				if (ld.exists()) {
 					if (!ld.isDirectory()) {
 						// Should probably inform user ... hmm!
@@ -336,7 +335,7 @@ public class PlantInformation_Direct extends Activity {
 
 				Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
-						Uri.fromFile(new File(BASE_PATH, camera_image_id + ".jpg")));
+						Uri.fromFile(new File(Values.BASE_PATH, camera_image_id + ".jpg")));
 				startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
 			}
 		});
@@ -392,7 +391,7 @@ public class PlantInformation_Direct extends Activity {
 		dt_taken = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
 		Log.i("K", "SPECIES ID : " + pheno_id + " , PHENOPHASE_ID : " + pheno_id + ", onetimeplant_id : " + onetimeplant_id);
 		
-		Cursor cursor = ot.rawQuery("SELECT plant_id, lat, lng, accuracy FROM onetimeob_observation WHERE plant_id = " + onetimeplant_id
+		Cursor cursor = ot.rawQuery("SELECT plant_id, lat, lng, accuracy FROM oneTimeObservation WHERE plant_id = " + onetimeplant_id
 				+ " AND phenophase_id=" + pheno_id, null);
 		
 		int count = 0;
@@ -416,7 +415,7 @@ public class PlantInformation_Direct extends Activity {
 		
 		if(count > 0) {
 			SQLiteDatabase oneDB = onetime.getWritableDatabase();
-			String query = "UPDATE onetimeob_observation SET " +
+			String query = "UPDATE oneTimeObservation SET " +
 			"image_id='" + camera_image_id + "'," +
 			"dt_taken='" + dt_taken + "'," +
 			"notes='" + notes.getText().toString() + "'" + "," +
@@ -514,7 +513,7 @@ public class PlantInformation_Direct extends Activity {
 			
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				
-				String imagePath = BASE_PATH + camera_image_id + ".jpg";
+				String imagePath = Values.BASE_PATH + camera_image_id + ".jpg";
 				
 				Media media = new Media();
 				photo_image.setImageBitmap(media.ShowPhotoTaken(imagePath));

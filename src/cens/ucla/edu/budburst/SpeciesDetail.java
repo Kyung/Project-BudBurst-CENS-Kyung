@@ -31,12 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-public class SpeciesDetail extends Activity implements View.OnTouchListener{
-
+//public class SpeciesDetail extends Activity implements View.OnTouchListener{
+public class SpeciesDetail extends Activity {
 	private StaticDBHelper sDBH;
 	private SyncDBHelper syncDBH;
 	private int species_id;
-	private int site_id;
 	private int category = 0;
     private ViewFlipper vf;
     private float oldTouchValue;
@@ -65,12 +64,11 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 		// get previous intent information
 		Intent intent = getIntent();
 	    species_id = intent.getExtras().getInt("id");
-	    site_id = intent.getExtras().getInt("site_id");
 	    category = intent.getExtras().getInt("category");
 	    
 	    // declare ViewFlipper
-	    vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
-	    vf.setOnTouchListener(this);
+	    //vf = (ViewFlipper) findViewById(R.id.layoutswitcher);
+	    //vf.setOnTouchListener(this);
 	    
 	    // set the layout
 	    ImageView image = (ImageView) findViewById(R.id.species_image);
@@ -95,7 +93,7 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 	    	    
 	    	    Log.i("K", "SELECT common_name, science_name FROM uclaTreeLists WHERE id=" + species_id);
 	    	    
-	    		Cursor cursorTree = db.rawQuery("SELECT common_name, science_name, credit FROM uclaTreeLists WHERE id=" + species_id, null);
+	    		Cursor cursorTree = db.rawQuery("SELECT common_name, science_name, credit FROM userDefineLists WHERE id=" + species_id, null);
 	    		while(cursorTree.moveToNext()) {
 	    			String imagePath = Values.TREE_PATH + species_id + ".jpg";
 	    			Log.i("K", "image Path : " + imagePath);
@@ -175,7 +173,7 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 			    image2.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor2.getInt(0), null, null));
 				 	
 			    //llayout.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-				vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				//vf.addView(itemView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		    }
 			cursor2.close();
 	    }
@@ -192,9 +190,6 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 	
 	public void onResume() {
 		super.onResume();
-		
-		Log.i("K", "VF : " + vf.getChildCount());
-		
 		
 		//vf.setOnTouchListener(SpeciesDetail.this);
 	}
@@ -217,7 +212,7 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 	}
 
 */
-
+/*
 	@Override
 	public boolean onTouch(View v, MotionEvent touchevent) {
 		// TODO Auto-generated method stub
@@ -259,4 +254,5 @@ public class SpeciesDetail extends Activity implements View.OnTouchListener{
 		}
 		return true;
 	}
+*/
 }

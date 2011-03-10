@@ -19,23 +19,37 @@
 		</ImageView>
 	</LinearLayout>
 	 -->    
-    <LinearLayout
+    
+	<LinearLayout
 		android:id="@+id/header_item"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:paddingTop="10dp"
-		android:paddingLeft="5dp"
-		android:paddingRight="5dp"
-		android:paddingBottom="5dp"
+		android:orientation="horizontal"
+		android:padding="3dp"
+		android:weightSum="1"
 		android:background="@drawable/bg_line"
 	>
-		<LinearLayout
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="0.2"
+			android:text="@string/Unknown_Plant_Text_1"
+			android:textSize="15dp"
+			android:paddingTop="10dp"
+			android:paddingLeft="5dp"
+			android:layout_marginBottom="7dp"
+		/>
+		<Button
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:weightSum="1"
-		>
+			android:id="@+id/skip"
+			android:text="@string/Skip"
+			android:layout_weight="0.8"
+			android:layout_marginTop="6dp"
+			android:layout_marginBottom="7dp"
+		/>
+	</LinearLayout>
+		<!-- 
 		<TextView
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
@@ -72,17 +86,8 @@
 			android:text="@string/Add_Notes"
 			android:layout_weight="0.25"
 		/>
-	</LinearLayout>
-	<TextView
-		android:layout_below="@+id/header_item"
-		android:layout_marginLeft="2dp"
-		android:layout_marginBottom="3dp"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/Unknown_Plant_Text_1"
-		android:textSize="15dp"
-	/>
-	</LinearLayout>
+		 -->
+	
 	<ListView 
 		android:id="@android:id/list"
 		android:layout_below="@+id/header_item"

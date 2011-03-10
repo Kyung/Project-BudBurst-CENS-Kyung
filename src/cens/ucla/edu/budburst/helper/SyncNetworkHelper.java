@@ -252,9 +252,9 @@ public class SyncNetworkHelper extends Activity{
         	MultipartEntity entity = new MultipartEntity();
         	entity.addPart("plant_id", new StringBody(Integer.toString(plant_id)));
         	entity.addPart("phenophase_id", new StringBody(Integer.toString(phenophase_id)));
-        	entity.addPart("latitude", new StringBody(latitude.toString()));
-        	entity.addPart("longitude", new StringBody(longitude.toString()));
-        	entity.addPart("accuracy", new StringBody(Float.toString(accuracy)));
+        	//entity.addPart("latitude", new StringBody(latitude.toString()));
+        	//entity.addPart("longitude", new StringBody(longitude.toString()));
+        	//entity.addPart("accuracy", new StringBody(Float.toString(accuracy)));
         	entity.addPart("date", new StringBody(dt_taken));
         	entity.addPart("note", new StringBody(notes));
 
@@ -313,7 +313,6 @@ public class SyncNetworkHelper extends Activity{
         	entity.addPart("time", new StringBody(time));
         	entity.addPart("note", new StringBody(note));
         	
-        	Log.i("K", "image_id.toString() : " + image_id.toString());
         	
         	File file = new File("/sdcard/pbudburst/" + image_id.toString() + ".jpg");
 

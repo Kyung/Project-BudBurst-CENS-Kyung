@@ -22,7 +22,8 @@ import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.onetime.Whatsinvasive.MyListAdapter;
+import cens.ucla.edu.budburst.lists.ListMain;
+import cens.ucla.edu.budburst.lists.UserDefinedTreeLists;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -78,9 +79,10 @@ public class OneTimeMain extends ListActivity {
 	
 	private TextView myTitleText = null;
 	private EditText unknownText = null;
-	private Button noteBtn = null;
-	private Button submitBtn = null;
-	private Button siteBtn = null;
+	//private Button noteBtn = null;
+	//private Button submitBtn = null;
+	//private Button siteBtn = null;
+	private Button skipBtn = null;
 	private EditText et1 = null;
 	
 	private MyListAdapter mylistapdater;
@@ -114,6 +116,8 @@ public class OneTimeMain extends ListActivity {
 		
 		helper = new FunctionsHelper();
 		LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
+		
+		Log.i("K","previous_activity : " + previous_activity);
 
 		// if previous activity is "PlantList.java"
 		// this page view is different by the previous activity
@@ -140,21 +144,53 @@ public class OneTimeMain extends ListActivity {
 		oneTime otime;
 		
 		//oneTime(Header String, title, icon_name, sub_title)
-		otime = new oneTime("Select plant name from lists", "Project Budburst", "pbb_icon_main", "Project Budburst");
+		otime = new oneTime("Local plants from national plant lists", "Project Budburst", "pbb_icon_main", "Project Budburst");
 		onetime_title.add(otime);
 		
-		otime = new oneTime("Or Choose from other plant lists", "Local Invasives", "invasive_plant", "Help locate invasive plants");
-		onetime_title.add(otime);
-		
-		otime = new oneTime("none", "Local Blooming", "pbbicon", "Local plants in flower now");
+		otime = new oneTime("none", "Local Invasives", "invasive_plant", "Help locate invasive plants");
 		onetime_title.add(otime);
 		
 		otime = new oneTime("none", "Local Native", "whatsnative", "Native and cultural plants");
 		onetime_title.add(otime);
+		
+		otime = new oneTime("Locally created lists of interest", "UCLA Trees", "s1000", "Tree species on campus");
+		onetime_title.add(otime);
+		
+		otime = new oneTime("none", "What's Blooming", "pbbicon", "Santa Monica blooming plants");
+		onetime_title.add(otime);
+		
+		
 
 		mylistapdater = new MyListAdapter(OneTimeMain.this, R.layout.onetime_list ,onetime_title);
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
+		
+		skipBtn = (Button)findViewById(R.id.skip);
+		
+		skipBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String dt_taken = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
+				
+				Intent intent = new Intent(OneTimeMain.this, AddNotes.class);
+				intent.putExtra("cname", "Unknown/Other");
+				intent.putExtra("sname", "Unknown/Other");
+				intent.putExtra("dt_taken", dt_taken);
+				intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
+				intent.putExtra("pheno_id", pheno_id);
+				intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+				intent.putExtra("camera_image_id", camera_image_id);
+				intent.putExtra("latitude", latitude);
+				intent.putExtra("longitude", longitude);
+				intent.putExtra("from", previous_activity);
+				
+				startActivity(intent);
+			}
+		});
+		
+		/*
 		
 		submitBtn = (Button)findViewById(R.id.submit);
 		
@@ -216,7 +252,8 @@ public class OneTimeMain extends ListActivity {
 				}
 			}
 		});
-		
+		*/
+		/*
 		siteBtn = (Button) findViewById(R.id.movetosite);
 		siteBtn.setOnClickListener(new View.OnClickListener() {
 			
@@ -243,8 +280,8 @@ public class OneTimeMain extends ListActivity {
 
 			}
 		});
-		
-		
+		*/
+		/*
 		noteBtn = (Button) findViewById(R.id.notes);
 		
 		noteBtn.setOnClickListener(new View.OnClickListener() {
@@ -282,10 +319,10 @@ public class OneTimeMain extends ListActivity {
 				});
 			}
 		});
+		*/
 	}
 	
-	
-	
+	/*
 	public void user_define_name() {
 		Dialog dialog = new Dialog(OneTimeMain.this);
 		
@@ -307,7 +344,7 @@ public class OneTimeMain extends ListActivity {
 					common_name = "Unknown/Other";
 				}
 				
-				helper.insertNewPlantToDB(OneTimeMain.this, Values.UNKNOWN_SPECIES, 0, 9, common_name, "Unknown/Other", Values.NORMAL_QC);
+				helper.insertNewSharedPlantToDB(OneTimeMain.this, Values.UNKNOWN_SPECIES, 0, 9, common_name, "Unknown/Other", Values.NORMAL_QC);
 				int getID = helper.getID(OneTimeMain.this);
 				helper.insertNewObservation(OneTimeMain.this, getID, pheno_id, latitude, longitude, accuracy, camera_image_id, notes);
 				
@@ -323,7 +360,7 @@ public class OneTimeMain extends ListActivity {
 			}
 		});
 	}
-
+	*/
 
 	class MyListAdapter extends BaseAdapter{
 		Context maincon;
@@ -358,7 +395,6 @@ public class OneTimeMain extends ListActivity {
 			
 			img.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/"+arSrc.get(position).image_url, null, null));
 			//img.setBackgroundResource(R.drawable.shapedrawable);
-			
 			
 			TextView header_view = (TextView) convertView.findViewById(R.id.list_header);
 			TextView title_view = (TextView) convertView.findViewById(R.id.list_name);
@@ -400,6 +436,13 @@ public class OneTimeMain extends ListActivity {
 		Intent intent = null;
 		
 		switch(position) {
+		/*
+		 * 0 : BudBurst
+		 * 1 : Invasive
+		 * 2 : Native
+		 * 3 : UCLA Trees
+		 * 4 : Blooming
+		 */
 		case 0:
 			if(previous_activity == Values.FROM_PLANT_LIST) {
 				intent = new Intent(OneTimeMain.this, AddPlant.class);
@@ -416,7 +459,7 @@ public class OneTimeMain extends ListActivity {
 			}
 			break;
 		case 1:
-			// Move to whatsinvasive.
+			
 		   	intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
 		    intent.putExtra("FROM", previous_activity);
 		    intent.putExtra("camera_image_id", camera_image_id);
@@ -424,22 +467,41 @@ public class OneTimeMain extends ListActivity {
 			intent.putExtra("longitude", longitude);
 			intent.putExtra("pheno_id", pheno_id);
 			intent.putExtra("notes", notes);
+			
 			//Something is wrong about the View - need to fix
 			startActivity(intent);
 			break;
 		case 2:
-			//Whats blooming
+			//Whats Native
 			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			break;
 		case 3:
-			//Whats native
+			//UCLA Trees
+			if(pref.getBoolean("getTreeLists", false)) {
+				intent = new Intent(OneTimeMain.this, UserDefinedTreeLists.class);
+				intent.putExtra("from", previous_activity);
+				intent.putExtra("camera_image_id", camera_image_id);
+				intent.putExtra("latitude", latitude);
+				intent.putExtra("longitude", longitude);
+				intent.putExtra("pheno_id", pheno_id);
+				startActivity(intent);
+			}
+			else {
+				Toast.makeText(OneTimeMain.this, "Still downloading the tree lists", Toast.LENGTH_SHORT).show();
+			}
+			break;
+		case 4:
+			//What's blooming
 			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			break;
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 
-	///////////////////////////////////////////////////////////
-	//Menu option
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
@@ -448,7 +510,10 @@ public class OneTimeMain extends ListActivity {
 		return true;
 	}
 	
-	//Menu option selection handling
+	/*
+	 * (non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	public boolean onOptionsItemSelected(MenuItem item){
 		Intent intent;
 		switch(item.getItemId()){

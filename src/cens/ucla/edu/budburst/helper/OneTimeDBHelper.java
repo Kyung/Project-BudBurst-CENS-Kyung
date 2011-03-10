@@ -8,15 +8,15 @@ import android.util.Log;
 public class OneTimeDBHelper extends SQLiteOpenHelper {
 
 	public OneTimeDBHelper(Context context){
-		super(context, "onetimeBudburst.db", null, 33);
+		super(context, "onetimeBudburst.db", null, 35);
 	}
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		
-		Log.i("K", "make a onetimeob table");
+		Log.i("K", "make a oneTimePlant table");
 		// TODO Auto-generated method stub
-		db.execSQL("CREATE TABLE onetimeob (" +
+		db.execSQL("CREATE TABLE oneTimePlant (" +
 				"_id INTEGER PRIMARY KEY AUTOINCREMENT," +
 				"plant_id NUMERIC," +
 				"species_id NUMERIC," +
@@ -32,13 +32,14 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				 * 2 - local budburst
 				 * 3 - local invasive
 				 * 4 - local native
+				 * and more...
 				 * 
-				 * 
+				 * Note : category number is different from the category in the server.
 				 * 
 				 */
 				"synced NUMERIC);");
 		
-		db.execSQL("CREATE TABLE onetimeob_observation (" +
+		db.execSQL("CREATE TABLE oneTimeObservation (" +
 				"plant_id NUMERIC," +
 				"phenophase_id NUMERIC," +
 				"lat NUMERIC," +
@@ -67,7 +68,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"lon TEXT, " + 
 				"distance NUMERIC);");
 		
-		db.execSQL("CREATE TABLE uclaTreeLists (" + 
+		db.execSQL("CREATE TABLE userDefineLists (" + 
 				"id INTEGER PRIMARY KEY, " +
 				"common_name TEXT, " +
 				"science_name TEXT, " +
@@ -89,11 +90,11 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 				
 		// TODO Auto-generated method stub
-		db.execSQL("DROP TABLE IF EXISTS onetimeob");
-		db.execSQL("DROP TABLE IF EXISTS onetimeob_observation");
+		db.execSQL("DROP TABLE IF EXISTS oneTimePlant");
+		db.execSQL("DROP TABLE IF EXISTS oneTimeObservation");
 		db.execSQL("DROP TABLE IF EXISTS speciesLists");
 		db.execSQL("DROP TABLE IF EXISTS pbbFlickrLists");
-		db.execSQL("DROP TABLE IF EXISTS uclaTreeLists");
+		db.execSQL("DROP TABLE IF EXISTS userDefineLists");
 		db.execSQL("DROP TABLE IF EXISTS localPlantLists");
 		
 		onCreate(db);
@@ -103,10 +104,9 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
-		db.execSQL("DELETE FROM onetimeob;");
+		db.execSQL("DELETE FROM oneTimePlant;");
 		db.execSQL("DELETE FROM speciesLists;");
-		db.execSQL("DELETE FROM onetimeob_observation;");
-		db.execSQL("DELETE FROM localPlantLists;");
+		db.execSQL("DELETE FROM oneTimeObservation;");
 		
 	 	dbhelper.close();
  	}
@@ -115,8 +115,17 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
-		db.execSQL("DELETE FROM uclaTreeLists;");
+		db.execSQL("DELETE FROM userDefineLists;");
 		
+	 	dbhelper.close();
+	}
+	
+	public void clearLocalListAll(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		
+		db.execSQL("DELETE FROM localPlantLists;");
+	
 	 	dbhelper.close();
 	}
 	

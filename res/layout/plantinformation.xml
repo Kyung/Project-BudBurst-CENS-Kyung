@@ -222,21 +222,28 @@
 			android:gravity="top" 
 			android:layout_gravity="center"
 			android:lines="3"
-			android:hint="@string/PlantInfo_addNotes"/>
+			/>
+			<!-- android:hint="@string/PlantInfo_addNotes" -->
 		</LinearLayout>
-
-		<Button
-			android:layout_below="@+id/observation_linear_layout"
-			android:id="@+id/save_changes" 
-			android:textColor="@drawable/black"
-			android:layout_width="250dp" 
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			android:textStyle="bold"
-			android:layout_marginTop="15dp"
-			android:textSize="16sp"
-			android:focusable="true"
-			android:text="@string/Button_saveChanges"/>
 	</LinearLayout>
 </ScrollView>
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:background="@color/darkgray"
+	>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:paddingTop="2dp"
+		>
+		<Button 
+			android:id="@+id/save_changes" 
+			android:layout_height="wrap_content" 
+			android:text="@string/Button_saveChanges" 
+			android:layout_width="200dp"/>
+		</LinearLayout>
+	</LinearLayout>
 </RelativeLayout>

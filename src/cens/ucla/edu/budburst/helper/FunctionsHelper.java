@@ -17,6 +17,7 @@ import java.util.List;
 
 import android.R;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -107,15 +108,15 @@ public class FunctionsHelper {
 			String dt_taken = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
 
 			// species_id, site_id, cname, sname, lat, lng, accuracy, dt_taken, notes, image_name, synced
-			ot.execSQL("INSERT INTO onetimeob_observation VALUES(" +
+			ot.execSQL("INSERT INTO oneTimeObservation VALUES(" +
 					plant_id + "," +
 					phenophase_id + "," +
 					"" + lat + "," +
 					"" + lng + "," +
 					"" + accuracy + "," +
-					"'" + image_id +"'," +
-					"'" + dt_taken + "'," +
-					"'" + notes + "'," +
+					"\"" + image_id +"\"," +
+					"\"" + dt_taken + "\"," +
+					"\"" + notes + "\"," +
 					SyncDBHelper.SYNCED_NO + ");"
 					);
 			onetime.close();
@@ -138,7 +139,7 @@ public class FunctionsHelper {
 			OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 			SQLiteDatabase ot = onetime.getReadableDatabase();
 			
-			Cursor c = ot.rawQuery("SELECT MAX(plant_id) as max FROM onetimeob;", null);
+			Cursor c = ot.rawQuery("SELECT MAX(plant_id) as max FROM oneTimePlant;", null);
 			while(c.moveToNext()) {
 				return_id = c.getInt(0);
 			}
@@ -146,6 +147,7 @@ public class FunctionsHelper {
 			onetime.close();
 			ot.close();
 			c.close();
+			
 			return return_id;
 		}
 		catch(Exception e) {
@@ -153,28 +155,77 @@ public class FunctionsHelper {
 		}
 	}
 	
-	public boolean insertNewPlantToDB(Context context, int speciesid, int siteid, int protocolid, String cname, String sname, int category){
+	public boolean insertNewMyPlantToDB(Context context, int speciesid, String speciesname, int siteid, String sitename, int protocol_id){
+
+		int s_id = speciesid;
+		SharedPreferences pref = context.getSharedPreferences("userinfo",0);
+		
+		if(speciesid == Values.UNKNOWN_SPECIES) {
+			s_id = pref.getInt("other_species_id", 0);
+			s_id++;
+		}
+		
+		Log.i("K", "INSERT PROTOCOL_ID : " + protocol_id);
 		
 		try{
-			Log.i("K", "INSIDE THE insertNewPlantDB function");
+			SyncDBHelper syncDBHelper = new SyncDBHelper(context);
+			SQLiteDatabase syncDB = syncDBHelper.getWritableDatabase();
 			
+			Log.i("K", "INSERTED STRING : " + "INSERT INTO my_plants VALUES(" +
+					"null," +
+					speciesid + "," +
+					siteid + "," +
+					"'" + sitename + "',"+
+					protocol_id + "," + 
+					"'" + speciesname + "'," +
+					"1, " + // active 0(need to be removed), 1(nothing), 2(update the species)
+					SyncDBHelper.SYNCED_NO + ");");
+			
+			syncDB.execSQL("INSERT INTO my_plants VALUES(" +
+					"null," +
+					speciesid + "," +
+					siteid + "," +
+					"'" + sitename + "',"+
+					protocol_id + "," + 
+					"'" + speciesname + "'," +
+					"1, " + // active 0(need to be removed), 1(nothing), 2(update the species)
+					SyncDBHelper.SYNCED_NO + ");"
+					);
+			
+			if(speciesid == Values.UNKNOWN_SPECIES) {
+				SharedPreferences.Editor edit = pref.edit();				
+				edit.putInt("other_species_id", s_id);
+				edit.commit();
+			}
+			
+			syncDBHelper.close();
+			return true;
+		}
+		catch(Exception e){
+			return false;
+		}
+	}
+	
+	public boolean insertNewSharedPlantToDB(Context context, int speciesid, int siteid, int protocolid, String cname, String sname, int category){
+		
+		try{
 			OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 			SQLiteDatabase ot = onetime.getWritableDatabase();
 			
 			int plant_id = getID(context);
+			
+			// for the next plant id
 			plant_id += 1;
 			
-			Log.i("K", "plant_id : " + plant_id);
-			
 			// _id, plant_id, species_id, site_id, protocol_id, cname, sname, active, synced
-			ot.execSQL("INSERT INTO onetimeob VALUES(" +
+			ot.execSQL("INSERT INTO oneTimePlant VALUES(" +
 					"null," +
 					plant_id + "," +
 					speciesid + "," +
 					siteid + "," +
 					protocolid + "," +
-					"'" + cname + "',"+
-					"'" + sname + "',"+
+					"\"" + cname + "\","+
+					"\"" + sname + "\","+
 					Values.ACTIVE_SPECIES + "," + // active
 					category + "," + 
 					SyncDBHelper.SYNCED_NO + ");"
@@ -277,20 +328,6 @@ public class FunctionsHelper {
 		
 		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(buf));
 		
-		/*
-		Log.i("K", "" + bitmap.getHeight());
-		
-		if(bitmap.getHeight() == 0) {
-			
-			Log.i("K", "@@@@@@@@@@");
-			
-			Resources res = context.getResources();
-			int resID = context.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null);
-			Bitmap resBit = BitmapFactory.decodeResource(res,resID);
-			
-			return resBit;
-		}
-		*/
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
 		int newWidth = 60;

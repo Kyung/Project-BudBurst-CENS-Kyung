@@ -68,7 +68,7 @@ public class PlantSummary extends MapActivity {
 
 	private PopupWindow popup = null;
 	private View popupview = null;
-	private ImageButton phone_image = null;
+	private ImageView phone_image = null;
 	private List<Overlay> mapOverlays = null;
 	private HelloItemizedOverlay itemizedOverlay = null;
 	/** Called when the activity is first created. */
@@ -76,16 +76,16 @@ public class PlantSummary extends MapActivity {
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		//requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.plantsummary);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		//getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
-		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
-		v = (ViewGroup)v.getChildAt(0);
-		v.setPadding(0, 0, 0, 0);
+		//ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		//v = (ViewGroup)v.getChildAt(0);
+		//v.setPadding(0, 0, 0, 0);
 
-		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" " + getString(R.string.Observation_Summary));
+		//TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		//myTitleText.setText(" " + getString(R.string.Observation_Summary));
 	    // set database
 	    otDBH = new OneTimeDBHelper(PlantSummary.this);
 	    
@@ -128,7 +128,7 @@ public class PlantSummary extends MapActivity {
 	    	OneTimeDBHelper otDBHelper = new OneTimeDBHelper(PlantSummary.this);
 			SQLiteDatabase otDB  = otDBHelper.getReadableDatabase();
 			
-			Cursor cur = otDB.rawQuery("SELECT lat, lng FROM onetimeob_observation WHERE plant_id = " + onetimeplant_id, null);
+			Cursor cur = otDB.rawQuery("SELECT lat, lng FROM oneTimeObservation WHERE plant_id = " + onetimeplant_id, null);
 			while(cur.moveToNext()) {
 				latitude = cur.getDouble(0);
 				longitude = cur.getDouble(1);
@@ -144,9 +144,9 @@ public class PlantSummary extends MapActivity {
 	    Log.i("K", "previous_activity : " + previous_activity + " , plant_id :" + pheno_id + " , pheno_image_id : " + pheno_icon + " onetimeplant_id : " + onetimeplant_id);
 
 	    // setting up layout
-	    phone_image = (ImageButton) findViewById(R.id.phone_image);
+	    phone_image = (ImageView) findViewById(R.id.phone_image);
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
-	    ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
+	    //ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
 	    TextView pheno_title = (TextView) findViewById(R.id.pheno_title);
 	    TextView cnameTxt = (TextView) findViewById(R.id.common_name);
 	    TextView snameTxt = (TextView) findViewById(R.id.science_name);
@@ -184,6 +184,7 @@ public class PlantSummary extends MapActivity {
 	    cnameTxt.setText(cname + " ");
 	    snameTxt.setText(sname + " ");
 	    
+	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    if(species_id > 76 || category == Values.TREE_LISTS_QC) {
 	    	// check out for the tree_list
 	    	if(category == Values.TREE_LISTS_QC) {
@@ -200,8 +201,7 @@ public class PlantSummary extends MapActivity {
 	    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+species_id, null, null));
 	    }
 	    
-	    species_image.setBackgroundResource(R.drawable.shapedrawable);
-	    phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+	    /*
 	    if(pheno_id == 0) {
 	    	pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
 	    }
@@ -211,8 +211,9 @@ public class PlantSummary extends MapActivity {
 	    
 	    pheno_image.setBackgroundResource(R.drawable.shapedrawable);
 	    pheno_image.setVisibility(View.VISIBLE);
-
+		*/
 	    // when click species image
+	    
 	    species_image.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -225,7 +226,7 @@ public class PlantSummary extends MapActivity {
 				startActivity(intent);
 			}
 		});
-	    
+	    /*
 	    // when click phenophase image
 	    pheno_image.setOnClickListener(new View.OnClickListener() {
 			
@@ -245,7 +246,7 @@ public class PlantSummary extends MapActivity {
 				startActivity(intent);
 			}
 		});
-	    
+	    */
 	    String imagePath = null;
 	    File file = new File(Values.BASE_PATH + photo_name + ".jpg");
 	    Bitmap bitmap = null;
@@ -277,6 +278,7 @@ public class PlantSummary extends MapActivity {
 	   	    phone_image.setVisibility(View.VISIBLE);
 	   	}
 	    
+	    phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 	    // when click the image taken through camera
 	    phone_image.setOnClickListener(new View.OnClickListener() {
 			

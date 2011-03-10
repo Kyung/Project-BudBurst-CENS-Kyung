@@ -62,6 +62,7 @@ public class GetPhenophase extends ListActivity {
 	private int protocol_id;
 	private int _position = 0;
 	private int previous_activity;
+	private int category = 0;
 	
 	private Button submitBtn = null;
 	private TextView myTitleText = null;
@@ -91,10 +92,20 @@ public class GetPhenophase extends ListActivity {
 	    camera_image_id = intent.getExtras().getString("camera_image_id");
 		dt_taken = intent.getExtras().getString("dt_taken");
 		previous_activity = intent.getExtras().getInt("from");
+
+		
+		Log.i("K", "Previous_activity(GetPhenophase) : " + previous_activity);
+		
 		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
 			common_name = intent.getExtras().getString("cname");
 			science_name = intent.getExtras().getString("sname");
 			species_id = intent.getExtras().getInt("tree_id");
+		}
+		
+		if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
+			common_name = intent.getExtras().getString("cname");
+			science_name = intent.getExtras().getString("sname");
+			category = intent.getExtras().getInt("category");
 		}
 		
 		
@@ -136,7 +147,8 @@ public class GetPhenophase extends ListActivity {
 
 		//GetPhenophase.this.unregisterReceiver(receiver);
 		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
-			Intent intent = new Intent(GetPhenophase.this, AddSite.class);
+			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
+			
 			intent.putExtra("cname", common_name);
 			intent.putExtra("sname", science_name);
 			intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
@@ -146,9 +158,28 @@ public class GetPhenophase extends ListActivity {
 			intent.putExtra("dt_taken", dt_taken);
 			intent.putExtra("pheno_id", position + 1);
 			intent.putExtra("species_id", species_id);
-			intent.putExtra("notes", "");
+			intent.putExtra("category", -1);
+			
 			// for the from value, as the parameters passed are the same as FROM_ONETIME_DIRECT, let's use that.
 			intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
+			startActivity(intent);
+		}
+		else if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
+			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
+			
+			intent.putExtra("cname", common_name);
+			intent.putExtra("sname", science_name);
+			intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
+			intent.putExtra("camera_image_id", camera_image_id);
+			intent.putExtra("latitude", latitude);
+			intent.putExtra("longitude", longitude);
+			intent.putExtra("dt_taken", dt_taken);
+			intent.putExtra("pheno_id", position + 1);
+			intent.putExtra("species_id", 0); // there's no species_id in LOCAL PLANT LISTS
+			intent.putExtra("category", category);
+			
+			// for the from value, as the parameters passed are the same as FROM_ONETIME_DIRECT, let's use that.
+			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
 			startActivity(intent);
 		}
 		else {
@@ -159,7 +190,7 @@ public class GetPhenophase extends ListActivity {
 			intent.putExtra("longitude", longitude);
 			intent.putExtra("dt_taken", dt_taken);
 			intent.putExtra("pheno_id", position + 1);
-			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+			intent.putExtra("FROM", Values.FROM_QUICK_CAPTURE);
 			
 			startActivity(intent);
 		}

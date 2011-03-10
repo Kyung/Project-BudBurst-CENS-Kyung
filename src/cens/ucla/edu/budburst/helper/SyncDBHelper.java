@@ -13,7 +13,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 	public static final int SYNCED_NO = 9;
 	
 	public SyncDBHelper(Context context){
-		super(context, "syncBudburst.db", null, 29);
+		super(context, "syncBudburst.db", null, 30);
 	}
 	
 	public void onCreate(SQLiteDatabase db){
@@ -28,9 +28,6 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"common_name TEXT," +
 				"active NUMERIC," + // active 0(need to be removed), 1(nothing), 2(update the species)
 				"synced NUMERIC);");
-				
-		//INSERT INTO onetimeob(photo_name, dt_taken, notes, sname, cname, image_id) VALUES(?, ?, ?, ?, ?, ?);
-				
 				
 				
 		//If synced is 

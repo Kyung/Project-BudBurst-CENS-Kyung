@@ -105,8 +105,8 @@ public class Sync extends Activity{
 			SQLiteDatabase otDB  = otHelper.getWritableDatabase();
 			SQLiteDatabase syncDB  = sHelper.getWritableDatabase();
 
-			otDB.execSQL("UPDATE onetimeob SET synced = 5;");
-			otDB.execSQL("UPDATE onetimeob_observation SET synced = 5;");
+			otDB.execSQL("UPDATE oneTimePlant SET synced = 5;");
+			otDB.execSQL("UPDATE oneTimeObservation SET synced = 5;");
 			
 			syncDB.execSQL("UPDATE my_sites SET synced = 5;");
 			syncDB.execSQL("UPDATE my_plants SET synced = 5;");
@@ -659,6 +659,8 @@ class doSyncThread extends Thread{
 				
 				SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
 		    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
+		    	SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
+		    
 				
 				query = "SELECT site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat, official " +
 						"FROM my_sites WHERE synced=" + SyncDBHelper.SYNCED_NO;
@@ -685,6 +687,8 @@ class doSyncThread extends Thread{
 					serverResponse = SyncNetworkHelper.upload_new_site(username, password, 
 							site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat, official);
 					
+					Log.i("K", "Add site response : " + serverResponse);
+					
 					if(serverResponse == null){
 						msgToMain.what = UPLOAD_ADDED_SITE* -1;
 						mLoop.quit();
@@ -700,8 +704,13 @@ class doSyncThread extends Thread{
 							mLoop.quit();
 							break;
 						}else{
+							
 							//Retrieve new site id 
 							String site_id_from_server = jsonobj.getString("results");
+							
+							Log.i("K", "New Site ID : " + site_id_from_server + " Old Site ID : " + site_id);
+							
+							
 							
 							//Update my_plants table with new site id 
 							query = "UPDATE my_plants " +
@@ -714,6 +723,16 @@ class doSyncThread extends Thread{
 							"SET site_id='" + site_id_from_server + "' " +
 							"WHERE site_id='" + site_id+"';";
 							syncWDB.execSQL(query);
+							
+							//int newSiteID = Integer.parseInt(site_id_from_server);
+							
+							//Update oneTimePlant table with new site id
+							query = "UPDATE oneTimePlant " +
+							"SET site_id=" + site_id_from_server + " " + 
+							"WHERE site_id=" + site_id + ";";
+							otWDB.execSQL(query);
+							
+							
 						}
 					}catch(Exception e){
 			            e.printStackTrace();
@@ -724,6 +743,7 @@ class doSyncThread extends Thread{
 				}
 				syncRDB.close();
 				syncWDB.close();
+				otWDB.close();
 				cursor.close();
 				break;
 			case UPLOAD_ADDED_PLANT:
@@ -799,7 +819,7 @@ class doSyncThread extends Thread{
 				SQLiteDatabase otRDB = otDBHelper.getReadableDatabase();
 		    	//SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
 				
-				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname, active, category FROM onetimeob " +
+				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname, active, category FROM oneTimePlant " +
 						"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = otRDB.rawQuery(query, null);
 				
@@ -861,8 +881,6 @@ class doSyncThread extends Thread{
 			        msgToMain.arg2 = NOT_FINISH_INT;
 					cursor.moveToNext();
 					
-					Log.i("K", "OOO : " + cursor.getString(0));
-					
 					
 					serverResponse = SyncNetworkHelper.upload_new_obs(username, password, context,
 							cursor.getString(0), cursor.getString(1), cursor.getString(2),
@@ -909,7 +927,7 @@ class doSyncThread extends Thread{
 		    	
 		    	//Open database cursor
 		    	query = "SELECT plant_id, phenophase_id, lat, lng, accuracy, image_id, dt_taken, notes " +
-		    			"FROM onetimeob_observation " +
+		    			"FROM oneTimeObservation " +
 		    			"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 		    	
 				cursor = otRDB.rawQuery(query, null);
@@ -1222,10 +1240,10 @@ class doSyncThread extends Thread{
 		
 					jsonresult = new JSONArray(jsonobj.getString("results"));
 					// delete first
-					onetime.execSQL("DELETE FROM onetimeob;");
+					onetime.execSQL("DELETE FROM oneTimePlant;");
 					for(int i=0; i<jsonresult.length(); i++){
 						
-						onetime.execSQL("INSERT INTO onetimeob " +
+						onetime.execSQL("INSERT INTO oneTimePlant " +
 								"(plant_id, species_id, site_id, protocol_id, cname, sname, active, category, synced)" +
 								"VALUES(" +
 								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
@@ -1292,8 +1310,8 @@ class doSyncThread extends Thread{
 					}
 		
 					jsonresult = new JSONArray(jsonobj.getString("results"));
-					// empty items in the onetimeob_observation table
-					onetime.execSQL("DELETE FROM onetimeob_observation;");
+					// empty items in the oneTimeObservation table
+					onetime.execSQL("DELETE FROM oneTimeObservation;");
 					for(int i=0; i<jsonresult.length(); i++){
 						
 						String has_image_flag = jsonresult.getJSONObject(i).getString("Has_Image");
@@ -1305,7 +1323,7 @@ class doSyncThread extends Thread{
 						}
 						
 						
-						onetime.execSQL("INSERT INTO onetimeob_observation " +
+						onetime.execSQL("INSERT INTO oneTimeObservation " +
 								"(plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes, synced)" +
 								"VALUES(" +
 								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +

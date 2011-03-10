@@ -36,4 +36,5 @@
 	<color name="BudBurstHighlight">#7fb57a</color>
 	<color name="BudBurstLightBackground">#f1ffe0</color>
 	<color name="blue">#0000FF</color>
+	<color name="darkgray">#AAAAAA</color>
 </resources>

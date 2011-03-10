@@ -16,8 +16,10 @@ import org.json.JSONObject;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.Sync;
+import cens.ucla.edu.budburst.helper.MyListAdapter;
 import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
+import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import android.app.ProgressDialog;
@@ -26,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -42,6 +45,7 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 	private ArrayList <PlantItem> localArray;
 	private boolean running = true;
 	private Items item;
+	private int category;
 	
 	public DownloadListFromServer(Context context, ListView list, LazyAdapter lazyadapter, Items item) {
 		this.context = context;
@@ -115,14 +119,15 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 		 * Use the boolean value to check the process will be contiunued
 		 * 
 		 */
+		
 		while(running) {
+			
 			String url = "http://networkednaturalist.org/python_scripts/cens-dylan/list.py?lat=" 
 				+ item[0].latitude
-				//+ "42.1497&lon=-74.9384&type=1";
 				+ "&lon=" + item[0].longitude 
 				+ "&type=" + item[0].category;
 			
-			Log.i("K", "URL : " + url);
+			category = item[0].category;
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(url);
@@ -143,7 +148,11 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 					
 					result = result_str.toString();
 					
-					JSONArray jsonAry = new JSONArray(result);
+					JSONObject jsonObj = new JSONObject(result);
+					String county = jsonObj.getString("county");
+					String state = jsonObj.getString("state");
+					
+					JSONArray jsonAry = jsonObj.getJSONArray("results");
 					
 					/*
 					 * Open OneTime Database and delete the list first - by category
@@ -159,36 +168,114 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 					
 					mStrings = new String[jsonAry.length()];
 					
+					/*
+					 * Category :
+					 *  - Budburst : 2
+					 *  - Whatsinvasive : 3
+					 *  - Whatsnative : 4
+					 *  - Whatsposionous : 5
+					 */
+					
 					// ReINSERT the values
 					for(int i = 0 ; i < jsonAry.length() ; i++) {
 					
+						/*
+						 * Set the first char to upper case.
+						 */
+						String commonName = jsonAry.getJSONObject(i).getString("common");
+						
+						/*
+						 * If there's a common name, change the first char to upper case.
+						 */
+						if(!commonName.equals("")) {
+							commonName = commonName.substring(0,1).toUpperCase() + commonName.substring(1);
+						}
+						else {
+							commonName = "Unknown/Other";
+						}
+						
 						otDB.execSQL("INSERT INTO localPlantLists VALUES(" +
 								item[0].category + ",\"" +
-								jsonAry.getJSONObject(i).getString("common") + "\",\"" +
+								commonName + "\",\"" +
 								jsonAry.getJSONObject(i).getString("scientific") + "\",\"" +
-								jsonAry.getJSONObject(i).getString("county") + "\",\"" +
-								jsonAry.getJSONObject(i).getString("state") + "\",\"" +
+								county + "\",\"" +
+								state + "\",\"" +
 								jsonAry.getJSONObject(i).getString("usda_url") + "\",\"" +
 								jsonAry.getJSONObject(i).getString("image_url") + "\",\"" +
 								jsonAry.getJSONObject(i).getString("image_copyright") + "\");"
 								);
-						
-						
-						// Put the values into the PlantItem class
-						// and pass them to the ArrayLists
-						PlantItem pi = new PlantItem(jsonAry.getJSONObject(i).getString("common")
-								, jsonAry.getJSONObject(i).getString("scientific")
-								, jsonAry.getJSONObject(i).getString("image_url")
-								, item[0].category);
-						localArray.add(pi);
 					}
 					
-					// Set boolean flag to false to stop this loop
-					running = false;
+					/*
+					 * Retrieve values from the table and put that into the PlantItem class.
+					 */
+
+					if(category == Values.BUDBURST_LIST) {
+						otDB = otDBH.getReadableDatabase();
+
+						Cursor cursor = otDB.rawQuery("SELECT science_name FROM localPlantLists WHERE category=" 
+								+ category 
+								+ " ORDER BY LOWER(common_name) ASC;", null);
+						
+						while(cursor.moveToNext()) {
+							
+							StaticDBHelper staticDB = new StaticDBHelper(context);
+							SQLiteDatabase sDB = staticDB.getReadableDatabase();
+							
+							Cursor getSpeciesInfo = sDB.rawQuery("SELECT _id, species_name, common_name, protocol_id, category, description FROM species WHERE species_name=\"" 
+									+ cursor.getString(0) + "\";", null);
+							
+							
+							while(getSpeciesInfo.moveToNext()) {
+								int resID = context.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+getSpeciesInfo.getInt(0), null, null);
+								
+								PlantItem pi;
+								/*
+								 *  pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+								 */
+								
+								/*
+								 * Insert into PlantItem object
+								 */
+								pi = new PlantItem(resID, getSpeciesInfo.getString(2), getSpeciesInfo.getString(1), getSpeciesInfo.getInt(0), getSpeciesInfo.getInt(3));
+
+								localArray.add(pi);
+							}
+							
+							getSpeciesInfo.close();
+							sDB.close();
+						}
+						
+						cursor.close();
+					}
+					else {
+						Cursor cursor = otDB.rawQuery("SELECT category, common_name, science_name, photo_url FROM localPlantLists WHERE category=" 
+								+ category 
+								+ " ORDER BY LOWER(common_name) ASC;", null);
+						
+						while(cursor.moveToNext()) {
+							PlantItem pi = new PlantItem(cursor.getString(1) 
+									, cursor.getString(2)
+									, cursor.getString(3)
+									, cursor.getInt(0));
+							localArray.add(pi);
+						}
+						
+						cursor.close();
+					}
+
 					
-					// DB close
+					/*
+					 *  DB close
+					 */
 					otDB.close();
 					otDBH.close();
+					
+					
+					/*
+					 *  Set boolean flag to false to stop this loop
+					 */
+					running = false;
 
 				}
 			} catch (IOException e) {
@@ -205,10 +292,15 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 	
 	@Override
 	protected void onPostExecute(Void unused) {
-		
-		lazyadapter = new LazyAdapter(context, localArray);
-        list.setAdapter(lazyadapter);
-		
 		dialog.dismiss();
+		
+		if(category == Values.BUDBURST_LIST) {
+			MyListAdapter mylistapdater = new MyListAdapter(context, R.layout.plantlist_item2, localArray);
+			list.setAdapter(mylistapdater);
+		}
+		else {
+			lazyadapter = new LazyAdapter(context, localArray);
+	        list.setAdapter(lazyadapter);
+		}
 	}
 }

@@ -11,6 +11,9 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
@@ -36,6 +39,7 @@ public class MyLocOverlay extends MyLocationOverlay{
 	private int previousZoomLevel = 9;
 	private float radius = 1;
 	private float previousRadius = 1;
+	private boolean first = true;
 	
 	public MyLocOverlay(Context context, MapView mapView) {
 		super(context, mapView);
@@ -116,7 +120,8 @@ public class MyLocOverlay extends MyLocationOverlay{
 	@Override
 	protected boolean dispatchTap() {
 		GeoPoint current_point = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
-		mc.setCenter(current_point);
+		//mc.setCenter(current_point);
+		
 		Toast.makeText(mContext, "Hello", Toast.LENGTH_SHORT).show();
 		//Toast.makeText(mContext, "Current radius : " + radius + "m" , Toast.LENGTH_SHORT).show();
 		return true;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="cens.ucla.edu.budburst"
-      android:versionName="1.8.9" android:versionCode="37">
+      android:versionCode="39" android:versionName="1.8.10">
       
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -21,21 +21,15 @@
       
     <application android:label="@string/app_name" android:debuggable="true" android:icon="@drawable/pbb_icon_main2">
  
- <activity android:name="firstActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait">
- <intent-filter>
-    			<action android:name="android.intent.action.MAIN"/>
-    			<category android:name="android.intent.category.LAUNCHER"/>
-    		</intent-filter>
- </activity>
+ 	<activity android:name="firstActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait">
+ 		<intent-filter>
+    		<action android:name="android.intent.action.MAIN"/>
+    		<category android:name="android.intent.category.LAUNCHER"/>
+    	</intent-filter>
+ 	</activity>
  
  
-    	<activity android:name=".Login"
-    		android:label="@string/app_name"
-    		android:theme="@android:style/Theme.Light.NoTitleBar"
-    		android:windowSoftInputMode="adjustResize"
-    		android:configChanges="orientation|keyboardHidden">
-    		
-    	</activity>
+<activity android:name=".Login" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:windowSoftInputMode="adjustResize" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:label="Helloscr" android:name=".Helloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantList" android:label="PlantList" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
@@ -52,7 +46,7 @@
 <activity android:name=".onetime.WPinfo" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <uses-library android:name="com.google.android.maps"></uses-library>
 <activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 
 <activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.Flora_Observer" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
@@ -82,6 +76,8 @@
 <activity android:name=".onetime.MyLocation" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".lists.ListSubCategory" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".lists.LazyAdapter"></activity>
+<activity android:name=".onetime.AddNotes" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:windowSoftInputMode="adjustResize"></activity>
+<activity android:name="PlantObservationSummary" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 

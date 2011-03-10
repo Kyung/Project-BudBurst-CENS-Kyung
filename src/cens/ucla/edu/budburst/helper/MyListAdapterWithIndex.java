@@ -42,10 +42,6 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		alphaIndexer = new HashMap<String, Integer>();
 		int size = items.size();
 		
-		
-		
-		//Toast.makeText(maincon, "" + size, Toast.LENGTH_SHORT).show();
-		
 		for(int i = 0 ; i < size ; i++) {
 			PlantItem pi = items.get(i);
 			String firstChar = pi.CommonName.substring(0,1);
@@ -100,7 +96,9 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		phenoStat.setVisibility(View.GONE);
 		phenoObsr.setVisibility(View.GONE);
 		
-		// call View from the xml and link the view to current position.
+		/*
+		 *  Call View from the xml and link the view to current position.
+		 */
 		View thumbnail = convertView.findViewById(R.id.wrap_icon);
 		thumbnail.setTag(items.get(position));
 		thumbnail.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +113,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 				maincon.startActivity(intent);
 			}
 		});
+		
 		
 		return convertView;
 	}

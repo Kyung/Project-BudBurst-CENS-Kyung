@@ -58,18 +58,7 @@ public class firstActivity extends Activity{
 			.show();
 	    }
 	    else {
-	    	
-	    	/*
-	    	 * 
-	    	 * Start two services
-	    	 *  - 1. Tree Lists service
-	    	 *  - 2. Local Lists from USDA
-	    	 * 
-	    	 */
-	    	
-		    Intent service = new Intent(firstActivity.this, BackgroundService.class);
-		    startService(service);
-		    		    
+	    			    
 		    StaticDBHelper staticDBHelper = new StaticDBHelper(firstActivity.this);
 			SyncDBHelper syncDBHelper = new SyncDBHelper(firstActivity.this);
 			OneTimeDBHelper otDBHelper = new OneTimeDBHelper(firstActivity.this);
@@ -102,5 +91,14 @@ public class firstActivity extends Activity{
 		    	}
 		    }, 2000);
 	    }		
+	}
+		
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	     if (keyCode == KeyEvent.KEYCODE_BACK) {
+	    	 //preventing default implementation previous to android.os.Build.VERSION_CODES.ECLAIR
+	    	 return true;
+	     }
+	     return super.onKeyDown(keyCode, event);    
 	}
 }

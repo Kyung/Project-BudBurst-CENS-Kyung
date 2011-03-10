@@ -35,9 +35,11 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.AddPlant;
 import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.MyListAdapter;
+import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.SyncDBHelper;
@@ -52,9 +54,10 @@ public class Flora_Observer extends ListActivity{
 	private MyListAdapter mylistapdater = null;
 	private ListView MyList = null;
 	
-	private RadioButton rb1 = null;
-	private RadioButton rb2 = null;
-	private RadioButton rb3 = null;
+	private Button rb1 = null;
+	private Button rb2 = null;
+	private Button rb3 = null;
+	private Button rb4 = null;
 	private EditText et1 = null;
 	private Dialog dialog = null;
 	
@@ -94,15 +97,17 @@ public class Flora_Observer extends ListActivity{
 		
 		Log.i("K", "Flora_OBSERVER = camera_image_id : " + camera_image_id + " , pheno_id : " + pheno_id);
 		
-		rb1 = (RadioButton)findViewById(R.id.option1);
-		rb2 = (RadioButton)findViewById(R.id.option2);
-		rb3 = (RadioButton)findViewById(R.id.option3);
+		rb1 = (Button)findViewById(R.id.option1);
+		rb2 = (Button)findViewById(R.id.option2);
+		rb3 = (Button)findViewById(R.id.option3);
+		rb4 = (Button)findViewById(R.id.option4);
 		
 		rb1.setOnClickListener(radio_listener);
 		rb2.setOnClickListener(radio_listener);
 		rb3.setOnClickListener(radio_listener);
+		rb4.setOnClickListener(radio_listener);
 		
-		rb1.setSelected(true);
+		//rb1.setSelected(true);
 		
 		//Check if site table is empty
 		staticDBHelper = new StaticDBHelper(Flora_Observer.this);
@@ -209,7 +214,7 @@ public class Flora_Observer extends ListActivity{
 				MyList.setAdapter(mylistapdater);
 				cursor.close();
 			}
-			else {
+			else if(v == rb3){
 				//header.setText("By Group.");
 				new AlertDialog.Builder(Flora_Observer.this)
 				.setTitle("Select Category")
@@ -281,6 +286,43 @@ public class Flora_Observer extends ListActivity{
 				
 			}
 			
+			else {
+				myTitleText.setText(" " + getString(R.string.AddPlant_local));
+				
+				arPlantList = new ArrayList<PlantItem>();
+				
+				OneTimeDBHelper otDBH = new OneTimeDBHelper(Flora_Observer.this);
+				SQLiteDatabase otDB = otDBH.getReadableDatabase();
+				Cursor cursor = staticDB.rawQuery("SELECT _id, species_name, common_name FROM species ORDER BY common_name;", null);
+				
+				while(cursor.moveToNext()) {
+					String sName = cursor.getString(1);
+					
+					Cursor cursor2 = otDB.rawQuery("SELECT science_name FROM localPlantLists WHERE category=1 AND science_name=\"" + sName + "\"", null);
+					if(cursor2.getCount() > 0) {
+						int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+cursor.getInt(0), null, null);
+						
+						String species_name = cursor.getString(1);
+						String common_name = cursor.getString(2);
+						
+						PlantItem pi;
+						//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+						pi = new PlantItem(resID, common_name, species_name, cursor.getInt(0));
+						arPlantList.add(pi);
+					}
+					
+					cursor2.close();
+				}
+				
+				otDBH.close();
+				otDB.close();
+								
+				mylistapdater = new MyListAdapter(Flora_Observer.this, R.layout.plantlist_item2, arPlantList);
+				MyList = getListView(); 
+				MyList.setAdapter(mylistapdater);
+				cursor.close();
+			}
+			
 			staticDBHelper.close();
 		}
 	};
@@ -310,18 +352,18 @@ public class Flora_Observer extends ListActivity{
 					if(cname.equals("")) {
 						cname = "Unknown/Other";
 					}
-					Intent intent = new Intent(Flora_Observer.this, AddSite.class);
+					Intent intent = new Intent(Flora_Observer.this, AddNotes.class);
+					
 					intent.putExtra("cname", cname);
 					intent.putExtra("sname", "Unknown/Other");
-					intent.putExtra("dt_taken", dt_taken);
 					intent.putExtra("protocol_id", arPlantList.get(current_position).ProtocolID);
 					intent.putExtra("pheno_id", pheno_id);
 					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
 					intent.putExtra("camera_image_id", camera_image_id);
 					intent.putExtra("latitude", latitude);
 					intent.putExtra("longitude", longitude);
-					intent.putExtra("notes", notes);
-					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+					intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+					intent.putExtra("category", Values.BUDBURST_LIST);
 					
 					dialog.dismiss();
 					
@@ -330,18 +372,19 @@ public class Flora_Observer extends ListActivity{
 			});
 		}
 		else {
-			Intent intent = new Intent(Flora_Observer.this, AddSite.class);
+			Intent intent = new Intent(Flora_Observer.this, AddNotes.class);
+			
 			intent.putExtra("cname", arPlantList.get(position).CommonName);
 			intent.putExtra("sname", arPlantList.get(position).SpeciesName);
-			intent.putExtra("dt_taken", dt_taken);
 			intent.putExtra("protocol_id", arPlantList.get(position).ProtocolID);
 			intent.putExtra("pheno_id", pheno_id);
 			intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
 			intent.putExtra("camera_image_id", camera_image_id);
 			intent.putExtra("latitude", latitude);
 			intent.putExtra("longitude", longitude);
-			intent.putExtra("notes", notes);
-			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+			intent.putExtra("category", Values.BUDBURST_LIST);
+		
 			startActivity(intent);
 		}
 	}

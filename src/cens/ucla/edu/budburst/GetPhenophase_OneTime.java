@@ -8,10 +8,14 @@ import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.onetime.AddNotes;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
+import cens.ucla.edu.budburst.onetime.QuickCapture;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,6 +47,7 @@ public class GetPhenophase_OneTime extends ListActivity {
 	private int species_id;
 	private int protocol_id;
 	private int category;
+	private int currentPosition;
 
 
 	/** Called when the activity is first created. */
@@ -65,7 +70,7 @@ public class GetPhenophase_OneTime extends ListActivity {
 		
 		OneTimeDBHelper onetime = new OneTimeDBHelper(GetPhenophase_OneTime.this);
 		SQLiteDatabase onetimeDB  = onetime.getReadableDatabase();
-		Cursor cursor = onetimeDB.rawQuery("SELECT cname, sname, species_id, protocol_id, category FROM onetimeob WHERE plant_id=" + id, null);
+		Cursor cursor = onetimeDB.rawQuery("SELECT cname, sname, species_id, protocol_id, category FROM oneTimePlant WHERE plant_id=" + id, null);
 		
 		while(cursor.moveToNext()) {
 			cname = cursor.getString(0);
@@ -106,7 +111,6 @@ public class GetPhenophase_OneTime extends ListActivity {
 				Intent intent = new Intent(GetPhenophase_OneTime.this, SpeciesDetail.class);
 				intent.putExtra("id", species_id);
 				intent.putExtra("category", category);
-				intent.putExtra("site_id", "");
 				startActivity(intent);
 			}
 		});
@@ -114,7 +118,7 @@ public class GetPhenophase_OneTime extends ListActivity {
 		StaticDBHelper staticDB = new StaticDBHelper(GetPhenophase_OneTime.this);
 		SQLiteDatabase sDB = staticDB.getReadableDatabase();
 		
-		cursor = sDB.rawQuery("SELECT _id, Type, Phenophase_ID, Phenophase_Icon, Description FROM Onetime_Observation", null);
+		cursor = sDB.rawQuery("SELECT _id, Category_Name, Phenophase_ID, Phenophase_Icon, Description FROM Onetime_Observation", null);
 
 		while(cursor.moveToNext()) {
 			
@@ -122,7 +126,7 @@ public class GetPhenophase_OneTime extends ListActivity {
 			int cursor_get_id = cursor.getInt(0);
 
 			
-			Cursor cursor2 = onetimeDB.rawQuery("SELECT phenophase_id, image_id, dt_taken, notes FROM onetimeob_observation WHERE plant_id=" + id, null);
+			Cursor cursor2 = onetimeDB.rawQuery("SELECT phenophase_id, image_id, dt_taken, notes FROM oneTimeObservation WHERE plant_id=" + id, null);
 			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(3), null, null);
 			
 			boolean flag = false;
@@ -188,8 +192,7 @@ public class GetPhenophase_OneTime extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		boolean observed_phenophase = pItem.get(position).Flag;
 		
-		Log.i("K", "onListItem Click -- ID : " + pItem.get(position).OneTimePlantID);
-		Log.i("K", "pItem.get(position).Camera_image : " + pItem.get(position).ImageName);
+		currentPosition = position;
 		
 		if(observed_phenophase) {
 			Log.i("K","go PlantSummary");
@@ -217,6 +220,72 @@ public class GetPhenophase_OneTime extends ListActivity {
 		else {
 			// from GetPhenophase_PBB
 			
+			/*
+			 * Ask users if they are ready to take a photo.
+			 */
+			new AlertDialog.Builder(GetPhenophase_OneTime.this)
+			.setTitle(getString(R.string.Menu_addQCPlant))
+			.setMessage(getString(R.string.Start_Shared_Plant))
+			.setPositiveButton(getString(R.string.Button_Photo), new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					/*
+					 * Move to QuickCapture
+					 */
+					
+					Intent intent = new Intent(GetPhenophase_OneTime.this, QuickCapture.class);
+					intent.putExtra("from", Values.FROM_QC_PHENOPHASE);
+					intent.putExtra("cname", cname);
+					intent.putExtra("sname", sname);
+					intent.putExtra("pheno_id", pItem.get(currentPosition).PhenoID);
+					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("species_id", species_id);
+					intent.putExtra("latitude", 0.0);
+					intent.putExtra("longitude", 0.0);
+					/*
+					 * onetimeplant_id is plant_id!
+					 */
+					intent.putExtra("plant_id", pItem.get(currentPosition).OneTimePlantID);
+					startActivity(intent);
+					
+				}
+			})
+			.setNeutralButton(getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					Intent intent = new Intent(GetPhenophase_OneTime.this, AddNotes.class);
+					intent.putExtra("camera_image_id", "");
+					intent.putExtra("from", Values.FROM_QC_PHENOPHASE);
+					intent.putExtra("cname", cname);
+					intent.putExtra("sname", sname);
+					intent.putExtra("pheno_id", pItem.get(currentPosition).PhenoID);
+					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("species_id", species_id);
+					intent.putExtra("latitude", 0.0);
+					intent.putExtra("longitude", 0.0);
+					/*
+					 * onetimeplant_id is plant_id!
+					 */
+					intent.putExtra("plant_id", pItem.get(currentPosition).OneTimePlantID);
+					
+					startActivity(intent);
+				}
+			})
+			.setNegativeButton(getString(R.string.Button_Cancel), new DialogInterface.OnClickListener() {
+						
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+				}
+			})
+			.show();
+			
+
+			/*
 			Intent intent = new Intent(GetPhenophase_OneTime.this, PlantInformation_Direct.class);
 			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
 			intent.putExtra("pheno_icon", pItem.get(position).PhenoImageID);
@@ -234,8 +303,8 @@ public class GetPhenophase_OneTime extends ListActivity {
 			intent.putExtra("direct", true);
 			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
 			intent.putExtra("onetimeplant_id", pItem.get(position).OneTimePlantID);
-
-			startActivityForResult(intent, Values.RETURN_FROM_PLANT_INFORMATION);
+			*/
+			//startActivityForResult(intent, Values.RETURN_FROM_PLANT_INFORMATION);
 			
 		}
 		

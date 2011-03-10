@@ -64,5 +64,7 @@ public class Values {
 	public static final int POISONOUS_LIST = 4;
 	public static final int THREATENED_ENDANGERED_LIST = 5;
 	
+	public static final int COMPLICATED = 99990;
+	
 
 }
