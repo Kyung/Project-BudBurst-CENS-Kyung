@@ -7,10 +7,10 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.Media;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst.helper;
+package cens.ucla.edu.budburst.adapter;
 
 import java.util.ArrayList;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.SpeciesDetail;
+import cens.ucla.edu.budburst.helper.PlantItem;
 
 public class MyListAdapter extends BaseAdapter{
 	Context maincon;

@@ -29,11 +29,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
+import cens.ucla.edu.budburst.database.SyncNetworkHelper;
 import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.First_Help;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.SyncNetworkHelper;
 import cens.ucla.edu.budburst.helper.Values;
 
 public class Sync extends Activity{
@@ -659,7 +659,7 @@ class doSyncThread extends Thread{
 				
 				SQLiteDatabase syncRDB = syncDBHelper.getReadableDatabase();
 		    	SQLiteDatabase syncWDB = syncDBHelper.getWritableDatabase();
-		    	SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
+		    	
 		    
 				
 				query = "SELECT site_id, site_name, latitude, longitude, accuracy, comments, hdistance, shading, irrigation, habitat, official " +
@@ -711,6 +711,7 @@ class doSyncThread extends Thread{
 							Log.i("K", "New Site ID : " + site_id_from_server + " Old Site ID : " + site_id);
 							
 							
+							SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
 							
 							//Update my_plants table with new site id 
 							query = "UPDATE my_plants " +
@@ -732,7 +733,7 @@ class doSyncThread extends Thread{
 							"WHERE site_id=" + site_id + ";";
 							otWDB.execSQL(query);
 							
-							
+							otWDB.close();
 						}
 					}catch(Exception e){
 			            e.printStackTrace();
@@ -743,7 +744,6 @@ class doSyncThread extends Thread{
 				}
 				syncRDB.close();
 				syncWDB.close();
-				otWDB.close();
 				cursor.close();
 				break;
 			case UPLOAD_ADDED_PLANT:
@@ -1263,7 +1263,7 @@ class doSyncThread extends Thread{
 					Log.e(TAG, e.toString());
 					Log.d(TAG, "DOWNLOAD_ONETIME_PLANTS: failed to store into db");
 				}
-				
+				onetime.close();
 				break;
 				
 				
@@ -1347,6 +1347,8 @@ class doSyncThread extends Thread{
 					Log.e(TAG, e.toString());
 					Log.d(TAG, "DOWNLOAD_ONETIME_OBSERVATIONS: failed to store into db");
 				}
+				
+				onetime.close();
 				
 				break;
 				

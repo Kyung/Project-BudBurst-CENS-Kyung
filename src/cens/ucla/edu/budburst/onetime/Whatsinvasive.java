@@ -67,17 +67,18 @@ import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.SpeciesDetail;
+import cens.ucla.edu.budburst.adapter.MyListAdapter;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.JSONHelper;
-import cens.ucla.edu.budburst.helper.MyListAdapter;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.lists.DownloadListFromServer;
 import cens.ucla.edu.budburst.lists.Items;
 import cens.ucla.edu.budburst.lists.LazyAdapter;
+import cens.ucla.edu.budburst.lists.ListSubCategory;
 import cens.ucla.edu.budburst.onetime.AreaList.DoAsyncTask;
 import cens.ucla.edu.budburst.onetime.AreaList.area;
 
@@ -99,20 +100,20 @@ public class Whatsinvasive extends ListActivity {
 	private String sname;
 	private String image_path;
 	private String dt_taken;
-	private String camera_image_id;
+	private String cameraImageID;
 	private String new_plant_species_name;
 	
 	private Double latitude;
 	private Double longitude;
 	
 	private int new_plant_species_id;
-	private int protocol_id = 0;
-	private int pheno_id;
+	private int protocolID = 0;
+	private int phenoID;
 	
 	private CharSequence[] seqUserSite;
 	private ListView MyList;
 	
-	private int previous_activity = 0;
+	private int previousActivity = 0;
 	private int current_position = 0;
 	protected static int GET_AREA_LIST = 1;
 	protected static int TO_WI_INFO = 2;
@@ -136,9 +137,9 @@ public class Whatsinvasive extends ListActivity {
 		myTitleText.setText(" Whats Invasive");
 		
 		Intent p_intent = getIntent();
-		previous_activity = p_intent.getExtras().getInt("FROM");
-		pheno_id = p_intent.getExtras().getInt("pheno_id");
-		camera_image_id = p_intent.getExtras().getString("camera_image_id");
+		previousActivity = p_intent.getExtras().getInt("from");
+		phenoID = p_intent.getExtras().getInt("pheno_id");
+		cameraImageID = p_intent.getExtras().getString("camera_image_id");
 		latitude = p_intent.getExtras().getDouble("latitude");
 		longitude = p_intent.getExtras().getDouble("longitude");
 		dt_taken = p_intent.getExtras().getString("dt_taken"); 
@@ -378,35 +379,29 @@ public class Whatsinvasive extends ListActivity {
 		/*
 		 * Choosing category dialog is only for FROM_PLANT_LIST
 		 */
-		if(previous_activity == Values.FROM_PLANT_LIST) {
+		if(previousActivity == Values.FROM_PLANT_LIST) {
 			
 			new AlertDialog.Builder(Whatsinvasive.this)
 			.setTitle(getString(R.string.AddPlant_SelectCategory))
 			.setIcon(android.R.drawable.ic_menu_more)
-			.setItems(R.array.category2, new DialogInterface.OnClickListener() {
+			.setItems(R.array.category, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					String[] category = getResources().getStringArray(R.array.category2);
+					String[] category = getResources().getStringArray(R.array.category);
 		
 					if(category[which].equals("Wild Flowers and Herbs")) {
-						protocol_id = Values.WILD_FLOWERS;
+						protocolID = Values.WILD_FLOWERS;
 					}
 					else if(category[which].equals("Grass")) {
-						protocol_id = Values.GRASSES;
+						protocolID = Values.GRASSES;
 					}
 					else if(category[which].equals("Deciduous Trees and Shrubs")) {
-						protocol_id = Values.DECIDUOUS_TREES;
-					}
-					else if(category[which].equals("Deciduous Trees and Shrubs - Wind")) {
-						protocol_id = Values.DECIDUOUS_TREES_WIND;
+						protocolID = Values.DECIDUOUS_TREES;
 					}
 					else if(category[which].equals("Evergreen Trees and Shrubs")) {
-						protocol_id = Values.EVERGREEN_TREES;
-					}
-					else if(category[which].equals("Evergreen Trees and Shrubs - Wind")) {
-						protocol_id = Values.EVERGREEN_TREES_WIND;
+						protocolID = Values.EVERGREEN_TREES;
 					}
 					else if(category[which].equals("Conifer")) {
-						protocol_id = Values.CONIFERS;
+						protocolID = Values.CONIFERS;
 					}
 					else {
 					}
@@ -418,19 +413,41 @@ public class Whatsinvasive extends ListActivity {
 			.show();
 		}
 		else {
-		
-			Intent intent = new Intent(Whatsinvasive.this, AddNotes.class);
-			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
-			intent.putExtra("cname", arSpeciesList.get(current_position).CommonName);
-			intent.putExtra("sname", arSpeciesList.get(current_position).SpeciesName);
-			intent.putExtra("pheno_id", pheno_id);
-			intent.putExtra("protocol_id", protocol_id);
-			intent.putExtra("dt_taken", dt_taken);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
-			intent.putExtra("camera_image_id", camera_image_id);
-			startActivity(intent);
+			
+			
+			new AlertDialog.Builder(Whatsinvasive.this)
+			.setTitle("Select Category")
+			.setIcon(android.R.drawable.ic_menu_more)
+			.setItems(R.array.quick_capture_phenophase_category, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					String[] _category = getResources().getStringArray(R.array.quick_capture_phenophase_category);
+					if(_category[which].equals("Trees and Shrubs")) {
+						protocolID = 1;
+					}
+					else if(_category[which].equals("Wild Flowers")) {
+						protocolID = 2;
+					}
+					else {
+						protocolID = 3;
+					}
+					
+					Intent intent = new Intent(Whatsinvasive.this, GetPhenophase.class);
+					
+					intent.putExtra("cname", arSpeciesList.get(current_position).CommonName);
+					intent.putExtra("sname", arSpeciesList.get(current_position).SpeciesName);
+					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+					intent.putExtra("camera_image_id", cameraImageID);
+					intent.putExtra("protocol_id", protocolID);
+					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+	
+					startActivity(intent);
+				}
+			})
+			.setNegativeButton("Back", null)
+			.show();
 		}	
 	}
 	
@@ -461,7 +478,7 @@ public class Whatsinvasive extends ListActivity {
 					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
 					intent.putExtra("from", Values.FROM_PLANT_LIST);
 					intent.putExtra("species_name", arSpeciesList.get(current_position).CommonName);
-					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("protocol_id", protocolID);
 					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
 					startActivity(intent);
 				}
@@ -469,7 +486,7 @@ public class Whatsinvasive extends ListActivity {
 					if(helper.checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id, Whatsinvasive.this)){
 						Toast.makeText(Whatsinvasive.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
-						if(helper.insertNewMyPlantToDB(Whatsinvasive.this, new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocol_id)){
+						if(helper.insertNewMyPlantToDB(Whatsinvasive.this, new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocolID)){
 							Intent intent = new Intent(Whatsinvasive.this, PlantList.class);
 							Toast.makeText(Whatsinvasive.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							
@@ -661,7 +678,7 @@ public class Whatsinvasive extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		//menu.add(0, 1, 0, "Change Area").setIcon(android.R.drawable.ic_menu_search);
-		menu.add(0, 2, 0, "Refresh the List").setIcon(android.R.drawable.ic_menu_rotate);
+		//menu.add(0, 2, 0, "Refresh the List").setIcon(android.R.drawable.ic_menu_rotate);
 		return true;
 	}
 	
@@ -679,8 +696,12 @@ public class Whatsinvasive extends ListActivity {
 				/*
 				 * Delete the invasive lists from the same park...
 				 */
-				deleteContents(Values.WI_PATH);
-				new DoAsyncTask().execute();
+				//deleteContents(Values.WI_PATH);
+				//new DoAsyncTask().execute();
+				Items items = new Items(Whatsinvasive.this, latitude, longitude, Values.WHATSINVASIVE_LIST);
+				DownloadListFromServer downloadlist = new DownloadListFromServer(this, MyList, lazyadapter, items);
+				downloadlist.execute(items);
+				
 				return true;
 		}
 		return false;

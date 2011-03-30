@@ -1,5 +1,6 @@
-package cens.ucla.edu.budburst.helper;
+package cens.ucla.edu.budburst.adapter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.SpeciesDetail;
+import cens.ucla.edu.budburst.helper.FunctionsHelper;
+import cens.ucla.edu.budburst.helper.PlantItem;
+import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.lists.ListsDetail;
 import cens.ucla.edu.budburst.onetime.Whatsinvasive;
 
@@ -79,6 +83,10 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		String imagePath = Values.TREE_PATH + items.get(position).SpeciesID + ".jpg";
 		Log.i("K", "imagePath : " + imagePath);
 		
+		//File existPhoto = new File(imagePath);
+		//if(!existPhoto.exists()) {
+		//	imagePath = Values.TREE_PATH + "s1000.jpg";
+		//}
 		
 		FunctionsHelper helper = new FunctionsHelper();
 		img.setImageBitmap(helper.showImage(maincon, imagePath));

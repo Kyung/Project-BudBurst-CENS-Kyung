@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.AddNotes;
 import cens.ucla.edu.budburst.onetime.QuickCapture;

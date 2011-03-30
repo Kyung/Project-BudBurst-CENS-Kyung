@@ -1,11 +1,11 @@
 package cens.ucla.edu.budburst;
 
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.AnimationHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.content.Intent;

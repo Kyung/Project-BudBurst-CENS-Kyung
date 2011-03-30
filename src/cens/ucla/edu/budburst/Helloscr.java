@@ -28,10 +28,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
+import cens.ucla.edu.budburst.database.SyncNetworkHelper;
 import cens.ucla.edu.budburst.helper.BackgroundService;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.SyncNetworkHelper;
 import cens.ucla.edu.budburst.helper.Values;
 
 public class Helloscr extends Activity{

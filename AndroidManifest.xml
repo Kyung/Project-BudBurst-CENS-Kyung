@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="cens.ucla.edu.budburst"
-      android:versionCode="39" android:versionName="1.8.10">
+      android:versionCode="53" android:versionName="1.8.45">
       
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -28,13 +28,56 @@
     	</intent-filter>
  	</activity>
  
- 
+ <!-- cens.ucla.edu.budburst package -->
 <activity android:name=".Login" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:windowSoftInputMode="adjustResize" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:label="Helloscr" android:name=".Helloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="PlantList" android:label="PlantList" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="Sync" android:label="Sync" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name="AddSite" android:theme="@android:style/Theme.Light" android:label="AddSite" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PlantObservationSummary" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="MainPage" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name="SpeciesDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="Help" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="Splash" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="GetPhenophase_OneTime" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PhenophaseDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+
+<!-- cens.ucla.edu.budburst.lists package -->
+<activity android:name=".lists.UserDefinedTreeLists" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.ListMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.ListsDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.ListSubCategory" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.LazyAdapter"></activity>
+
+
+<!-- cens.ucla.edu.budburst.helper package -->
+<activity android:name=".helper.First_Help" android:theme="@android:style/Theme.Light.NoTitleBar" android:screenOrientation="portrait"></activity>
+<activity android:name=".helper.MyAlertDialog" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<service android:name=".helper.GetDataAsBackground"></service>
+<service android:name=".helper.BackgroundService" 
+		 android:enabled="true">
+	<intent-filter>
+		<action android:name="cens.ucla.edu.helper.BackgroundService.SERVICE"/>
+	</intent-filter>
+</service>
+
+
+<!-- cens.ucla.edu.budburst.mapview package -->
+<activity android:name=".mapview.PBB_map" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".mapview.MyLocation" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".mapview.SpeciesDetail_inMapView" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".mapview.MapViewMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+
+<!-- cens.ucla.edu.budburst.onetime package -->
+<activity android:name=".onetime.QuickCapture" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.AddNotes" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:windowSoftInputMode="adjustResize"></activity>
+<activity android:name=".onetime.Flora_Observer" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.OneTimeMain" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.GetSpeciesInfo" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.GetPhenophase" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" ></activity>
@@ -44,40 +87,12 @@
 <activity android:name=".onetime.AreaList" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.WIinfo" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".onetime.WPinfo" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+<!-- cens.ucla.edu.budburst.weeklyplant package -->
+<activity android:name=".weeklyplant.WeeklyPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+
 <uses-library android:name="com.google.android.maps"></uses-library>
-<activity android:name="GetPhenophase_PBB" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="PlantSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-
-<activity android:name="PlantInformation_Direct" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.Flora_Observer" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="MainPage" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
-<activity android:name=".mapview.PBB_map" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-
-<activity android:name="SpeciesDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="Help" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="Splash" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.QuickCapture" android:configChanges="orientation|keyboardHidden"></activity>
-
-<activity android:name="GetPhenophase_OneTime" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<service android:name=".helper.BackgroundService" 
-		 android:enabled="true">
-	<intent-filter>
-		<action android:name="cens.ucla.edu.helper.BackgroundService.SERVICE"/>
-	</intent-filter>
-</service>
-<activity android:name=".mapview.SpeciesDetail_inMapView" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name="PhenophaseDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".helper.First_Help" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
-<activity android:name=".lists.UserDefinedTreeLists" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<service android:name=".helper.GetDataAsBackground"></service>
-<activity android:name=".lists.ListMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".lists.ListsDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".helper.MyAlertDialog" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".onetime.MyLocation" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".lists.ListSubCategory" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".lists.LazyAdapter"></activity>
-<activity android:name=".onetime.AddNotes" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:windowSoftInputMode="adjustResize"></activity>
-<activity android:name="PlantObservationSummary" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 

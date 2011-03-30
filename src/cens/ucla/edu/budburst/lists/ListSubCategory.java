@@ -7,11 +7,11 @@ import cens.ucla.edu.budburst.Help;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.helper.MyListAdapter;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.adapter.MyListAdapter;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.Flora_Observer;
 import android.app.Activity;
@@ -132,7 +132,9 @@ public class ListSubCategory extends ListActivity {
 			SharedPreferences.Editor edit = pref.edit();				
 			edit.putBoolean("localbudburst", true);
 			edit.commit();
-
+			
+			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
+			startActivity(intent);
 		}
 		else {
 			callFromDatabaseForBudburst();
@@ -157,6 +159,9 @@ public class ListSubCategory extends ListActivity {
 			edit.putBoolean("localwhatsinvasive", true);
 			edit.commit();
 
+			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
+			startActivity(intent);
+			
 		}
 		else {
 			callFromDatabase();
@@ -181,6 +186,9 @@ public class ListSubCategory extends ListActivity {
 			edit.putBoolean("localnative", true);
 			edit.commit();
 		
+			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
+			startActivity(intent);
+			
 		}
 		else {
 			callFromDatabase();
@@ -203,6 +211,9 @@ public class ListSubCategory extends ListActivity {
 			SharedPreferences.Editor edit = pref.edit();				
 			edit.putBoolean("localpoisonous", true);
 			edit.commit();
+			
+			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
+			startActivity(intent);
 		
 		}
 		else {

@@ -13,9 +13,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.JSONHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.onetime.Whatsinvasive;
 import android.app.Activity;
@@ -86,8 +86,8 @@ public class Login extends Activity{
 		Button buttonLogin = (Button)findViewById(R.id.login_button);
 		buttonLogin.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View v){
-				Username = textUsername.getText().toString();
-				Password = textPassword.getText().toString();
+				Username = textUsername.getText().toString().trim();
+				Password = textPassword.getText().toString().trim();
 				
 				if(Username.equals("") || Password.equals("")){
 					Toast.makeText(Login.this, getString(R.string.Alert_wrongUserPass),Toast.LENGTH_SHORT).show();	

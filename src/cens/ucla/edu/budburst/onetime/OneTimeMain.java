@@ -16,12 +16,13 @@ import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.lists.GetUserPlantLists;
 import cens.ucla.edu.budburst.lists.ListMain;
 import cens.ucla.edu.budburst.lists.UserDefinedTreeLists;
 import android.app.Activity;
@@ -68,9 +69,9 @@ public class OneTimeMain extends ListActivity {
 	private String notes = "";
 	private String common_name = "Unknown/Other";
 	
-	private double latitude = 0.0;
-	private double longitude = 0.0;
-	private float accuracy = 0;
+	//private double latitude = 0.0;
+	//private double longitude = 0.0;
+	//private float accuracy = 0;
 	
 	private int new_plant_species_id;
 	private int new_plant_site_id;
@@ -112,27 +113,26 @@ public class OneTimeMain extends ListActivity {
 		edit.commit();
 		
 		Intent p_intent = getIntent();
-		previous_activity = p_intent.getExtras().getInt("FROM");
+		previous_activity = p_intent.getExtras().getInt("from");
 		
 		helper = new FunctionsHelper();
-		LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
+		//LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
 		
 		Log.i("K","previous_activity : " + previous_activity);
 
 		// if previous activity is "PlantList.java"
 		// this page view is different by the previous activity
 		if(previous_activity == Values.FROM_PLANT_LIST) {
-			ll.setVisibility(View.GONE);
-			latitude = 0.0;
-			longitude = 0.0;
+			//ll.setVisibility(View.GONE);
+			//latitude = 0.0;
+			//longitude = 0.0;
 			camera_image_id = "none";
 		}
 		// else
 		else {
-			ll.setVisibility(View.VISIBLE);
+			//ll.setVisibility(View.VISIBLE);
 			camera_image_id = p_intent.getExtras().getString("camera_image_id");
-			pheno_id = p_intent.getExtras().getInt("pheno_id");
-			
+			//pheno_id = p_intent.getExtras().getInt("pheno_id");
 		}
 	    // TODO Auto-generated method stub
 	}
@@ -144,20 +144,27 @@ public class OneTimeMain extends ListActivity {
 		oneTime otime;
 		
 		//oneTime(Header String, title, icon_name, sub_title)
-		otime = new oneTime("Local plants from national plant lists", "Project Budburst", "pbb_icon_main", "Project Budburst");
+		otime = new oneTime(getString(R.string.List_Official_Header), getString(R.string.List_Project_Budburst_title), "pbb_icon_main", getString(R.string.List_Budburst));
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Local Invasives", "invasive_plant", "Help locate invasive plants");
+		otime = new oneTime("none", getString(R.string.List_Whatsinvasive_title), "invasive_plant", getString(R.string.List_Whatsinvasive));
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "Local Native", "whatsnative", "Native and cultural plants");
+		otime = new oneTime("none", getString(R.string.List_Whatsendangered_title), "endangered", getString(R.string.List_Whats_endangered));
 		onetime_title.add(otime);
 		
-		otime = new oneTime("Locally created lists of interest", "UCLA Trees", "s1000", "Tree species on campus");
+		otime = new oneTime("none", getString(R.string.List_Whatspoisonous_title), "poisonous", getString(R.string.List_Whats_poisonous));
 		onetime_title.add(otime);
 		
-		otime = new oneTime("none", "What's Blooming", "pbbicon", "Santa Monica blooming plants");
+		//iItem = new listItem("none", "Local Poisonous", "", "Native and cultural plants");
+		//onetime_title.add(iItem);
+		
+		otime = new oneTime(getString(R.string.List_User_Plant_Header), "UCLA Trees", "s1000", getString(R.string.List_User_Plant_UCLA_trees));
 		onetime_title.add(otime);
+		
+		otime = new oneTime("none", getString(R.string.List_Whatsblooming_title), "pbbicon", getString(R.string.List_User_Plant_SAMO));
+		onetime_title.add(otime);
+		
 		
 		
 
@@ -165,6 +172,7 @@ public class OneTimeMain extends ListActivity {
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
 		
+		/*
 		skipBtn = (Button)findViewById(R.id.skip);
 		
 		skipBtn.setOnClickListener(new View.OnClickListener() {
@@ -189,6 +197,7 @@ public class OneTimeMain extends ListActivity {
 				startActivity(intent);
 			}
 		});
+		*/
 		
 		/*
 		
@@ -447,51 +456,89 @@ public class OneTimeMain extends ListActivity {
 			if(previous_activity == Values.FROM_PLANT_LIST) {
 				intent = new Intent(OneTimeMain.this, AddPlant.class);
 				startActivity(intent);
-			}
+			} 
+			// else from Quick_Capture...
 			else {
 				intent = new Intent(OneTimeMain.this, Flora_Observer.class);
 				intent.putExtra("camera_image_id", camera_image_id);
-				intent.putExtra("latitude", latitude);
-				intent.putExtra("longitude", longitude);
-				intent.putExtra("pheno_id", pheno_id);
-				intent.putExtra("notes", notes);
+				intent.putExtra("from", previous_activity);
+				//intent.putExtra("latitude", latitude);
+				//intent.putExtra("longitude", longitude);
+				//intent.putExtra("pheno_id", pheno_id);
+				//intent.putExtra("notes", notes);
 				startActivity(intent);
 			}
 			break;
 		case 1:
-			
-		   	intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
-		    intent.putExtra("FROM", previous_activity);
-		    intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("pheno_id", pheno_id);
-			intent.putExtra("notes", notes);
-			
-			//Something is wrong about the View - need to fix
-			startActivity(intent);
+			/*
+			 * Call WhatsInvasive
+			 */
+			if(!pref.getBoolean("listDownloaded", false)) {
+				Toast.makeText(OneTimeMain.this, "Local lists are still downloading...", Toast.LENGTH_SHORT).show();
+			}
+			else {
+				intent = new Intent(OneTimeMain.this, Whatsinvasive.class);
+			    intent.putExtra("from", previous_activity);
+			    intent.putExtra("camera_image_id", camera_image_id);
+				//intent.putExtra("latitude", latitude);
+				//intent.putExtra("longitude", longitude);
+				intent.putExtra("pheno_id", pheno_id);
+				intent.putExtra("notes", notes);
+				
+				startActivity(intent);
+			}
+		   	
 			break;
 		case 2:
-			//Whats Native
+			/*
+			 * Whats Endangered
+			 */
 			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			break;
 		case 3:
-			//UCLA Trees
+			/*
+			 * Whats Poisonous
+			 */
+			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+			break;
+		case 4:
+			/*
+			 * User Defined Lists
+			 *  - UCLA Tree Lists
+			 */
+			
 			if(pref.getBoolean("getTreeLists", false)) {
 				intent = new Intent(OneTimeMain.this, UserDefinedTreeLists.class);
 				intent.putExtra("from", previous_activity);
 				intent.putExtra("camera_image_id", camera_image_id);
-				intent.putExtra("latitude", latitude);
-				intent.putExtra("longitude", longitude);
 				intent.putExtra("pheno_id", pheno_id);
 				startActivity(intent);
 			}
 			else {
-				Toast.makeText(OneTimeMain.this, "Still downloading the tree lists", Toast.LENGTH_SHORT).show();
+				
+				if(pref.getBoolean("firstDownloadTreeList", true)) {
+					/*
+					 * Get User Plant Tree Lists - UCLA
+					 */
+					
+					Toast.makeText(this, getString(R.string.Start_Downloading_UCLA_Tree_Lists), Toast.LENGTH_SHORT).show();
+					
+					new GetUserPlantLists().execute(OneTimeMain.this);
+					
+					SharedPreferences.Editor edit = pref.edit();
+					edit.putBoolean("firstDownloadTreeList", false);
+					edit.commit();
+				}
+				else {
+					Toast.makeText(OneTimeMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+				}	
 			}
 			break;
-		case 4:
-			//What's blooming
+		case 5:
+			/*
+			 * User Defined Lists
+			 *  - What's blooming
+			 */
 			Toast.makeText(OneTimeMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 			break;
 		}

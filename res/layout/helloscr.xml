@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+    <!-- header -->
     <LinearLayout  
     	android:id="@+id/logo_layout"
 	    android:layout_width="fill_parent" 
@@ -21,18 +22,25 @@
 	     	android:layout_centerVertical="true" />
 	</LinearLayout>        
 	
-	<ScrollView
+	<!-- Body -->
+	<LinearLayout
+		android:id="@+id/body"
 		android:layout_below="@+id/logo_layout"
-		android:layout_height="wrap_content"
+		android:layout_above="@+id/lower"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+	>
+	<ScrollView
+		android:id="@+id/HelloScroll"
+		android:layout_height="fill_parent"
 		android:layout_width="fill_parent"
 		android:paddingTop="15dp"
-		android:id="@+id/HelloScroll"
+		
 		>
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:weightSum="1"
 		>
 		<TextView
 			android:id="@+id/hello_textview"
@@ -40,25 +48,31 @@
 			android:layout_width="wrap_content"
 			android:paddingLeft="20dp"
 			android:paddingRight="20dp"
-			android:layout_marginBottom="30dp"
 			android:textSize="18sp"
-			android:layout_weight="0.8"/>
+			/>
 			
+
+		</LinearLayout>			
+	</ScrollView>
+	</LinearLayout>
+	
+	<!-- footer -->
+	<LinearLayout
+	  	android:id="@+id/lower"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:gravity="center"
+		android:background="@color/darkgray">
 		<Button
 			android:id="@+id/sync"
 			android:textColor="@drawable/black"
 			android:layout_height="fill_parent"
-			android:layout_width="wrap_content"
-			android:layout_marginTop="40dp"
-			android:textSize="20sp"
+			android:layout_width="200dp"
+			android:layout_marginTop="3dp"
+			android:textSize="16sp"
 			android:focusable="true"
 			android:layout_gravity="center"
-			android:text="@string/Button_synchronize" 
-			android:layout_weight="0.2"/>		
-			
-		</LinearLayout>			
-	</ScrollView>
-	
-	
-	
+			android:text="@string/Button_synchronize" />		
+	</LinearLayout>		
 </RelativeLayout>

@@ -1,6 +1,10 @@
-package cens.ucla.edu.budburst.helper;
+package cens.ucla.edu.budburst.database;
 
+import java.util.ArrayList;
+
+import cens.ucla.edu.budburst.helper.PlantItem;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -8,7 +12,7 @@ import android.util.Log;
 public class OneTimeDBHelper extends SQLiteOpenHelper {
 
 	public OneTimeDBHelper(Context context){
-		super(context, "onetimeBudburst.db", null, 35);
+		super(context, "onetimeBudburst.db", null, 36);
 	}
 	
 	@Override
@@ -108,6 +112,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		db.execSQL("DELETE FROM speciesLists;");
 		db.execSQL("DELETE FROM oneTimeObservation;");
 		
+		db.close();
 	 	dbhelper.close();
  	}
 	
@@ -117,6 +122,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		
 		db.execSQL("DELETE FROM userDefineLists;");
 		
+		db.close();
 	 	dbhelper.close();
 	}
 	
@@ -126,6 +132,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		
 		db.execSQL("DELETE FROM localPlantLists;");
 	
+		db.close();
 	 	dbhelper.close();
 	}
 	
@@ -135,7 +142,73 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		
 		db.execSQL("DELETE FROM localPlantLists WHERE category=" + category + ";");
 		
+		db.close();
 	 	dbhelper.close();
+	}
+	
+	public int getTotalNumberOfQCOPlants(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		Cursor cursor = db.rawQuery("SELECT * FROM oneTimePlant WHERE synced=" + SyncDBHelper.SYNCED_YES, null);
+		int count = cursor.getCount();
+		
+		db.close();
+		cursor.close();
+		
+		return count;
+	}
+	
+	public int getTotalNumberOfQCObservations(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		Cursor cursor = db.rawQuery("SELECT * FROM oneTimeObservation WHERE synced=" + SyncDBHelper.SYNCED_YES, null);
+		int count = cursor.getCount();
+		
+		db.close();
+		cursor.close();
+		
+		return count;
+	}
+	
+	public ArrayList<PlantItem> getAllMyListInformation(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		ArrayList<PlantItem> plantList = new ArrayList<PlantItem>();
+		
+		PlantItem pi = null;
+		
+		Cursor cursor = db.rawQuery("SELECT _id, species_id, plant_id, protocol_id, cname, sname FROM oneTimePlant;", null);
+		Cursor cursor2 = null;
+		while(cursor.moveToNext()) {
+			
+			 cursor2 = db.rawQuery("SELECT plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes FROM oneTimeObservation WHERE plant_id = " + cursor.getInt(2) + " ORDER BY dt_taken;", null);
+			 
+			 int speciesID = cursor.getInt(1);
+			 String commonName = cursor.getString(4);
+			 String scienceName = cursor.getString(5);
+			 
+			 
+			 while(cursor2.moveToNext()) {
+				 int phenophaseID = cursor2.getInt(1);
+				 double latitude = cursor2.getDouble(2);
+				 double longitude = cursor2.getDouble(3);
+				 String imageName = cursor2.getString(4);
+				 String dtTaken = cursor2.getString(5);
+				 String notes = cursor2.getString(6);
+				 
+				 pi = new PlantItem(speciesID, commonName, scienceName, phenophaseID, latitude, longitude, imageName, dtTaken, notes);
+				 plantList.add(pi);
+			 }
+		}
+		
+		db.close();
+		cursor.close();
+		cursor2.close();
+		
+		return plantList;
 	}
 	
 	public void clearLocalLists(Context cont) {
@@ -144,6 +217,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		
 		db.execSQL("DELETE FROM localPlantLists;");
 		
+		db.close();
 	 	dbhelper.close();
 	}
 }

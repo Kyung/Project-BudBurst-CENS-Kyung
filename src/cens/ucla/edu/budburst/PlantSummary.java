@@ -12,12 +12,13 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.onetime.HelloItemizedOverlay;
+import cens.ucla.edu.budburst.mapview.BalloonItemizedOverlay;
+import cens.ucla.edu.budburst.mapview.SpeciesItemizedOverlay;
 import cens.ucla.edu.budburst.onetime.WPinfo;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -70,7 +71,7 @@ public class PlantSummary extends MapActivity {
 	private View popupview = null;
 	private ImageView phone_image = null;
 	private List<Overlay> mapOverlays = null;
-	private HelloItemizedOverlay itemizedOverlay = null;
+	private SpeciesItemizedOverlay itemizedOverlay = null;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -167,7 +168,7 @@ public class PlantSummary extends MapActivity {
 	    
 	    mapOverlays = myMap.getOverlays();
 	    Drawable marker = getResources().getDrawable(R.drawable.marker);
-	    itemizedOverlay = new HelloItemizedOverlay(marker, this);
+	    itemizedOverlay = new SpeciesItemizedOverlay(marker, this);
 	    
 	    OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found");
 	    

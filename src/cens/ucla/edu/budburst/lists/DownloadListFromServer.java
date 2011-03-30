@@ -16,11 +16,11 @@ import org.json.JSONObject;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.Sync;
-import cens.ucla.edu.budburst.helper.MyListAdapter;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.adapter.MyListAdapter;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -263,8 +263,6 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 						
 						cursor.close();
 					}
-
-					
 					/*
 					 *  DB close
 					 */
@@ -293,6 +291,30 @@ public class DownloadListFromServer extends AsyncTask<Items, Integer, Void>{
 	@Override
 	protected void onPostExecute(Void unused) {
 		dialog.dismiss();
+		
+		int doneCategory = item.category;
+		String doneCategoryString = "";
+		
+		switch(doneCategory) {
+		case 1:
+			doneCategoryString = "localbudburst";
+			break;
+		case 2:
+			doneCategoryString = "localwhatsinvasive";
+			break;
+		case 3:
+			doneCategoryString = "localnative";
+			break;
+		case 4:
+			doneCategoryString = "localpoisonous";
+			break;
+		}
+		
+		SharedPreferences pref = context.getSharedPreferences("userinfo", 0);
+		SharedPreferences.Editor edit = pref.edit();				
+		edit.putBoolean(doneCategoryString, true);
+		edit.commit();
+		
 		
 		if(category == Values.BUDBURST_LIST) {
 			MyListAdapter mylistapdater = new MyListAdapter(context, R.layout.plantlist_item2, localArray);

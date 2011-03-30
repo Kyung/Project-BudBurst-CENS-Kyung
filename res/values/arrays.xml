@@ -7,15 +7,6 @@
 		<item>Evergreen Trees and Shrubs</item>
 		<item>Conifer</item>
 	</string-array>
-	<string-array name="category2">
-		<item>Wild Flowers and Herbs</item>
-		<item>Grass</item>
-		<item>Deciduous Trees and Shrubs</item>
-		<item>Deciduous Trees and Shrubs - Wind</item>
-		<item>Evergreen Trees and Shrubs</item>
-		<item>Evergreen Trees and Shrubs - Wind</item>
-		<item>Conifer</item>
-	</string-array>
 	<string-array name="recommend">
 		<item>"What's Blooming"</item>
 		<item>"What's Invasive"</item>
@@ -27,10 +18,17 @@
 		<item>Delete</item>
 	</string-array>
 	<string-array name="plantlist">
-		<!-- 
-		<item>Move to o.o</item>
-		-->
 		<item>Edit Species</item>
+		<item>Add Same Species</item>
 		<item>Delete Species</item>
+	</string-array>
+	<string-array name="plantcategory">
+		<item>Shared Plants</item>
+		<item>Trees</item>
+	</string-array>
+	<string-array name="quick_capture_phenophase_category">
+		<item>Trees and Shrubs</item>
+		<item>Wild Flowers</item>
+		<item>Grasses</item>
 	</string-array>
 </resources>

@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst.onetime;
+package cens.ucla.edu.budburst.mapview;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ import cens.ucla.edu.budburst.R;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
-public class HelloItemizedOverlay extends ItemizedOverlay {
+public class SpeciesItemizedOverlay extends ItemizedOverlay {
 
     private Context mContext;
     private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
@@ -42,7 +42,7 @@ public class HelloItemizedOverlay extends ItemizedOverlay {
     private SharedPreferences pref;
  
     
-    public HelloItemizedOverlay(Drawable defaultMarker, Context context) {
+    public SpeciesItemizedOverlay(Drawable defaultMarker, Context context) {
         super(boundCenterBottom(defaultMarker));
         // TODO Auto-generated constructor stub
         mContext = context;
@@ -98,10 +98,10 @@ public class HelloItemizedOverlay extends ItemizedOverlay {
 		edit.putString("lng", eachValue[4]);
 		edit.commit();
 		
-		// cname.setText(" Science name : " + eachValue[1]);
-		// sname.setText(" Common name : " + eachValue[2]);
+	//	cname.setText(" Science name : " + eachValue[1]);
+     //   sname.setText(" Common name : " + eachValue[2]);
         dt_taken.setText(" Date&Time : " + eachValue[5]);
-        // n_comments.setText(" " + eachValue[6] + " comment(s)");
+     //   n_comments.setText(" " + eachValue[6] + " comment(s)");
         
         //Bitmap bit = BitmapFactory.decodeResource(getContext()., id)
         
@@ -126,6 +126,7 @@ public class HelloItemizedOverlay extends ItemizedOverlay {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					// TODO Auto-generated method stub
+					/*
 					Intent intent = new Intent(mContext, WPinfo.class);
 
 					intent.putExtra("common_name", common_name);
@@ -138,6 +139,7 @@ public class HelloItemizedOverlay extends ItemizedOverlay {
 					intent.putExtra("comment_count", Integer.parseInt(num_of_comments));
 					
 					mContext.startActivity(intent);
+					*/
 				}
 			});
         dialog.setNegativeButton("Okay", null);

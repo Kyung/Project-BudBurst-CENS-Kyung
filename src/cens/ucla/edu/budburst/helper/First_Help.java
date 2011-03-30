@@ -6,9 +6,15 @@ import cens.ucla.edu.budburst.Splash;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -20,7 +26,14 @@ public class First_Help extends Activity implements OnClickListener{
 	private Button done;
 	private ViewFlipper vf;
 	private int page_num = 0;
-	
+	private GestureDetector gestureDetector;
+	View.OnTouchListener gestureListener;
+	private Animation slideLeftIn;
+	private Animation slideLeftOut;
+	private Animation slideRightIn;
+	private Animation slideRightOut;
+	    
+	    
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -34,8 +47,44 @@ public class First_Help extends Activity implements OnClickListener{
 	    previous = (Button) findViewById(R.id.previous);
 	    done = (Button) findViewById(R.id.done);
 	    
-	    previous.setEnabled(false);
+	    slideLeftIn = AnimationUtils.loadAnimation(this, R.anim.slide_left_in);
+        slideLeftOut = AnimationUtils.loadAnimation(this, R.anim.slide_left_out);
+        slideRightIn = AnimationUtils.loadAnimation(this, R.anim.slide_right_in);
+        slideRightOut = AnimationUtils.loadAnimation(this, R.anim.slide_right_out);
+	    
+	    
+	    
+	    //previous.setEnabled(false);
+	    
+	    
+	    gestureDetector = new GestureDetector(new MyGestureDetector(this, vf));
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (gestureDetector.onTouchEvent(event)) {
+                    return true;
+                }
+                return false;
+            }
+        };
 	}
+	
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (gestureDetector.onTouchEvent(event)) {
+        	Log.i("K", "TOUCHED");
+        	
+        	return true;
+        }
+	        
+	    else
+	    	return false;
+    }
+    
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+    	super.dispatchTouchEvent(event);
+    	return gestureDetector.onTouchEvent(event);
+    }
 	
 	public void onResume() {
 		super.onResume();
@@ -50,7 +99,10 @@ public class First_Help extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 		if(v == next) {
 			page_num++;
-			vf.showNext();
+        	vf.setInAnimation(slideLeftIn);
+        	vf.setOutAnimation(slideLeftOut);
+        	vf.showNext();
+        	/*
 			if(page_num == 0) {
 				previous.setEnabled(false);
 				next.setEnabled(true);
@@ -67,14 +119,17 @@ public class First_Help extends Activity implements OnClickListener{
 				previous.setEnabled(true);
 				next.setEnabled(false);
 			}
-			
+			*/
 			//vf.setAnimation(AnimationHelper.inFromRightAnimation());
 			//vf.setAnimation(AnimationHelper.outToLeftAnimation());
 			
 		}
 		if(v == previous) {
 			page_num--;
-			vf.showPrevious();
+        	vf.setInAnimation(slideRightIn);
+        	vf.setOutAnimation(slideRightOut);
+        	vf.showPrevious();
+        	/*
 			if(page_num == 0) {
 				previous.setEnabled(false);
 				next.setEnabled(true);
@@ -91,6 +146,7 @@ public class First_Help extends Activity implements OnClickListener{
 				previous.setEnabled(true);
 				next.setEnabled(false);
 			}
+			*/
 			//vf.setAnimation(AnimationHelper.inFromLeftAnimation());
 			//vf.setAnimation(AnimationHelper.outToRightAnimation());
 

@@ -12,6 +12,7 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.mapview.BalloonItemizedOverlay;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,9 +26,10 @@ import android.widget.Toast;
 
 public class WPinfo extends MapActivity {
 
+	
 	private String latitude;
 	private String longitude;
-	private HelloItemizedOverlay itemizedOverlay = null;
+	private BalloonItemizedOverlay itemizedOverlay = null;
 	private List<Overlay> mapOverlays = null;
 	
 	/** Called when the activity is first created. */
@@ -71,11 +73,11 @@ public class WPinfo extends MapActivity {
 		
 		mapOverlays = myMap.getOverlays();
 		Drawable marker = getResources().getDrawable(R.drawable.marker);
-		itemizedOverlay = new HelloItemizedOverlay(marker, this);
+		//itemizedOverlay = new BalloonItemizedOverlay(marker, this);
 		
 		OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found!");
-		itemizedOverlay.addOverlay(overlayitem);
-		mapOverlays.add(itemizedOverlay);
+		//itemizedOverlay.addOverlay(overlayitem);
+		//mapOverlays.add(itemizedOverlay);
 		
 		myMap.setSatellite(false);
 		myMap.setBackgroundResource(R.drawable.shapedrawable);

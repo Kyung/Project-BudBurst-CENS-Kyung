@@ -70,37 +70,9 @@ public class QuickCapture extends Activity {
 	    super.onCreate(savedInstanceState);
 	    
 	    // check if there is any attributes....
-	    Intent p_intent = getIntent();
-		previous_activity = p_intent.getExtras().getInt("from");
-		
-		Log.i("K", "Previous_activity : " + previous_activity);
-		
-		common_name = p_intent.getExtras().getString("cname");
-		science_name = p_intent.getExtras().getString("sname");
-		
-		if(previous_activity == Values.FROM_UCLA_TREE_LISTS || previous_activity == Values.FROM_QUICK_CAPTURE) {
-			tree_id = p_intent.getExtras().getInt("tree_id");
-		}
-		
-		if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
-			category = p_intent.getExtras().getInt("category");
-		}
-		
-		if(previous_activity == Values.FROM_QC_PHENOPHASE || previous_activity == Values.FROM_PBB_PHENOPHASE) {
-			phenoID = p_intent.getExtras().getInt("pheno_id");
-			protocolID = p_intent.getExtras().getInt("protocol_id");
-			speciesID = p_intent.getExtras().getInt("species_id");
-			latitude = p_intent.getExtras().getInt("latitude");
-			longitude = p_intent.getExtras().getInt("longitude");
-			
-			if(previous_activity == Values.FROM_QC_PHENOPHASE) {
-				plantID = p_intent.getExtras().getInt("plant_id");
-			}
-			if(previous_activity == Values.FROM_PBB_PHENOPHASE) {
-				siteID = p_intent.getExtras().getInt("site_id");
-			}
-		}
-		
+	    loadPreviousActivity();
+	    
+	    // check sd card
 		try {
 			File ld = new File(Values.BASE_PATH);
 			if(ld.exists()) {
@@ -147,12 +119,55 @@ public class QuickCapture extends Activity {
 		super.onResume();
 	}
 	
+	public void loadPreviousActivity() {
+		Intent p_intent = getIntent();
+		previous_activity = p_intent.getExtras().getInt("from");
+		
+		Log.i("K", "Previous_activity : " + previous_activity);
+		
+		common_name = p_intent.getExtras().getString("cname");
+		science_name = p_intent.getExtras().getString("sname");
+		
+		if(previous_activity == Values.FROM_UCLA_TREE_LISTS || previous_activity == Values.FROM_QUICK_CAPTURE) {
+			tree_id = p_intent.getExtras().getInt("tree_id");
+			protocolID = p_intent.getExtras().getInt("protocol_id");
+		}
+		if(previous_activity == Values.FROM_QUICK_CAPTURE) {
+			tree_id = p_intent.getExtras().getInt("tree_id");
+		}
+		
+		if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
+			category = p_intent.getExtras().getInt("category");
+			protocolID = p_intent.getExtras().getInt("protocol_id");
+		}
+		if(previous_activity == Values.FROM_PLANT_LIST_ADD_SAMESPECIES
+						|| previous_activity == Values.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
+			protocolID = p_intent.getExtras().getInt("protocol_id");
+			speciesID = p_intent.getExtras().getInt("species_id");
+		}
+		if(previous_activity == Values.FROM_QC_PHENOPHASE 
+				|| previous_activity == Values.FROM_PBB_PHENOPHASE) {
+			phenoID = p_intent.getExtras().getInt("pheno_id");
+			protocolID = p_intent.getExtras().getInt("protocol_id");
+			speciesID = p_intent.getExtras().getInt("species_id");
+			latitude = p_intent.getExtras().getDouble("latitude");
+			longitude = p_intent.getExtras().getDouble("longitude");
+			
+			if(previous_activity == Values.FROM_QC_PHENOPHASE) {
+				plantID = p_intent.getExtras().getInt("plant_id");
+			}
+			if(previous_activity == Values.FROM_PBB_PHENOPHASE) {
+				siteID = p_intent.getExtras().getInt("site_id");
+			}
+		}
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// You can use the requestCode to select between multiple child
 		// activities you may have started. Here there is only one thing
 		// we launch.
-		
+		/*
 		if(resultCode == Activity.RESULT_CANCELED) {
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				new AlertDialog.Builder(QuickCapture.this)
@@ -174,6 +189,7 @@ public class QuickCapture extends Activity {
 								intent.putExtra("cname", common_name);
 								intent.putExtra("sname", science_name);
 								intent.putExtra("tree_id", tree_id);
+								intent.putExtra("protocol_id", protocolID);
 							}
 							else if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
 								intent = new Intent(QuickCapture.this, GetPhenophase.class);
@@ -182,14 +198,12 @@ public class QuickCapture extends Activity {
 								intent.putExtra("cname", common_name);
 								intent.putExtra("sname", science_name);
 								intent.putExtra("category", category);
+								intent.putExtra("protocol_id", protocolID);
 							}
 							else if(previous_activity == Values.FROM_QUICK_CAPTURE) {
-								intent = new Intent(QuickCapture.this, GetPhenophase.class);
+								intent = new Intent(QuickCapture.this, OneTimeMain.class);
 								intent.putExtra("camera_image_id", "");
 								intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
-								intent.putExtra("cname", common_name);
-								intent.putExtra("sname", science_name);
-								intent.putExtra("tree_id", tree_id);
 							}
 							
 							else if(previous_activity == Values.FROM_QC_PHENOPHASE || previous_activity == Values.FROM_PBB_PHENOPHASE) {
@@ -236,6 +250,7 @@ public class QuickCapture extends Activity {
 				
 			}
 		}
+		*/
 		
 		if(resultCode == Activity.RESULT_OK) {
 			
@@ -257,25 +272,35 @@ public class QuickCapture extends Activity {
 					intent.putExtra("cname", common_name);
 					intent.putExtra("sname", science_name);
 					intent.putExtra("tree_id", tree_id);
+					intent.putExtra("protocol_id", protocolID);
 				}
-				
-				else if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
+				else if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS ) {
 					intent = new Intent(QuickCapture.this, GetPhenophase.class);
 					intent.putExtra("camera_image_id", camera_image_id);
-					intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+					intent.putExtra("from", previous_activity);
 					intent.putExtra("cname", common_name);
 					intent.putExtra("sname", science_name);
 					intent.putExtra("category", category);
+					intent.putExtra("protocol_id", protocolID);
 				}
-				else if(previous_activity == Values.FROM_QUICK_CAPTURE) {
+				else if(previous_activity == Values.FROM_PLANT_LIST_ADD_SAMESPECIES
+						|| previous_activity == Values.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
 					intent = new Intent(QuickCapture.this, GetPhenophase.class);
 					intent.putExtra("camera_image_id", camera_image_id);
-					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+					intent.putExtra("from", previous_activity);
 					intent.putExtra("cname", common_name);
 					intent.putExtra("sname", science_name);
+					intent.putExtra("species_id", speciesID);
+					intent.putExtra("protocol_id", protocolID);
+				}
+				else if(previous_activity == Values.FROM_QUICK_CAPTURE) {
+					intent = new Intent(QuickCapture.this, OneTimeMain.class);
+					intent.putExtra("camera_image_id", camera_image_id);
+					intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
 					intent.putExtra("tree_id", tree_id);
 				}
-				else if(previous_activity == Values.FROM_QC_PHENOPHASE || previous_activity == Values.FROM_PBB_PHENOPHASE) {
+				else if(previous_activity == Values.FROM_QC_PHENOPHASE 
+						|| previous_activity == Values.FROM_PBB_PHENOPHASE) {
 					intent = new Intent(QuickCapture.this, AddNotes.class);
 					intent.putExtra("camera_image_id", camera_image_id);
 					intent.putExtra("from", previous_activity);

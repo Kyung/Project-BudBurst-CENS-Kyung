@@ -15,13 +15,14 @@ import cens.ucla.edu.budburst.AddPlant;
 import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.DrawableManager;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.onetime.Flora_Observer;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
 import cens.ucla.edu.budburst.onetime.QuickCapture;
 import android.app.Activity;
@@ -53,10 +54,10 @@ import android.widget.Toast;
 public class ListsDetail extends Activity {
 
 	private static final int COMPLETE = 0;
-	private int species_id;
+	private int speciesID;
 	private int category;
 	private int previous_activity = 0;
-	private int protocol_id;
+	private int protocolID;
 	private TextView myTitleText;
 	private ImageView speciesImage;
 	private ProgressBar mSpinner;
@@ -139,6 +140,16 @@ public class ListsDetail extends Activity {
 	    if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
 	    	
 	    	category = p_intent.getIntExtra("category", 0);
+	    	
+	    	/*
+	    	 * Show footer or not.
+	    	 */
+	    	boolean showFooter = p_intent.getBooleanExtra("show_footer", true);
+	    	if(!showFooter) {
+	    		LinearLayout footer = (LinearLayout)findViewById(R.id.lower);
+	    		footer.setVisibility(View.GONE);
+	    	}
+	    	
 	    	String science_name = p_intent.getStringExtra("science_name");
 	    	
 			if(category == Values.BUDBURST_LIST) {
@@ -165,7 +176,7 @@ public class ListsDetail extends Activity {
 				    t2.setText(" " + getSpeciesInfo.getString(1) + " ");
 				    note.setText("" + getSpeciesInfo.getString(3) + " ");
 				    image2.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+getSpeciesInfo.getInt(0), null, null));
-				    species_id = getSpeciesInfo.getInt(0);
+				    speciesID = getSpeciesInfo.getInt(0);
 				}
 				
 				getSpeciesInfo.close();
@@ -242,9 +253,9 @@ public class ListsDetail extends Activity {
 					if(category == Values.BUDBURST_LIST) {
 						StaticDBHelper staticDBHelper = new StaticDBHelper(ListsDetail.this);
 						SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
-						Cursor c = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id = " + species_id, null);
+						Cursor c = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id = " + speciesID, null);
 						while(c.moveToNext()) {
-							protocol_id = c.getInt(0);
+							protocolID = c.getInt(0);
 						}
 						c.close();
 						staticDB.close();
@@ -252,7 +263,7 @@ public class ListsDetail extends Activity {
 						popupDialog();
 					}
 					else {
-						species_id = 999;
+						speciesID = 999;
 						showProtocolDialog();
 					}
 				}
@@ -262,7 +273,44 @@ public class ListsDetail extends Activity {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub					
+					// TODO Auto-generated method stub
+					/*
+					 * We already know the Shared Plant category if we choose species from official budburst lists.
+					 * - hardcoded protocolID
+					 */
+					
+					int getSpeciesID = speciesID;
+					int getProtocolID = 2;
+					
+					StaticDBHelper staticDBH = new StaticDBHelper(ListsDetail.this);
+					SQLiteDatabase staticDB = staticDBH.getReadableDatabase();
+					
+					Cursor cursor = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id=" + getSpeciesID + ";", null);
+					while(cursor.moveToNext()) {
+						getProtocolID = cursor.getInt(0);
+					}
+					
+					switch(getProtocolID) {
+					case Values.WILD_FLOWERS:
+						protocolID = Values.QUICK_WILD_FLOWERS; 
+						break;
+					case Values.DECIDUOUS_TREES:
+						protocolID = Values.QUICK_TREES_AND_SHRUBS;
+						break;
+					case Values.EVERGREEN_TREES:
+						protocolID = Values.QUICK_TREES_AND_SHRUBS;
+						break;
+					case Values.CONIFERS:
+						protocolID = Values.QUICK_TREES_AND_SHRUBS;
+						break;
+					case Values.GRASSES:
+						protocolID = Values.QUICK_GRASSES;
+						break;
+					}
+					
+					cursor.close();
+					staticDB.close();
+					
 					/*
 					 * Ask users if they are ready to take a photo.
 					 */
@@ -277,13 +325,19 @@ public class ListsDetail extends Activity {
 							/*
 							 * Move to QuickCapture
 							 */
+							
 							Intent intent = new Intent(ListsDetail.this, QuickCapture.class);
-							intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+							
 							intent.putExtra("cname", commonName);
 							intent.putExtra("sname", scienceName);
+							intent.putExtra("protocol_id", protocolID);
 							intent.putExtra("category", category);
+							intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
 							
 							startActivity(intent);
+
+							
+							
 						}
 					})
 					.setNeutralButton(getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
@@ -291,6 +345,7 @@ public class ListsDetail extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// TODO Auto-generated method stub
+							
 							/*
 							 * Move to Getphenophase without a photo.
 							 */
@@ -299,9 +354,12 @@ public class ListsDetail extends Activity {
 							intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
 							intent.putExtra("cname", commonName);
 							intent.putExtra("sname", scienceName);
+							intent.putExtra("protocol_id", protocolID);
+							intent.putExtra("species_id", speciesID);
 							intent.putExtra("category", category);
 							
 							startActivity(intent);
+	
 						}
 					})
 					.setNegativeButton(getString(R.string.Button_Cancel), new DialogInterface.OnClickListener() {
@@ -321,11 +379,11 @@ public class ListsDetail extends Activity {
 	     * If from UCLA tree lists
 	     * 
 	     */
-	    else {
+	    else if(previous_activity == Values.FROM_UCLA_TREE_LISTS){
 	    	
-	    	species_id = p_intent.getIntExtra("id", 0); 
+	    	speciesID = p_intent.getIntExtra("id", 0); 
 	    	
-	    	cursor = db.rawQuery("SELECT common_name, science_name, credit FROM userDefineLists WHERE id=" + species_id +";", null);
+	    	cursor = db.rawQuery("SELECT common_name, science_name, credit FROM userDefineLists WHERE id=" + speciesID +";", null);
 			while(cursor.moveToNext()) {
 				cName.setText(cursor.getString(0));
 				sName.setText(cursor.getString(1));
@@ -342,7 +400,7 @@ public class ListsDetail extends Activity {
 			 *  Load image from the server
 			 */
 			DrawableManager dm = new DrawableManager(mSpinner);
-			dm.fetchDrawableOnThread("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/images/treelists/" + species_id + ".jpg", speciesImage);
+			dm.fetchDrawableOnThread("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/images/treelists/" + speciesID + ".jpg", speciesImage);
 			
 			
 			myplantBtn.setOnClickListener(new View.OnClickListener() {
@@ -351,7 +409,7 @@ public class ListsDetail extends Activity {
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					
-					species_id = 999;
+					speciesID = 999;
 					showProtocolDialog();
 				}
 			});
@@ -368,24 +426,29 @@ public class ListsDetail extends Activity {
 					new AlertDialog.Builder(ListsDetail.this)
 					.setTitle(getString(R.string.Menu_addQCPlant))
 					.setMessage(getString(R.string.Start_Shared_Plant))
-					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					.setPositiveButton(getString(R.string.Button_Photo), new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// TODO Auto-generated method stub
+							
+	
 							/*
 							 * Move to QuickCapture
 							 */
 							Intent intent = new Intent(ListsDetail.this, QuickCapture.class);
 							intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
-							intent.putExtra("tree_id", species_id);
+							intent.putExtra("tree_id", speciesID);
 							intent.putExtra("cname", commonName);
 							intent.putExtra("sname", scienceName);
+							intent.putExtra("protocol_id", Values.QUICK_TREES_AND_SHRUBS);
 							
 							startActivity(intent);
+							
+
 						}
 					})
-					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					.setNeutralButton(getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -393,20 +456,60 @@ public class ListsDetail extends Activity {
 							/*
 							 * Move to Getphenophase without a photo.
 							 */
+							
 							Intent intent = new Intent(ListsDetail.this, GetPhenophase.class);
 							intent.putExtra("camera_image_id", "");
 							intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
-							intent.putExtra("tree_id", species_id);
+							intent.putExtra("tree_id", speciesID);
 							intent.putExtra("cname", commonName);
 							intent.putExtra("sname", scienceName);
+							intent.putExtra("protocol_id", Values.QUICK_TREES_AND_SHRUBS);
 							
 							startActivity(intent);
 						}
 					})
+					.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+						
+						}
+					})
 					.show();
+
+					
 				}
 			});
 	    }
+	    else {
+	    	
+	    	speciesID = p_intent.getIntExtra("id", 0); 
+	    	
+	    	cursor = db.rawQuery("SELECT common_name, science_name, credit FROM userDefineLists WHERE id=" + speciesID +";", null);
+			while(cursor.moveToNext()) {
+				cName.setText(cursor.getString(0));
+				sName.setText(cursor.getString(1));
+				credit.setText("Photo By - " + cursor.getString(2));
+				
+				commonName = cursor.getString(0).toString();
+				scienceName = cursor.getString(1).toString();
+			}
+			otDBH.close();
+			db.close();
+			cursor.close();
+			
+			/*
+			 *  Load image from the server
+			 */
+			DrawableManager dm = new DrawableManager(mSpinner);
+			dm.fetchDrawableOnThread("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/images/treelists/" + speciesID + ".jpg", speciesImage);
+	    	
+	    	
+	    	LinearLayout footer = (LinearLayout)findViewById(R.id.lower);
+	    	footer.setVisibility(View.GONE);
+	    }
+	    
 	    // TODO Auto-generated method stub
 		super.onResume();
 	}
@@ -430,27 +533,27 @@ public class ListsDetail extends Activity {
 				if(category[which].equals("Wild Flowers and Herbs")) {
 					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.WILD_FLOWERS + " ORDER BY common_name;",null);
 					myTitleText.setText(" " + getString(R.string.AddPlant_addFlowers));
-					protocol_id = Values.WILD_FLOWERS;
+					protocolID = Values.WILD_FLOWERS;
 				}
 				else if(category[which].equals("Grass")) {
 					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.GRASSES + " ORDER BY common_name;",null);
 					myTitleText.setText(" " + getString(R.string.AddPlant_addGrass));
-					protocol_id = Values.GRASSES;
+					protocolID = Values.GRASSES;
 				}
 				else if(category[which].equals("Deciduous Trees and Shrubs")) {
 					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.DECIDUOUS_TREES + " ORDER BY common_name;",null);
 					myTitleText.setText(" " + getString(R.string.AddPlant_addDecid));
-					protocol_id = Values.DECIDUOUS_TREES;
+					protocolID = Values.DECIDUOUS_TREES;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs")) {
 					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.EVERGREEN_TREES + " ORDER BY common_name;",null);
 					myTitleText.setText(" " + getString(R.string.AddPlant_addEvergreen));
-					protocol_id = Values.EVERGREEN_TREES;
+					protocolID = Values.EVERGREEN_TREES;
 				}
 				else if(category[which].equals("Conifer")) {
 					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + Values.CONIFERS + " ORDER BY common_name;",null);
 					myTitleText.setText(" " + getString(R.string.AddPlant_addConifer));
-					protocol_id = Values.CONIFERS;
+					protocolID = Values.CONIFERS;
 				}
 				
 				cursor.close();
@@ -481,18 +584,18 @@ public class ListsDetail extends Activity {
 				
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(ListsDetail.this, AddSite.class);
-					intent.putExtra("species_id", species_id);
+					intent.putExtra("species_id", speciesID);
 					intent.putExtra("common_name", commonName);
-					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("protocol_id", protocolID);
 					intent.putExtra("from", Values.FROM_PLANT_LIST);
 					startActivity(intent);
 				}
 				else {
-					if(helper.checkIfNewPlantAlreadyExists(species_id, new_plant_site_id, ListsDetail.this)){
+					if(helper.checkIfNewPlantAlreadyExists(speciesID, new_plant_site_id, ListsDetail.this)){
 						Toast.makeText(ListsDetail.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
 
-						if(helper.insertNewMyPlantToDB(ListsDetail.this, species_id, commonName, new_plant_site_id, new_plant_site_name, protocol_id)){
+						if(helper.insertNewMyPlantToDB(ListsDetail.this, speciesID, commonName, new_plant_site_id, new_plant_site_name, protocolID)){
 							Intent intent = new Intent(ListsDetail.this, PlantList.class);
 							Toast.makeText(ListsDetail.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							

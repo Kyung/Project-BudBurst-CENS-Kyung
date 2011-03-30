@@ -15,6 +15,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.http.HttpStatus;
+
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
+
 import android.R;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -395,11 +400,15 @@ public class FunctionsHelper {
 		
 		try {
 			imageURL = new URL(url);
-			Log.i("K", "IMAGE URL : " + imageURL);
+			
+			Object getContent = imageURL.getContent();
+			
+			Log.i("K", "getContent : " + getContent);
 			HttpURLConnection conn = (HttpURLConnection)imageURL.openConnection();
 			conn.connect();
-
+			
 			int len = conn.getContentLength();
+			
 			byte[] buffer = new byte[len];
 			InputStream is = conn.getInputStream();
 			FileOutputStream fos = new FileOutputStream(path + fileName + ".jpg");

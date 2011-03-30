@@ -19,15 +19,19 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
 import cens.ucla.edu.budburst.helper.Values;
 
 public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
+	
+	private SharedPreferences pref;
+	private int category;
 	
 	@Override
 	protected Void doInBackground(Items... item) {
@@ -38,27 +42,12 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 		 * 
 		 */
 		
-		SharedPreferences pref = item[0].context.getSharedPreferences("userinfo", 0);
-		SharedPreferences.Editor edit = pref.edit();
+		Log.i("K", "Downloading complete - category : " + category);
 		
-		Log.i("K", "Downloading complete - category : " + item[0].category);
+		category = item[0].category;
 		
-		switch(item[0].category) {
-		case 1:
-			edit.putBoolean("localbudburst", true);
-			break;
-		case 2:
-			edit.putBoolean("localwhatsinvasive", true);
-			break;
-		case 3:
-			edit.putBoolean("localnative", true);
-			break;
-		case 4:
-			edit.putBoolean("localpoisonous", true);
-			break;
-		}
-	
-		edit.commit();
+		pref = item[0].context.getSharedPreferences("userinfo", 0);
+		
 		
 		
 		
@@ -92,6 +81,7 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 				String county = jsonObj.getString("county");
 				String state = jsonObj.getString("state");
 				
+				SharedPreferences.Editor edit = pref.edit();
 				/*
 				 * Save state and county values into SharedPreferences.
 				 */
@@ -109,50 +99,56 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 				 */
 				
 				OneTimeDBHelper otDBH = new OneTimeDBHelper(item[0].context);
-				SQLiteDatabase otDB = otDBH.getWritableDatabase();
-				
 				// Delete the list first - by category
 				otDBH.clearLocalListsByCategory(item[0].context, item[0].category);
 				
 				Log.i("K", "Json Array Length : " + jsonAry.length());	
+				SQLiteDatabase otDB = null;
 				
 				// ReINSERT the values
 				for(int i = 0 ; i < jsonAry.length() ; i++) {
 					
-					/*
-					 * Set the first char to upper case.
-					 */
-					String commonName = jsonAry.getJSONObject(i).getString("common");
-					Log.i("K", "commonName : " + commonName);
-					
-					/*
-					 * If there's a common name, change the first char to upper case.
-					 */
-					if(!commonName.equals("")) {
-						commonName = commonName.substring(0,1).toUpperCase() + commonName.substring(1);
-					}
-					else {
-						commonName = "Unknown/Other";
-					}
-				
-					otDB.execSQL("INSERT INTO localPlantLists VALUES(" +
-							item[0].category + ",\"" +
-							commonName + "\",\"" +
-							jsonAry.getJSONObject(i).getString("scientific") + "\",\"" +
-							county + "\",\"" +
-							state + "\",\"" +
-							jsonAry.getJSONObject(i).getString("usda_url") + "\",\"" +
-							jsonAry.getJSONObject(i).getString("image_url") + "\",\"" +
-							jsonAry.getJSONObject(i).getString("image_copyright") + "\");"
-							);
-					}
-					
-					
-					// DB close
-					otDB.close();
-					otDBH.close();
+					try {
+						otDB = otDBH.getWritableDatabase();
+						
+						/*
+						 * Set the first char to upper case.
+						 */
+						String commonName = jsonAry.getJSONObject(i).getString("common");
+						Log.i("K", "commonName : " + commonName);
+						
+						/*
+						 * If there's a common name, change the first char to upper case.
+						 */
+						if(!commonName.equals("")) {
+							commonName = commonName.substring(0,1).toUpperCase() + commonName.substring(1);
+						}
+						else {
+							commonName = "Unknown/Other";
+						}
 
+						otDB.execSQL("INSERT INTO localPlantLists VALUES(" +
+								item[0].category + ",\"" +
+								commonName + "\",\"" +
+								jsonAry.getJSONObject(i).getString("scientific") + "\",\"" +
+								county + "\",\"" +
+								state + "\",\"" +
+								jsonAry.getJSONObject(i).getString("usda_url") + "\",\"" +
+								jsonAry.getJSONObject(i).getString("image_url") + "\",\"" +
+								jsonAry.getJSONObject(i).getString("image_copyright") + "\");"
+							);
+
+					}
+					catch(SQLiteException ex) {
+						ex.printStackTrace();
+						otDB.close();
+					}
 				}
+					
+				// DB close
+				otDB.close();
+				otDBH.close();
+			}
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -164,5 +160,30 @@ public class DownloadListByService extends AsyncTask<Items, Integer, Void>{
 	
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	protected void onPostExecute(Void unused) {
+		
+		Log.i("K", "finish downloading locallist by service");
+		
+		SharedPreferences.Editor edit = pref.edit();
+		
+		switch(category) {
+		case 1:
+			edit.putBoolean("localbudburst", true);
+			break;
+		case 2:
+			edit.putBoolean("localwhatsinvasive", true);
+			break;
+		case 3:
+			edit.putBoolean("localnative", true);
+			break;
+		case 4:
+			edit.putBoolean("localpoisonous", true);
+			break;
+		}
+	
+		edit.commit();
 	}
 }

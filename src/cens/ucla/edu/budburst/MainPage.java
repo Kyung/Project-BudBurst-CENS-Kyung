@@ -4,16 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.BackgroundService;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.lists.ListMain;
 import cens.ucla.edu.budburst.lists.UserDefinedTreeLists;
+import cens.ucla.edu.budburst.mapview.MapViewMain;
 import cens.ucla.edu.budburst.mapview.PBB_map;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
 import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.weeklyplant.WeeklyPlant;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -34,6 +36,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainPage extends Activity {
@@ -44,8 +47,9 @@ public class MainPage extends Activity {
 	private Button mapBtn = null;
 	private Button newsBtn = null;
 	private Button weeklyBtn = null;
+	private TextView mUserInfo = null;
 	private SharedPreferences pref;
-	private String username;
+	private String mUsername;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,9 +57,10 @@ public class MainPage extends Activity {
 	    setContentView(R.layout.mainpage);
 	    
 	    pref = getSharedPreferences("userinfo",0);
-	    username = pref.getString("Username", "");
-	    if(username.equals("test10")){
-	    	username = "Preview";
+	    
+	    mUsername = pref.getString("Username", "");
+	    if(mUsername.equals("test10")){
+	    	mUsername = "Preview";
 	    }
 	    SharedPreferences.Editor edit = pref.edit();	
 	    edit.putBoolean("new", false);
@@ -150,9 +155,9 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-				//Intent intent = new Intent(MainPage.this, PBB_map.class);
-				//startActivity(intent);
+				//Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent(MainPage.this, PBB_map.class);
+				startActivity(intent);
 			}
 	    	
 	    });
@@ -174,10 +179,16 @@ public class MainPage extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				//Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent(MainPage.this, WeeklyPlant.class);
+				startActivity(intent);
+
 			}
 	    	
 	    });
+	    
+	    mUserInfo = (TextView) findViewById(R.id.user_info);
+	    mUserInfo.setText("Hi, " + mUsername);
 	    
 	    // TODO Auto-generated method stub
 	}
@@ -290,7 +301,7 @@ public class MainPage extends Activity {
 				return true;
 			case 4:
 				new AlertDialog.Builder(MainPage.this)
-				.setTitle(getString(R.string.Menu_logout) + " - " + username)
+				.setTitle(getString(R.string.Menu_logout) + " - " + mUsername)
 				.setMessage(getString(R.string.Alert_logout))
 				.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
 					
@@ -309,6 +320,7 @@ public class MainPage extends Activity {
 						edit.putBoolean("localnative", false);
 						edit.putBoolean("localpoisonous", false);
 						edit.putBoolean("listDownloaded", false);
+						edit.putBoolean("firstDownloadTreeList", true);
 						edit.commit();
 						
 						//Drop user table in database

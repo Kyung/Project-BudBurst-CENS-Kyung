@@ -30,7 +30,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 
 public class Whatsblooming extends ListActivity {
 	

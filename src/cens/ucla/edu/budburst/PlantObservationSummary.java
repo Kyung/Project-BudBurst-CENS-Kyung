@@ -7,10 +7,10 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.Media;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.AddNotes;
 import android.app.Activity;
@@ -196,7 +196,7 @@ public class PlantObservationSummary extends Activity {
 			StaticDBHelper sDBHelper = new StaticDBHelper(PlantObservationSummary.this);
 			SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 			
-			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Type, Description FROM Onetime_Observation WHERE Phenophase_ID=" + phenoID, null);
+			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Type, Description FROM Onetime_Observation WHERE _id =" + phenoID, null);
 			
 			while(getPhenoInfo.moveToNext()) {
 				phenoIcon = getPhenoInfo.getInt(0);

@@ -74,18 +74,16 @@ public class AddNotes extends Activity {
 		category = p_intent.getExtras().getInt("category", 0);
 		previousActivity = p_intent.getExtras().getInt("from", 0);
 	    
+		Log.i("K", "category : " + category);
+		
 	    doneBtn = (Button) findViewById(R.id.notes_done);
 	    skipBtn = (Button) findViewById(R.id.skip);
 	    noteTxt = (EditText) findViewById(R.id.notes);
 	    
 	    noteTxt.setText("");
 	    
-	    // LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
-	    
 	    if(previousActivity == Values.FROM_QC_PHENOPHASE) {
 	    	plantID = p_intent.getExtras().getInt("plant_id", 0);
-	    	//ll.setVisibility(View.GONE);
-	    	//doneBtn.setText("Save Observation");
 	    }
 		if(previousActivity == Values.FROM_PBB_PHENOPHASE) {
 			siteID = p_intent.getExtras().getInt("site_id");

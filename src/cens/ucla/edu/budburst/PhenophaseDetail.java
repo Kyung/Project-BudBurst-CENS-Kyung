@@ -1,8 +1,8 @@
 package cens.ucla.edu.budburst;
 
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.AnimationHelper;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.content.Intent;
@@ -79,7 +79,7 @@ public class PhenophaseDetail extends Activity {
 		    cursor.close();
 	    }
 	    else {
-	    	cursor = db.rawQuery("SELECT Category_Name, Detail_Description, Phenophase_Icon FROM Onetime_Observation WHERE Phenophase_ID = " + pheno_id + ";", null);
+	    	cursor = db.rawQuery("SELECT Type, Detail_Description, Phenophase_Icon FROM Onetime_Observation WHERE _id = " + pheno_id + ";", null);
 
 		    while(cursor.moveToNext()) {
 		    	phenoName.setText(" " + cursor.getString(0) + " ");

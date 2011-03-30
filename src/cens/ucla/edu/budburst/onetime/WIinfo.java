@@ -3,9 +3,9 @@ package cens.ucla.edu.budburst.onetime;
 import java.io.FileOutputStream;
 
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.AnimationHelper;
 import cens.ucla.edu.budburst.helper.DrawableManager;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;

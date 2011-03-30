@@ -16,6 +16,8 @@ public class Values {
 	public static final int FROM_MAIN_PAGE = 103;
 	public static final int FROM_ONE_TIME_MAIN = 104;
 	public static final int FROM_UCLA_TREE_LISTS = 105;
+	public static final int FROM_PLANT_LIST_ADD_SAMESPECIES = 106;
+	public static final int FROM_QUICK_CAPTURE_ADD_SAMESPECIES = 107;
 	public static final int WHATSINVASIVE = 1000;
 	public static final int FROM_PBB_PHENOPHASE = 1000;
 	public static final int FROM_QC_PHENOPHASE = 1001;
@@ -39,6 +41,10 @@ public class Values {
 	public static final int EVERGREEN_TREES_WIND = 7;
 	public static final int CONIFERS = 8;
 	
+	// categort for shared_plant(quick capture)
+	public static final int QUICK_TREES_AND_SHRUBS = 1;
+	public static final int QUICK_WILD_FLOWERS = 2;
+	public static final int QUICK_GRASSES = 3;
 	
 	public static final String TREE_PATH = "/sdcard/pbudburst/tree_lists/";
 	public static final String WI_PATH = "/sdcard/pbudburst/wi_list/";

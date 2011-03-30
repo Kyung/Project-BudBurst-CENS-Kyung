@@ -10,8 +10,8 @@ import cens.ucla.edu.budburst.Help;
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.Flora_Observer;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
@@ -67,8 +67,8 @@ public class ListMain extends ListActivity {
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.Menu_Lists));
 
-		LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
-		ll.setVisibility(View.GONE);
+		//LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
+		//ll.setVisibility(View.GONE);
 
 	    // TODO Auto-generated method stub
 	}
@@ -94,23 +94,30 @@ public class ListMain extends ListActivity {
 		ArrayList<listItem> onetime_title = new ArrayList<listItem>();
 		listItem iItem;
 		
-		//oneTime(Header String, title, icon_name, sub_title)
-		iItem = new listItem("Local plants from national plant lists", "Project Budburst", "pbb_icon_main", "Local BudBurst plants");
+		/*
+		 * oneTime(Header String, title, icon_name, sub_title)
+		 * - Note : don't put the icon_name in the string file.
+		 */
+
+		iItem = new listItem(getString(R.string.List_Official_Header), getString(R.string.List_Project_Budburst_title), "pbb_icon_main", getString(R.string.List_Budburst));
 		onetime_title.add(iItem);
 		
-		iItem = new listItem("none", "Local Invasives", "invasive_plant", "Help locate local invasive");
+		iItem = new listItem("none", getString(R.string.List_Whatsinvasive_title), "invasive_plant", getString(R.string.List_Whatsinvasive));
 		onetime_title.add(iItem);
 		
-		iItem = new listItem("none", "Local Native", "whatsnative", "Local natives from the USDA");
+		iItem = new listItem("none", getString(R.string.List_Whatsendangered_title), "endangered", getString(R.string.List_Whats_endangered));
+		onetime_title.add(iItem);
+		
+		iItem = new listItem("none", getString(R.string.List_Whatspoisonous_title), "poisonous", getString(R.string.List_Whats_poisonous));
 		onetime_title.add(iItem);
 		
 		//iItem = new listItem("none", "Local Poisonous", "", "Native and cultural plants");
 		//onetime_title.add(iItem);
 		
-		iItem = new listItem("Locally created lists of interest", "UCLA Trees", "s1000", "Tree species on campus");
+		iItem = new listItem(getString(R.string.List_User_Plant_Header), "UCLA Trees", "s1000", getString(R.string.List_User_Plant_UCLA_trees));
 		onetime_title.add(iItem);
 		
-		iItem = new listItem("none", "What's Blooming", "pbbicon", "Santa Monica blooming plants");
+		iItem = new listItem("none", getString(R.string.List_Whatsblooming_title), "pbbicon", getString(R.string.List_User_Plant_SAMO));
 		onetime_title.add(iItem);
 		
 		mylistapdater = new MyListAdapter(ListMain.this, R.layout.onetime_list ,onetime_title);
@@ -213,39 +220,87 @@ public class ListMain extends ListActivity {
 			 */
 			switch(position) {
 			case 0:
+				/*
+				if(pref.getBoolean("localbudburst", false)) {
+					//Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+					intent = new Intent(ListMain.this, ListSubCategory.class);
+					intent.putExtra("category", Values.BUDBURST_LIST);
+					startActivity(intent);
+				}
+				else {
+					Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+				}
+				*/
 				
-				//Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				intent = new Intent(ListMain.this, ListSubCategory.class);
 				intent.putExtra("category", Values.BUDBURST_LIST);
 				startActivity(intent);
 				
+				
 				break;
 			case 1:
+				/*
 				// What's Invasives
+				if(pref.getBoolean("localwhatsinvasive", false)) {
+					intent = new Intent(ListMain.this, ListSubCategory.class);
+					intent.putExtra("category", Values.WHATSINVASIVE_LIST);
+					startActivity(intent);
+				}
+				else {
+					Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+				}*/
 				intent = new Intent(ListMain.this, ListSubCategory.class);
 				intent.putExtra("category", Values.WHATSINVASIVE_LIST);
 				startActivity(intent);
+				
+				
 				break;
 			case 2:
-				// Native Plants
+				// Endangered Plants
 				//intent = new Intent(ListMain.this, LocalBudBurst.class);
 				//intent.putExtra("category", Values.NATIVE_LIST);
 				//startActivity(intent);
 				Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				break;
 			case 3:
+				// Poisonous Plants
+				//intent = new Intent(ListMain.this, LocalBudBurst.class);
+				//intent.putExtra("category", Values.NATIVE_LIST);
+				//startActivity(intent);
+				Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				break;
+			case 4:
 				// Local Plant From Users
-
+				
 				if(pref.getBoolean("getTreeLists", false)) {
 					intent = new Intent(ListMain.this, UserDefinedTreeLists.class);
 					intent.putExtra("from", 0);
 					startActivity(intent);
 				}
 				else {
-					Toast.makeText(ListMain.this, "Still downloading the tree lists", Toast.LENGTH_SHORT).show();
+					
+					if(pref.getBoolean("firstDownloadTreeList", true)) {
+						/*
+						 * Get User Plant Tree Lists - UCLA
+						 */
+						
+						Toast.makeText(this, getString(R.string.Start_Downloading_UCLA_Tree_Lists), Toast.LENGTH_SHORT).show();
+						
+						new GetUserPlantLists().execute(ListMain.this);
+						
+						SharedPreferences.Editor edit = pref.edit();
+						edit.putBoolean("firstDownloadTreeList", false);
+						edit.commit();
+					}
+					else {
+						Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+					}	
 				}
+				//intent = new Intent(ListMain.this, UserDefinedTreeLists.class);
+				//intent.putExtra("from", 0);
+				//startActivity(intent);
 				break;
-			case 4:
+			case 5:
 				// Whats Blooming
 				Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				break;		

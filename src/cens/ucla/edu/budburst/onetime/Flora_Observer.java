@@ -38,11 +38,11 @@ import android.widget.Toast;
 import cens.ucla.edu.budburst.AddPlant;
 import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.helper.MyListAdapter;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.adapter.MyListAdapter;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 
 public class Flora_Observer extends ListActivity{
@@ -65,13 +65,16 @@ public class Flora_Observer extends ListActivity{
 	private TextView myTitleText = null;
 	
 	private int current_position = 0;
-	private int pheno_id = 0;
+	private int phenoID = 0;
+	private int previousActivity;
+	private int protocolID = 0;
 	private double latitude = 0.0;
 	private double longitude = 0.0;
-	private String camera_image_id = null;
+	private String cameraImageID = null;
 	private String dt_taken = null;
 	private String notes = "";
 	private String cname = "Unknown/Other";
+	
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -88,14 +91,15 @@ public class Flora_Observer extends ListActivity{
 		
 		Intent p_intent = getIntent();
 		
-		camera_image_id = p_intent.getExtras().getString("camera_image_id");
+		cameraImageID = p_intent.getExtras().getString("camera_image_id");
 		latitude = p_intent.getExtras().getDouble("latitude");
 		longitude = p_intent.getExtras().getDouble("longitude");
 		dt_taken = p_intent.getExtras().getString("dt_taken");
-		pheno_id = p_intent.getExtras().getInt("pheno_id");
+		phenoID = p_intent.getExtras().getInt("pheno_id");
 		notes = p_intent.getExtras().getString("notes");
+		previousActivity = p_intent.getExtras().getInt("from");
 		
-		Log.i("K", "Flora_OBSERVER = camera_image_id : " + camera_image_id + " , pheno_id : " + pheno_id);
+		Log.i("K", "Flora_OBSERVER = camera_image_id : " + cameraImageID + " , pheno_id : " + phenoID);
 		
 		rb1 = (Button)findViewById(R.id.option1);
 		rb2 = (Button)findViewById(R.id.option2);
@@ -333,6 +337,9 @@ public class Flora_Observer extends ListActivity{
 
 		current_position = position;
 		
+		/*
+		 * If user chooses Unknown/Plant, show the popup dialog adding common name.
+		 */
 		if(arPlantList.get(position).SpeciesID == Values.UNKNOWN_SPECIES) {
 			dialog = new Dialog(Flora_Observer.this);
 			
@@ -352,40 +359,138 @@ public class Flora_Observer extends ListActivity{
 					if(cname.equals("")) {
 						cname = "Unknown/Other";
 					}
-					Intent intent = new Intent(Flora_Observer.this, AddNotes.class);
 					
-					intent.putExtra("cname", cname);
-					intent.putExtra("sname", "Unknown/Other");
-					intent.putExtra("protocol_id", arPlantList.get(current_position).ProtocolID);
-					intent.putExtra("pheno_id", pheno_id);
-					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
-					intent.putExtra("camera_image_id", camera_image_id);
-					intent.putExtra("latitude", latitude);
-					intent.putExtra("longitude", longitude);
-					intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
-					intent.putExtra("category", Values.BUDBURST_LIST);
+					if(previousActivity == Values.FROM_QUICK_CAPTURE) {
+						
+						new AlertDialog.Builder(Flora_Observer.this)
+						.setTitle("Select Category")
+						.setIcon(android.R.drawable.ic_menu_more)
+						.setItems(R.array.quick_capture_phenophase_category, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+								String[] _category = getResources().getStringArray(R.array.quick_capture_phenophase_category);
+								if(_category[which].equals("Trees and Shrubs")) {
+									protocolID = 1;
+								}
+								else if(_category[which].equals("Wild Flowers")) {
+									protocolID = 2;
+								}
+								else {
+									protocolID = 3;
+								}
+								
+								Intent intent = new Intent(Flora_Observer.this, GetPhenophase.class);
+								
+								intent.putExtra("cname", cname);
+								intent.putExtra("sname", "Unknown/Other");
+								intent.putExtra("protocol_id", protocolID);
+								intent.putExtra("pheno_id", phenoID);
+								intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+								intent.putExtra("camera_image_id", cameraImageID);
+								intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+								intent.putExtra("category", Values.NORMAL_QC);
+								
+								startActivity(intent);
+							}
+						})
+						.setNegativeButton("Back", null)
+						.show();
+					}
+					else {
+						Intent intent = new Intent(Flora_Observer.this, AddNotes.class);
+						
+						intent.putExtra("cname", cname);
+						intent.putExtra("sname", "Unknown/Other");
+						intent.putExtra("protocol_id", arPlantList.get(current_position).ProtocolID);
+						intent.putExtra("pheno_id", phenoID);
+						intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
+						intent.putExtra("camera_image_id", cameraImageID);
+						intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+						intent.putExtra("category", Values.BUDBURST_LIST);
+						
+						startActivity(intent);
+
+					}
 					
-					dialog.dismiss();
-					
-					startActivity(intent);
+					dialog.dismiss();					
 				}
 			});
 		}
+		/*
+		 * If user chooses one of the official species..
+		 */
 		else {
-			Intent intent = new Intent(Flora_Observer.this, AddNotes.class);
 			
-			intent.putExtra("cname", arPlantList.get(position).CommonName);
-			intent.putExtra("sname", arPlantList.get(position).SpeciesName);
-			intent.putExtra("protocol_id", arPlantList.get(position).ProtocolID);
-			intent.putExtra("pheno_id", pheno_id);
-			intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
-			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
-			intent.putExtra("category", Values.BUDBURST_LIST);
-		
-			startActivity(intent);
+			if(previousActivity == Values.FROM_QUICK_CAPTURE) {
+				
+				int getSpeciesID = arPlantList.get(position).SpeciesID;
+				int getProtocolID = 2;
+				
+				StaticDBHelper staticDBH = new StaticDBHelper(Flora_Observer.this);
+				SQLiteDatabase staticDB = staticDBH.getReadableDatabase();
+				
+				/*
+				 * We already know the Shared Plant category if we choose species from official budburst lists.
+				 * - hardcoded protocolID
+				 * 
+				 */
+				
+				Cursor cursor = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id=" + getSpeciesID + ";", null);
+				while(cursor.moveToNext()) {
+					getProtocolID = cursor.getInt(0);
+				}
+				
+				switch(getProtocolID) {
+				case Values.WILD_FLOWERS:
+					protocolID = Values.QUICK_WILD_FLOWERS; 
+					break;
+				case Values.DECIDUOUS_TREES:
+					protocolID = Values.QUICK_TREES_AND_SHRUBS;
+					break;
+				case Values.EVERGREEN_TREES:
+					protocolID = Values.QUICK_TREES_AND_SHRUBS;
+					break;
+				case Values.CONIFERS:
+					protocolID = Values.QUICK_TREES_AND_SHRUBS;
+					break;
+				case Values.GRASSES:
+					protocolID = Values.QUICK_GRASSES;
+					break;
+				}
+				
+				cursor.close();
+				staticDB.close();
+				
+				Intent intent = new Intent(Flora_Observer.this, GetPhenophase.class);
+				
+				intent.putExtra("cname", arPlantList.get(current_position).CommonName);
+				intent.putExtra("sname", arPlantList.get(current_position).SpeciesName);
+				intent.putExtra("protocol_id", protocolID);
+				intent.putExtra("pheno_id", phenoID);
+				intent.putExtra("species_id", arPlantList.get(current_position).SpeciesID);
+				intent.putExtra("camera_image_id", cameraImageID);
+				intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+				intent.putExtra("category", Values.NORMAL_QC);
+				
+				startActivity(intent);
+				
+			}
+			else {
+				Intent intent = new Intent(Flora_Observer.this, AddNotes.class);
+				
+				intent.putExtra("cname", arPlantList.get(position).CommonName);
+				intent.putExtra("sname", arPlantList.get(position).SpeciesName);
+				intent.putExtra("protocol_id", arPlantList.get(position).ProtocolID);
+				intent.putExtra("pheno_id", phenoID);
+				intent.putExtra("species_id", arPlantList.get(position).SpeciesID);
+				intent.putExtra("camera_image_id", cameraImageID);
+				intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+				intent.putExtra("category", Values.BUDBURST_LIST);
+			
+				startActivity(intent);
+			}
 		}
 	}
 }

@@ -3,10 +3,10 @@ package cens.ucla.edu.budburst;
 import java.io.File;
 import java.util.ArrayList;
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.AddNotes;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
@@ -44,8 +44,8 @@ public class GetPhenophase_OneTime extends ListActivity {
 	private TextView myTitleText = null;
 	private String cname;
 	private String sname;
-	private int species_id;
-	private int protocol_id;
+	private int speciesID;
+	private int protocolID;
 	private int category;
 	private int currentPosition;
 
@@ -75,8 +75,8 @@ public class GetPhenophase_OneTime extends ListActivity {
 		while(cursor.moveToNext()) {
 			cname = cursor.getString(0);
 			sname = cursor.getString(1);
-			species_id = cursor.getInt(2);
-			protocol_id = cursor.getInt(3);
+			speciesID = cursor.getInt(2);
+			protocolID = cursor.getInt(3);
 			category = cursor.getInt(4);
 		}
 		
@@ -88,9 +88,9 @@ public class GetPhenophase_OneTime extends ListActivity {
 		TextView science_name = (TextView) findViewById(R.id.science_name);
 		
 		species_image.setVisibility(View.VISIBLE);
-	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + species_id, null, null));
+	    species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + speciesID, null, null));
 	    if(category == Values.TREE_LISTS_QC) {
-    		String imagePath = Values.TREE_PATH + species_id + ".jpg";
+    		String imagePath = Values.TREE_PATH + speciesID + ".jpg";
     		FunctionsHelper helper = new FunctionsHelper();
     		species_image.setImageBitmap(helper.showImage(GetPhenophase_OneTime.this, imagePath));
 
@@ -109,7 +109,7 @@ public class GetPhenophase_OneTime extends ListActivity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(GetPhenophase_OneTime.this, SpeciesDetail.class);
-				intent.putExtra("id", species_id);
+				intent.putExtra("id", speciesID);
 				intent.putExtra("category", category);
 				startActivity(intent);
 			}
@@ -118,40 +118,58 @@ public class GetPhenophase_OneTime extends ListActivity {
 		StaticDBHelper staticDB = new StaticDBHelper(GetPhenophase_OneTime.this);
 		SQLiteDatabase sDB = staticDB.getReadableDatabase();
 		
-		cursor = sDB.rawQuery("SELECT _id, Category_Name, Phenophase_ID, Phenophase_Icon, Description FROM Onetime_Observation", null);
+		Log.i("K", "Protocol_ID : " + protocolID);
+		
+		cursor = sDB.rawQuery("SELECT _id, Type, Phenophase_Icon, Description FROM Onetime_Observation WHERE Category=" + protocolID, null);
 
 		while(cursor.moveToNext()) {
-			
-			// get the _id value from Onetime_Observation table
-			int cursor_get_id = cursor.getInt(0);
-
-			
+						
 			Cursor cursor2 = onetimeDB.rawQuery("SELECT phenophase_id, image_id, dt_taken, notes FROM oneTimeObservation WHERE plant_id=" + id, null);
-			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(3), null, null);
+			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(2), null, null);
 			
 			boolean flag = false;
 			boolean header = false;
 			String camera_image = "";
 			String date = "";
 			
-			// 1, 4, 6, 8, 11 will show the header
-			if(cursor_get_id == 1 || cursor_get_id == 4 || cursor_get_id == 6 || cursor_get_id == 8 || cursor_get_id == 11) {
-				header = true;
+			if(protocolID == 1) {
+				// to show the header, we need to know the first index of each category.
+				if(cursor.getInt(0) == 1 
+						|| cursor.getInt(0) == 4 
+						|| cursor.getInt(0) == 7 
+						|| cursor.getInt(0) == 10
+						|| cursor.getInt(0) == 13) {
+					header = true;
+				}
 			}
-			
-			Log.i("K", "cursor_get_id : " + cursor_get_id + " , header : " + header );
+			else if(protocolID == 2) {
+				// to show the header, we need to know the first index of each category.
+				if(cursor.getInt(0) == 16 
+						|| cursor.getInt(0) == 19) {
+					header = true;
+				}
+
+			}
+			else if(protocolID == 3) {
+				// to show the header, we need to know the first index of each category.
+				if(cursor.getInt(0) == 22 
+						|| cursor.getInt(0) == 23 
+						|| cursor.getInt(0) == 26 ) {
+					header = true;
+				}
+			}
 
 			while(cursor2.moveToNext()) {
 				if(cursor.getInt(0) == cursor2.getInt(0)) {
 					flag = true;
-					PlantItem pi = new PlantItem(resID, cursor.getString(4), cursor.getInt(2), cursor.getInt(3), cursor.getString(1), flag, cursor2.getString(1), cursor2.getString(2), id, cursor2.getString(3), header);
+					PlantItem pi = new PlantItem(resID, cursor.getString(3), cursor.getInt(0), cursor.getInt(2), cursor.getString(1), flag, cursor2.getString(1), cursor2.getString(2), id, cursor2.getString(3), header);
 					pItem.add(pi);
 				}
 			}
 			
 			if(!flag) {
 				// no notes
-				PlantItem pi = new PlantItem(resID, cursor.getString(4), cursor.getInt(2), cursor.getInt(3), cursor.getString(1), flag, camera_image, date, id, "", header);
+				PlantItem pi = new PlantItem(resID, cursor.getString(3), cursor.getInt(0), cursor.getInt(2), cursor.getString(1), flag, camera_image, date, id, "", header);
 				pItem.add(pi);
 			}
 			
@@ -203,10 +221,10 @@ public class GetPhenophase_OneTime extends ListActivity {
 			intent.putExtra("pheno_icon", pItem.get(position).PhenoImageID);
 			intent.putExtra("pheno_text", pItem.get(position).Description);
 			intent.putExtra("pheno_name", pItem.get(position).PhenoName);
-			intent.putExtra("protocol_id", protocol_id);
+			intent.putExtra("protocol_id", protocolID);
 			intent.putExtra("category", category);
 			intent.putExtra("photo_name", pItem.get(position).ImageName);
-			intent.putExtra("species_id", species_id);
+			intent.putExtra("species_id", speciesID);
 			intent.putExtra("site_id", 0);
 			intent.putExtra("dt_taken", pItem.get(position).Date);
 			intent.putExtra("notes", pItem.get(position).Note);
@@ -240,8 +258,8 @@ public class GetPhenophase_OneTime extends ListActivity {
 					intent.putExtra("cname", cname);
 					intent.putExtra("sname", sname);
 					intent.putExtra("pheno_id", pItem.get(currentPosition).PhenoID);
-					intent.putExtra("protocol_id", protocol_id);
-					intent.putExtra("species_id", species_id);
+					intent.putExtra("protocol_id", protocolID);
+					intent.putExtra("species_id", speciesID);
 					intent.putExtra("latitude", 0.0);
 					intent.putExtra("longitude", 0.0);
 					/*
@@ -263,8 +281,8 @@ public class GetPhenophase_OneTime extends ListActivity {
 					intent.putExtra("cname", cname);
 					intent.putExtra("sname", sname);
 					intent.putExtra("pheno_id", pItem.get(currentPosition).PhenoID);
-					intent.putExtra("protocol_id", protocol_id);
-					intent.putExtra("species_id", species_id);
+					intent.putExtra("protocol_id", protocolID);
+					intent.putExtra("species_id", speciesID);
 					intent.putExtra("latitude", 0.0);
 					intent.putExtra("longitude", 0.0);
 					/*

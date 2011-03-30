@@ -62,7 +62,6 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 			/*
 			 * Convert the touched point to geoPoint
 			 */
-			
 			Projection proj = mapView.getProjection();
 			GeoPoint loc = proj.fromPixels((int)event.getX(), (int)event.getY());
 			
@@ -73,7 +72,6 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 		}
 		
 		//GeoPoint gPoint = mapView.getProjection().fromPixels((int)event.getX(), (int)event.getY());
-		
 		Log.i("K", "Item Added!");
 		
 		populate();

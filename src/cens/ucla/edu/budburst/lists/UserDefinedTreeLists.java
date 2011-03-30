@@ -20,13 +20,13 @@ import org.json.JSONObject;
 import cens.ucla.edu.budburst.AddSite;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.adapter.MyListAdapterWithIndex;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
 import cens.ucla.edu.budburst.helper.JSONHelper;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.helper.MyListAdapterWithIndex;
 import cens.ucla.edu.budburst.onetime.AddNotes;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
 import cens.ucla.edu.budburst.onetime.OneTimeMain;
@@ -68,7 +68,7 @@ public class UserDefinedTreeLists extends ListActivity {
 	private String new_plant_species_name;
 	
 	private int current_position = 0;
-	private int protocol_id;
+	private int protocolID;
 	private int pheno_id;
 	private int previousActivity = 0;
 	private int new_plant_species_id;
@@ -141,6 +141,9 @@ public class UserDefinedTreeLists extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
+		
+		current_position = position;
+		
 		/*
 		 * Act differently based on the previous activity
 		 *  1. FROM_PLANT_LIST : directly add the species into the database.
@@ -152,18 +155,13 @@ public class UserDefinedTreeLists extends ListActivity {
 		}
 		else if(previousActivity == Values.FROM_QUICK_CAPTURE) {
 			
-			Intent intent = new Intent(UserDefinedTreeLists.this, AddNotes.class);
+			Intent intent = new Intent(UserDefinedTreeLists.this, GetPhenophase.class);
 			
-			intent.putExtra("cname", treeLists.get(position).CommonName);
-			intent.putExtra("sname", treeLists.get(position).SpeciesName);
-			intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
+			intent.putExtra("cname", treeLists.get(current_position).CommonName);
+			intent.putExtra("sname", treeLists.get(current_position).SpeciesName);
+			intent.putExtra("protocol_id", Values.QUICK_TREES_AND_SHRUBS); // temporary put protocol_id to 9
 			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("dt_taken", dt_taken);
-			intent.putExtra("pheno_id", pheno_id);
-			intent.putExtra("species_id", treeLists.get(position).SpeciesID);
-			//intent.putExtra("category", -1);
+			intent.putExtra("tree_id", treeLists.get(current_position).SpeciesID);
 			intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
 			
 			startActivity(intent);
@@ -192,30 +190,24 @@ public class UserDefinedTreeLists extends ListActivity {
 		new AlertDialog.Builder(UserDefinedTreeLists.this)
 		.setTitle(getString(R.string.AddPlant_SelectCategory))
 		.setIcon(android.R.drawable.ic_menu_more)
-		.setItems(R.array.category2, new DialogInterface.OnClickListener() {
+		.setItems(R.array.category, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				String[] category = getResources().getStringArray(R.array.category2);
+				String[] category = getResources().getStringArray(R.array.category);
 	
 				if(category[which].equals("Wild Flowers and Herbs")) {
-					protocol_id = Values.WILD_FLOWERS;
+					protocolID = Values.WILD_FLOWERS;
 				}
 				else if(category[which].equals("Grass")) {
-					protocol_id = Values.GRASSES;
+					protocolID = Values.GRASSES;
 				}
 				else if(category[which].equals("Deciduous Trees and Shrubs")) {
-					protocol_id = Values.DECIDUOUS_TREES;
-				}
-				else if(category[which].equals("Deciduous Trees and Shrubs - Wind")) {
-					protocol_id = Values.DECIDUOUS_TREES_WIND;
+					protocolID = Values.DECIDUOUS_TREES;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs")) {
-					protocol_id = Values.EVERGREEN_TREES;
-				}
-				else if(category[which].equals("Evergreen Trees and Shrubs - Wind")) {
-					protocol_id = Values.EVERGREEN_TREES_WIND;
+					protocolID = Values.EVERGREEN_TREES;
 				}
 				else if(category[which].equals("Conifer")) {
-					protocol_id = Values.CONIFERS;
+					protocolID = Values.CONIFERS;
 				}
 				else {
 				}
@@ -236,7 +228,7 @@ public class UserDefinedTreeLists extends ListActivity {
 					intent.putExtra("cname", treeLists.get(current_position).CommonName);
 					intent.putExtra("sname", treeLists.get(current_position).SpeciesName);
 					intent.putExtra("pheno_id", pheno_id);
-					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("protocol_id", protocolID);
 					intent.putExtra("dt_taken", dt_taken);
 					intent.putExtra("latitude", latitude);
 					intent.putExtra("longitude", longitude);
@@ -274,7 +266,7 @@ public class UserDefinedTreeLists extends ListActivity {
 					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
 					intent.putExtra("from", Values.FROM_PLANT_LIST);
 					intent.putExtra("species_name", treeLists.get(current_position).CommonName);
-					intent.putExtra("protocol_id", protocol_id);
+					intent.putExtra("protocol_id", protocolID);
 					intent.putExtra("species_id", Values.UNKNOWN_SPECIES);
 					startActivity(intent);
 				}
@@ -282,7 +274,7 @@ public class UserDefinedTreeLists extends ListActivity {
 					if(helper.checkIfNewPlantAlreadyExists(new_plant_species_id, new_plant_site_id, UserDefinedTreeLists.this)){
 						Toast.makeText(UserDefinedTreeLists.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
-						if(helper.insertNewMyPlantToDB(UserDefinedTreeLists.this, new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocol_id)){
+						if(helper.insertNewMyPlantToDB(UserDefinedTreeLists.this, new_plant_species_id, new_plant_species_name, new_plant_site_id, new_plant_site_name, protocolID)){
 							Intent intent = new Intent(UserDefinedTreeLists.this, PlantList.class);
 							Toast.makeText(UserDefinedTreeLists.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							//clear all stacked activities.

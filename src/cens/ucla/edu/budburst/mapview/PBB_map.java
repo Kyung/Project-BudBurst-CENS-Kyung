@@ -8,6 +8,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -18,16 +21,23 @@ import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.OverlayItem;
 
+import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
 import cens.ucla.edu.budburst.R.id;
 import cens.ucla.edu.budburst.R.layout;
 import cens.ucla.edu.budburst.R.string;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.JSONHelper;
 import cens.ucla.edu.budburst.helper.MyLocOverlay;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.PlantItem;
+import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.onetime.GetPhenophase;
+import cens.ucla.edu.budburst.onetime.QuickCapture;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -48,6 +58,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -61,6 +74,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -69,21 +83,38 @@ import android.widget.Toast;
 public class PBB_map extends MapActivity {
 	private SharedPreferences pref;
 	private OneTimeDBHelper otDBH = null;
-	private static GpsListener gpsListener;
-	private LocationManager lm = null;
-	private MapView map=null;
-	private MyLocOverlay me=null;
-	private MapController mc = null;
+	private GpsListener gpsListener;
+	
+	// Map related variables
+	private LocationManager mLocManager = null;
+	private MapView mMapView = null;
+	//private MyLocOverlay mMyOverLay = null;
+	private MyLocationOverlay mMyOverLay = null;
+	private MapController mMapController = null;
+	
+	// Dialog
+	private ProgressDialog mDialog;
+	
+	// other variables
 	private String signalLevelString = null;
 	private String url = null;	
 	private double latitude 		= 0.0;
 	private double longitude 		= 0.0;
+	private boolean mHandlerDone	= false;
+	
+	private static final int GET_GPS_SIGNAL = 10;
+	private static final int GET_MY_OBSERVED_LISTS = 11;
 	private static final int EXCELLENT_LEVEL = 75;
 	private static final int GOOD_LEVEL = 50;
 	private static final int MODERATE_LEVEL = 25;
 	private static final int WEAK_LEVEL = 0;
 	private boolean viewFlag = false;
 	
+	private ArrayList<PlantItem> plantList;
+	private PlantItem pItem;
+	
+	// timer variables
+	private Timer timer;
 	
 	private void startSignalLevelListener() {
 		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -132,35 +163,71 @@ public class PBB_map extends MapActivity {
 		Log.i("signalLevel ","" + signalLevelString);
 	}
 	*/
+	
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			
+			switch(msg.what) {
+			case GET_GPS_SIGNAL:
+				Log.i("K", "get GET_GPS_SIGNAL");
+				showSpeciesOnMap(true);
+				break;
+			case GET_MY_OBSERVED_LISTS:
+				Log.i("K", "get GET_MY_OBSERVED_LISTS");
+				mDialog.dismiss();
+			}
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// set title bar
-		//requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.pbb_map);
-		//getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
-		//ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
-		//v = (ViewGroup)v.getChildAt(0);
-		//v.setPadding(0, 0, 0, 0);
+		// startSignalLevelListener();
+		
+		// remove accuracy bar
+		TextView titleBar = (TextView)findViewById(R.id.myloc_accuracy);
+		titleBar.setVisibility(View.GONE);
+		
+		mLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-		//TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		//myTitleText.setText(" " + getString(R.string.PBBMap_title));
+		// Set MapView
+		mMapView = (MapView)findViewById(R.id.map);
 		
-		startSignalLevelListener();
+		// Set mapController
+		mMapController = mMapView.getController();
+		mMapController.setZoom(12);
+		
+		// Add mylocation overlay
+		mMyOverLay = new MyLocationOverlay(PBB_map.this, mMapView);
+		mMyOverLay.enableMyLocation();
 		
 		gpsListener = new GpsListener();
 		
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
-		// set update the location data in 3secs or 10meters
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, gpsListener);
-		       
 		// check if GPS is turned on...
-		if (lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
-		   	
+		if (mLocManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+			
+			Location lastLoc = mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
+			// if we can get the last known location, use that first.
+			if(lastLoc.getLatitude() != 0.0) {
+				latitude = lastLoc.getLatitude();
+			    longitude = lastLoc.getLongitude();
+			    
+			    // convert points into GeoPoint
+			    GeoPoint gPoint = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
+			    // center the map
+			    mMapController.setCenter(gPoint);
+
+			    // load my species from the database
+			    showSpeciesOnMap(false);
+			}
+			// else try to get the new GPS
+			else {
+				getNewGPS();			
+			}
 		}
 		else {
 		   	
@@ -179,64 +246,175 @@ public class PBB_map extends MapActivity {
 		   			}
 		   		})
 		   		.show();
-		}
+		}	
+	}
+	
+	
+	public void showSpeciesOnMap(boolean hasHandler) {
+		       
+		Log.i("K", "in showSpeciesOnMap() function");
 		
 		// set criteria
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-		criteria.setAltitudeRequired(false);
-		criteria.setBearingRequired(false);
-		criteria.setCostAllowed(false);
-		criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
-		String provider = lm.getBestProvider(criteria, true);    
+		//Criteria criteria = new Criteria();
+		//criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		//criteria.setAltitudeRequired(false);
+		//criteria.setBearingRequired(false);
+		//criteria.setCostAllowed(false);
+		//criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+		//String provider = mLocManager.getBestProvider(criteria, true);    
 		    
-		Location loca = lm.getLastKnownLocation(provider);
-		if(loca.getLatitude() != 0.0) {
-			latitude = loca.getLatitude();
-		    longitude = loca.getLongitude();
-		}
+		//Location lastLoc = mLocManager.getLastKnownLocation(provider);
+		//if(lastLoc.getLatitude() != 0.0) {
+		//	latitude = lastLoc.getLatitude();
+		//    longitude = lastLoc.getLongitude();
+		//}
 		
-		pref = getSharedPreferences("userinfo",0);
-		    
+		//pref = getSharedPreferences("userinfo",0);
 		// TODO Auto-generated method stub
 		otDBH = new OneTimeDBHelper(PBB_map.this);
-		map=(MapView)findViewById(R.id.map);
-	
+		
 		GeoPoint gPoint = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
 		
-		ClickReceiver clickRecvr = new ClickReceiver(PBB_map.this, gPoint);
-		map.getOverlays().add(clickRecvr);
+		//ClickReceiver clickRecvr = new ClickReceiver(PBB_map.this, gPoint);
+		//mMapView.getOverlays().add(clickRecvr);
 		
-		mc = map.getController();
-		me = new MyLocOverlay(PBB_map.this, map);
+		//mMapView.removeAllViews();
+		mMapView.setBuiltInZoomControls(true);
 		
-		url = "http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/PBB_social_list.php?lat=" + latitude + "&lon=" + longitude;
-	
-		new DoAsyncTask().execute(url);
-	}
+		
+		// add button in the map(top)
+		/*
+	    Button mapBtn = new Button(getApplicationContext());
+	    mapBtn.setBackgroundDrawable(getResources().getDrawable(android.R.drawable.ic_menu_gallery));
+	    
+	    MapView.LayoutParams screenLP;
+	    screenLP = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
+	    									MapView.LayoutParams.WRAP_CONTENT,
+	    									235,0,
+	    									MapView.LayoutParams.TOP_LEFT);
+	    mMapView.addView(mapBtn, screenLP);
+		*/
+		
+		/*
+		 * Call species information from the local database
+		 */
+		if(getMyListsFromDB()) {
+			Log.i("K", "Get species lists in the database");
+			
+			Drawable marker = getResources().getDrawable(R.drawable.marker);
+			marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+			
+			//MapView mapView, Drawable marker, ArrayList<PlantItem> plantList
+			mMapView.getOverlays().add(new SpeciesMapOverlay(mMapView, marker, plantList));
+			mMapView.getOverlays().add(mMyOverLay);
+			
+			mMapController.setCenter(gPoint);
+			
+			
+			if(hasHandler) {
+				mHandlerDone = true;
+				mHandler.sendEmptyMessage(GET_MY_OBSERVED_LISTS);
+				mMapController.setZoom(12);
+			}
+		}
+		else {
+			Log.i("K", "No species lists in the database.");
+		}
 
+	}
+	
+	public void showUsersSpeciesOnMap() {
+		
+		Log.i("K", "in showUsersSpeciesOnMap() function");
+		
+		GeoPoint gPoint = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
+		mMapView.setBuiltInZoomControls(true);
+		
+		mMapView.invalidate();
+		
+		Drawable marker = getResources().getDrawable(R.drawable.marker);
+		marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+		
+		//MapView mapView, Drawable marker, ArrayList<PlantItem> plantList
+		mMapView.getOverlays().add(new SpeciesMapOverlay(mMapView, marker, plantList));
+		mMapView.getOverlays().add(mMyOverLay);
+		
+		mMapController.setCenter(gPoint);
+	}
+	
+	public boolean getMyListsFromDB() {
+		SyncDBHelper sDBH = new SyncDBHelper(this);
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(this);
+		
+		// initialize plantList
+		plantList = new ArrayList<PlantItem>();
+		
+		// add myPlantList from Monitored Plants
+		plantList = sDBH.getAllMyListInformation(this);
+		
+		// add myPlantList from Shared Plants
+		plantList.addAll(oDBH.getAllMyListInformation(this));
+		
+		Log.i("K", "the number of mylist (size) : " + plantList.size());
+		
+		sDBH.close();
+		oDBH.close();
+		
+		if(plantList.size() > 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void getOtherUsersListsFromServer(int category) {
+		
+		SpeciesOthersFromServer getSpecies = new SpeciesOthersFromServer(PBB_map.this, mMapView, mMyOverLay, category);
+		getSpecies.execute(getString(R.string.get_onetimeob_others) + 
+				"?latitude=" + latitude + "&longitude=" + longitude);
+		
+		/*
+		while(true) {
+			
+			Log.i("K", "Waiting....");
+			
+			if(getSpecies.finishDownloading()) {
+				// initialize plantList
+				plantList = new ArrayList<PlantItem>();
+				
+				// get other users' shared plant observations
+				plantList = getSpecies.getPlantList();
+				
+				Log.i("K", "the number of mylist (size) : " + plantList.size());
+				
+				if(plantList.size() > 0) {
+					break;
+				}
+			}
+		}
+		return true;
+		*/
+	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		me.enableCompass();
-
+		mMyOverLay.enableCompass();
 	}		
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		me.disableCompass();
+		mMyOverLay.disableCompass();
 	}		
-
-	///////////////////////////////////////////////////////////
-	//Menu option
+	
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
 		menu.add(0, 1, 0, getString(R.string.PBBMapMenu_myLocation)).setIcon(android.R.drawable.ic_menu_mylocation);
 		menu.add(0, 2, 0, getString(R.string.PBBMapMenu_changeView)).setIcon(android.R.drawable.ic_menu_revert);
-		menu.add(0, 3, 0, getString(R.string.PBBMapMenu_refresh)).setIcon(android.R.drawable.ic_menu_rotate);
+		//menu.add(0, 3, 0, getString(R.string.PBBMapMenu_seeLists)).setIcon(android.R.drawable.ic_menu_recent_history);
+		menu.add(0, 4, 0, getString(R.string.PBBMapMenu_refresh)).setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0, 5, 0, getString(R.string.otherCategoryMap)).setIcon(android.R.drawable.ic_menu_gallery);
 			
 		return true;
 	}
@@ -252,47 +430,90 @@ public class PBB_map extends MapActivity {
 				else {
 					current_point = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
 
-					mc = map.getController();
-					mc.animateTo(current_point);
-					mc.setZoom(16);
+					mMapController = mMapView.getController();
+					mMapController.animateTo(current_point);
+					mMapController.setZoom(15);
 				}
 				return true;
 			case 2:
 				if(!viewFlag) {
-					map.setSatellite(true);
+					mMapView.setSatellite(true);
 					viewFlag = true;
 				}
 				else {
-					map.setSatellite(false);
+					mMapView.setSatellite(false);
 					viewFlag = false;
 				}
 				
 				return true;				
-			case 3:
-				SharedPreferences.Editor edit = pref.edit();				
-				edit.putBoolean("Update", false);
-				edit.commit();
-	
-				new DoAsyncTask().execute(url);
+			case 3:	
+				Intent intent = new Intent(PBB_map.this, PlantList.class);
+				startActivity(intent);
+					
+				return true;
+			case 4:
+				getNewGPS();
+				return true;
+			case 5:
+				new AlertDialog.Builder(PBB_map.this)
+		   		.setTitle("Category")
+		   		.setNegativeButton("Back", null)
+		   		.setItems(R.array.plantcategory, new DialogInterface.OnClickListener() {
+			
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						String[] category = getResources().getStringArray(R.array.plantcategory);
 
+						if(category[which].equals("Shared Plants")) {
+							getOtherUsersListsFromServer(0);
+						}
+						else if(category[which].equals("Trees")){
+							getOtherUsersListsFromServer(1);
+						}
+						else {
+							
+						}
+					}
+		   		})
+		   		.show();
+				
+				
 				return true;
 		}
 		return false;
 	}
+	
+	private void getNewGPS() {
+		mDialog = new ProgressDialog(this);
+		mDialog.setMessage(getString(R.string.Map_Getting_GPS_Signal));
+		mDialog.setCancelable(true);
+		mDialog.show();
+		
+		new Thread(new Runnable() {
 
-	protected boolean isRouteDisplayed() {
-		return(false);
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Looper.prepare();
+				// set update the location data in 1secs or 5meters
+				mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
+				
+				Looper.loop();
+			}
+			
+		}).start();
+
 	}
-
+	
 	@Override
 	public void onDestroy() {
-		Log.i("K", "IN onDestory()");
-	
 		// when user finish this activity, turn off the gps
-		lm.removeUpdates(gpsListener);
-		// if there's a overlay, should call disableCompass() explicitly!!!!
-		me.disableCompass();
-		me.disableMyLocation();
+		mLocManager.removeUpdates(gpsListener);
+		
+		// if there's a overlay, should call disableCompass() explicitly
+		mMyOverLay.disableCompass();
+		mMyOverLay.disableMyLocation();
 	
 		// terminate telephony
 		stopListening();
@@ -300,8 +521,79 @@ public class PBB_map extends MapActivity {
 		super.onDestroy();
 	}
 	
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	// or when user press back button
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			mLocManager.removeUpdates(gpsListener);
+			
+			// if there's a overlay, should call disableCompass() explicitly.
+			mMyOverLay.disableMyLocation();
+			mMyOverLay.disableCompass();
+			
+			// terminate telephony
+			stopListening();
+		
+			finish();
+			return true;
+		}
+		return false;
+	}
+ 
+	private GeoPoint getPoint(double lat, double lon) {
+		return(new GeoPoint((int)(lat*1000000.0), (int)(lon*1000000.0)));
+	}
+	
+	class GpsListener implements LocationListener {
+		
+		@Override
+		public void onLocationChanged(Location loc) {
+			// TODO Auto-generated method stub
+			if(loc != null) {
+				latitude = loc.getLatitude();
+				longitude = loc.getLongitude();
+				
+				if(!mHandlerDone) {
+					mHandler.sendEmptyMessage(GET_GPS_SIGNAL);
+				}
+				//timer.cancel();
+			}
+		}
+		@Override
+		public void onProviderDisabled(String arg0) {
+			// TODO Auto-generated method stub
+		}
+		@Override
+		public void onProviderEnabled(String arg0) {
+			// TODO Auto-generated method stub
+		}
+		@Override
+		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+			// TODO Auto-generated method stub
+		}
+	}
+}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	 /*
 	// getting information of markers from the server
-	class DoAsyncTask extends AsyncTask<String, Integer, Void> {
+	public class DownloadSpeciesList extends AsyncTask<String, Integer, Void> {
 		ProgressDialog dialog;
 		
 		protected void onPreExecute() {
@@ -410,7 +702,7 @@ public class PBB_map extends MapActivity {
 		    map.addView(et1, screenLP);    
 		    // end show...
 		    
-		    /*
+		   
 		    Button mapBtn = new Button(getApplicationContext());
 		    mapBtn.setBackgroundDrawable(getResources().getDrawable(android.R.drawable.ic_menu_gallery));
 		    
@@ -437,7 +729,7 @@ public class PBB_map extends MapActivity {
 					}
 				}
 		    });
-			*/
+			
 
 		    //List<Overlay> mapOverlays = myMap.getOverlays();
 			Drawable marker = getResources().getDrawable(R.drawable.marker);
@@ -453,13 +745,13 @@ public class PBB_map extends MapActivity {
 			map.setBuiltInZoomControls(true);
 			mc = map.getController();
 			
-			if(lm.getLastKnownLocation("gps") == null) {
+			if(mLocManager.getLastKnownLocation("gps") == null) {
 				current_point = new GeoPoint((int)(0.0), (int)(0.0));
 				mc.animateTo(current_point);
 				mc.setZoom(1);
 			}
 			else {
-				current_point = new GeoPoint((int)(lm.getLastKnownLocation("gps").getLatitude() * 1000000), (int)(lm.getLastKnownLocation("gps").getLongitude() * 1000000));
+				current_point = new GeoPoint((int)(mLocManager.getLastKnownLocation("gps").getLatitude() * 1000000), (int)(mLocManager.getLastKnownLocation("gps").getLongitude() * 1000000));
 				mc.animateTo(current_point);
 				mc.setZoom(9);
 			}
@@ -472,295 +764,4 @@ public class PBB_map extends MapActivity {
 			dialog.dismiss();
 		}
 	}
-	
-	// or when user press back button
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			Log.i("K", "IN BACK BUTTON");
-			lm.removeUpdates(gpsListener);
-			// if there's a overlay, should call disableCompass() explicitly!!!!
-			me.disableMyLocation();
-			me.disableCompass();
-			// terminate telephony
-			stopListening();
-		
-			finish();
-			return true;
-		}
-		return false;
-	}
- 
-	private GeoPoint getPoint(double lat, double lon) {
-		return(new GeoPoint((int)(lat*1000000.0),
-												(int)(lon*1000000.0)));
-	}
-	
-	// overlay class
-	private class SitesOverlay extends ItemizedOverlay<CustomItem> {
-		private List<CustomItem> item=new ArrayList<CustomItem>();
-		private	PopupPanel panel=new PopupPanel(R.layout.popup);
-	
-		public SitesOverlay(Drawable marker) {
-			super(null);
-			
-		    // read data from the table
-			SQLiteDatabase db;
-			db = otDBH.getReadableDatabase();
-			
-			String query = null;
-			query = "SELECT common_name, science_name, phenophase, dt_taken, lat, lon, distance FROM pbbFlickrLists";
-			
-			Cursor cursor = db.rawQuery(query, null);
-			
-		    while(cursor.moveToNext()) {
-		    	
-		    	String real_info_title = cursor.getString(0) + ";;" + 
-		    							cursor.getString(1) + ";;" +
-		    							cursor.getString(2) + ";;" +
-		    							cursor.getString(3) + ";;" +
-		    							cursor.getString(4) + ";;" +
-		    							cursor.getString(5) + ";;" +
-		    							cursor.getString(6);
-		    						
-		    	
-		    	Log.i("K", "db info : " + real_info_title);
-		    	
-		    	
-		    	item.add(new CustomItem(getPoint(Double.parseDouble(cursor.getString(4)),Double.parseDouble(cursor.getString(5))),
-		    			cursor.getString(0), cursor.getString(1) + ";;" + cursor.getString(2) + ";;" + cursor.getString(3), getMarker(R.drawable.full_marker), marker));
-		    }
-		    
-			db.close();
-			otDBH.close();
-		    cursor.close();
-		    
-		    
-			populate();
-		}
-		
-		private Drawable getMarker(int resource) {
-			Drawable marker=getResources().getDrawable(resource);
-			marker.setBounds(-marker.getIntrinsicWidth() / 2, marker.getIntrinsicHeight(), marker.getIntrinsicWidth() / 2, 0);
-			boundCenter(marker);
-			return(marker);
-		}
-	
-		@Override
-		protected CustomItem createItem(int i) {
-			return(item.get(i));
-		}
-	
-		@Override
-		public void draw(Canvas canvas, MapView mapView,
-										boolean shadow) {
-			super.draw(canvas, mapView, false);
-		}
-		
-		/*
-		private Drawable LoadImageFromWebOperation(String url) {
-			try {
-				InputStream is = (InputStream) new URL(url).getContent();
-				Drawable d = Drawable.createFromStream(is, "image.jpg");
-				return d;
-			}
-			catch(Exception e) {
-				return null;
-			}
-		}
-		*/
-		
-		private Bitmap LoadImageFromWebOperation(String url) {
-			try {
-				URL imageURL = new URL(url);
-				HttpURLConnection conn = (HttpURLConnection)imageURL.openConnection();
-				conn.setDoInput(true);
-				conn.connect();
-				
-				InputStream is = conn.getInputStream();
-				Bitmap bitmap = BitmapFactory.decodeStream(is);
-				
-				return bitmap; 
-				
-			}
-			catch(Exception e) {
-				return null;
-			}
-		}
-		
-		@Override
-		protected boolean onTap(int i) {
-			OverlayItem item=getItem(i);
-			GeoPoint geo=item.getPoint();
-			Point pt = map.getProjection().toPixels(geo, null);
-			map.getController().setCenter(geo);
-			View view=panel.getView();
-		
-			String temp = item.getSnippet();
-			String[] split_temp = temp.split(";;");
-			
-			ImageView image = (ImageView)view.findViewById(R.id.imageView);
-			image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/plant", null, null));
-			
-			((TextView)view.findViewById(R.id.title))
-			.setText("" + item.getTitle() + "\n" + split_temp[0]);
-			((TextView)view.findViewById(R.id.geodata))
-			.setText(getString(R.string.PBBMap_phenophase) + split_temp[1]);
-			((TextView)view.findViewById(R.id.dt_taken))
-			.setText(getString(R.string.PBBMap_date) + split_temp[2]);
-			Button okayBtn = (Button)view.findViewById(R.id.okayBtn);
-			okayBtn.setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					panel.hide();
-					map.invalidate();
-				}
-			});
-			
-			
-			Button moreBtn = (Button)view.findViewById(R.id.detailBtn);
-			moreBtn.setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					//Toast.makeText(PBB_map.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(PBB_map.this, SpeciesDetail_inMapView.class);
-					
-					/*
-					 * we need common_name, latitude, longitude, dt_taken, pheno
-					 *
-					 * 
-					 * intent.putExtra("common_name", value);
-					intent.putExtra("latitude", value);
-					intent.putExtra("longitude", value);
-					intent.putExtra("dt_taken", value);
-					intent.putExtra("pheno", value);
-					 */
-
-					//startActivity(intent);
-				}
-			});
-			
-			panel.show();
-		
-			return(true);
-		}
-
-	
-		@Override
-		public int size() {
-			return(item.size());
-		}
-		
-		void toggleHeart() {
-			CustomItem focus=getFocus();
-			
-			if (focus!=null) {
-				focus.toggleHeart();
-			}
-			
-			map.invalidate();
-		}
-
-	}
-
-	class PopupPanel {
-		View popup;
-		boolean isVisible=false;
-		LayoutInflater inflater = getLayoutInflater();
-	
-		PopupPanel(int layout) {
-			ViewGroup parent=(ViewGroup)map.getParent();
-
-			popup=inflater.inflate(layout, parent, false);
-
-		
-			popup.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					hide();
-				}
-			});
-		}
-	
-		View getView() {
-			return(popup);
-		}
-	
-		void show() {
-			RelativeLayout.LayoutParams lp=new RelativeLayout.LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT
-			);
-		
-			lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-			lp.setMargins(0, 30, 0, 0);
-			
-			
-			hide();
-			
-			((ViewGroup)map.getParent()).addView(popup, lp);
-			isVisible=true;
-		}
-		
-		void hide() {
-			if (isVisible) {
-				isVisible=false;
-				((ViewGroup)popup.getParent()).removeView(popup);
-			}
-		}
-	}
-	
-	private class GpsListener implements LocationListener {
-		
-		@Override
-		public void onLocationChanged(Location loc) {
-			// TODO Auto-generated method stub
-			if(loc != null) {
-				latitude = loc.getLatitude();
-				longitude = loc.getLongitude();
-			}
-		}
-		@Override
-		public void onProviderDisabled(String arg0) {
-			// TODO Auto-generated method stub
-		}
-		@Override
-		public void onProviderEnabled(String arg0) {
-			// TODO Auto-generated method stub
-		}
-		@Override
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-			// TODO Auto-generated method stub
-		}
-	}
-	
-	class CustomItem extends OverlayItem {
-		Drawable marker=null;
-		boolean isHeart=false;
-		Drawable heart=null;
-		
-		CustomItem(GeoPoint pt, String name, String snippet,
-							 Drawable marker, Drawable heart) {
-			super(pt, name, snippet);
-
-			this.marker=marker;
-			this.heart=heart;
-			
-		}
-		
-		@Override
-		public Drawable getMarker(int stateBitset) {
-			Drawable result=(isHeart ? heart : marker);
-			
-			setState(result, stateBitset);
-		
-			return(result);
-		}
-		
-		void toggleHeart() {
-			isHeart=!isHeart;
-		}
-	}	
-}
+	*/

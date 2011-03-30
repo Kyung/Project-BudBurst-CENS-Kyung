@@ -81,7 +81,7 @@ public class LazyAdapter extends BaseAdapter {
         holder.image.setTag(localArray.get(position).imageUrl);
         imageLoader.DisplayImage(localArray.get(position).imageUrl, context, holder.image);
         
-        /*
+        
         holder.thumbnail.setTag(localArray.get(position));
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {
 			
@@ -94,10 +94,11 @@ public class LazyAdapter extends BaseAdapter {
 				intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
 				intent.putExtra("category", pi.Category);
 				intent.putExtra("science_name", pi.SpeciesName);
+				intent.putExtra("show_footer", false);
 				context.startActivity(intent);
 			}
 		});
-		*/
+		
         return vi;
 	}
 }

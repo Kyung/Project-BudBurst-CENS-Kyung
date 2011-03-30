@@ -19,7 +19,7 @@
 		</ImageView>
 	</LinearLayout>
 	 -->    
-    
+    <!-- 
 	<LinearLayout
 		android:id="@+id/header_item"
 		android:layout_width="fill_parent"
@@ -49,6 +49,7 @@
 			android:layout_marginBottom="7dp"
 		/>
 	</LinearLayout>
+	 -->
 		<!-- 
 		<TextView
 			android:layout_height="wrap_content"

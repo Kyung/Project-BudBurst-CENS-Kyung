@@ -10,6 +10,7 @@
     <string name="get_onetime_plant_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_plant_download.php</string>
     <string name="get_onetime_observation_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_observation_download.php</string>
     <string name="get_observation_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_obs</string>
+    <string name="get_onetimeob_others">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_onetime_otherusers_observation.php</string>
     <string name="authentication_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?authentication</string>
     <string name="authentication">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_authorization</string>
     <string name="user_plant_lists_image">http://networkednaturalist.org/User_Plant_Lists_Images/</string>
@@ -20,7 +21,7 @@
     <string name="download_obs_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/view.php</string>
     <string name="download_onetime_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/onetime.php</string>
     <string name="add_plant_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?add_plant</string>
-    <string name="upload_ot_observation">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service</string>
+    <string name="upload_ot_observation">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service</string>    
     <string name="submit_question">You have unsubmitted observations. Do you want to submit them?</string>
     <string-array name="state">
        <item>AL</item> 
@@ -116,9 +117,9 @@
 <string name="AddSite_enabledGPS">GPS enabled</string>
 <string name="GetPhenophase_choose">Choose Phenophase</string>
 <string name="GetPhenophase_noPhoto">(No Photo)</string>
-<string name="Menu_addPlant">Add Monitored</string>
-<string name="Menu_addQCPlant">Quick Share</string>
-<string name="Menu_addQCPlant_Menu">Quick Share</string>
+<string name="Menu_addPlant">Add Observer</string>
+<string name="Menu_addQCPlant">Share Occasional</string>
+<string name="Menu_addQCPlant_Menu">Share Occasional</string>
 <string name="Menu_addSite">Add Site</string>
 <string name="Alert_titleQuestion">Question</string>
 <string name="Start_Shared_Plant">Proceed to next step?</string>
@@ -150,6 +151,7 @@
 <string name="Message_Save_GPS">Save your location?</string>
 <string name="PBBMapMenu_myLocation">My Location</string>
 <string name="PBBMapMenu_changeView">Change View</string>
+<string name="PBBMapMenu_seeLists">List View</string>
 <string name="PBBMapMenu_refresh">Refresh</string>
 <string name="Alert_loading">Loading...</string>
 <string name="PBBMap_loadingComponents">Loading map components...</string>
@@ -189,10 +191,10 @@
 <string name="AddSite_address">Address</string>
 <string name="AddSite_lookingAddress">Looking up address...</string>
 <string name="AddSite_description">Site Description</string>
-<string name="AddSite_optional">Site Notest (optional)</string>
+<string name="AddSite_optional">Site Note (optional)</string>
 <string name="Button_save">Done</string>
 <string name="Button_update_GPS">Update GPS</string>
-<string name="Button_switch_to_map">Mapview</string>
+<string name="Button_switch_to_map">Map View</string>
 <string name="WI_Area">Areas with official invasive species lists</string>
 <string name="WI_parks">The seven nearest parks</string>
 <string name="BBList">Project BudBurst Plants</string>
@@ -219,7 +221,7 @@
 <string name="Button_saveChanges">Save Changes</string>
 <string name="PlantList_phenosObserved">phenophases observed</string>
 <string name="Button_editObs">Edit Observation</string>
-<string name="Button_more">More</string>
+<string name="Button_Detail">Detail</string>
 <string-array name="AddSite_hDistance">
 	<item>Urban/Highly Modified</item>
 	<item>Suburban</item>
@@ -258,6 +260,7 @@
 <string name="Unknown_Plant_Text_1">Add plant name from a list below or skip if unknown.</string>
 <string name="Unknown_Plant_Text_2">Add optional site description and select Done.</string>
 <string name="Unknown_Plant_Text_3">Add notes to your observation or Skip to the site description.</string>
+<string name="Unknown_Plant_Text_4">Add site name and optional description, then select Done.</string>
 <string name="Submit">Submit</string>
 <string name="Cannot_Change">You cannot change the name of this species</string>
 <string name="DoSyncFirst_For_UnknownPlant">Please synchronize first if you have unofficial species</string>
@@ -274,15 +277,17 @@
 <string name="Add_Notes">Notes</string>
 <string name="Move_To_Site">Site</string>
 <string name="Help_About_this_project">About this Project</string>
-<string name="Help_About_Version">Version 0.2 Beta</string>
-<string name="Help_About_para1">Project BudBurst is a citizen science campaign for the study of the timing of life cycle events in plants as they relate to the environment.  With the help of volunteers, we wish to understand what \&quot;calendar\&quot; plants use to begin flowering, leafing or reproducing.\n\nPlants respond to their local climate and according to scientists the Earth is warming more quickly than it has in the past.  Project BudBurst Mobile helps you monitor the trees, shrubs, and grasses that help scientists determine how life is changing in response to a globally changing climate.</string>
+<string name="Help_About_Version">Version 1.0</string>
+<string name="Help_About_para1">Project BudBurst is a citizen science campaign for the study of the timing of life cycle events in plants as they relate to the environment.  With the help of volunteers, we wish to understand what \&quot;calendar\&quot; plants use to begin flowering, leafing or reproducing.</string>
 <string name="Help_About_budburst_link">http://BudBurst.org</string>
-<string name="Help_About_para2">Project BudBurst Mobile is a partnership between the National Environmental Observatory Network (NEON) and the Center for Embedded Networked Sensing (CENS) at UCLA.</string>
+<string name="Help_About_para2">This mobile app is a partnership between the National Environmental Observatory Network (NEON) and the Center for Embedded Networked Sensing (CENS) at UCLA.</string>
 <string name="Help_About_cens_link">http://cens.ucla.edu</string>
 <string name="Help_About_para3">If you would like to comment on this app, if you find any bugs, or would like to offer suggestions, please send us a message:</string>
 <string name="Help_About_netnat_link">mobile@NetworkedNaturalist.org</string>
 <string name="Help_About_para4">Some of the people who have contributed to this mobile project include:</string>
+<string name="Help_About_para5">Project BudBurst is a proud member of the USA National Phenology Network and as such, providing data to scientists studying phenology is one of our main goals.</string>
 <string name="Help_About_people">Jameel Al-Aziz\nDeborah Estrin\nLisa Gardiner\nEric Graham\nKyung Han\nSandra Henderson\nJinha Kang\nKeith Mayoral\nDylan Vassallo\nDennis Ward\nEric Yuen\n</string>
+<string name="Help_About_npn_link">http://usanpn.org</string>
 <string name="Help_Main">Main Page Help</string>
 <string name="Help_Main_para1">Main Page Icons are the links to the main functions of the Project BudBurst Mobile app:</string>
 <string name="Help_Main_My_BudBurst_List">My BudBurst List:  A record of all your observe plants.  From this page, you can review your BudBurst Observer and Occasional Observer plants, add new plants, and make new observations.</string>
@@ -297,7 +302,8 @@
 <string name="Help_MyList_para2">The List is sorted alphabetically within sites and the number of observations you have made are listed with each plant.</string>
 <string name="Help_MyList_para3">Touch the Plant Thumbnail Image on the left of the list to see a larger image and a description of your plant.</string>
 <string name="Help_MyList_para4">Touch the Plant Name to make a NEW phenophase observation.</string>
-<string name="Help_MyList_para5">To Add a Plant to your List, choose the MENU button on the phone, then one of the two options for either adding a Monitored (regular BudBurst Observer) plant or a Shared (Occasional Observer) plant:</string>
+<string name="Help_MyList_para5">To Add a Plant to your List, choose the MENU button on the phone, then one of the two options for either adding a Monitored (regular BudBurst Observer) plant:</string>
+<string name="Help_MyList_para10">Or a Shared (Occasional Observer) plant:</string>
 <string name="Help_MyList_addPlant">Add Monitored</string>
 <string name="Help_MyList_para6">You will then be asked to choose a plant from the Project BudBurst List or from any of the other available plant lists.</string>
 <string name="Help_MyList_para7">You may choose \"Unknown/Other\" for a plant and write-in the plant name or leave blank to be listed as unknown.  Any photos of this plant that you submit may be placed on a public web page for help in identification.</string>
@@ -330,7 +336,6 @@
 <string name="Preview_Mode_Done">Done</string>
 <string name="Done_Quick_Capture">Done Quick Capture</string>
 <string name="AddSite_Finish_GPS">Finish GPS</string>
-<item type="id" name="app_notification_id">19820713</item>
 <string name="Help_About_NEON_url">http://www.neoninc.org</string>
 <string name="Help_About_para0">Please note: data collected using this mobile app is being temporarily sent to a different location than the official Project BudBurst site!\n\nIf you would like to manage and download your collected data, please visit this link:</string>
 <string name="Help_About_para0_url">http://bit.ly/mobilePBB</string>
@@ -348,4 +353,27 @@
 <string name="Button_Cancel">Cancel</string>
 <string name="Button_Photo">Photo</string>
 <string name="Button_NoPhoto">No Photo</string>
+<string name="Still_Downloading">Still Downloading the lists</string>
+<string name="Download_complete_local">Successfully download local plant lists</string>
+<string name="Start_Downloading_UCLA_Tree_Lists">Start Downloading user defined lists</string>
+<string name="List_Budburst">Local BudBurst plants</string>
+<string name="List_Whatsinvasive">Help locate local invasives</string>
+<string name="List_Whats_endangered">Local endangered species from the USDA</string>
+<string name="List_Whats_poisonous">Local poisonous plants from the USDA</string>
+<string name="List_User_Plant_UCLA_trees">Tree species on campus</string>
+<string name="List_User_Plant_SAMO">Santa Monica blooming plants</string>
+<string name="List_Official_Header">Local plants from national plant lists</string>
+<string name="List_User_Plant_Header">Locally created lists of interest</string>
+<string name="List_Project_Budburst_title">Project BudBurst</string>
+<string name="List_Whatsinvasive_title">Local Invasives</string>
+<string name="List_Whatsendangered_title">Local Endangered</string>
+<string name="List_Whatspoisonous_title">Local Poisonous</string>
+<string name="List_Whatsblooming_title">What\'s Blooming</string>
+<string name="My_Plant_Summary">My Plant Summary</string>
+<string name="Map_Getting_GPS_Signal">Getting GPS signal...</string>
+<string name="WeeklyPlant"> Weekly Plant</string>
+<string name="mapKeyDeveloper">0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ</string>
+<string name="mapKey">0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ</string>
+<string name="otherCategoryMap">Choose a list</string>
+<item type="id" name="app_notification_id"/>
 </resources>

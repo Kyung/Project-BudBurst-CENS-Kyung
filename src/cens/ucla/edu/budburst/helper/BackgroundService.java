@@ -50,8 +50,11 @@ public class BackgroundService extends Service{
 	private Timer timer;
 	private boolean gpsEnabled = false;
 	private boolean networkEnabled = false;
+	private int SIMPLE_NOTFICATION_ID = 1234567890;
 
 	private Handler mHandler = new Handler();
+	
+	private boolean stopListDownload = false;
 	/*
 	 * Network Listener
 	 */
@@ -134,6 +137,8 @@ public class BackgroundService extends Service{
 		Log.i("K", "********************Start Lists as Background Service***********************");
 		
 		mContext = this;
+		
+		notificationMgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		
 		mQuit = false;
 		pref = getSharedPreferences("userinfo", 0);
@@ -238,6 +243,17 @@ public class BackgroundService extends Service{
 					});
 		}
 	}
+
+	private void displayNotificationMessage(String message) {
+		Notification notification = new Notification(R.drawable.stat_sys_download_done, message, System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, null, PendingIntent.FLAG_CANCEL_CURRENT);
+		
+		notification.setLatestEventInfo(this, "Project Budburst", message, contentIntent);
+		
+		notificationMgr.notify(SIMPLE_NOTFICATION_ID, notification);
+	}
 	
 	@Override
 	public void onDestroy() {
@@ -268,13 +284,41 @@ public class BackgroundService extends Service{
 	
 	
 	public void downloadingDataFromServer(Location loc) {
+		
 		/*
 		 * Getting local species lists from the server
 		 * This is called only once when the app firstly receives GPS data.
 		 * 
 		 */
 		
-		if(!pref.getBoolean("listDownloaded", false)) {
+		/*
+		 * If all boolean values are true, (meaning all lists are downloaded..)
+		 * show the notification message and stop the service.
+		 */
+		if((pref.getBoolean("localbudburst", false))
+				&&(pref.getBoolean("localwhatsinvasive", false))) {
+				//&&(pref.getBoolean("localnative", false))
+				//&&(pref.getBoolean("localpoisonous", false))
+				//&&(pref.getBoolean("getTreeLists", false))) {
+			
+					mQuit = true;
+				
+					displayNotificationMessage("Successfully download local plant lists");
+					
+					/*
+					 * The list download process should be done only once.
+					 * So, we are using preference value to guarantee this process happens only once.
+					 * 
+					 */
+
+					SharedPreferences.Editor edit = pref.edit();
+					edit.putBoolean("listDownloaded", true);
+					edit.commit();
+										
+					stopSelf();
+		}
+		
+		if(!stopListDownload) {
 			/*
 			 * Get USDA Plant Lists
 			 * 
@@ -285,21 +329,13 @@ public class BackgroundService extends Service{
 			item = new Items(mContext, loc.getLatitude(), loc.getLongitude(), Values.WHATSINVASIVE_LIST);
 			new DownloadListByService().execute(item);
 			
-			/*
-			 * Get User Plant Tree Lists - UCLA
-			 * 
-			 */
-			new GetUserPlantLists().execute(mContext);
 			
-			/*
-			 * The list download process should be done only once.
-			 * So, we are using preference value to guarantee this process happens only once.
-			 * 
-			 */
-			SharedPreferences.Editor edit = pref.edit();
-			edit.putBoolean("listDownloaded", true);
-			edit.commit();
+			
+			
+			stopListDownload = true;
 		}
+		
+		
 		
 		latitude = loc.getLatitude();
 		longitude = loc.getLongitude();
@@ -324,8 +360,11 @@ public class BackgroundService extends Service{
 			edit.putString("accuracy", Float.toHexString(accuracy));
 			edit.commit();
 			
+			//lm.removeUpdates(gpsListener);
+			//lm.removeUpdates(networkListener);
+			
 			Log.i("K","Receive GPS within 20 meters. Turned off GPS.");
-			stopSelf();
+			
 		}
 		else {
 			edit.putBoolean("new", true);

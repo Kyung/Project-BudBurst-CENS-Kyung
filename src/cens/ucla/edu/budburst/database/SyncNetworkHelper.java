@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst.helper;
+package cens.ucla.edu.budburst.database;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

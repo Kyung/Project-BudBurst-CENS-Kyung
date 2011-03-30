@@ -21,8 +21,9 @@
 			android:layout_marginBottom="3dp"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@string/Unknown_Plant_Text_2"
+			android:text="@string/Unknown_Plant_Text_4"
 			android:textSize="15sp"
+			android:id="@+id/add_site_text"
 		/>
 	</LinearLayout>
 	<!-- End Head View -->

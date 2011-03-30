@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst.helper;
+package cens.ucla.edu.budburst.adapter;
 
 import java.util.ArrayList;
 
@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.PhenophaseDetail;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.PlantItem;
+import cens.ucla.edu.budburst.helper.Values;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
 
 public class MyListAdapter2 extends BaseAdapter{

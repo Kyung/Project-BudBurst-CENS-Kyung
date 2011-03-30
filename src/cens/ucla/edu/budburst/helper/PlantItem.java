@@ -68,6 +68,19 @@ public class PlantItem{
 		PhenoID = aPhenoID;
 	}
 	
+	public PlantItem(int aSpeciesID, String aCommonName, String aScienceName, int aPhenoID, double aLatitude, double aLongitude, String aImageName, String aDate, String aNotes) {
+		SpeciesID = aSpeciesID;
+		CommonName = aCommonName;
+		SpeciesName = aScienceName;
+		PhenoID = aPhenoID;
+		Latitude = aLatitude;
+		Longitude = aLongitude;
+		ImageName = aImageName;
+		Date = aDate;
+		Note = aNotes;
+		
+	}
+	
 	public PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName, boolean aMonitor, int aSynced){
 		Picture = aPicture;
 		CommonName = aCommonName;
@@ -81,6 +94,22 @@ public class PlantItem{
 		TopItem = aTopItem;
 		Monitor = aMonitor;
 		Synced = aSynced;
+	}
+	
+	public PlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName, boolean aMonitor, int aSynced, int aCategory){
+		Picture = aPicture;
+		CommonName = aCommonName;
+		SpeciesName = aSpeciesName;
+		SiteName = aSiteName;
+		SpeciesID = aSpeciesID;
+		SiteID = aSiteID;
+		ProtocolID = aProtocolID;
+		current_pheno = aPheno_done;
+		total_pheno = aTotal_pheno;
+		TopItem = aTopItem;
+		Monitor = aMonitor;
+		Synced = aSynced;
+		Category = aCategory;
 	}
 	
 	public PlantItem (int aPicture, String aDescription, int aPheno_ID, int aPhenoImageID, String aPheno_name, boolean aFlag, String aCamera_image, String aDate, int aOneTimePlantID, String aNote, boolean aHeader) {
@@ -119,6 +148,8 @@ public class PlantItem{
 	public int Synced;
 	public int OneTimePlantID;
 	public int Category;
+	public double Latitude;
+	public double Longitude;
 	public boolean Header;
 	public boolean TopItem;
 	public boolean Monitor;

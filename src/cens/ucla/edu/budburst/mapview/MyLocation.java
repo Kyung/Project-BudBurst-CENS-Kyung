@@ -1,16 +1,14 @@
-package cens.ucla.edu.budburst.onetime;
+package cens.ucla.edu.budburst.mapview;
 
 import cens.ucla.edu.budburst.Help;
 import cens.ucla.edu.budburst.Login;
 import cens.ucla.edu.budburst.MainPage;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.Sync;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.MyLocOverlay;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.mapview.PBB_map;
-import cens.ucla.edu.budburst.mapview.SitesOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -41,7 +39,7 @@ public class MyLocation extends MapActivity {
 	private SharedPreferences pref;
 	private static GpsListener gpsListener;
 	private LocationManager locManager = null;
-	private MapView map = null;
+	private MapView mMapView = null;
 	private MapController mapCon = null;
 	private MyLocOverlay mOver = null;
 	private SitesOverlay sOverlay = null;
@@ -58,22 +56,21 @@ public class MyLocation extends MapActivity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.pbb_map);
 	    
-	    map = (MapView)findViewById(R.id.map);
-	    map.setBuiltInZoomControls(true);
+	    mMapView = (MapView)findViewById(R.id.map);
+	    mMapView.setBuiltInZoomControls(true);
 	    
 	    mylocInfo = (TextView) findViewById(R.id.myloc_accuracy);
 	    
-	    mapCon = map.getController();
+	    mapCon = mMapView.getController();
 	    mapCon.setZoom(19);
 	    
-	    
-	    
+	   
 	    /*
 	     * Add Mylocation Overlay
 	     */
-	    mOver = new MyLocOverlay(MyLocation.this, map);
+	    mOver = new MyLocOverlay(MyLocation.this, mMapView);
 	    mOver.enableMyLocation();
-	    map.getOverlays().add(mOver);
+	    mMapView.getOverlays().add(mOver);
 	    
 	    /*
 	     * Add ItemizedOverlay Overlay
@@ -81,11 +78,11 @@ public class MyLocation extends MapActivity {
 	    Drawable marker = getResources().getDrawable(R.drawable.marker);
 	    marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 	    sOverlay = new SitesOverlay(MyLocation.this, marker);	    
-	    map.getOverlays().add(sOverlay);
+	    mMapView.getOverlays().add(sOverlay);
 	    
 	   	
-	    map.setSatellite(false);
-	    map.invalidate();
+	    mMapView.setSatellite(false);
+	    mMapView.invalidate();
 	    
 	    pref = getSharedPreferences("userinfo",0);
 	    latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
@@ -227,11 +224,11 @@ public class MyLocation extends MapActivity {
 				return true;
 			case 2:
 				if(!satelliteView) {
-					map.setSatellite(true);
+					mMapView.setSatellite(true);
 					satelliteView = true;
 				}
 				else {
-					map.setSatellite(false);
+					mMapView.setSatellite(false);
 					satelliteView = false;
 				}
 				return true;

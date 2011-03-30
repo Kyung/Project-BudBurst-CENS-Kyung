@@ -354,7 +354,7 @@
 			android:id="@+id/simpleGM_map"
 			android:layout_width="fill_parent"
 			android:layout_height="100dp"
-			android:apiKey="0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ"
+			android:apiKey="@string/mapKey"
 			android:clickable="true"
 			android:layout_marginTop="3dp"
 			android:layout_marginBottom="3dp"

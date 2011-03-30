@@ -31,12 +31,12 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.adapter.MyListAdapter;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.MyListAdapter;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 
 public class AddPlant extends ListActivity{
@@ -342,9 +342,9 @@ public class AddPlant extends ListActivity{
 		.setTitle(getString(R.string.AddPlant_SelectCategory))
 		.setIcon(android.R.drawable.ic_menu_more)
 		.setCancelable(true)
-		.setItems(R.array.category2, new DialogInterface.OnClickListener() {
+		.setItems(R.array.category, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				String[] category = getResources().getStringArray(R.array.category2);
+				String[] category = getResources().getStringArray(R.array.category);
 				
 				if(category[which].equals("Wild Flowers and Herbs")) {
 					protocol_id = Values.WILD_FLOWERS;
@@ -355,14 +355,8 @@ public class AddPlant extends ListActivity{
 				else if(category[which].equals("Deciduous Trees and Shrubs")) {
 					protocol_id = Values.DECIDUOUS_TREES;
 				}
-				else if(category[which].equals("Deciduous Trees and Shrubs - Wind")) {
-					protocol_id = Values.DECIDUOUS_TREES_WIND;
-				}
 				else if(category[which].equals("Evergreen Trees and Shrubs")) {
 					protocol_id = Values.EVERGREEN_TREES;
-				}
-				else if(category[which].equals("Evergreen Trees and Shrubs - Wind")) {
-					protocol_id = Values.EVERGREEN_TREES_WIND;
 				}
 				else if(category[which].equals("Conifer")) {
 					protocol_id = Values.CONIFERS;
@@ -398,7 +392,7 @@ public class AddPlant extends ListActivity{
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(AddPlant.this, AddSite.class);
 					intent.putExtra("species_id", new_plant_species_id);
-					intent.putExtra("common_name", new_plant_species_name);
+					intent.putExtra("cname", new_plant_species_name);
 					intent.putExtra("protocol_id", protocol_id);
 					intent.putExtra("from", Values.FROM_PLANT_LIST);
 					startActivity(intent);

@@ -11,13 +11,13 @@ import cens.ucla.edu.budburst.PhenophaseDetail;
 import cens.ucla.edu.budburst.PlantInformation_Direct;
 import cens.ucla.edu.budburst.PlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.adapter.MyListAdapter2;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.BackgroundService;
 import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.MyListAdapter2;
-import cens.ucla.edu.budburst.helper.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.Values;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,15 +53,15 @@ import android.widget.Toast;
 public class GetPhenophase extends ListActivity {
 	
 	private ArrayList<PlantItem> pItem;
-	private String common_name = null;
-	private String science_name = null;
-	private String dt_taken = null;
-	private String camera_image_id = null;
+	private String commonName = null;
+	private String scienceName = null;
+	//private String dt_taken = null;
+	private String cameraImageID = null;
 	
-	private int species_id = 0;
-	private int protocol_id;
+	private int speciesID = 0;
+	private int protocolID = 1;
 	private int _position = 0;
-	private int previous_activity;
+	private int previousActivity;
 	private int category = 0;
 	
 	private Button submitBtn = null;
@@ -69,8 +69,8 @@ public class GetPhenophase extends ListActivity {
 	private MyListAdapter2 MyAdapter = null;
 	private ListView myList = null;
 	
-	private double latitude = 0.0;
-	private double longitude = 0.0;
+	//private double latitude = 0.0;
+	//private double longitude = 0.0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -89,30 +89,29 @@ public class GetPhenophase extends ListActivity {
 		myTitleText.setText(" " + getString(R.string.Best_Phenophase));
 
 		Intent intent = getIntent();
-	    camera_image_id = intent.getExtras().getString("camera_image_id");
-		dt_taken = intent.getExtras().getString("dt_taken");
-		previous_activity = intent.getExtras().getInt("from");
-
+		cameraImageID = intent.getExtras().getString("camera_image_id");
+	    commonName = intent.getExtras().getString("cname");
+	    scienceName = intent.getExtras().getString("sname");
+	    previousActivity = intent.getExtras().getInt("from");
+	    protocolID = intent.getExtras().getInt("protocol_id");
 		
-		Log.i("K", "Previous_activity(GetPhenophase) : " + previous_activity);
+		Log.i("K", "Previous_activity(GetPhenophase) : " + previousActivity);
 		
-		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
-			common_name = intent.getExtras().getString("cname");
-			science_name = intent.getExtras().getString("sname");
-			species_id = intent.getExtras().getInt("tree_id");
+		if(previousActivity == Values.FROM_UCLA_TREE_LISTS) {
+			speciesID = intent.getExtras().getInt("tree_id");
 		}
 		
-		if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
-			common_name = intent.getExtras().getString("cname");
-			science_name = intent.getExtras().getString("sname");
+		if(previousActivity == Values.FROM_LOCAL_PLANT_LISTS) {
+			category = intent.getExtras().getInt("category");
+			speciesID = intent.getExtras().getInt("species_id");
+		}
+		
+		if(previousActivity == Values.FROM_QUICK_CAPTURE 
+				|| previousActivity == Values.FROM_PLANT_LIST_ADD_SAMESPECIES 
+				|| previousActivity == Values.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
+			speciesID = intent.getExtras().getInt("species_id");
 			category = intent.getExtras().getInt("category");
 		}
-		
-		
-		// retrieve latitude and longitude from SharedPreferences
-		SharedPreferences pref = getSharedPreferences("userinfo", 0);
-		latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
-		longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
 		
 		pItem = new ArrayList<PlantItem>();
 
@@ -121,16 +120,44 @@ public class GetPhenophase extends ListActivity {
 		
 		db = staticDB.getReadableDatabase();
 		
-		Cursor cursor = db.rawQuery("SELECT _id, Type, Phenophase_ID, Phenophase_Icon, Chrono_Order, Description FROM Onetime_Observation ORDER BY Chrono_Order;", null);
+		Cursor cursor = db.rawQuery("SELECT _id, Type, Phenophase_Icon, Description FROM Onetime_Observation WHERE Category=" + protocolID, null);
 		while(cursor.moveToNext()) {
 			boolean header = false;
 			
-			if(cursor.getInt(0) == 1 || cursor.getInt(0) == 4 || cursor.getInt(0) == 6 || cursor.getInt(0) == 8 || cursor.getInt(0) == 11) {
-				header = true;
+			Log.i("K", "PROTOCOL ID : " + protocolID);
+			
+			/*
+			 * This is for choosing the list items with the header information.
+			 */
+			if(protocolID == 1) {
+				// to show the header, we need to know the first index of each category.
+				if(cursor.getInt(0) == 1 
+						|| cursor.getInt(0) == 4 
+						|| cursor.getInt(0) == 7 
+						|| cursor.getInt(0) == 10
+						|| cursor.getInt(0) == 13) {
+					header = true;
+				}
+			}
+			else if(protocolID == 2) {
+				// to show the header, we need to know the first index of each category.
+				if(cursor.getInt(0) == 16 
+						|| cursor.getInt(0) == 19) {
+					header = true;
+				}
+
+			}
+			else if(protocolID == 3) {
+				// to show the header, we need to know the first index of each category.
+				if(cursor.getInt(0) == 22 
+						|| cursor.getInt(0) == 23 
+						|| cursor.getInt(0) == 26 ) {
+					header = true;
+				}
 			}
 			
-			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(3), null, null);
-			PlantItem pi = new PlantItem(resID, cursor.getString(5), cursor.getInt(3), cursor.getString(1), cursor.getInt(2), header);
+			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(2), null, null);
+			PlantItem pi = new PlantItem(resID, cursor.getString(3), cursor.getInt(2), cursor.getString(1), cursor.getInt(0), header);
 			pItem.add(pi);
 		}
 		
@@ -146,53 +173,63 @@ public class GetPhenophase extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
 		//GetPhenophase.this.unregisterReceiver(receiver);
-		if(previous_activity == Values.FROM_UCLA_TREE_LISTS) {
+		if(previousActivity == Values.FROM_UCLA_TREE_LISTS) {
 			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
 			
-			intent.putExtra("cname", common_name);
-			intent.putExtra("sname", science_name);
-			intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
-			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("dt_taken", dt_taken);
-			intent.putExtra("pheno_id", position + 1);
-			intent.putExtra("species_id", species_id);
+			intent.putExtra("cname", commonName);
+			intent.putExtra("sname", scienceName);
+			intent.putExtra("protocol_id", protocolID); // temporary put protocol_id to 9
+			intent.putExtra("camera_image_id", cameraImageID);
+			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
+			intent.putExtra("species_id", speciesID);
 			intent.putExtra("category", -1);
 			
 			// for the from value, as the parameters passed are the same as FROM_ONETIME_DIRECT, let's use that.
 			intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
 			startActivity(intent);
 		}
-		else if(previous_activity == Values.FROM_LOCAL_PLANT_LISTS) {
+		else if(previousActivity == Values.FROM_LOCAL_PLANT_LISTS 
+				|| previousActivity == Values.FROM_PLANT_LIST_ADD_SAMESPECIES) {
 			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
 			
-			intent.putExtra("cname", common_name);
-			intent.putExtra("sname", science_name);
-			intent.putExtra("protocol_id", 9); // temporary put protocol_id to 9
-			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("dt_taken", dt_taken);
-			intent.putExtra("pheno_id", position + 1);
+			intent.putExtra("cname", commonName);
+			intent.putExtra("sname", scienceName);
+			intent.putExtra("protocol_id", protocolID); // temporary put protocol_id to 9
+			intent.putExtra("camera_image_id", cameraImageID);
+			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
 			intent.putExtra("species_id", 0); // there's no species_id in LOCAL PLANT LISTS
 			intent.putExtra("category", category);
-			
-			// for the from value, as the parameters passed are the same as FROM_ONETIME_DIRECT, let's use that.
 			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
 			startActivity(intent);
 		}
+		else if(previousActivity == Values.FROM_QUICK_CAPTURE
+				|| previousActivity == Values.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
+			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
+			
+			intent.putExtra("cname", commonName);
+			intent.putExtra("sname", scienceName);
+			intent.putExtra("protocol_id", protocolID); // temporary put protocol_id to 9
+			intent.putExtra("camera_image_id", cameraImageID);
+			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
+			intent.putExtra("species_id", speciesID);
+			intent.putExtra("category", category);
+			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+			startActivity(intent);
+		}
+		/*
+		 * If the previous activity is from "Quick Share" on the PlantLists
+		 */
+		/*
+		 * 
 		else {
 			Intent intent = new Intent(GetPhenophase.this, OneTimeMain.class);
 			
 			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("latitude", latitude);
-			intent.putExtra("longitude", longitude);
-			intent.putExtra("dt_taken", dt_taken);
 			intent.putExtra("pheno_id", position + 1);
 			intent.putExtra("FROM", Values.FROM_QUICK_CAPTURE);
 			
 			startActivity(intent);
 		}
+		*/
 	}
 }

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  
+  <!-- Body -->
+  <ScrollView
+  	android:layout_width="fill_parent"
+  	android:layout_height="fill_parent"
+  	android:id="@+id/upper"
+  	android:layout_above="@+id/footer"
+  	android:paddingLeft="10dp"
+  	android:paddingTop="10dp"
+  >
+  <LinearLayout
+  	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+  >
+  <LinearLayout
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:orientation="horizontal"
+  	android:id="@+id/firstView">
+  	<ProgressBar
+	  	android:gravity="center"
+	  	android:layout_width="wrap_content"
+	  	android:layout_height="wrap_content"
+	  	android:id="@+id/progressbar"
+	/>
+  	<ImageView
+  		android:layout_width="100dp"
+  		android:layout_height="100dp"
+  		android:id="@+id/species_image"
+  	/>
+  	<TextView
+ 	 	android:layout_width="wrap_content"
+  		android:layout_height="wrap_content"
+  		android:layout_marginLeft="5dp"
+  		android:id="@+id/species_name"
+  		android:textSize="18sp"
+  		android:layout_gravity="center"
+  		android:gravity="center"
+  	/>
+  </LinearLayout>
+  
+  <TextView
+ 	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="10dp"
+  	android:layout_below="@+id/firstView"
+  	android:id="@+id/credit_text"
+  	android:text="Credit"
+  	android:textSize="19sp"
+  	android:textColor="@android:color/black"
+  />
+  
+  <TextView
+ 	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="2dp"
+  	android:layout_below="@+id/credit_text"
+  	android:id="@+id/credit"
+  	android:textSize="17sp"
+  />
+  
+  <TextView
+ 	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="10dp"
+  	android:layout_below="@+id/credit"
+  	android:id="@+id/haiku_text"
+  	android:text="Haiku"
+  	android:textSize="19sp"
+  	android:textColor="@android:color/black"
+  />
+  
+  <TextView
+ 	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="2dp"
+  	android:layout_below="@+id/haiku_text"
+  	android:id="@+id/haiku"
+  	android:textSize="17sp"
+  />
+  
+  <TextView
+ 	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="10dp"
+  	android:layout_below="@+id/haiku"
+  	android:id="@+id/link_text"
+  	android:text="Link"
+  	android:textSize="19sp"
+  	android:textColor="@android:color/black"
+  />
+  
+  <TextView
+ 	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="2dp"
+  	android:layout_below="@+id/link_text"
+  	android:id="@+id/link"
+  	android:textSize="17sp"
+  />
+  </LinearLayout>
+  </ScrollView>
+  <!-- end Body -->
+  <!-- Footer -->
+  <LinearLayout
+  	android:id="@+id/footer"
+	android:layout_width="fill_parent"
+	android:layout_height="55dp"
+	android:layout_marginTop="3dp"
+	android:gravity="center"
+	android:weightSum="1"
+	android:orientation="horizontal"
+	android:layout_alignParentBottom="true"
+	android:background="@color/darkgray">
+	  		
+	<Button
+	  	android:layout_width="fill_parent"
+	  	android:layout_height="wrap_content"
+	  	android:layout_weight="0.5"
+	  	android:id="@+id/to_myplant"
+	  	android:textSize="16sp"
+	  	android:text="@string/Help_MyList_addPlant"
+	  />
+	<Button
+	  	android:layout_width="fill_parent"
+	  	android:layout_height="wrap_content"
+	  	android:layout_weight="0.5"
+	  	android:id="@+id/to_shared_plant"
+	  	android:textSize="16sp"
+	  	android:text="@string/Main_quickCapture"
+	  />
+  </LinearLayout>
+  <!-- end Footer -->
+  
+  
+  
+</RelativeLayout>

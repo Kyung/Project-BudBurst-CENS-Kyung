@@ -6,7 +6,6 @@ import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
 import cens.ucla.edu.budburst.R.id;
 import cens.ucla.edu.budburst.R.layout;
-import cens.ucla.edu.budburst.onetime.HelloItemizedOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -26,7 +25,7 @@ public class SpeciesDetail_inMapView extends MapActivity {
 
 	private String latitude;
 	private String longitude;
-	private HelloItemizedOverlay itemizedOverlay = null;
+	private BalloonItemizedOverlay itemizedOverlay = null;
 	private List<Overlay> mapOverlays = null;
 	
 	/** Called when the activity is first created. */
@@ -62,10 +61,10 @@ public class SpeciesDetail_inMapView extends MapActivity {
 		
 		mapOverlays = myMap.getOverlays();
 		Drawable marker = getResources().getDrawable(R.drawable.marker);
-		itemizedOverlay = new HelloItemizedOverlay(marker, this);
+		//itemizedOverlay = new BalloonItemizedOverlay(marker, this);
 		
 		OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found!");
-		itemizedOverlay.addOverlay(overlayitem);
+		//itemizedOverlay.addOverlay(overlayitem);
 		mapOverlays.add(itemizedOverlay);
 		
 		myMap.setSatellite(false);

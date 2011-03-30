@@ -5,21 +5,20 @@
   android:layout_height="fill_parent"
   android:orientation="vertical"
   android:weightSum="1">
-  <ScrollView
-  	android:id="@+id/header"
-  	android:layout_width="fill_parent"
-  	android:layout_height="wrap_content"
-  	android:background="@color/BudBurstLightBackground" 
-  	android:layout_weight="0.9"
-  >
+
   	<ViewFlipper
   		android:id="@+id/viewflipper"
   		android:layout_width="fill_parent"
-  		android:layout_height="wrap_content"
+  		android:layout_height="fill_parent"
+  		android:layout_weight="0.9"
   	>
-  	
-<!-- start 0 layout -->
 
+  	<!-- start 0 layout -->
+  	<ScrollView
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+  		android:saveEnabled="false"
+  	>
 <LinearLayout
   android:orientation="vertical" 
   android:layout_width="fill_parent" 
@@ -28,6 +27,7 @@
   android:scrollbarAlwaysDrawVerticalTrack="true" 
   android:scrollbars="vertical" 
   android:layout_height="fill_parent">
+	
 	<LinearLayout android:id="@+id/LinearLayout01" android:layout_marginBottom="10px" android:background="@color/BudBurstBackground" android:layout_width="fill_parent" android:gravity="center_horizontal" android:orientation="vertical" android:layout_height="wrap_content">
 		<ImageView android:layout_height="60dp" android:id="@+id/ImageView01" android:layout_width="wrap_content" android:src="@drawable/header_help" android:paddingTop="5dp" android:scaleType="fitCenter"></ImageView>
 	</LinearLayout>
@@ -39,6 +39,11 @@
 	<TextView android:paddingRight="10dip" android:clickable="true" android:linksClickable="true" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView013" android:paddingTop="10dip" android:text="@string/Help_About_para0_url" android:paddingLeft="10dip" android:typeface="normal" android:autoLink="web" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="normal"></TextView>
 	<TextView android:id="@+id/TextView03" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="18dip" android:text="@string/Help_About_para1" android:paddingLeft="10dip" android:paddingRight="10dip" android:paddingTop="10dip" android:textColor="@color/black"></TextView>
 	<TextView android:paddingRight="10dip" android:clickable="true" android:linksClickable="true" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView04" android:paddingTop="10dip" android:text="@string/Help_About_budburst_link" android:paddingLeft="10dip" android:typeface="normal" android:autoLink="web" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="normal"></TextView>
+	
+	<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView11" android:paddingTop="10dip" android:text="@string/Help_About_para5" android:paddingLeft="10dip" android:layout_height="wrap_content" android:textColor="@color/black"></TextView>
+	<TextView android:paddingRight="10dip" android:clickable="true" android:linksClickable="true" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView12" android:paddingTop="10dip" android:text="@string/Help_About_npn_link" android:paddingLeft="10dip" android:typeface="normal" android:autoLink="web" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="normal"></TextView>
+	
+	
 	<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView05" android:paddingTop="10dip" android:text="@string/Help_About_para2" android:paddingLeft="10dip" android:layout_height="wrap_content" android:textColor="@color/black"></TextView>
 	<TextView android:paddingRight="10dip" android:clickable="true" android:linksClickable="true" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView011" android:paddingTop="10dip" android:text="@string/Help_About_NEON_url" android:paddingLeft="10dip" android:typeface="normal" android:autoLink="web" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="normal"></TextView>
 	<TextView android:paddingRight="10dip" android:clickable="true" android:linksClickable="true" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView06" android:paddingTop="10dip" android:text="@string/Help_About_cens_link" android:paddingLeft="10dip" android:typeface="normal" android:autoLink="web" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="normal"></TextView>
@@ -49,12 +54,18 @@
 
 
 </LinearLayout>  	
-  	
+  	</ScrollView>
   	
 <!-- start 1st layout main -->
+	<ScrollView
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+  	>
 	<LinearLayout
 	  android:orientation="vertical" 
-	  android:layout_width="fill_parent" android:background="@color/BudBurstLightBackground" android:isScrollContainer="true" android:scrollbarAlwaysDrawVerticalTrack="true" android:scrollbars="vertical" android:layout_height="fill_parent">
+	  android:layout_width="fill_parent" 
+	  android:background="@color/BudBurstLightBackground" 
+	  android:layout_height="fill_parent">
 		
 		<LinearLayout android:id="@+id/LinearLayout01" android:layout_marginBottom="10px" android:background="@color/BudBurstBackground" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="fill_parent">
 			<ImageView android:src="@drawable/header_help" android:paddingTop="5dp" android:scaleType="fitCenter" android:layout_height="wrap_content" android:id="@+id/ImageView01" android:layout_width="wrap_content"></ImageView>
@@ -101,9 +112,17 @@
 		</LinearLayout>
 		
 	</LinearLayout>
-  	
+  	</ScrollView>
 <!-- start 2nd layout list -->
- <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:background="@color/BudBurstLightBackground" android:isScrollContainer="true" android:scrollbarAlwaysDrawVerticalTrack="true" android:scrollbars="vertical" android:layout_height="fill_parent">
+	<ScrollView
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+  	>
+ <LinearLayout 
+ 		android:orientation="vertical" 
+ 		android:layout_width="fill_parent" 
+ 		android:background="@color/BudBurstLightBackground" 
+ 		android:layout_height="fill_parent">
 	
 	<LinearLayout android:id="@+id/LinearLayout01" android:layout_marginBottom="10px" android:background="@color/BudBurstBackground" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="fill_parent">
 		<ImageView android:src="@drawable/header_help" android:scaleType="fitCenter" android:layout_height="60dp" android:id="@+id/ImageView01" android:paddingTop="5dp" android:layout_width="wrap_content"></ImageView>
@@ -151,75 +170,144 @@
 	
 	<TextView android:paddingRight="10dp" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView010" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:textColor="@color/black" android:text="@string/Help_PlantLists_User"></TextView>
 
-</LinearLayout>
+	</LinearLayout>
+  	</ScrollView>
   	
   	<!-- Start 3rd layout my list-->
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical" 
-  android:layout_width="fill_parent" android:background="@color/BudBurstLightBackground" android:isScrollContainer="true" android:scrollbarAlwaysDrawVerticalTrack="true" android:scrollbars="vertical" android:layout_height="fill_parent">
+  	<ScrollView
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+  	>
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical" 
+		android:layout_width="fill_parent" 
+		android:background="@color/BudBurstLightBackground" 
+		android:layout_height="fill_parent">
 	
-	<LinearLayout android:id="@+id/LinearLayout01" android:layout_marginBottom="10px" android:background="@color/BudBurstBackground" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="fill_parent">
-		<ImageView android:src="@drawable/header_help" android:scaleType="fitCenter" android:paddingTop="5dp" android:layout_height="wrap_content" android:id="@+id/ImageView01" android:layout_width="wrap_content"></ImageView>
-	</LinearLayout>
-	
-	<TextView android:textSize="25dip" android:layout_width="fill_parent" android:id="@+id/TextView02" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="bold" android:text="@string/Help_MyList" android:textColor="@color/black"></TextView>
-	<TextView android:paddingRight="10dp" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView01" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para1" android:textColor="@color/black"></TextView>
-	<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView05" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para2"></TextView>
-	
-	<LinearLayout android:id="@+id/LinearLayout02" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_gravity="center_horizontal" android:layout_marginTop="10dp" android:layout_width="fill_parent">
-		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView06" android:paddingLeft="10dp" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/Help_MyList_1" android:layout_gravity="top" android:textStyle="bold"></TextView>
-		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView07" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para3" android:layout_width="wrap_content"></TextView>
-	</LinearLayout>
-	
-	<LinearLayout android:id="@+id/LinearLayout03" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_gravity="center_horizontal" android:layout_marginTop="10dp" android:layout_width="fill_parent">
-		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView08" android:paddingLeft="10dp" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/Help_MyList_2" android:layout_gravity="top" android:textStyle="bold"></TextView>
-		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView09" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para4" android:layout_width="wrap_content"></TextView>
-	</LinearLayout>
-
-	<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView10" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para5"></TextView>
-	
-	<LinearLayout 
-		android:id="@+id/LinearLayout04" 
-		android:layout_height="wrap_content" 
-		android:layout_width="wrap_content" 
-		android:layout_gravity="center_horizontal" 
-		android:layout_marginTop="10dp" 
-		android:background="@color/BudBurstLightBackground">
-		<LinearLayout android:id="@+id/LinearLayout04" android:layout_height="wrap_content" android:background="@color/White" android:layout_width="wrap_content" android:layout_marginTop="10dp" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:layout_marginRight="10dp">
-			<ImageView android:maxWidth="50dp" android:layout_marginLeft="10dp" android:adjustViewBounds="true" android:scaleType="fitXY" android:maxHeight="50dp" android:layout_height="50dp" android:id="@+id/ImageView02" android:layout_width="50dp" android:src="@drawable/add_plant"></ImageView>
-			<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView11" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:text="@string/Help_MyList_addPlant" android:paddingBottom="10dip" android:textColor="@color/black"></TextView>
+		<LinearLayout android:id="@+id/LinearLayout01" android:layout_marginBottom="10px" android:background="@color/BudBurstBackground" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="fill_parent">
+			<ImageView android:src="@drawable/header_help" android:scaleType="fitCenter" android:paddingTop="5dp" android:layout_height="wrap_content" android:id="@+id/ImageView01" android:layout_width="wrap_content"></ImageView>
 		</LinearLayout>
-		<LinearLayout android:id="@+id/LinearLayout04" android:layout_height="wrap_content" android:background="@color/White" android:layout_width="wrap_content" android:layout_marginTop="10dp" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:layout_marginLeft="10dp">
-			<ImageView android:maxWidth="50dp" android:layout_marginLeft="10dp" android:adjustViewBounds="true" android:scaleType="fitXY" android:maxHeight="50dp" android:layout_height="50dp" android:id="@+id/ImageView02" android:layout_width="50dp" android:src="@drawable/add_plant"></ImageView>
-			<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView11" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:paddingBottom="10dip" android:textColor="@color/black" android:text="@string/Menu_addQCPlant"></TextView>
+		
+		<TextView android:textSize="25dip" android:layout_width="fill_parent" android:id="@+id/TextView02" android:layout_height="wrap_content" android:gravity="center_horizontal" android:textStyle="bold" android:text="@string/Help_MyList" android:textColor="@color/black"></TextView>
+		<TextView android:paddingRight="10dp" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView01" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para1" android:textColor="@color/black"></TextView>
+		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView05" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para2"></TextView>
+		
+		<LinearLayout android:id="@+id/LinearLayout02" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_gravity="center_horizontal" android:layout_marginTop="10dp" android:layout_width="fill_parent">
+			<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView06" android:paddingLeft="10dp" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/Help_MyList_1" android:layout_gravity="top" android:textStyle="bold"></TextView>
+			<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView07" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para3" android:layout_width="wrap_content"></TextView>
+		</LinearLayout>
+		
+		<LinearLayout android:id="@+id/LinearLayout03" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_gravity="center_horizontal" android:layout_marginTop="10dp" android:layout_width="fill_parent">
+			<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView08" android:paddingLeft="10dp" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/Help_MyList_2" android:layout_gravity="top" android:textStyle="bold"></TextView>
+			<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:id="@+id/TextView09" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para4" android:layout_width="wrap_content"></TextView>
+		</LinearLayout>
+	
+		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView10" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para5"></TextView>
+		
+			<LinearLayout 
+				android:id="@+id/LinearLayout04" 
+				android:layout_height="wrap_content" 
+				android:background="@color/White" 
+				android:layout_width="wrap_content" 
+				android:layout_marginTop="10dp" 
+				android:gravity="center_vertical|center_horizontal" 
+				android:layout_gravity="center_horizontal" >
+
+				
+				<ImageView 
+					android:maxWidth="50dp" 
+					android:layout_marginLeft="10dp" 
+					android:adjustViewBounds="true" 
+					android:scaleType="fitXY" 
+					android:maxHeight="50dp" 
+					android:layout_height="50dp" 
+					android:id="@+id/ImageView02" 
+					android:layout_width="50dp" 
+					android:src="@drawable/add_plant"/>
+				<TextView android:paddingRight="10dip" 
+					android:textSize="18dip" 
+					android:layout_width="wrap_content" 
+					android:id="@+id/TextView11" 
+					android:paddingTop="10dip" 
+					android:paddingLeft="10dip" 
+					android:layout_height="wrap_content" 
+					android:text="@string/Help_MyList_addPlant" 
+					android:paddingBottom="10dip" 
+					android:textColor="@color/black"/>
+			</LinearLayout>
+			
+			<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView10" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para10"></TextView>
+			
+			<LinearLayout 
+				android:id="@+id/LinearLayout04" 
+				android:layout_height="wrap_content" 
+				android:background="@color/White" 
+				android:layout_width="wrap_content" 
+				android:layout_marginTop="10dp"
+				android:gravity="center_vertical|center_horizontal" 
+				android:layout_gravity="center_horizontal">
+				<ImageView 
+					android:maxWidth="50dp" 
+					android:layout_marginLeft="10dp" 
+					android:adjustViewBounds="true" 
+					android:scaleType="fitXY" 
+					android:maxHeight="50dp" 
+					android:layout_height="50dp" 
+					android:id="@+id/ImageView02" 
+					android:layout_width="50dp" 
+					android:src="@drawable/ic_menu_camera"/>
+					
+				<TextView 
+					android:paddingRight="10dip" 
+					android:textSize="18dip" 
+					android:layout_width="wrap_content" 
+					android:id="@+id/TextView11" 
+					android:paddingTop="10dip" 
+					android:paddingLeft="10dip" 
+					android:layout_height="wrap_content" 
+					android:paddingBottom="10dip" 
+					android:textColor="@color/black" 
+					android:text="@string/Menu_addQCPlant"/>
+			</LinearLayout>
+	
+		
+		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView012" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para6"></TextView>
+		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView013" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para7"></TextView>
+		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView014" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para8"></TextView>
+		
+		<LinearLayout 
+			android:id="@+id/LinearLayout05" 
+			android:layout_gravity="center_horizontal" 
+			android:background="@color/White" 
+			android:layout_height="wrap_content" 
+			android:gravity="center_vertical|center_horizontal" 
+			android:layout_width="wrap_content" 
+			android:layout_marginTop="10dp">
+			<ImageView 
+				android:maxWidth="50dp" 
+				android:layout_marginLeft="10dp" 
+				android:adjustViewBounds="true" 
+				android:src="@drawable/sync" 
+				android:scaleType="fitXY" 
+				android:maxHeight="50dp" 
+				android:layout_height="50dp" 
+				android:id="@+id/ImageView03" 
+				android:layout_width="50dp"></ImageView>
+			<TextView android:paddingBottom="10dip" android:paddingRight="10dip" android:textColor="@color/black" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView15" android:paddingTop="10dip" android:text="@string/Help_MyList_Sync" android:paddingLeft="10dip" android:layout_height="wrap_content"></TextView>
+		</LinearLayout>
+		
+		<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView016" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para9"></TextView>
+	
+		<LinearLayout android:id="@+id/LinearLayout06" android:layout_height="wrap_content" android:layout_width="wrap_content">
+			<ImageView android:maxWidth="50dp" android:layout_marginLeft="10dp" android:adjustViewBounds="true" android:scaleType="fitXY" android:maxHeight="50dp" android:layout_marginTop="10dp" android:layout_height="50dp" android:id="@+id/ImageView07" android:layout_width="50dp" android:src="@drawable/yellow_triangle_exclamation50"></ImageView>
+			<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView017" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:text="@string/Help_MyList_warning" android:textColor="@color/black"></TextView>
 		</LinearLayout>
 	</LinearLayout>
-	
-	<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView012" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para6"></TextView>
-	<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView013" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para7"></TextView>
-	<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView014" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para8"></TextView>
-	
-	<LinearLayout android:id="@+id/LinearLayout05" android:layout_gravity="center_horizontal" android:background="@color/White" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_width="wrap_content" android:layout_marginTop="10dp">
-		<ImageView android:maxWidth="50dp" android:layout_marginLeft="10dp" android:adjustViewBounds="true" android:src="@drawable/sync" android:scaleType="fitXY" android:maxHeight="50dp" android:layout_height="50dp" android:id="@+id/ImageView03" android:layout_width="50dp"></ImageView>
-		<TextView android:paddingBottom="10dip" android:paddingRight="10dip" android:textColor="@color/black" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView15" android:paddingTop="10dip" android:text="@string/Help_MyList_Sync" android:paddingLeft="10dip" android:layout_height="wrap_content"></TextView>
-	</LinearLayout>
-	
-	<TextView android:paddingRight="10dp" android:textColor="@color/black" android:textSize="18dip" android:layout_width="fill_parent" android:id="@+id/TextView016" android:paddingTop="10dp" android:paddingLeft="10dp" android:layout_height="wrap_content" android:textStyle="normal" android:text="@string/Help_MyList_para9"></TextView>
-
-	<LinearLayout android:id="@+id/LinearLayout06" android:layout_height="wrap_content" android:layout_width="wrap_content">
-		<ImageView android:maxWidth="50dp" android:layout_marginLeft="10dp" android:adjustViewBounds="true" android:scaleType="fitXY" android:maxHeight="50dp" android:layout_marginTop="10dp" android:layout_height="50dp" android:id="@+id/ImageView07" android:layout_width="50dp" android:src="@drawable/yellow_triangle_exclamation50"></ImageView>
-		<TextView android:paddingRight="10dip" android:textSize="18dip" android:layout_width="wrap_content" android:id="@+id/TextView017" android:paddingTop="10dip" android:paddingLeft="10dip" android:layout_height="wrap_content" android:text="@string/Help_MyList_warning" android:textColor="@color/black"></TextView>
-	</LinearLayout>
-	
-
-
-</LinearLayout>
-	
+	</ScrollView>
 	
 <!-- End 3rd layout -->
   	</ViewFlipper>
-  </ScrollView>
   <LinearLayout	
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
