@@ -252,7 +252,7 @@
 						android:layout_width="75dp"
 						android:layout_height="75dp"
 						android:background="@drawable/icon_compass"
-						android:id="@+id/weekly"
+						android:id="@+id/flora"
 					/>
 					<TextView
 						android:layout_width="fill_parent"

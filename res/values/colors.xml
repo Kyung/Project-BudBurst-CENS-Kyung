@@ -18,13 +18,6 @@
 	<drawable name="app_grayblue">#637E93</drawable>
 	<drawable name="app_skyblue">#2B8AC8</drawable>
 	<drawable name="app_green">#A3CE44</drawable>
-	<drawable name="screen_background_black">#ff000000</drawable>
-	<drawable name="translucent_background">#A0000000</drawable>
-	<drawable name="transparent_background">#00000000</drawable>
-	<drawable name="transparent_white">#AFFFFFFF</drawable>
-	<drawable name="PBB_teel">#06b592</drawable>
-	<drawable name="Flora_Observer">#edcb3f</drawable>
-	<drawable name="PBB_teel2">#d3fe9f</drawable>
 	<color name="pbb_text_color">#d3fe9f</color>
 	<color name="flora_text_color">#264811</color>
 	<color name="pbb_title_background">#55940a</color>

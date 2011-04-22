@@ -27,17 +27,17 @@
     	android:paddingLeft="6dp"
     >
     <RelativeLayout
-    	android:layout_width="66dp"
-    	android:layout_height="65dp"
+    	android:layout_width="67dp"
+    	android:layout_height="67dp"
     	android:id="@+id/wrap_icon"
     >
-    	<ImageView android:id="@+id/icon"
+    	<ImageView 
+    		android:id="@+id/icon"
 	        android:layout_width="65dp"
    		    android:layout_height="65dp"
 	        android:layout_marginLeft="2dp"
 	        android:layout_marginRight="2dp"
-	        android:layout_gravity="center_vertical"
-	        android:scaleType="fitCenter"/>
+	        android:scaleType="centerCrop"/>
 	</RelativeLayout>
 	<View 
 		android:id="@+id/divider"

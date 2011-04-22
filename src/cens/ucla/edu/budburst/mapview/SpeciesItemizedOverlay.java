@@ -21,7 +21,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cens.ucla.edu.budburst.PlantList;
+import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 
 import com.google.android.maps.ItemizedOverlay;

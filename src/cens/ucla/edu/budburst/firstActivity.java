@@ -1,9 +1,18 @@
 package cens.ucla.edu.budburst;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.apache.http.util.ByteArrayBuffer;
+
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.BackgroundService;
+import cens.ucla.edu.budburst.helper.HelperBackgroundService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -30,6 +39,7 @@ public class firstActivity extends Activity{
 	private String getCurrentVersion;
 	private String getOldVersion;
 	private SharedPreferences pref;
+	private LocationManager lm;
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -40,8 +50,12 @@ public class firstActivity extends Activity{
 	
 	public void onResume() {
 		super.onResume();
-		
-		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		getCurrentVersion();
+		moveToMainPage();
+	}
+	
+	public void getCurrentVersion() {
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		
 		ComponentName comp = new ComponentName(firstActivity.this, "");
 		
@@ -52,22 +66,9 @@ public class firstActivity extends Activity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		/*
-		try {
-			URL urls = new URL("http://networkednaturalist.org/User_Plant_Lists_Images/200_thumb.jpg");
-			HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
-			conn.connect();
-			
-			Toast.makeText(firstActivity.this, " " + conn.getResponseCode(), Toast.LENGTH_SHORT).show();
-		}
-		catch(Exception e) {
-			
-		}
-		*/
-		
-		
-		
+	}
+	
+	public void moveToMainPage() {
 		pref = getSharedPreferences("userinfo", 0);
 		getOldVersion = pref.getString("version", getCurrentVersion);
 		
@@ -135,24 +136,16 @@ public class firstActivity extends Activity{
 	
 				new Handler().postDelayed(new Runnable(){
 			    	public void run() {
-			    		Intent intent = new Intent(firstActivity.this, Splash.class);
+			    		//checkUpdate();
+			    		Intent intent = new Intent(firstActivity.this, PBBSplash.class);
 						finish();
 						startActivity(intent);
 			    	}
 			    }, 2000);
-			 	
-			 	/*SharedPreferences pref = getSharedPreferences("userinfo",0);
-				if(pref.getBoolean("db_upgraded", true)) {
-					new Handler().postDelayed(new Runnable(){
-				    	public void run() {
-				    		Intent intent = new Intent(firstActivity.this, Splash.class);
-							finish();
-							startActivity(intent);
-				    	}
-				    }, 2000);
-				}*/
+
 		    }		
 		}
+
 	}
 		
 	@Override
@@ -162,5 +155,63 @@ public class firstActivity extends Activity{
 	    	 return true;
 	     }
 	     return super.onKeyDown(keyCode, event);    
+	}
+	
+	public void checkUpdate() {
+		
+		try {
+			URL urls = new URL(getString(R.string.check_version_number) + "?version=" + getCurrentVersion);
+			Object getContent = urls.getContent();
+			
+			Log.i("K", "getContent : " + getContent);
+			HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
+			conn.connect();
+			
+			InputStream is = conn.getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+            
+            /* Read bytes to the Buffer until
+             * there is nothing more to read(-1). */
+            ByteArrayBuffer baf = new ByteArrayBuffer(50);
+            int current = 0;
+            while((current = bis.read()) != -1){
+                    baf.append((byte)current);
+            }
+
+            /* Convert the Bytes read to a String. */
+            String myString = new String(baf.toByteArray());
+            
+            if(myString.equals("NEEDUPDATES")) {
+            	new AlertDialog.Builder(this)
+    	    	.setTitle("Budburst needs updates")
+    	    	.setMessage("Please updates budburst. App might crash if you use the old version.")
+    	    	.setPositiveButton("Updates", new DialogInterface.OnClickListener() {
+    				
+    				@Override
+    				public void onClick(DialogInterface dialog, int which) {
+    					// TODO Auto-generated method stub
+    					Intent intent = new Intent(Intent.ACTION_VIEW);
+    					intent.setData(Uri.parse("market://details?id=cens.ucla.edu.budburst"));
+    					startActivity(intent);
+    				}
+    			})
+    			.setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						moveToMainPage();
+					}
+				})
+    			.show();
+            }
+            else {
+            	moveToMainPage();
+            }
+			
+		}
+		catch(Exception e) {
+			
+		}
 	}
 }

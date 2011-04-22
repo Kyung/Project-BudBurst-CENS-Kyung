@@ -6,22 +6,20 @@
   android:orientation="horizontal">
   
   
-  <RelativeLayout
-	android:layout_width="67dp"
-	android:layout_height="67dp"
-	android:id="@+id/wrap_icon"
+  	<RelativeLayout
+		android:layout_width="72dp"
+		android:layout_height="72dp"
+		android:id="@+id/wrap_icon"
     >
-  
-  <ImageView
-  	  android:id="@+id/thumbnail"
-  	  android:layout_margin="4dp"
-  	  android:layout_marginLeft="5dp"
-	  android:layout_width="65dp"
-	  android:layout_height="65dp" 
-	  android:src="@drawable/stub" 
-	  android:scaleType="centerCrop"/>
-   </RelativeLayout>
-	
+	  	<ImageView
+		  	  android:id="@+id/thumbnail"
+		  	  android:layout_margin="4dp"
+		  	  android:layout_marginLeft="4dp"
+			  android:layout_width="66dp"
+			  android:layout_height="66dp" 
+			  android:src="@drawable/stub" 
+			  android:scaleType="centerCrop"/>
+	</RelativeLayout>
 	<View 
 		android:id="@+id/divider"
 		android:background="@drawable/bborder"

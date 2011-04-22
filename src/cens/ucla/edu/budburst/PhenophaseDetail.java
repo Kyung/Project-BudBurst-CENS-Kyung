@@ -3,7 +3,7 @@ package cens.ucla.edu.budburst;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.AnimationHelper;
-import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.helper.HelperValues;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -53,7 +53,7 @@ public class PhenophaseDetail extends Activity {
 	    
 	    // set the layout
 	    ImageView image = (ImageView) findViewById(R.id.species_image);
-	    TextView phenoName = (TextView) findViewById(R.id.science_name);
+	    TextView phenoName = (TextView) findViewById(R.id.common_name);
 	    TextView phenoDescription = (TextView) findViewById(R.id.text);
 	    
 	    // open database
@@ -64,7 +64,7 @@ public class PhenophaseDetail extends Activity {
 	    
 	    db = sDBH.getReadableDatabase();
 	    
-	    if(previous_activity == Values.FROM_PBB_PHENOPHASE) {
+	    if(previous_activity == HelperValues.FROM_PBB_PHENOPHASE) {
 	    	int protocol_id = intent.getExtras().getInt("protocol_id");
 	    	
 		    cursor = db.rawQuery("SELECT Phenophase_Name, Detail_Description, Phenophase_Icon FROM Phenophase_Protocol_Icon WHERE Phenophase_ID = " + pheno_id + " AND Protocol_ID = " + protocol_id +";", null);

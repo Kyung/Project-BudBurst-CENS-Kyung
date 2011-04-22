@@ -12,17 +12,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.PhenophaseDetail;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
 
 public class MyListAdapter2 extends BaseAdapter{
 	Context maincon;
 	LayoutInflater Inflater;
-	ArrayList<PlantItem> arSrc;
+	ArrayList<HelperPlantItem> arSrc;
 	int layout;
 	
-	public MyListAdapter2(Context context, int alayout, ArrayList<PlantItem> aarSrc){
+	public MyListAdapter2(Context context, int alayout, ArrayList<HelperPlantItem> aarSrc){
 		maincon = context;
 		Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		arSrc = aarSrc;
@@ -65,11 +65,11 @@ public class MyListAdapter2 extends BaseAdapter{
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				PlantItem pi = (PlantItem)v.getTag();
+				HelperPlantItem pi = (HelperPlantItem)v.getTag();
 				
 				Intent intent = new Intent(maincon, PhenophaseDetail.class);
 				intent.putExtra("id", pi.PhenoID);
-				intent.putExtra("frome", Values.FROM_QC_PHENOPHASE);
+				intent.putExtra("frome", HelperValues.FROM_QC_PHENOPHASE);
 				maincon.startActivity(intent);
 			}
 		});

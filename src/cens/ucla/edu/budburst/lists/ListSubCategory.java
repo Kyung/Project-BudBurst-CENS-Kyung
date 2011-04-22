@@ -3,17 +3,20 @@ package cens.ucla.edu.budburst.lists;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import cens.ucla.edu.budburst.Help;
-import cens.ucla.edu.budburst.Login;
-import cens.ucla.edu.budburst.MainPage;
+import cens.ucla.edu.budburst.PBBHelpPage;
+import cens.ucla.edu.budburst.PBBLogin;
+import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapter;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.onetime.Flora_Observer;
+import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.helper.HelperLazyAdapter;
+import cens.ucla.edu.budburst.onetime.OneTimePBBLists;
+import cens.ucla.edu.budburst.utils.PBBItems;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -36,14 +39,14 @@ import android.widget.TextView;
 
 public class ListSubCategory extends ListActivity {
 
-	private ListView list;
-	private LazyAdapter lazyadapter;
-	private ArrayList <PlantItem> localArray;
-	private SharedPreferences pref;
-	private double latitude;
-	private double longitude;
-	private Items item;
-	private int category;
+	private ListView mList;
+	private HelperLazyAdapter mLazyadapter;
+	private ArrayList <HelperPlantItem> localArray;
+	private HelperSharedPreference mPref;
+	private double mLatitude;
+	private double mLongitude;
+	private ListItems item;
+	private int mCategory;
 	private TextView myTitleText;
 	
 	/** Called when the activity is first created. */
@@ -64,49 +67,51 @@ public class ListSubCategory extends ListActivity {
 		/*
 		 *  Initialize ArrayList
 		 */
-		localArray = new ArrayList<PlantItem>();
+		localArray = new ArrayList<HelperPlantItem>();
 		
 		/*
 		 *  Receive intent value from the previous activity
 		 */
 		Intent p_intent = getIntent();
-		category = p_intent.getExtras().getInt("category");
+		mCategory = p_intent.getExtras().getInt("category");
+		
+		Log.i("K", "ListSubCategory - category : " + mCategory);
 		
 		/*
 		 *  Retrieve lat / lng
 		 */
-		pref = getSharedPreferences("userinfo", 0);
-		latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
-		longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+		mPref = new HelperSharedPreference(this);
+		mLatitude = Double.parseDouble(mPref.getPreferenceString("latitude", "0.0"));
+		mLongitude = Double.parseDouble(mPref.getPreferenceString("longitude", "0.0"));
 		
 		/*
 		 * Put the state and county in the title bar.
 		 */
 		
-		String county = pref.getString("county", "");
-		String state = pref.getString("state", "");
+		String county = mPref.getPreferenceString("county", "");
+		String state = mPref.getPreferenceString("state", "");
 		
 		myTitleText.setText(" " + getString(R.string.Local_BudBurst) + " (" + county + ", " + state + ")");
 		
 		/*
 		 * Set Items object to pass to the DownloadListFromServer
 		 */
-		item = new Items(latitude, longitude, category);
+		item = new ListItems(mLatitude, mLongitude, mCategory);
 		 
-		list = getListView();
+		mList = getListView();
 				
-		switch(category) {
-		case Values.BUDBURST_LIST:
+		switch(mCategory) {
+		case HelperValues.LOCAL_BUDBURST_LIST:
 			checkLocalBudburst();
 			break;
-		case Values.WHATSINVASIVE_LIST:
+		case HelperValues.LOCAL_WHATSINVASIVE_LIST:
 			checkLocalWhatsinvasive();
 			break;
-		case Values.NATIVE_LIST:
-			checkLocalNative();
-			break;
-		case Values.POISONOUS_LIST:
+		case HelperValues.LOCAL_POISONOUS_LIST:
 			checkLocalPoisonous();
+			break;
+		case HelperValues.LOCAL_THREATENED_ENDANGERED_LIST:
+			checkLocalEndangered();
 			break;
 		}        
 	}
@@ -116,22 +121,20 @@ public class ListSubCategory extends ListActivity {
 		 * If data is stored in the database, no need to request to the server.
 		 *  - not implement county checking yet
 		 */
-		if(!pref.getBoolean("localbudburst", false)) {
+		if(!mPref.getPreferenceBoolean("localbudburst")) {
 			
 			/*
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			DownloadListFromServer downloadlist = new DownloadListFromServer(this, list, lazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
 			downloadlist.execute(item);
 			
 			/*
 			 * Set localbudburst preferece to true 
 			 */
-			pref = getSharedPreferences("userinfo",0);
-			SharedPreferences.Editor edit = pref.edit();				
-			edit.putBoolean("localbudburst", true);
-			edit.commit();
+			
+			mPref.setPreferencesBoolean("localbudburst", true);				
 			
 			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
 			startActivity(intent);
@@ -142,22 +145,19 @@ public class ListSubCategory extends ListActivity {
 	}
 	
 	public void checkLocalWhatsinvasive() {
-		if(!pref.getBoolean("localwhatsinvasive", false)) {
+		if(!mPref.getPreferenceBoolean("localwhatsinvasive")) {
 			
 			/*
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			DownloadListFromServer downloadlist = new DownloadListFromServer(this, list, lazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
 			downloadlist.execute(item);
 			
 			/*
 			 * Set localbudburst preferece to true 
 			 */
-			pref = getSharedPreferences("userinfo",0);
-			SharedPreferences.Editor edit = pref.edit();				
-			edit.putBoolean("localwhatsinvasive", true);
-			edit.commit();
+			mPref.setPreferencesBoolean("localwhatsinvasive", true);		
 
 			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
 			startActivity(intent);
@@ -168,49 +168,42 @@ public class ListSubCategory extends ListActivity {
 		}
 	}
 	
-	public void checkLocalNative() {
-		if(!pref.getBoolean("localnative", false)) {
+	public void checkLocalPoisonous() {
+		if(!mPref.getPreferenceBoolean("localpoisonous")) {
 			
 			/*
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			DownloadListFromServer downloadlist = new DownloadListFromServer(this, list, lazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
 			downloadlist.execute(item);
-			
 			/*
 			 * Set localbudburst preferece to true 
 			 */
-			pref = getSharedPreferences("userinfo",0);
-			SharedPreferences.Editor edit = pref.edit();				
-			edit.putBoolean("localnative", true);
-			edit.commit();
-		
+			mPref.setPreferencesBoolean("localpoisonous", true);
+			
 			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
 			startActivity(intent);
-			
+		
 		}
 		else {
 			callFromDatabase();
 		}
 	}
 	
-	public void checkLocalPoisonous() {
-		if(!pref.getBoolean("localpoisonous", false)) {
+	public void checkLocalEndangered() {
+		if(!mPref.getPreferenceBoolean("localendangered")) {
 			
 			/*
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			DownloadListFromServer downloadlist = new DownloadListFromServer(this, list, lazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
 			downloadlist.execute(item);
 			/*
 			 * Set localbudburst preferece to true 
 			 */
-			pref = getSharedPreferences("userinfo",0);
-			SharedPreferences.Editor edit = pref.edit();				
-			edit.putBoolean("localpoisonous", true);
-			edit.commit();
+			mPref.setPreferencesBoolean("localendangered", true);
 			
 			Intent intent = new Intent(ListSubCategory.this, ListSubCategory.class);
 			startActivity(intent);
@@ -229,7 +222,7 @@ public class ListSubCategory extends ListActivity {
 		SQLiteDatabase otDB = otDBH.getReadableDatabase();
 
 		Cursor cursor = otDB.rawQuery("SELECT science_name FROM localPlantLists WHERE category=" 
-				+ category 
+				+ mCategory 
 				+ " ORDER BY LOWER(common_name) ASC;", null);
 		
 		while(cursor.moveToNext()) {
@@ -244,7 +237,7 @@ public class ListSubCategory extends ListActivity {
 			while(getSpeciesInfo.moveToNext()) {
 				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+getSpeciesInfo.getInt(0), null, null);
 				
-				PlantItem pi;
+				HelperPlantItem pi;
 				/*
 				 *  pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
 				 */
@@ -252,7 +245,7 @@ public class ListSubCategory extends ListActivity {
 				/*
 				 * Insert into PlantItem object
 				 */
-				pi = new PlantItem(resID, getSpeciesInfo.getString(2), getSpeciesInfo.getString(1), getSpeciesInfo.getInt(0), getSpeciesInfo.getInt(3));
+				pi = new HelperPlantItem(resID, getSpeciesInfo.getString(2), getSpeciesInfo.getString(1), getSpeciesInfo.getInt(0), getSpeciesInfo.getInt(3));
 
 				localArray.add(pi);
 			}
@@ -266,8 +259,14 @@ public class ListSubCategory extends ListActivity {
 		cursor.close();
 		
 		
+		if(localArray.size() == 0) {
+			TextView instruction = (TextView)findViewById(R.id.instruction);
+			instruction.setVisibility(View.VISIBLE);
+		}
+		
+		
 		MyListAdapter mylistapdater = new MyListAdapter(ListSubCategory.this, R.layout.plantlist_item2, localArray);
-		list.setAdapter(mylistapdater);
+		mList.setAdapter(mylistapdater);
 	}
 	
 	public void callFromDatabase() {
@@ -277,15 +276,15 @@ public class ListSubCategory extends ListActivity {
 		OneTimeDBHelper otDBH = new OneTimeDBHelper(this);
 		SQLiteDatabase otDB = otDBH.getReadableDatabase();
 
-		Cursor cursor = otDB.rawQuery("SELECT category, common_name, science_name, photo_url FROM localPlantLists WHERE category=" 
-				+ category 
+		Cursor cursor = otDB.rawQuery("SELECT common_name, science_name, photo_url FROM localPlantLists WHERE category=" 
+				+ mCategory 
 				+ " ORDER BY LOWER(common_name) ASC;", null);
 		
 		while(cursor.moveToNext()) {
-			PlantItem pi = new PlantItem(cursor.getString(1) 
+			HelperPlantItem pi = new HelperPlantItem(cursor.getString(0) 
+					, cursor.getString(1)
 					, cursor.getString(2)
-					, cursor.getString(3)
-					, cursor.getInt(0));
+					, mCategory);
 			localArray.add(pi);
 		}
 		
@@ -293,40 +292,33 @@ public class ListSubCategory extends ListActivity {
 		otDB.close();
 		cursor.close();
 		
+		if(localArray.size() == 0) {
+			TextView instruction = (TextView)findViewById(R.id.instruction);
+			instruction.setVisibility(View.VISIBLE);
+		}
+		
 		/*
 		 * Connect to the adapter
 		 */
-		lazyadapter = new LazyAdapter(this, localArray);
-        list.setAdapter(lazyadapter);
+		mLazyadapter = new HelperLazyAdapter(this, localArray);
+		mList.setAdapter(mLazyadapter);
 	}
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
-		if(category == Values.BUDBURST_LIST) {
-			/*
-			 *  aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-			 */
-			Intent intent = new Intent(ListSubCategory.this, ListsDetail.class);
-			
-			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
-			intent.putExtra("category", Values.BUDBURST_LIST);
-			intent.putExtra("science_name", localArray.get(position).SpeciesName);
-			//intent.putExtra("id", localArray.get(position).SpeciesID);
-
-			startActivity(intent);
-			
-		}
-		else {
-			Intent intent = new Intent(ListSubCategory.this, ListsDetail.class);
-			
-			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
-			intent.putExtra("category", localArray.get(position).Category);
-			intent.putExtra("science_name", localArray.get(position).SpeciesName);
-			//intent.putExtra("id", localArray.get(position).SpeciesID);
-
-			startActivity(intent);
-		}
+		Intent intent = new Intent(ListSubCategory.this, ListDetail.class);
+		
+		PBBItems pbbItem = new PBBItems();
+		pbbItem.setScienceName(localArray.get(position).SpeciesName);
+		pbbItem.setCommonName(localArray.get(position).CommonName);
+		pbbItem.setSpeciesID(localArray.get(position).SpeciesID);
+		pbbItem.setCategory(mCategory);
+		
+		intent.putExtra("pbbItem", pbbItem);
+		intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);		
+		
+		startActivity(intent);
 	}
 	
 	
@@ -348,7 +340,7 @@ public class ListSubCategory extends ListActivity {
 
 		switch(_item.getItemId()){
 			case 1:
-				DownloadListFromServer downloadlist = new DownloadListFromServer(ListSubCategory.this, list, lazyadapter, item);
+				ListDownloadFromServer downloadlist = new ListDownloadFromServer(ListSubCategory.this, mList, mLazyadapter, item);
 				downloadlist.execute(item);
 
 				return true;

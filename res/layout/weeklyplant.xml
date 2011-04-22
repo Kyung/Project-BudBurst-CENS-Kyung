@@ -30,8 +30,8 @@
 	  	android:id="@+id/progressbar"
 	/>
   	<ImageView
-  		android:layout_width="100dp"
-  		android:layout_height="100dp"
+  		android:layout_width="80dp"
+  		android:layout_height="80dp"
   		android:id="@+id/species_image"
   	/>
   	<TextView
@@ -40,6 +40,7 @@
   		android:layout_marginLeft="5dp"
   		android:id="@+id/species_name"
   		android:textSize="18sp"
+  		android:textStyle="bold"
   		android:layout_gravity="center"
   		android:gravity="center"
   	/>
@@ -50,6 +51,7 @@
   	android:layout_height="wrap_content"
   	android:layout_marginTop="10dp"
   	android:layout_below="@+id/firstView"
+  	android:background="@drawable/bg_line"
   	android:id="@+id/credit_text"
   	android:text="Credit"
   	android:textSize="19sp"
@@ -70,6 +72,7 @@
   	android:layout_height="wrap_content"
   	android:layout_marginTop="10dp"
   	android:layout_below="@+id/credit"
+  	android:background="@drawable/bg_line"
   	android:id="@+id/haiku_text"
   	android:text="Haiku"
   	android:textSize="19sp"
@@ -86,12 +89,13 @@
   />
   
   <TextView
- 	android:layout_width="fill_parent"
+ 	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
   	android:layout_marginTop="10dp"
   	android:layout_below="@+id/haiku"
+  	android:background="@drawable/bg_line"
   	android:id="@+id/link_text"
-  	android:text="Link"
+  	android:text="More Information"
   	android:textSize="19sp"
   	android:textColor="@android:color/black"
   />

@@ -7,12 +7,13 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.Media;
-import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.onetime.AddNotes;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperMedia;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.utils.PBBItems;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -39,26 +40,28 @@ import android.widget.Toast;
 
 public class PlantObservationSummary extends Activity {
 
-	private String cname = "";
-	private String sname = "";
-	private String cameraImageID = "";
-	private String notes = "";
+	private String mCommonName;
+	private String mScienceName;
+	private String mCameraImageID;
+	private String mNotes;
 	
-	private int protocolID;
-	private int phenoID;
-	private int speciesID;
-	private int category;
-	private int previousActivity;
-	private int plantID;
-	private int phenoIcon = 0;
-	private int siteID;
+	private int mProtocolID;
+	private int mPhenoID;
+	private int mSpeciesID;
+	private int mCategory;
+	private int mPreviousActivity;
+	private int mPlantID;
+	private int mPhenoIcon = 0;
+	private int mSiteID;
 	
-	private double latitude;
-	private double longitude;
+	private double mLatitude;
+	private double mLongitude;
 	
-	private String phenoName = null;
-	private String photoName = null;
-	private String phenoDescription = null;
+	private String mPhenoName = null;
+	private String mPhotoName = null;
+	private String mPhenoDescription = null;
+	
+	private HelperFunctionCalls mHelper;
 	
 	/*
 	 * Layout Components
@@ -71,6 +74,8 @@ public class PlantObservationSummary extends Activity {
 	private View replace_photo 		= null;
 	private ImageView photo_image 	= null;
 	
+	
+	private PBBItems pbbItem;
 	/*
 	 * Variables
 	 */
@@ -93,30 +98,30 @@ public class PlantObservationSummary extends Activity {
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.Observation_Summary));
 		Intent p_intent = getIntent();
+		
+		mHelper = new HelperFunctionCalls();
 	    
 		/*
 		 * Getting values from the previous activity.
 		 */
-		cname = p_intent.getExtras().getString("cname");
-		sname = p_intent.getExtras().getString("sname");
-		cameraImageID = p_intent.getExtras().getString("camera_image_id");
-		protocolID = p_intent.getExtras().getInt("protocol_id");
-		speciesID = p_intent.getExtras().getInt("species_id");
-		phenoID = p_intent.getExtras().getInt("pheno_id");
-		latitude = p_intent.getExtras().getDouble("latitude");
-		longitude = p_intent.getExtras().getDouble("longitude");
-		notes = p_intent.getExtras().getString("notes");
-		previousActivity = p_intent.getExtras().getInt("from", 0);
+		Bundle bundle = getIntent().getExtras();
+		pbbItem = bundle.getParcelable("pbbItem");
+		mCommonName = pbbItem.getCommonName();
+		mScienceName = pbbItem.getScienceName();
+		mCameraImageID = pbbItem.getImageName();
+		mProtocolID = pbbItem.getProtocolID();
+		mSpeciesID = pbbItem.getSpeciesID();
+		mPhenoID = pbbItem.getPhenophaseID();
+		mLatitude = pbbItem.getLatitude();
+		mLongitude = pbbItem.getLongitude();
+		mCategory = pbbItem.getCategory();
+		mPlantID = pbbItem.getPlantID();
+		mSiteID = pbbItem.getSiteID();
+		mNotes = pbbItem.getNote();
 		
-		if(previousActivity == Values.FROM_QC_PHENOPHASE) {
-	    	plantID = p_intent.getExtras().getInt("plant_id", 0);
-	    }
+		mPreviousActivity = p_intent.getExtras().getInt("from", 0);
 		
-		if(previousActivity == Values.FROM_PBB_PHENOPHASE) {
-			siteID = p_intent.getExtras().getInt("site_id", 0);
-		}
-	    
-	    
+		Log.i("K", "PlantObservationSummary(mCategory) : " + mCategory + ", mSpeciesID: " + mSpeciesID);
 	    /*
 	     * Set the layout components
 	     */
@@ -131,36 +136,13 @@ public class PlantObservationSummary extends Activity {
 		photo_image = (ImageView) findViewById(R.id.image);
 		photo_image.setVisibility(View.VISIBLE);
 		
-		/*
-		 * Species Image, Name
-		 */
-		if(speciesID == 0) {
-			species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-			species_image.setBackgroundResource(R.drawable.shapedrawable);
-		    species_name.setText(cname + " ");
-		    science_name.setText(sname + " ");
-		}
-		else {
-		    if(speciesID > 76 || category == Values.TREE_LISTS_QC) {
-		    	// check out for the tree_list
-		    	if(category == Values.TREE_LISTS_QC) {
-		    		String imagePath = Values.TREE_PATH + speciesID + ".jpg";
-		    		FunctionsHelper helper = new FunctionsHelper();
-		    		species_image.setImageBitmap(helper.showImage(PlantObservationSummary.this, imagePath));
-		    	}
-		    	else {
-		    		species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
-		    	}
-		    }
-		    else {
-		    	species_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+speciesID, null, null));
-		    }
-		    species_image.setBackgroundResource(R.drawable.shapedrawable);
-		    species_name.setText(cname + " ");
-		    science_name.setText(sname + " ");
-		}
+		species_name.setText(mCommonName);
+		science_name.setText(mScienceName);
 		
-		
+		// species_image view
+		// should be dealt differently by category
+		species_image.setVisibility(View.VISIBLE);
+		mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
 		
 		/*
 		 *  Set xml
@@ -175,33 +157,32 @@ public class PlantObservationSummary extends Activity {
 		 *   - 1. PBB Phenophase
 		 *   - 2. Quick Share Phenophase
 		 */
-		
-		if(previousActivity == Values.FROM_PBB_PHENOPHASE) {
+		if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
 			StaticDBHelper sDBHelper = new StaticDBHelper(PlantObservationSummary.this);
 			SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 			
-			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Phenophase_Name, description FROM Phenophase_Protocol_Icon WHERE Phenophase_ID=" + phenoID + " AND Protocol_ID=" + protocolID, null);
+			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Phenophase_Name, description FROM Phenophase_Protocol_Icon WHERE Phenophase_ID=" + mPhenoID + " AND Protocol_ID=" + mProtocolID, null);
 			
 			while(getPhenoInfo.moveToNext()) {
-				phenoIcon = getPhenoInfo.getInt(0);
-				phenoName = getPhenoInfo.getString(1);
-				phenoDescription= getPhenoInfo.getString(2);
+				mPhenoIcon = getPhenoInfo.getInt(0);
+				mPhenoName = getPhenoInfo.getString(1);
+				mPhenoDescription= getPhenoInfo.getString(2);
 			}
 			
 			sDB.close();
 			getPhenoInfo.close();
 		}
 		
-		if(previousActivity == Values.FROM_QC_PHENOPHASE) {
+		if(mPreviousActivity == HelperValues.FROM_QC_PHENOPHASE) {
 			StaticDBHelper sDBHelper = new StaticDBHelper(PlantObservationSummary.this);
 			SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 			
-			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Type, Description FROM Onetime_Observation WHERE _id =" + phenoID, null);
+			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Type, Description FROM Onetime_Observation WHERE _id =" + mPhenoID, null);
 			
 			while(getPhenoInfo.moveToNext()) {
-				phenoIcon = getPhenoInfo.getInt(0);
-				phenoName = getPhenoInfo.getString(1);
-				phenoDescription= getPhenoInfo.getString(2);
+				mPhenoIcon = getPhenoInfo.getInt(0);
+				mPhenoName = getPhenoInfo.getString(1);
+				mPhenoDescription= getPhenoInfo.getString(2);
 			}
 			
 			sDB.close();
@@ -209,11 +190,11 @@ public class PlantObservationSummary extends Activity {
 		}
 		
 		
-		pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + phenoIcon, null, null));
+		pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + mPhenoIcon, null, null));
 		pheno_image.setBackgroundResource(R.drawable.shapedrawable);
-		phenoNameText.setText(phenoName);
-		phenoDescriptionTxt.setText(phenoDescription);
-		noteTxt.setText(notes);
+		phenoNameText.setText(mPhenoName);
+		phenoDescriptionTxt.setText(mPhenoDescription);
+		noteTxt.setText(mNotes);
 
 		/*
 		 * Check the sd card and the folder if existed.
@@ -227,10 +208,10 @@ public class PlantObservationSummary extends Activity {
 	    replace_photo.setVisibility(View.GONE);
 
 		
-	    File file = new File(Values.BASE_PATH + cameraImageID + ".jpg");
+	    File file = new File(HelperValues.BASE_PATH + mCameraImageID + ".jpg");
 		
 		if(file.exists()) {
-			Bitmap bitmap = BitmapFactory.decodeFile(Values.BASE_PATH + cameraImageID + ".jpg");
+			Bitmap bitmap = BitmapFactory.decodeFile(HelperValues.BASE_PATH + mCameraImageID + ".jpg");
 			photo_image.setImageBitmap(bitmap);
 			take_photo.setVisibility(View.GONE);
 		    replace_photo.setVisibility(View.VISIBLE);
@@ -251,10 +232,8 @@ public class PlantObservationSummary extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(PlantObservationSummary.this, SpeciesDetail.class);
-				intent.putExtra("id", speciesID);
-				intent.putExtra("site_id", "");
-				intent.putExtra("category", category);
+				Intent intent = new Intent(PlantObservationSummary.this, DetailPlantInfo.class);
+				intent.putExtra("pbbItem", pbbItem);
 				startActivity(intent);
 			}
 		});
@@ -268,19 +247,27 @@ public class PlantObservationSummary extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(PlantObservationSummary.this, PhenophaseDetail.class);
-				if(previousActivity == Values.FROM_PBB_PHENOPHASE) {
-					intent.putExtra("from", Values.FROM_PBB_PHENOPHASE);
-					intent.putExtra("protocol_id", protocolID);
+				if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
+					intent.putExtra("from", HelperValues.FROM_PBB_PHENOPHASE);
+					intent.putExtra("protocol_id", mProtocolID);
 				}
 				else {
-					intent.putExtra("from", Values.FROM_QC_PHENOPHASE);
+					intent.putExtra("from", HelperValues.FROM_QC_PHENOPHASE);
 				}
 				
-				intent.putExtra("id", phenoID);
+				intent.putExtra("id", mPhenoID);
 				startActivity(intent);
 			}
 		});
 	    
+
+	    // TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
 	    /*
 		 * When click photo image, move to the detail view.
 		 */
@@ -296,14 +283,14 @@ public class PlantObservationSummary extends Activity {
 				AlertDialog.Builder dialog = new AlertDialog.Builder(PlantObservationSummary.this);
 				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
 				
-			    String imagePath = Values.BASE_PATH + cameraImageID + ".jpg";
+			    String imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
 
 			    File file = new File(imagePath);
 			    Bitmap bitmap = null;
 			    
 			    // if file exists show the photo on the ImageButton
 			    if(file.exists()) {
-			    	imagePath = Values.BASE_PATH + cameraImageID + ".jpg";
+			    	imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
 				   	bitmap = BitmapFactory.decodeFile(imagePath);
 				   	image_view.setImageBitmap(bitmap);
 			    }
@@ -334,7 +321,7 @@ public class PlantObservationSummary extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				try {
-					File file = new File(Values.BASE_PATH);
+					File file = new File(HelperValues.BASE_PATH);
 					if (file.exists()) {
 						if(!file.isDirectory()) {
 							Toast.makeText(PlantObservationSummary.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
@@ -353,7 +340,7 @@ public class PlantObservationSummary extends Activity {
 						String randomNum = new Integer(prng.nextInt()).toString();
 						MessageDigest sha = MessageDigest.getInstance("SHA-1");
 						byte[] result = sha.digest(randomNum.getBytes());
-						cameraImageID = hexEncode(result);
+						mCameraImageID = hexEncode(result);
 					} catch (NoSuchAlgorithmException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -362,7 +349,7 @@ public class PlantObservationSummary extends Activity {
 					
 					Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 					mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
-							Uri.fromFile(new File(Values.BASE_PATH, cameraImageID + ".jpg")));
+							Uri.fromFile(new File(HelperValues.BASE_PATH, mCameraImageID + ".jpg")));
 					startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
 				
 				}
@@ -379,7 +366,7 @@ public class PlantObservationSummary extends Activity {
 		replace_photo.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				File ld = new File(Values.BASE_PATH);
+				File ld = new File(HelperValues.BASE_PATH);
 				if (ld.exists()) {
 					if (!ld.isDirectory()) {
 						// Should probably inform user ... hmm!
@@ -398,7 +385,7 @@ public class PlantObservationSummary extends Activity {
 					String randomNum = new Integer(prng.nextInt()).toString();
 					MessageDigest sha = MessageDigest.getInstance("SHA-1");
 					byte[] result = sha.digest(randomNum.getBytes());
-					cameraImageID = hexEncode(result);
+					mCameraImageID = hexEncode(result);
 				} catch (NoSuchAlgorithmException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -406,7 +393,7 @@ public class PlantObservationSummary extends Activity {
 
 				Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
-						Uri.fromFile(new File(Values.BASE_PATH, cameraImageID + ".jpg")));
+						Uri.fromFile(new File(HelperValues.BASE_PATH, mCameraImageID + ".jpg")));
 				startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
 			}
 		});
@@ -427,12 +414,12 @@ public class PlantObservationSummary extends Activity {
 				// TODO Auto-generated method stub
 				try{
 					
-					Log.i("K", "PREVIOUS ACTIVITY : " + previousActivity);
+					Log.i("K", "PREVIOUS ACTIVITY : " + mPreviousActivity);
 					
-					if(previousActivity == Values.FROM_PBB_PHENOPHASE) {
+					if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
 						addSpeciesFromPlantlist();
 					}
-					else if(previousActivity == Values.FROM_QC_PHENOPHASE) {
+					else if(mPreviousActivity == HelperValues.FROM_QC_PHENOPHASE) {
 						addSpeciesFromQuickcapture();
 					}
 					else {
@@ -442,7 +429,7 @@ public class PlantObservationSummary extends Activity {
 					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 					vibrator.vibrate(500);
 					
-					Intent intent = new Intent(PlantObservationSummary.this, PlantList.class);
+					Intent intent = new Intent(PlantObservationSummary.this, PBBPlantList.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
 					
@@ -451,7 +438,8 @@ public class PlantObservationSummary extends Activity {
 				}
 			}
 		});
-	    // TODO Auto-generated method stub
+		
+		
 	}
 
 	/*
@@ -460,51 +448,19 @@ public class PlantObservationSummary extends Activity {
 	public void addSpeciesFromPlantlist() {
 		SyncDBHelper syncDBHelper = new SyncDBHelper(PlantObservationSummary.this);
 
-		//SQLiteDatabase r_db = syncDBHelper.getReadableDatabase();
-		
-		//String find_species = "SELECT _id FROM my_observation WHERE phenophase_id=" 
-		//				+ phenoID + " AND species_id=" + speciesID + " AND site_id=" + siteID;
-		//Log.i("K", "QUERY : " + find_species);
-		//Cursor cursor = r_db.rawQuery(find_species, null);
-		//cursor.moveToNext();
-		
-		//int count = cursor.getCount();
-		//Log.i("K", "COUNT : " + count);
-
-		//r_db.close();
-		
 		SQLiteDatabase db = syncDBHelper.getWritableDatabase();
-		String query;
-		
 		String dt_taken = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
 		
-		//INSERT INTO my_observation VALUES (null,56,3339,24,'3224193362','28 December 2010','ppp',9);
-		//if(count == 0){
-			query = "INSERT INTO my_observation VALUES (" +
-					"null," +
-					speciesID + "," +
-					siteID + "," +
-					phenoID+"," +
-					"'" + cameraImageID + "'," +
-					"'" + dt_taken + "'," +
-					"'" + noteTxt.getText().toString() + "'," +
-					SyncDBHelper.SYNCED_NO + ");";
-		//}else{
-		//	int c_id = cursor.getInt(0);
-		//	Log.i("K", "C_ID : " + c_id);
+		String query = "INSERT INTO my_observation VALUES (" +
+		"null," +
+		mSpeciesID + "," +
+		mSiteID + "," +
+		mPhenoID + "," +
+		"'" + mCameraImageID + "'," +
+		"'" + dt_taken + "'," +
+		"'" + noteTxt.getText().toString() + "'," +
+		SyncDBHelper.SYNCED_NO + ");";
 			
-			
-		//	query = "UPDATE my_observation SET " +
-		//			"image_id='" + camera_image_id + "'," +
-		//			"time='" + dt_taken + "'," +
-		//			"note='" + notes.getText().toString() + "'" + "," +
-		//			"synced=" + SyncDBHelper.SYNCED_NO + " " + 
-		//			"WHERE _id=" + c_id + ";"; 
-			
-			//Toast.makeText(PlantObservationSummary.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
-		//}
-		//cursor.close();
-		//Log.i("K", "QUERY : " + query);
 		db.execSQL(query);
 		db.close();
 		syncDBHelper.close();
@@ -519,9 +475,9 @@ public class PlantObservationSummary extends Activity {
 	 * Add Quick Shared Observation into the database.
 	 */
 	public void addSpeciesFromQuickcapture() {
-		FunctionsHelper helper = new FunctionsHelper();
-		helper.insertNewObservation(PlantObservationSummary.this, plantID, phenoID,
-				latitude, longitude, 0, cameraImageID, noteTxt.getText().toString());
+		
+		mHelper.insertNewObservation(PlantObservationSummary.this, mPlantID, mPhenoID,
+				mLatitude, mLongitude, 0, mCameraImageID, noteTxt.getText().toString());
 
 		Toast.makeText(PlantObservationSummary.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
 
@@ -539,9 +495,9 @@ public class PlantObservationSummary extends Activity {
 			
 			if (requestCode == PHOTO_CAPTURE_CODE) {
 				
-				String imagePath = Values.BASE_PATH + cameraImageID + ".jpg";
+				String imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
 				
-				Media media = new Media();
+				HelperMedia media = new HelperMedia();
 				photo_image.setImageBitmap(media.ShowPhotoTaken(imagePath));
 				photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 				photo_image.setEnabled(true);

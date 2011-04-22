@@ -181,7 +181,7 @@ public class SyncNetworkHelper extends Activity{
 	}
 	
 	static public String upload_new_plant(String username, String password, Context cont
-			,String species_id, String site_id, Integer active, String common_name, Integer protocol_id){
+			,String species_id, String site_id, Integer active, String common_name, Integer protocol_id, Integer category){
 		try{
 			
 	        // Add your data  
@@ -196,15 +196,20 @@ public class SyncNetworkHelper extends Activity{
 		    		username+"&password="+password);
 		    HttpPost httppost = new HttpPost(url);
 		    
-		    Log.i("K","species_id : " + species_id + " , site_id : " + site_id + ", ACTIVE : " + active + ", Common Name : " + common_name + " Protocl_id : " + protocol_id);
+		    Log.i("K","species_id : " + species_id + " , site_id : " + site_id + 
+		    		", ACTIVE : " + active + ", Common Name : " + common_name + 
+		    		" Protocl_id : " + protocol_id + ", category : " + category);
+		    
 		    String active_str = active.toString();
 		    String protocol_id_str = protocol_id.toString();
+		    String category_str = category.toString();
 		    
         	nameValuePairs.add(new BasicNameValuePair("species_id", species_id));  
         	nameValuePairs.add(new BasicNameValuePair("site_id", site_id));  
         	nameValuePairs.add(new BasicNameValuePair("active", active_str));
         	nameValuePairs.add(new BasicNameValuePair("common_name", common_name));
         	nameValuePairs.add(new BasicNameValuePair("protocol_id", protocol_id_str));
+        	nameValuePairs.add(new BasicNameValuePair("category", category_str));
         	httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
         	
         	

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import cens.ucla.edu.budburst.weeklyplant.WeeklyPlant;
 
@@ -253,7 +254,7 @@ public class StaticDBHelper extends SQLiteOpenHelper{
 				"Type TEXT, " +
 				"Description TEXT, " +
 				"Detail_Description TEXT, " +
-				"Category INTEGER" +
+				"Protocol_ID INTEGER" +
 				");");
 		
 		db.execSQL("CREATE TABLE Phenophase_Protocol_Icon (Detail_Description TEXT, " +
@@ -396,7 +397,7 @@ public class StaticDBHelper extends SQLiteOpenHelper{
  		}
  		cursor.close();
  		
- 		cursor = tempDB.rawQuery("SELECT _id, Phenophase_Icon, Type, Description, Detail_Description, Category FROM Onetime_Observation;", null);
+ 		cursor = tempDB.rawQuery("SELECT _id, Phenophase_Icon, Type, Description, Detail_Description, Protocol_ID FROM Onetime_Observation;", null);
  		while(cursor.moveToNext()) {
  			db.execSQL("INSERT INTO Onetime_Observation VALUES(" +
  					cursor.getInt(0) + ", " +
@@ -462,19 +463,39 @@ public class StaticDBHelper extends SQLiteOpenHelper{
     	return getID;
     }
     
-    public String getSpeciesName(Context cont, String speciesName) {
+    public String[] getSpeciesName(Context cont, String speciesName) {
     	StaticDBHelper staticDBHelper = new StaticDBHelper(cont);
 		SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
     	
-    	Cursor cursor = staticDB.rawQuery("SELECT species_name FROM species WHERE common_name = \"" + speciesName + "\"", null);
-    	String getName = "";
+    	Cursor cursor = staticDB.rawQuery("SELECT species_name, description FROM species WHERE common_name = \"" + speciesName + "\"", null);
+    	String []getName = new String[2];
     	
     	while(cursor.moveToNext()) {
-    		getName = cursor.getString(0);
+    		getName[0] = cursor.getString(0);
+    		getName[1] = cursor.getString(1);
     	}
     	cursor.close();
     	staticDB.close();
     	
     	return getName;
+    }
+    
+    public HashMap getPhenoName(Context cont, int phenoID) {
+    	StaticDBHelper staticDBHelper = new StaticDBHelper(cont);
+		SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
+    	
+    	Cursor cursor = staticDB.rawQuery("SELECT Phenophase_Icon, Type, Description, Detail_Description FROM Onetime_Observation WHERE _id=" + phenoID, null);
+    	HashMap hMap = new HashMap();
+    	
+    	while(cursor.moveToNext()) {
+    		hMap.put("pIcon", cursor.getInt(0));
+    		hMap.put("pType", cursor.getString(1));
+    		hMap.put("pDesc", cursor.getString(2));
+    		hMap.put("pDetail", cursor.getString(3));
+    	}
+    	cursor.close();
+    	staticDB.close();
+    	
+    	return hMap;
     }
 }

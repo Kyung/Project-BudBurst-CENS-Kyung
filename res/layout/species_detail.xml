@@ -38,22 +38,24 @@
 				android:orientation="vertical"
 			>
 			<TextView
-				android:id="@+id/science_name"
+				android:id="@+id/common_name"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
 				android:textSize="18sp" 
-				android:textColor="@drawable/black" 
+				android:textColor="@drawable/black"
+				android:gravity="center"
 				android:layout_gravity="center"
 				android:textStyle="italic|bold" 
 				android:layout_marginTop="10dp"
 				/>			
 		
 			<TextView
-				android:id="@+id/common_name"
+				android:id="@+id/science_name"
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
 				android:textSize="16sp" 
 				android:textColor="@drawable/black" 
+				android:gravity="center"
 				android:layout_gravity="center"
 				android:textStyle="italic|bold" 
 				/>		

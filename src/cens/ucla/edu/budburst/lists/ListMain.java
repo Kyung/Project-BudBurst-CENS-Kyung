@@ -4,18 +4,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import cens.ucla.edu.budburst.AddPlant;
-import cens.ucla.edu.budburst.AddSite;
-import cens.ucla.edu.budburst.Help;
-import cens.ucla.edu.budburst.MainPage;
-import cens.ucla.edu.budburst.PlantList;
+import cens.ucla.edu.budburst.PBBAddPlant;
+import cens.ucla.edu.budburst.PBBAddSite;
+import cens.ucla.edu.budburst.PBBHelpPage;
+import cens.ucla.edu.budburst.PBBLogin;
+import cens.ucla.edu.budburst.PBBMainPage;
+import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.adapter.MyListAdapterMainPage;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.onetime.Flora_Observer;
-import cens.ucla.edu.budburst.onetime.OneTimeMain;
-import cens.ucla.edu.budburst.onetime.Whatsinvasive;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.HelperBackgroundService;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperListItem;
+import cens.ucla.edu.budburst.helper.HelperSettings;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.onetime.OneTimePBBLists;
+import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
+import cens.ucla.edu.budburst.onetime.OneTimeAddMyPlant;
+import cens.ucla.edu.budburst.utils.PBBItems;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -47,9 +54,8 @@ import android.widget.Toast;
 public class ListMain extends ListActivity {
 	
 	private TextView myTitleText = null;
-	private MyListAdapter mylistapdater;
+	private MyListAdapterMainPage mylistapdater;
 	private SharedPreferences pref;
-	FunctionsHelper helper;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -67,9 +73,6 @@ public class ListMain extends ListActivity {
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.Menu_Lists));
 
-		//LinearLayout ll = (LinearLayout)findViewById(R.id.header_item);
-		//ll.setVisibility(View.GONE);
-
 	    // TODO Auto-generated method stub
 	}
 
@@ -83,7 +86,7 @@ public class ListMain extends ListActivity {
 		Cursor cursor = otDB.rawQuery("SELECT category, common_name, photo_url FROM localPlantLists", null);
 		
 		while(cursor.moveToNext()) {
-			Log.i("K", "Category : " + cursor.getInt(0) + " common_name : " + cursor.getString(1));
+			//Log.i("K", "Category : " + cursor.getInt(0) + " common_name : " + cursor.getString(1));
 		}
 		
 		otDBH.close();
@@ -91,110 +94,52 @@ public class ListMain extends ListActivity {
 		cursor.close();
 		
 		
-		ArrayList<listItem> onetime_title = new ArrayList<listItem>();
-		listItem iItem;
+		ArrayList<HelperListItem> listArr = new ArrayList<HelperListItem>();
+		HelperListItem iItem;
 		
 		/*
 		 * oneTime(Header String, title, icon_name, sub_title)
 		 * - Note : don't put the icon_name in the string file.
 		 */
+		
+		/*
+		 *  1 : Project Budburst
+		 *  2 : What's Invasive
+		 *  3 : Poisonous
+		 *  4 : Endangered
+		 *  10 : Tree lists 
+		 *  11 : What's Blooming
+		 *  and more later.
+		 */
 
-		iItem = new listItem(getString(R.string.List_Official_Header), getString(R.string.List_Project_Budburst_title), "pbb_icon_main", getString(R.string.List_Budburst));
-		onetime_title.add(iItem);
+		// 1 : Budburst
+		iItem = new HelperListItem(getString(R.string.List_Official_Header), getString(R.string.List_Project_Budburst_title), "pbb_icon_main", getString(R.string.List_Budburst));
+		listArr.add(iItem);
 		
-		iItem = new listItem("none", getString(R.string.List_Whatsinvasive_title), "invasive_plant", getString(R.string.List_Whatsinvasive));
-		onetime_title.add(iItem);
+		// 2 :  Local invasive
+		iItem = new HelperListItem("none", getString(R.string.List_Whatsinvasive_title), "invasive_plant", getString(R.string.List_Whatsinvasive));
+		listArr.add(iItem);
 		
-		iItem = new listItem("none", getString(R.string.List_Whatsendangered_title), "endangered", getString(R.string.List_Whats_endangered));
-		onetime_title.add(iItem);
+		// 3 : Local Poisonous
+		iItem = new HelperListItem("none", "Local Poisonous", "poisonous", getString(R.string.List_Whats_poisonous));
+		listArr.add(iItem);
 		
-		iItem = new listItem("none", getString(R.string.List_Whatspoisonous_title), "poisonous", getString(R.string.List_Whats_poisonous));
-		onetime_title.add(iItem);
+		// 4 : Local Endangered
+		iItem = new HelperListItem("none", getString(R.string.List_Whatsendangered_title), "endangered", getString(R.string.List_Whats_endangered));
+		listArr.add(iItem);
+
+		// 10 : UCLA treelists
+		iItem = new HelperListItem(getString(R.string.List_User_Plant_Header), "UCLA Trees", "s1000", getString(R.string.List_User_Plant_UCLA_trees));
+		listArr.add(iItem);
 		
-		//iItem = new listItem("none", "Local Poisonous", "", "Native and cultural plants");
-		//onetime_title.add(iItem);
+		// 11 : Whats blooming
+		iItem = new HelperListItem("none", getString(R.string.List_Whatsblooming_title), "pbbicon", getString(R.string.List_User_Plant_SAMO));
+		listArr.add(iItem);
 		
-		iItem = new listItem(getString(R.string.List_User_Plant_Header), "UCLA Trees", "s1000", getString(R.string.List_User_Plant_UCLA_trees));
-		onetime_title.add(iItem);
-		
-		iItem = new listItem("none", getString(R.string.List_Whatsblooming_title), "pbbicon", getString(R.string.List_User_Plant_SAMO));
-		onetime_title.add(iItem);
-		
-		mylistapdater = new MyListAdapter(ListMain.this, R.layout.onetime_list ,onetime_title);
+		mylistapdater = new MyListAdapterMainPage(ListMain.this, R.layout.onetime_list ,listArr);
 		ListView MyList = getListView();
 		MyList.setAdapter(mylistapdater);
 	
-	}
-	
-	class MyListAdapter extends BaseAdapter{
-		Context maincon;
-		LayoutInflater Inflater;
-		ArrayList<listItem> arSrc;
-		int layout;
-		
-		public MyListAdapter(Context context, int alayout, ArrayList<listItem> aarSrc){
-			maincon = context;
-			Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			arSrc = aarSrc;
-			layout = alayout;
-		}
-		
-		public int getCount(){
-			return arSrc.size();
-		}
-		
-		public String getItem(int position){
-			return arSrc.get(position).Title;
-		}
-		
-		public long getItemId(int position){
-			return position;
-		}
-		
-		public View getView(int position, View convertView, ViewGroup parent){
-			if(convertView == null)
-				convertView = Inflater.inflate(layout, parent, false);
-			
-			ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-			
-			img.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/"+arSrc.get(position).Image_Url, null, null));
-			//img.setBackgroundResource(R.drawable.shapedrawable);
-			
-			
-			TextView header_view = (TextView) convertView.findViewById(R.id.list_header);
-			TextView title_view = (TextView) convertView.findViewById(R.id.list_name);
-			TextView title_desc = (TextView) convertView.findViewById(R.id.list_name_detail);
-			
-			/*
-			 *  If the header is not "none", show the header on the screen.
-			 */
-			if(!arSrc.get(position).Header.equals("none")) {
-				header_view.setText(" " + arSrc.get(position).Header);
-				header_view.setVisibility(View.VISIBLE);
-			}
-			else {
-				header_view.setVisibility(View.GONE);
-			}
-			
-			title_view.setText(arSrc.get(position).Title);
-			title_desc.setText(arSrc.get(position).Description + " ");
-	
-			return convertView;
-		}
-	}
-	
-	class listItem{	
-		listItem(String aHeader, String aTitle, String aImage_url, String aDescription){
-			Header = aHeader;
-			Title = aTitle;
-			Image_Url = aImage_url;
-			Description = aDescription;
-		}
-		
-		String Header;
-		String Title;
-		String Image_Url;
-		String Description;
 	}
 	
 	@Override
@@ -205,106 +150,122 @@ public class ListMain extends ListActivity {
 		pref = getSharedPreferences("userinfo", 0);
 		double latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
 		double longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
-		
-		if(!pref.getBoolean("listDownloaded", false)) {
-			Toast.makeText(ListMain.this, "Local lists are still downloading...", Toast.LENGTH_SHORT).show();
-		}
-		else {
-			/*
-			 *  0 : Project Budburst
-			 *  1 : What's Invasive
-			 *  2 : Native
-			 *  3 : Local Plants
-			 *  4 : What's Blooming
-			 *  and more later.
-			 */
-			switch(position) {
-			case 0:
-				/*
-				if(pref.getBoolean("localbudburst", false)) {
-					//Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-					intent = new Intent(ListMain.this, ListSubCategory.class);
-					intent.putExtra("category", Values.BUDBURST_LIST);
-					startActivity(intent);
-				}
-				else {
-					Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
-				}
-				*/
-				
-				intent = new Intent(ListMain.this, ListSubCategory.class);
-				intent.putExtra("category", Values.BUDBURST_LIST);
-				startActivity(intent);
-				
-				
-				break;
-			case 1:
-				/*
-				// What's Invasives
-				if(pref.getBoolean("localwhatsinvasive", false)) {
-					intent = new Intent(ListMain.this, ListSubCategory.class);
-					intent.putExtra("category", Values.WHATSINVASIVE_LIST);
-					startActivity(intent);
-				}
-				else {
-					Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
-				}*/
-				intent = new Intent(ListMain.this, ListSubCategory.class);
-				intent.putExtra("category", Values.WHATSINVASIVE_LIST);
-				startActivity(intent);
-				
-				
-				break;
-			case 2:
-				// Endangered Plants
-				//intent = new Intent(ListMain.this, LocalBudBurst.class);
-				//intent.putExtra("category", Values.NATIVE_LIST);
-				//startActivity(intent);
-				Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-				break;
-			case 3:
-				// Poisonous Plants
-				//intent = new Intent(ListMain.this, LocalBudBurst.class);
-				//intent.putExtra("category", Values.NATIVE_LIST);
-				//startActivity(intent);
-				Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-				break;
-			case 4:
-				// Local Plant From Users
-				
-				if(pref.getBoolean("getTreeLists", false)) {
-					intent = new Intent(ListMain.this, UserDefinedTreeLists.class);
-					intent.putExtra("from", 0);
-					startActivity(intent);
-				}
-				else {
-					
-					if(pref.getBoolean("firstDownloadTreeList", true)) {
-						/*
-						 * Get User Plant Tree Lists - UCLA
-						 */
-						
-						Toast.makeText(this, getString(R.string.Start_Downloading_UCLA_Tree_Lists), Toast.LENGTH_SHORT).show();
-						
-						new GetUserPlantLists().execute(ListMain.this);
-						
-						SharedPreferences.Editor edit = pref.edit();
-						edit.putBoolean("firstDownloadTreeList", false);
-						edit.commit();
-					}
-					else {
-						Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
-					}	
-				}
-				//intent = new Intent(ListMain.this, UserDefinedTreeLists.class);
-				//intent.putExtra("from", 0);
-				//startActivity(intent);
-				break;
-			case 5:
-				// Whats Blooming
-				Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-				break;		
+	
+		/*
+		 *  1 : Project Budburst
+		 *  2 : What's Invasive
+		 *  3 : Poisonous
+		 *  4 : Endangered
+		 *  10 : Tree lists 
+		 *  11 : What's Blooming
+		 *  and more later.
+		 */
+		switch(position) {
+		case 0:
+			if(!pref.getBoolean("listDownloaded", false)) {
+				Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
 			}
+			else {
+				intent = new Intent(ListMain.this, ListSubCategory.class);
+				intent.putExtra("category", HelperValues.LOCAL_BUDBURST_LIST);
+				startActivity(intent);
+			}
+			break;
+		case 1:
+			if(!pref.getBoolean("listDownloaded", false)) {
+				Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+			}
+			else {
+				intent = new Intent(ListMain.this, ListSubCategory.class);
+				intent.putExtra("category", HelperValues.LOCAL_WHATSINVASIVE_LIST);
+				startActivity(intent);
+			}	
+			break;
+			
+		case 2:
+			// Poisonous Plants
+			if(!pref.getBoolean("listDownloaded", false)) {
+				Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+			}
+			else {
+				intent = new Intent(ListMain.this, ListSubCategory.class);
+				intent.putExtra("category", HelperValues.LOCAL_POISONOUS_LIST);
+				startActivity(intent);
+			}
+			
+			//Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+			break;
+			
+		case 3:
+			// Endangered Plants
+			if(!pref.getBoolean("listDownloaded", false)) {
+				Toast.makeText(ListMain.this, getString(R.string.Still_Downloading), Toast.LENGTH_SHORT).show();
+			}
+			else {
+				intent = new Intent(ListMain.this, ListSubCategory.class);
+				intent.putExtra("category", HelperValues.LOCAL_THREATENED_ENDANGERED_LIST);
+				startActivity(intent);
+			}
+			break;
+			
+		case 4:
+			// Local Plant From Users (TreeLists)
+			if(pref.getBoolean("getTreeLists", false)) {
+				intent = new Intent(ListMain.this, ListUserTrees.class);
+				PBBItems pbbItem = new PBBItems();
+				pbbItem.setCategory(HelperValues.USER_DEFINED_TREE_LISTS);
+				
+				intent.putExtra("pbbItem", pbbItem);
+				intent.putExtra("from", 0);
+				startActivity(intent);
+			}
+			else {
+				if(pref.getBoolean("firstDownloadTreeList", true)) {
+					Toast.makeText(ListMain.this, "To download the list, Go 'Settings' page", Toast.LENGTH_SHORT).show();
+				}
+				else {
+					Toast.makeText(ListMain.this, "Still downloading - Tree lists", Toast.LENGTH_SHORT).show();
+				}
+			}
+			break;
+		case 5:
+			// Whats Blooming
+			Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+			break;		
 		}
+	}
+	
+
+	
+	/*
+	 * Menu option(non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
+	public boolean onCreateOptionsMenu(Menu menu){
+		super.onCreateOptionsMenu(menu);
+		
+		menu.add(0, 1, 0, getString(R.string.Menu_help)).setIcon(android.R.drawable.ic_menu_help);
+		menu.add(0, 2, 0, getString(R.string.Menu_settings)).setIcon(android.R.drawable.ic_menu_preferences);
+		
+		return true;
+	}
+	
+	/*
+	 * Menu option selection handling(non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
+	public boolean onOptionsItemSelected(MenuItem item){
+		
+		switch(item.getItemId()){
+		case 1:
+			Toast.makeText(ListMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+			return true;
+		case 2:			
+			Intent intent = new Intent(ListMain.this, HelperSettings.class);
+			intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
+			startActivity(intent);
+			return true;
+		}
+		return false;
 	}
 }

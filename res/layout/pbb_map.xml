@@ -17,6 +17,7 @@
 		android:apiKey="@string/mapKeyDeveloper"
 		android:clickable="true" />
 </RelativeLayout>
+<!-- mapKeyDeveloper -->
 <!-- android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ" -->
 
 

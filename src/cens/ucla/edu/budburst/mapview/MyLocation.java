@@ -1,14 +1,13 @@
 package cens.ucla.edu.budburst.mapview;
 
-import cens.ucla.edu.budburst.Help;
-import cens.ucla.edu.budburst.Login;
-import cens.ucla.edu.budburst.MainPage;
+import cens.ucla.edu.budburst.PBBHelpPage;
+import cens.ucla.edu.budburst.PBBLogin;
+import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.Sync;
+import cens.ucla.edu.budburst.PBBSync;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.MyLocOverlay;
-import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.helper.HelperValues;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -43,9 +42,9 @@ public class MyLocation extends MapActivity {
 	private MapController mapCon = null;
 	private MyLocOverlay mOver = null;
 	private SitesOverlay sOverlay = null;
-	private double latitude = 0.0;
-	private double longitude = 0.0;
-	private float accuracy = 0;
+	private double mLatitude = 0.0;
+	private double mLongitude = 0.0;
+	private float mAccuracy = 0;
 	private TextView mylocInfo;
 	private boolean first_myLoc = true;
 	private boolean satelliteView = false;
@@ -57,21 +56,19 @@ public class MyLocation extends MapActivity {
 	    setContentView(R.layout.pbb_map);
 	    
 	    mMapView = (MapView)findViewById(R.id.map);
-	    mMapView.setBuiltInZoomControls(true);
 	    
 	    mylocInfo = (TextView) findViewById(R.id.myloc_accuracy);
 	    
 	    mapCon = mMapView.getController();
 	    mapCon.setZoom(19);
-	    
-	   
 	    /*
 	     * Add Mylocation Overlay
 	     */
 	    mOver = new MyLocOverlay(MyLocation.this, mMapView);
 	    mOver.enableMyLocation();
 	    mMapView.getOverlays().add(mOver);
-	    
+	    mMapView.setSatellite(true);
+	    mMapView.setBuiltInZoomControls(true);
 	    /*
 	     * Add ItemizedOverlay Overlay
 	     */
@@ -80,16 +77,14 @@ public class MyLocation extends MapActivity {
 	    sOverlay = new SitesOverlay(MyLocation.this, marker);	    
 	    mMapView.getOverlays().add(sOverlay);
 	    
-	   	
-	    mMapView.setSatellite(false);
-	    mMapView.invalidate();
 	    
+	    //mMapView.invalidate();
 	    pref = getSharedPreferences("userinfo",0);
-	    latitude = Double.parseDouble(pref.getString("latitude", "0.0"));
-	    longitude = Double.parseDouble(pref.getString("longitude", "0.0"));
+	    mLatitude = Double.parseDouble(pref.getString("latitude", "0.0"));
+	    mLongitude = Double.parseDouble(pref.getString("longitude", "0.0"));
 	    
-	    GeoPoint geoP = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
-	    mapCon.animateTo(geoP);
+	    GeoPoint geoPoint = getPoint(mLatitude, mLongitude);
+	    mapCon.animateTo(geoPoint);
 	   
 	    gpsListener = new GpsListener();
 	    locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -103,13 +98,13 @@ public class MyLocation extends MapActivity {
 		@Override
 		public void onLocationChanged(Location loc) {
 			if(loc != null) {
-				latitude = loc.getLatitude();
-				longitude = loc.getLongitude();
-				accuracy = loc.getAccuracy();
+				mLatitude = loc.getLatitude();
+				mLongitude = loc.getLongitude();
+				mAccuracy = loc.getAccuracy();
 				
-				GeoPoint geoPoint = new GeoPoint((int)(latitude * 1000000), (int)(longitude * 1000000));
+				GeoPoint geoPoint = getPoint(mLatitude, mLongitude);
 				
-				mylocInfo.setText("Accuracy : " + accuracy + "\u00b1m");
+				mylocInfo.setText("Accuracy : " + mAccuracy + "\u00b1m");
 				
 				if(first_myLoc) {
 					mapCon.animateTo(geoPoint);
@@ -141,6 +136,10 @@ public class MyLocation extends MapActivity {
 		return false;
 	}
 	
+	private GeoPoint getPoint(double lat, double lon) {
+		return(new GeoPoint((int)(lat*1000000.0), (int)(lon*1000000.0)));
+	}
+	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -160,9 +159,9 @@ public class MyLocation extends MapActivity {
 	   				SharedPreferences.Editor edit = pref.edit();
 	   				edit.putBoolean("new", true);
 	   				edit.putBoolean("highly", true);
-	   				edit.putString("latitude", Double.toString(latitude));
-	   				edit.putString("longitude", Double.toString(longitude));
-	   				edit.putString("accuracy", Float.toHexString(accuracy));
+	   				edit.putString("latitude", Double.toString(mLatitude));
+	   				edit.putString("longitude", Double.toString(mLongitude));
+	   				edit.putString("accuracy", Float.toHexString(mAccuracy));
 	   				edit.commit();
 	   				
 	   				finish();
@@ -186,11 +185,10 @@ public class MyLocation extends MapActivity {
 	   				edit.putBoolean("highly", true);
 	   				edit.putString("latitude", Double.toString(sOverlay.getLatitude()));
 	   				edit.putString("longitude", Double.toString(sOverlay.getLongitude()));
-	   				edit.putString("accuracy", Float.toHexString(accuracy));
+	   				edit.putString("accuracy", Float.toHexString(mAccuracy));
 	   				edit.commit();
 	   				
 	   				finish();
-
 				}
 			})
 	   		.show();			

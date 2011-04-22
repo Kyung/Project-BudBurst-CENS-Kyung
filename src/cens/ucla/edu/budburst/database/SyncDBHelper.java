@@ -2,11 +2,13 @@ package cens.ucla.edu.budburst.database;
 
 import java.util.ArrayList;
 
-import cens.ucla.edu.budburst.helper.PlantItem;
+import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class SyncDBHelper extends SQLiteOpenHelper{
 	
@@ -16,7 +18,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 	public static final int SYNCED_NO = 9;
 	
 	public SyncDBHelper(Context context){
-		super(context, "syncBudburst.db", null, 31);
+		super(context, "syncBudburst.db", null, 33);
 	}
 	
 	public void onCreate(SQLiteDatabase db){
@@ -30,7 +32,15 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				"protocol_id NUMERIC," +
 				"common_name TEXT," +
 				"active NUMERIC," + // active 0(need to be removed), 1(nothing), 2(update the species)
-				"synced NUMERIC);");
+				"synced NUMERIC, " + 
+				"category NUMERIC DEFAULT 1);");
+				// category 1 : budburst
+				// category 2 : invasive
+				// category 3 : poisonous
+				// category 4 : endangered
+				// category 10 : treelists
+				// category 11 : blooming
+				
 				
 				
 		//If synced is 
@@ -126,28 +136,29 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 	*/
 	
 	
-	public ArrayList<PlantItem> getAllMyListInformation(Context cont) {
+	public ArrayList<HelperPlantItem> getAllMyListInformation(Context cont) {
 		SyncDBHelper dbhelper = new SyncDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getReadableDatabase();
 		
-		ArrayList<PlantItem> plantList = new ArrayList<PlantItem>();
+		ArrayList<HelperPlantItem> plantList = new ArrayList<HelperPlantItem>();
 		
-		PlantItem pi;
+		HelperPlantItem pi;
 		
-		Cursor cursor = db.rawQuery("SELECT _id, species_id, site_id, site_name, protocol_id, common_name FROM my_plants WHERE synced=" + this.SYNCED_YES, null);
-		Cursor cursor2 = null;
-		Cursor cursor3 = null;
+		Cursor cursor = db.rawQuery("SELECT _id, species_id, site_id, site_name, protocol_id, common_name, category FROM my_plants WHERE synced=" + this.SYNCED_YES, null);
 		
 		while(cursor.moveToNext()) {
-			 cursor2 = db.rawQuery("SELECT species_id, site_id, phenophase_id, image_id, time, note FROM my_observation WHERE species_id = " + cursor.getInt(1), null);
+			 Cursor cursor2 = db.rawQuery("SELECT species_id, site_id, phenophase_id, image_id, time, note FROM my_observation WHERE species_id = " + cursor.getInt(1) + " LIMIT 1", null);
 			 
 			 int speciesID = cursor.getInt(1);
+			 int protocolID = cursor.getInt(4);
+			 int category = cursor.getInt(6);
 			 String commonName = cursor.getString(5);
 			 String scienceName = "";
 			 double latitude = 0.0;
 			 double longitude = 0.0;
+			 int siteID = cursor.getInt(2);
 			 
-			 cursor3 = db.rawQuery("SELECT latitude, latitude FROM my_sites WHERE site_id=" + cursor.getInt(2), null);
+			 Cursor cursor3 = db.rawQuery("SELECT latitude, longitude FROM my_sites WHERE site_id=" + siteID, null);
 			 while(cursor3.moveToNext()) {
 				 latitude = cursor3.getDouble(0);
 				 longitude = cursor3.getDouble(1);
@@ -155,26 +166,83 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 			 
 			 while(cursor2.moveToNext()) {
 				 int phenophaseID = cursor2.getInt(2);
+				 int plantID = 0; // we don't have a plantID for monitored plants, so just put 0.
 				 
 				 String imageName = cursor2.getString(3);
 				 String dtTaken = cursor2.getString(4);
 				 String notes = cursor2.getString(5);
 				 
-				 pi = new PlantItem(speciesID, commonName, scienceName, phenophaseID, latitude, longitude, imageName, dtTaken, notes);
+				 Log.i("K", "Lat: " + latitude + ", Lng: " + longitude);
+				 
+				 pi = new HelperPlantItem(HelperValues.MY_PLANT_LIST, HelperValues.FROM_PLANT_LIST, 
+						 speciesID, siteID, category, "" ,commonName, scienceName, phenophaseID, 
+						 protocolID, latitude, longitude, imageName, dtTaken, notes);
 				 plantList.add(pi);
 			 }
 			 cursor2.close();
 			 cursor3.close();
 		}
 		
-		dbhelper.close();
-		
+		dbhelper.close();		
 		cursor.close();
-		cursor2.close();
-		cursor3.close();
 		
 		return plantList;
 	}
+	
+	
+	public String getScienceName(Context context, int speciesID, int siteID) {
+	
+		return null;
+	}
+	
+	public String getCommonName() {
+		
+		return null;
+	}
+	
+	public String getImageName(Context context, int speciesID, int siteID) {
+		
+		SyncDBHelper dbhelper = new SyncDBHelper(context);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		Cursor cursor = db.rawQuery("SELECT image_id FROM my_observation WHERE species_id=" + 
+				speciesID + " AND site_id=" + siteID, null);
+		
+		String getImageName = "";
+		if(cursor.getCount() > 0) {
+			cursor.moveToNext();
+			getImageName = cursor.getString(0);
+		}
+
+		cursor.close();
+		db.close();
+		return getImageName;
+	}
+	
+	public String getNote(Context context, int speciesID, int siteID) {
+		SyncDBHelper dbhelper = new SyncDBHelper(context);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		Cursor cursor = db.rawQuery("SELECT note FROM my_observation WHERE species_id=" + 
+				speciesID + " AND site_id=" + siteID, null);
+		
+		String getNote = "";
+		if(cursor.getCount() > 0) {
+			cursor.moveToNext();
+			getNote = cursor.getString(0);
+		}
+		
+		cursor.close();
+		db.close();
+		
+		return getNote;
+	}
+	
+	public int getProtocolID() {
+		
+		return 0; 
+	}
+	
 	
 		
 	public void clearAllTable(Context cont){

@@ -1,0 +1,529 @@
+package cens.ucla.edu.budburst;
+
+import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperMedia;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.utils.PBBItems;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Vibrator;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class UpdatePlantInfo extends Activity {
+
+	private int mPhenoID;
+	private int mSpeciesID;
+	private int mSiteID;
+	private int mProtocolID;
+	private int mOnetimeplantID;
+	private int mPreviousActivity;
+	private int mCategory;
+	
+	private String mPhenoName = null;
+	private String pheno_text = null;
+	private String mCommonName	= null;
+	private String mScienceName	= null;
+	private String mNote		= null;
+	//private String mImagePath = null;
+	private String mCameraImageID 	= null;
+	private String mDate			= null;
+	
+	private boolean mDirect;
+	
+	//private Double mLatitude = null;
+	//private Double mLongitude = null;
+	
+	private File dict_tmp 			= null;
+	private Button saveBtn 			= null;
+	private Button siteBtn			= null;
+	private EditText notes			= null;
+	private View take_photo 		= null;
+	private View replace_photo 		= null;
+	private ImageView photo_image 		= null;
+	private HelperFunctionCalls mHelper;
+	
+	private PBBItems pbbItem;
+	
+	protected static final int PHOTO_CAPTURE_CODE = 0;
+	protected static final int GET_SUMMARY_CODE = 1;
+	
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.plantinformation);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(" " + getString(R.string.PlantInfo_makeObs));
+		
+		// get variables from the previous intent
+		getParcelable();
+		
+	    StaticDBHelper sDBH = new StaticDBHelper(this);
+		HashMap pInfo = sDBH.getPhenoName(this, mPhenoID);
+
+		// set the layout
+		ImageView species_image = (ImageView) findViewById(R.id.species_image);
+	    TextView species_name = (TextView) findViewById(R.id.species_name);
+	    TextView science_name = (TextView) findViewById(R.id.science_name);
+		ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
+		TextView phenoTxt = (TextView) findViewById(R.id.pheno_text);
+		TextView phenoName = (TextView) findViewById(R.id.pheno_name);
+		photo_image = (ImageView) findViewById(R.id.image);
+		photo_image.setVisibility(View.VISIBLE);
+		
+		species_name.setText(mCommonName);
+		science_name.setText(mScienceName);
+		
+		// species_image view
+		// should be dealt differently by category
+		species_image.setVisibility(View.VISIBLE);
+		mHelper = new HelperFunctionCalls();
+		mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+	   
+		
+		// set xml
+		notes = (EditText) findViewById(R.id.notes);
+		take_photo = this.findViewById(R.id.take_photo);
+		replace_photo = this.findViewById(R.id.replace_photo);
+		// show pheno_image and pheno_text
+
+		pheno_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + pInfo.get("pIcon"), null, null));
+		pheno_image.setBackgroundResource(R.drawable.shapedrawable);
+		phenoName.setText(pInfo.get("pType") + " ");
+		phenoTxt.setText(pInfo.get("pDesc") + " ");
+		notes.setText(mNote);
+
+	    dict_tmp = new File(Environment.getExternalStorageDirectory(), "pbudburst/pbb/");
+	    if(!dict_tmp.exists()) {
+	    	dict_tmp.mkdir();
+	    }
+	    
+	    take_photo.setVisibility(View.VISIBLE);
+	    replace_photo.setVisibility(View.GONE);
+
+	    		
+	    File file = new File(HelperValues.BASE_PATH + mCameraImageID + ".jpg");
+		
+		if(file.exists()) {
+			Bitmap bitmap = BitmapFactory.decodeFile(HelperValues.BASE_PATH + mCameraImageID + ".jpg");
+			photo_image.setImageBitmap(bitmap);
+			take_photo.setVisibility(View.GONE);
+		    replace_photo.setVisibility(View.VISIBLE);
+		    photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+		}
+		else {
+			photo_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			photo_image.setEnabled(false);
+			take_photo.setVisibility(View.VISIBLE);
+		    replace_photo.setVisibility(View.GONE);
+		}
+		
+	    species_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(UpdatePlantInfo.this, DetailPlantInfo.class);
+				intent.putExtra("pbbItem", pbbItem);
+				startActivity(intent);
+			}
+		});
+	    
+	    pheno_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(UpdatePlantInfo.this, PhenophaseDetail.class);
+				if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
+					intent.putExtra("from", HelperValues.FROM_PBB_PHENOPHASE);
+					intent.putExtra("protocol_id", mProtocolID);
+				}
+				else {
+					intent.putExtra("from", HelperValues.FROM_QC_PHENOPHASE);
+				}
+				
+				intent.putExtra("id", mPhenoID);
+				startActivity(intent);
+			}
+		});
+	    
+	    photo_image.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+				// TODO Auto-generated method stub
+				final RelativeLayout linear = (RelativeLayout) View.inflate(UpdatePlantInfo.this, R.layout.image_popup, null);
+				// TODO Auto-generated method stub
+				AlertDialog.Builder dialog = new AlertDialog.Builder(UpdatePlantInfo.this);
+				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
+				
+			    String imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
+
+			    File file = new File(imagePath);
+			    Bitmap bitmap = null;
+			    
+			    // if file exists show the photo on the ImageButton
+			    if(file.exists()) {
+			    	imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
+				   	bitmap = BitmapFactory.decodeFile(imagePath);
+				   	image_view.setImageBitmap(bitmap);
+			    }
+			    // if not, show 'no image' ImageButton
+			    else {
+			    	image_view.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/no_photo", null, null));
+			    }
+			    
+			    // when press 'Back', close the dialog
+				dialog.setPositiveButton(getString(R.string.Button_back), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub	
+					}
+				});
+		        dialog.setView(linear);
+		        dialog.show();
+			}
+		});
+	    
+	    // when click take_photo button
+		take_photo.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				try {
+					File file = new File(HelperValues.BASE_PATH);
+					if (file.exists()) {
+						if(!file.isDirectory()) {
+							Toast.makeText(UpdatePlantInfo.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+							finish();
+						}
+					}
+					else {
+						if (!file.mkdir()) {
+							Toast.makeText(UpdatePlantInfo.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+							finish();
+						}
+					}
+					
+					try {
+						SecureRandom prng = SecureRandom.getInstance("SHA1PRNG");
+						String randomNum = new Integer(prng.nextInt()).toString();
+						MessageDigest sha = MessageDigest.getInstance("SHA-1");
+						byte[] result = sha.digest(randomNum.getBytes());
+						mCameraImageID = hexEncode(result);
+					} catch (NoSuchAlgorithmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					
+					Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
+							Uri.fromFile(new File(HelperValues.BASE_PATH, mCameraImageID + ".jpg")));
+					startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
+				
+				}
+				catch(Exception e) {
+					Log.e("K", e.toString());
+				}
+			}
+		});
+		
+		
+		//Take replace button
+		replace_photo.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				File ld = new File(HelperValues.BASE_PATH);
+				if (ld.exists()) {
+					if (!ld.isDirectory()) {
+						// Should probably inform user ... hmm!
+						Toast.makeText(UpdatePlantInfo.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+						UpdatePlantInfo.this.finish();
+					}
+				} else {
+					if (!ld.mkdir()) {
+						Toast.makeText(UpdatePlantInfo.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+						UpdatePlantInfo.this.finish();
+					}
+				}
+
+				try {
+					SecureRandom prng = SecureRandom.getInstance("SHA1PRNG");
+					String randomNum = new Integer(prng.nextInt()).toString();
+					MessageDigest sha = MessageDigest.getInstance("SHA-1");
+					byte[] result = sha.digest(randomNum.getBytes());
+					mCameraImageID = hexEncode(result);
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				Intent mediaCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				mediaCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
+						Uri.fromFile(new File(HelperValues.BASE_PATH, mCameraImageID + ".jpg")));
+				startActivityForResult(mediaCaptureIntent, PHOTO_CAPTURE_CODE);
+			}
+		});
+		
+		saveBtn = (Button) findViewById(R.id.save_changes);
+		if(mDirect) {
+			saveBtn.setText(getString(R.string.PlantInfo_makeObs));
+		}
+		saveBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				try{
+					
+					Log.i("K", "PREVIOUS ACTIVITY : " + mPreviousActivity);
+					
+					if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
+						add_species_from_plantlist();
+					}
+					else if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE) {
+						add_species_from_quickcapture();
+					}
+					else {
+						// nothing is here.
+					}
+					
+					// add vibration when done
+					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+					vibrator.vibrate(500);
+					
+				}catch(Exception e){
+					Log.e("K", e.toString());
+				}
+
+				Intent intent = getIntent();
+				setResult(RESULT_OK, intent);
+				finish();	
+				
+			}
+		});
+	    // TODO Auto-generated method stub
+	}
+	
+	private void getParcelable() {
+	    //Intent p_intent = getIntent();
+		Bundle bundle = getIntent().getExtras();
+		pbbItem = bundle.getParcelable("pbbItem");
+		
+		mCommonName = pbbItem.getCommonName();
+	    mScienceName = pbbItem.getScienceName();
+	    mDate = pbbItem.getDate();
+	    mNote = pbbItem.getNote();
+	    mCameraImageID = pbbItem.getImageName();
+	    mCategory = pbbItem.getCategory();
+	    mPhenoID = pbbItem.getPhenophaseID();
+	    mProtocolID = pbbItem.getProtocolID();
+	    mSpeciesID = pbbItem.getSpeciesID();
+	    mSiteID = pbbItem.getSiteID();
+	    mOnetimeplantID = pbbItem.getPlantID();
+	    mPreviousActivity = bundle.getInt("from");
+	    mDirect = bundle.getBoolean("direct");
+	}
+	
+	private void add_species_from_quickcapture() {
+		
+		Log.i("K", "in add_species_from_quickcapture() function");
+		
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(UpdatePlantInfo.this);
+		SQLiteDatabase oDB = oDBH.getReadableDatabase();
+		
+		mDate = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
+		//Log.i("K", "SPECIES ID : " + mPhenoID + " , PHENOPHASE_ID : " + mPhenoID + ", onetimeplant_id : " + mOnetimeplantID);
+		Cursor cursor = oDB.rawQuery("SELECT plant_id, lat, lng, accuracy FROM oneTimeObservation WHERE plant_id = " + mOnetimeplantID
+				+ " AND phenophase_id=" + mPhenoID, null);
+		
+		int count = 0;
+		double latitude = 0.0;
+		double longitude = 0.0;
+		float accuracy = 0;
+		
+		while(cursor.moveToNext()) {
+			count = cursor.getCount();
+			latitude = cursor.getDouble(1);
+			longitude = cursor.getDouble(2);
+			accuracy = cursor.getFloat(3);
+		}
+		
+		cursor.close();
+		oDB.close();
+		
+		//Log.i("K", "COUNT : " + count);
+		//Log.i("K", "camera_image_id : " + mCameraImageID);
+		//Log.i("K", "onetimeplant_id : " + mOnetimeplantID + " notes.getText().toString() : " + notes.getText().toString() + " dt_taken : " + mDate);
+		
+		if(count > 0) {
+			
+			String tNotes = notes.getText().toString();
+			
+			Log.i("K", "NOTES: " + tNotes);
+			
+			//pbbItem.setLocalImageName(mCameraImageID);
+			//pbbItem.setNote(tNotes);
+			//pbbItem.setDate(mDate);
+			
+			SQLiteDatabase oneDB = oDBH.getWritableDatabase();
+			String query = "UPDATE oneTimeObservation SET " +
+			"image_id='" + mCameraImageID + "'," +
+			"dt_taken='" + mDate + "'," +
+			"notes='" + notes.getText().toString() + "'" + "," +
+			"synced=" + SyncDBHelper.SYNCED_NO + " " + 
+			"WHERE plant_id=" + mOnetimeplantID + " AND phenophase_id=" + mPhenoID + ";";
+			oneDB.execSQL(query);
+			oneDB.close();
+			
+			Toast.makeText(UpdatePlantInfo.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
+		}
+		else {
+			HelperFunctionCalls helper = new HelperFunctionCalls();
+			helper.insertNewObservation(UpdatePlantInfo.this, mOnetimeplantID, mPhenoID,
+					latitude, longitude, accuracy, mCameraImageID, notes.getText().toString());
+
+			Toast.makeText(UpdatePlantInfo.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	
+	private void add_species_from_plantlist() {
+		
+		SyncDBHelper syncDBHelper = new SyncDBHelper(UpdatePlantInfo.this);
+		SQLiteDatabase sDB = syncDBHelper.getReadableDatabase();
+		
+		String query = "SELECT _id FROM my_observation WHERE phenophase_id=" 
+						+ mPhenoID + " AND species_id=" + mSpeciesID + " AND site_id=" + mSiteID;
+		Cursor cursor = sDB.rawQuery(query, null);
+		
+		cursor.moveToNext();
+		int count = cursor.getCount();
+		sDB.close();
+		
+		SQLiteDatabase db = syncDBHelper.getWritableDatabase();
+		mDate = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
+		//INSERT INTO my_observation VALUES (null,56,3339,24,'3224193362','28 December 2010','ppp',9);
+		if(count == 0){
+			query = "INSERT INTO my_observation VALUES (" +
+					"null," +
+					mSpeciesID + "," +
+					mSiteID + "," +
+					mPhenoID + "," +
+					"'" + mCameraImageID + "'," +
+					"'" + mDate + "'," +
+					"'" + notes.getText().toString() + "'," +
+					SyncDBHelper.SYNCED_NO + ");";
+			Toast.makeText(UpdatePlantInfo.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+		}
+		else {
+			int c_id = cursor.getInt(0);
+			Log.i("K", "NOTES: " + notes.getText().toString());
+			
+			//pbbItem.setLocalImageName(mCameraImageID);
+			//pbbItem.setNote(notes.getText().toString());
+			//pbbItem.setDate(mDate);
+			
+			query = "UPDATE my_observation SET " +
+					"image_id='" + mCameraImageID + "'," +
+					"time='" + mDate + "'," +
+					"note='" + notes.getText().toString() + "'" + "," +
+					"synced=" + SyncDBHelper.SYNCED_NO + " " + 
+					"WHERE _id=" + c_id + ";"; 
+			
+			Toast.makeText(UpdatePlantInfo.this, getString(R.string.PlantInfo_successUpdate), Toast.LENGTH_SHORT).show();
+		}
+		
+		cursor.close();
+		Log.i("K", "QUERY : " + query);
+		db.execSQL(query);
+		db.close();
+		syncDBHelper.close();
+	}
+
+	static private String hexEncode( byte[] aInput){
+		StringBuilder result = new StringBuilder();
+		char[] digits = {'0', '1', '2', '3', '4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m'};
+		for ( int idx = 0; idx < 5; ++idx) {
+			byte b = aInput[idx];
+			result.append( digits[ (b&0xf0) >> 5 ] );
+			result.append( digits[ b&0x0f] );
+		}
+		return result.toString();
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// You can use the requestCode to select between multiple child
+		// activities you may have started. Here there is only one thing
+		// we launch.
+		Log.d("K", "onActivityResult");
+		
+		if(resultCode == Activity.RESULT_OK) {
+			
+			if (requestCode == PHOTO_CAPTURE_CODE) {
+				
+				String imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
+				
+				HelperMedia media = new HelperMedia();
+				photo_image.setImageBitmap(media.ShowPhotoTaken(imagePath));
+				photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
+				photo_image.setEnabled(true);
+				
+				Toast.makeText(this, getString(R.string.PlantInfo_photoAdded), Toast.LENGTH_SHORT).show();
+				
+				photo_image.setVisibility(View.VISIBLE);
+				take_photo.setVisibility(View.GONE);
+			    replace_photo.setVisibility(View.VISIBLE);
+			}
+		}			
+	}
+}
+

@@ -3,6 +3,8 @@ package cens.ucla.edu.budburst.weeklyplant;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,15 +16,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-import cens.ucla.edu.budburst.AddSite;
-import cens.ucla.edu.budburst.PlantList;
+import cens.ucla.edu.budburst.PBBAddSite;
+import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
-import cens.ucla.edu.budburst.helper.DrawableManager;
-import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.lists.ListsDetail;
+import cens.ucla.edu.budburst.helper.HelperDrawableManager;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.lists.ListDetail;
 import cens.ucla.edu.budburst.onetime.GetPhenophase;
 import cens.ucla.edu.budburst.onetime.QuickCapture;
 import android.app.Activity;
@@ -33,6 +35,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -53,9 +57,10 @@ public class WeeklyPlant extends Activity {
 	
 	private int mSpeciesID;
 	private int mProtocolID;
-	private int mCategory = Values.BUDBURST_LIST;
+	private int mCategory = HelperValues.LOCAL_BUDBURST_LIST;
 	private String mCommonName;
 	private String mScienceName;
+	private String mGetWeeklyPlant;
 	
 	private List<String> mList;
 	private ImageView mUrl;
@@ -67,8 +72,9 @@ public class WeeklyPlant extends Activity {
 	private Button myplantBtn;
 	private Button sharedplantBtn;
 	private CharSequence[] mSeqUserSite;
-	private FunctionsHelper mHelper;
+	private HelperFunctionCalls mHelper;
 	private HashMap<String, Integer> mMapUserSiteNameID;
+	
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -104,16 +110,32 @@ public class WeeklyPlant extends Activity {
 		/*
 		 * Call FunctionsHelper();
 		 */
-		mHelper = new FunctionsHelper();
+		mHelper = new HelperFunctionCalls();
 		mMapUserSiteNameID = mHelper.getUserSiteIDMap(WeeklyPlant.this);
 		
-		/*
-		 * Download weekly plant information from the server.
-		 */
-	    DownloadWeeklyPlant weeklyPlant = new DownloadWeeklyPlant(this);
-	    weeklyPlant.execute();	   
-	    
+		if(!isNetworkAvailable()) {
+			finish();
+		}
+		else {
+			/*
+			 * Download weekly plant information from the server.
+			 */
+		    DownloadWeeklyPlant weeklyPlant = new DownloadWeeklyPlant(this);
+		    weeklyPlant.execute();
+		}
+		
 	    // TODO Auto-generated method stub
+	}
+	
+	private boolean isNetworkAvailable() {
+		ConnectivityManager cManager = 
+			(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		
+		NetworkInfo nInfo = cManager.getActiveNetworkInfo();
+		
+		Log.i("K", "info : " + nInfo.isConnectedOrConnecting());
+		
+		return nInfo.isConnectedOrConnecting();
 	}
 	
 	@Override
@@ -166,20 +188,20 @@ public class WeeklyPlant extends Activity {
 				}
 				
 				switch(getProtocolID) {
-				case Values.WILD_FLOWERS:
-					mProtocolID = Values.QUICK_WILD_FLOWERS; 
+				case HelperValues.WILD_FLOWERS:
+					mProtocolID = HelperValues.QUICK_WILD_FLOWERS; 
 					break;
-				case Values.DECIDUOUS_TREES:
-					mProtocolID = Values.QUICK_TREES_AND_SHRUBS;
+				case HelperValues.DECIDUOUS_TREES:
+					mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
 					break;
-				case Values.EVERGREEN_TREES:
-					mProtocolID = Values.QUICK_TREES_AND_SHRUBS;
+				case HelperValues.EVERGREEN_TREES:
+					mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
 					break;
-				case Values.CONIFERS:
-					mProtocolID = Values.QUICK_TREES_AND_SHRUBS;
+				case HelperValues.CONIFERS:
+					mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
 					break;
-				case Values.GRASSES:
-					mProtocolID = Values.QUICK_GRASSES;
+				case HelperValues.GRASSES:
+					mProtocolID = HelperValues.QUICK_GRASSES;
 					break;
 				}
 				
@@ -207,7 +229,7 @@ public class WeeklyPlant extends Activity {
 						intent.putExtra("sname", mScienceName);
 						intent.putExtra("protocol_id", mProtocolID);
 						intent.putExtra("category", mCategory);
-						intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
 						
 						startActivity(intent);
 
@@ -226,7 +248,7 @@ public class WeeklyPlant extends Activity {
 						 */
 						Intent intent = new Intent(WeeklyPlant.this, GetPhenophase.class);
 						intent.putExtra("camera_image_id", "");
-						intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
 						intent.putExtra("cname", mCommonName);
 						intent.putExtra("sname", mScienceName);
 						intent.putExtra("protocol_id", mProtocolID);
@@ -269,11 +291,11 @@ public class WeeklyPlant extends Activity {
 				String new_plant_site_name = mSeqUserSite[which].toString();
 				
 				if(new_plant_site_name == "Add New Site") {
-					Intent intent = new Intent(WeeklyPlant.this, AddSite.class);
+					Intent intent = new Intent(WeeklyPlant.this, PBBAddSite.class);
 					intent.putExtra("species_id", mSpeciesID);
 					intent.putExtra("common_name", mCommonName);
 					intent.putExtra("protocol_id", mProtocolID);
-					intent.putExtra("from", Values.FROM_PLANT_LIST);
+					intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
 					startActivity(intent);
 				}
 				else {
@@ -281,8 +303,9 @@ public class WeeklyPlant extends Activity {
 						Toast.makeText(WeeklyPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
 
-						if(mHelper.insertNewMyPlantToDB(WeeklyPlant.this, mSpeciesID, mCommonName, new_plant_site_id, new_plant_site_name, mProtocolID)){
-							Intent intent = new Intent(WeeklyPlant.this, PlantList.class);
+						if(mHelper.insertNewMyPlantToDB(WeeklyPlant.this, mSpeciesID, mCommonName, 
+								new_plant_site_id, new_plant_site_name, mProtocolID, HelperValues.LOCAL_BUDBURST_LIST)){
+							Intent intent = new Intent(WeeklyPlant.this, PBBPlantList.class);
 							Toast.makeText(WeeklyPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							
 							/*
@@ -316,6 +339,10 @@ public class WeeklyPlant extends Activity {
 		private String getSpecies;
 		private String getHaiku;
 		
+		// getSpeciesInfo[0] = Science Name
+		// getSpeciesInfo[1] = Species Info
+		private String []getSpeciesInfo; 
+		
 		public DownloadWeeklyPlant(Context context) {
 			mContext = context;
 			
@@ -327,16 +354,17 @@ public class WeeklyPlant extends Activity {
 			
 			mDialog = ProgressDialog.show(mContext, "Please wait...", "Plant of the week!", true);
 			mDialog.setCancelable(true);
+			
+			mGetWeeklyPlant = "http://networkednaturalist.org/python_scripts/plant_of_the_week_scrape.py";
 		}
 
 		@Override
 		protected Void doInBackground(Void... unused) {
 			// TODO Auto-generated method stub
 		
-			String url = "http://networkednaturalist.org/python_scripts/plant_of_the_week_scrape.py";
-			
 			HttpClient httpClient = new DefaultHttpClient();
-			HttpPost httpPost = new HttpPost(url);
+			HttpPost httpPost = new HttpPost(mGetWeeklyPlant);
+			
 			String result = "";
 				
 			try {
@@ -366,15 +394,18 @@ public class WeeklyPlant extends Activity {
 					OneTimeDBHelper onetimeDBHelper = new OneTimeDBHelper(WeeklyPlant.this);
 					
 					mSpeciesID = staticDBHelper.getSpeciesID(WeeklyPlant.this, getSpecies);
-					mScienceName = staticDBHelper.getSpeciesName(WeeklyPlant.this, getSpecies);
+					getSpeciesInfo = staticDBHelper.getSpeciesName(WeeklyPlant.this, getSpecies);
+					mScienceName = getSpeciesInfo[0];
 					mCommonName = getSpecies;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				finish();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				finish();
 			}
 			// TODO Auto-generated method stub
 			return null;
@@ -385,13 +416,13 @@ public class WeeklyPlant extends Activity {
 			mDialog.dismiss();
 		
 		    mCredit.setText(getCredit);
-		    mLink.setText(getLink);
+		    mLink.setText(getSpeciesInfo[1]);
 		    mSpecies.setText(getSpecies);
 		    mHaiku.setText(getHaiku);
 		    
-		    Linkify.addLinks(mLink, Linkify.WEB_URLS);
+		    //Linkify.addLinks(mLink, Linkify.WEB_URLS);
 		    
-		    DrawableManager dm = new DrawableManager(mSpinner);
+		    HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
 			dm.fetchDrawableOnThread(getUrl, mUrl);
 			
 		}

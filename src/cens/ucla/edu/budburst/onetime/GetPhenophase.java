@@ -3,22 +3,24 @@ package cens.ucla.edu.budburst.onetime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cens.ucla.edu.budburst.AddPlant;
-import cens.ucla.edu.budburst.AddSite;
-import cens.ucla.edu.budburst.GetPhenophase_OneTime;
-import cens.ucla.edu.budburst.MainPage;
+import cens.ucla.edu.budburst.PBBAddNotes;
+import cens.ucla.edu.budburst.PBBAddPlant;
+import cens.ucla.edu.budburst.PBBAddSite;
+import cens.ucla.edu.budburst.GetPhenophaseShared;
+import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.PhenophaseDetail;
-import cens.ucla.edu.budburst.PlantInformation_Direct;
-import cens.ucla.edu.budburst.PlantList;
+import cens.ucla.edu.budburst.UpdatePlantInfo;
+import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapter2;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
-import cens.ucla.edu.budburst.helper.BackgroundService;
-import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.Values;
+import cens.ucla.edu.budburst.helper.HelperBackgroundService;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.utils.PBBItems;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -52,22 +54,23 @@ import android.widget.Toast;
 
 public class GetPhenophase extends ListActivity {
 	
-	private ArrayList<PlantItem> pItem;
-	private String commonName = null;
-	private String scienceName = null;
-	//private String dt_taken = null;
-	private String cameraImageID = null;
+	private ArrayList<HelperPlantItem> pItem;
+	private String mCommonName = null;
+	private String mScienceName = null;
+	private String mCameraImageID = null;
+	private String mImageID;
 	
-	private int speciesID = 0;
-	private int protocolID = 1;
-	private int _position = 0;
-	private int previousActivity;
-	private int category = 0;
+	private int mSpeciesID;
+	private int mProtocolID;
+	private int mPreviousActivity;
+	private int mCategory;
 	
 	private Button submitBtn = null;
 	private TextView myTitleText = null;
 	private MyListAdapter2 MyAdapter = null;
 	private ListView myList = null;
+	
+	private PBBItems pbbItem;
 	
 	//private double latitude = 0.0;
 	//private double longitude = 0.0;
@@ -88,48 +91,56 @@ public class GetPhenophase extends ListActivity {
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.Best_Phenophase));
 
-		Intent intent = getIntent();
-		cameraImageID = intent.getExtras().getString("camera_image_id");
-	    commonName = intent.getExtras().getString("cname");
-	    scienceName = intent.getExtras().getString("sname");
-	    previousActivity = intent.getExtras().getInt("from");
-	    protocolID = intent.getExtras().getInt("protocol_id");
+		Bundle bundle = getIntent().getExtras();
+		pbbItem = bundle.getParcelable("pbbItem");
 		
-		Log.i("K", "Previous_activity(GetPhenophase) : " + previousActivity);
+		mCommonName = pbbItem.getCommonName();
+		mScienceName = pbbItem.getScienceName();
+		mCameraImageID = pbbItem.getImageName();
+		mProtocolID = pbbItem.getProtocolID();
+		mSpeciesID = pbbItem.getSpeciesID();
+		mCategory = pbbItem.getCategory();
 		
-		if(previousActivity == Values.FROM_UCLA_TREE_LISTS) {
-			speciesID = intent.getExtras().getInt("tree_id");
+		mPreviousActivity = bundle.getInt("from");
+		Log.i("K", "Previous_activity (GetPhenophase) : " + mPreviousActivity);
+		Log.i("K", "Category (Getphenophase) : " + mCategory);
+		Log.i("K", "protocolID (Getphenophase) : " + mProtocolID);
+		// if the previous activity is from LOCAL_PLANT_LISTS,
+		// there is one more value, "image_id"
+		if(mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS) {
+			mImageID = bundle.getString("image_id");
+			
+			Log.i("K", "GetPhenophase(imageID) : " + mImageID);
 		}
-		
-		if(previousActivity == Values.FROM_LOCAL_PLANT_LISTS) {
-			category = intent.getExtras().getInt("category");
-			speciesID = intent.getExtras().getInt("species_id");
-		}
-		
-		if(previousActivity == Values.FROM_QUICK_CAPTURE 
-				|| previousActivity == Values.FROM_PLANT_LIST_ADD_SAMESPECIES 
-				|| previousActivity == Values.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
-			speciesID = intent.getExtras().getInt("species_id");
-			category = intent.getExtras().getInt("category");
-		}
-		
-		pItem = new ArrayList<PlantItem>();
+				
+		pItem = new ArrayList<HelperPlantItem>();
 
 		SQLiteDatabase db;
 		StaticDBHelper staticDB = new StaticDBHelper(GetPhenophase.this);
 		
 		db = staticDB.getReadableDatabase();
 		
-		Cursor cursor = db.rawQuery("SELECT _id, Type, Phenophase_Icon, Description FROM Onetime_Observation WHERE Category=" + protocolID, null);
+		String query = null;
+		if(mProtocolID == 1) {
+			query = "SELECT _id, Type, Phenophase_Icon, Description FROM Onetime_Observation WHERE Protocol_ID=1";
+		}
+		else if(mProtocolID == 2) {
+			query = "SELECT _id, Type, Phenophase_Icon, Description FROM Onetime_Observation WHERE Protocol_ID=2";
+		}
+		else {
+			query = "SELECT _id, Type, Phenophase_Icon, Description FROM Onetime_Observation WHERE Protocol_ID=3";
+		}
+		
+		Cursor cursor = db.rawQuery(query, null);
 		while(cursor.moveToNext()) {
 			boolean header = false;
 			
-			Log.i("K", "PROTOCOL ID : " + protocolID);
+			Log.i("K", "PROTOCOL ID : " + mProtocolID);
 			
 			/*
 			 * This is for choosing the list items with the header information.
 			 */
-			if(protocolID == 1) {
+			if(mProtocolID == 1) {
 				// to show the header, we need to know the first index of each category.
 				if(cursor.getInt(0) == 1 
 						|| cursor.getInt(0) == 4 
@@ -139,7 +150,7 @@ public class GetPhenophase extends ListActivity {
 					header = true;
 				}
 			}
-			else if(protocolID == 2) {
+			else if(mProtocolID == 2) {
 				// to show the header, we need to know the first index of each category.
 				if(cursor.getInt(0) == 16 
 						|| cursor.getInt(0) == 19) {
@@ -147,7 +158,7 @@ public class GetPhenophase extends ListActivity {
 				}
 
 			}
-			else if(protocolID == 3) {
+			else if(mProtocolID == 3) {
 				// to show the header, we need to know the first index of each category.
 				if(cursor.getInt(0) == 22 
 						|| cursor.getInt(0) == 23 
@@ -157,7 +168,7 @@ public class GetPhenophase extends ListActivity {
 			}
 			
 			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(2), null, null);
-			PlantItem pi = new PlantItem(resID, cursor.getString(3), cursor.getInt(2), cursor.getString(1), cursor.getInt(0), header);
+			HelperPlantItem pi = new HelperPlantItem(resID, cursor.getString(3), cursor.getInt(2), cursor.getString(1), cursor.getInt(0), header);
 			pItem.add(pi);
 		}
 		
@@ -173,63 +184,29 @@ public class GetPhenophase extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
 		//GetPhenophase.this.unregisterReceiver(receiver);
-		if(previousActivity == Values.FROM_UCLA_TREE_LISTS) {
-			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
-			
-			intent.putExtra("cname", commonName);
-			intent.putExtra("sname", scienceName);
-			intent.putExtra("protocol_id", protocolID); // temporary put protocol_id to 9
-			intent.putExtra("camera_image_id", cameraImageID);
-			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
-			intent.putExtra("species_id", speciesID);
-			intent.putExtra("category", -1);
-			
-			// for the from value, as the parameters passed are the same as FROM_ONETIME_DIRECT, let's use that.
-			intent.putExtra("from", Values.FROM_UCLA_TREE_LISTS);
+		if(mPreviousActivity == HelperValues.FROM_UCLA_TREE_LISTS) {
+			Intent intent = new Intent(GetPhenophase.this, PBBAddNotes.class);
+			pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
+			intent.putExtra("pbbItem", pbbItem);
+			intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
 			startActivity(intent);
 		}
-		else if(previousActivity == Values.FROM_LOCAL_PLANT_LISTS 
-				|| previousActivity == Values.FROM_PLANT_LIST_ADD_SAMESPECIES) {
-			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
-			
-			intent.putExtra("cname", commonName);
-			intent.putExtra("sname", scienceName);
-			intent.putExtra("protocol_id", protocolID); // temporary put protocol_id to 9
-			intent.putExtra("camera_image_id", cameraImageID);
-			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
-			intent.putExtra("species_id", 0); // there's no species_id in LOCAL PLANT LISTS
-			intent.putExtra("category", category);
-			intent.putExtra("from", Values.FROM_LOCAL_PLANT_LISTS);
+		else if(mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS 
+				|| mPreviousActivity == HelperValues.FROM_PLANT_LIST_ADD_SAMESPECIES) {
+			Intent intent = new Intent(GetPhenophase.this, PBBAddNotes.class);
+			pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
+			intent.putExtra("pbbItem", pbbItem);
+			intent.putExtra("image_id", mImageID);
+			intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
 			startActivity(intent);
 		}
-		else if(previousActivity == Values.FROM_QUICK_CAPTURE
-				|| previousActivity == Values.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
-			Intent intent = new Intent(GetPhenophase.this, AddNotes.class);
-			
-			intent.putExtra("cname", commonName);
-			intent.putExtra("sname", scienceName);
-			intent.putExtra("protocol_id", protocolID); // temporary put protocol_id to 9
-			intent.putExtra("camera_image_id", cameraImageID);
-			intent.putExtra("pheno_id", pItem.get(position).PhenoID);
-			intent.putExtra("species_id", speciesID);
-			intent.putExtra("category", category);
-			intent.putExtra("from", Values.FROM_QUICK_CAPTURE);
+		else if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE
+				|| mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
+			Intent intent = new Intent(GetPhenophase.this, PBBAddNotes.class);
+			pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
+			intent.putExtra("pbbItem", pbbItem);
+			intent.putExtra("from", HelperValues.FROM_QUICK_CAPTURE);
 			startActivity(intent);
 		}
-		/*
-		 * If the previous activity is from "Quick Share" on the PlantLists
-		 */
-		/*
-		 * 
-		else {
-			Intent intent = new Intent(GetPhenophase.this, OneTimeMain.class);
-			
-			intent.putExtra("camera_image_id", camera_image_id);
-			intent.putExtra("pheno_id", position + 1);
-			intent.putExtra("FROM", Values.FROM_QUICK_CAPTURE);
-			
-			startActivity(intent);
-		}
-		*/
 	}
 }

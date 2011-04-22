@@ -13,15 +13,20 @@
     <string name="get_onetimeob_others">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_onetime_otherusers_observation.php</string>
     <string name="authentication_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?authentication</string>
     <string name="authentication">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_authorization</string>
+    <string name="get_floracaching_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracaching_list.php</string>
+    <string name="get_floracaching_plant_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracaching_plant_lists.php</string>
     <string name="user_plant_lists_image">http://networkednaturalist.org/User_Plant_Lists_Images/</string>
-    <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below.\n \n (1) Add a plant. \nClick MENU-&gt;ADD-&gt;ADD PLANT \n\n (2) Your quick capture. \nClick BACK-&gt;QUICK CAPTURE \n\n\n If you already have the species lists, Click MENU-&gt;SYNCHRONIZE\n\n</string>
+    <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below.\n \n (1) Add a monitored BudBurst Observer plant. \nClick MENU-&gt;ADD-&gt;Add Observer \n\n (2) Share an Occasional Observer plant.  \nClick MENU-&gt;ADD-&gt;Share Occational \n\n\n If you already have observed species, then click MENU-&gt;SYNCHRONIZE\n\n</string>
     <string name="get_user_spcies_URL">http://www.google.com</string>
     <string name="upload_observation_URL">http://www.naver.com</string>
     <string name="add_site_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/register.php</string>
     <string name="download_obs_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/view.php</string>
     <string name="download_onetime_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/onetime.php</string>
     <string name="add_plant_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?add_plant</string>
-    <string name="upload_ot_observation">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service</string>    
+    <string name="upload_ot_observation">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service</string>
+    <string name="request_to_kickoff_background_search">http://networkednaturalist.org/python_scripts/cens-dylan/announce.py</string>
+    <string name="request_to_get_result">http://networkednaturalist.org/python_scripts/cens-dylan/search.py</string>
+    <string name="check_version_number">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/checkUpdates.php</string>    
     <string name="submit_question">You have unsubmitted observations. Do you want to submit them?</string>
     <string-array name="state">
        <item>AL</item> 
@@ -143,6 +148,7 @@
 <string name="Alert_thanks">Thank you!</string>
 <string name="Alert_holdBackExit">Hold the Back Button to exit.</string>
 <string name="Menu_help">Help</string>
+<string name="Menu_settings">Settings</string>
 <string name="Menu_Satellite">Change view</string>
 <string name="Menu_logout">Log out</string>
 <string name="Menu_about">About</string>
@@ -261,6 +267,7 @@
 <string name="Unknown_Plant_Text_2">Add optional site description and select Done.</string>
 <string name="Unknown_Plant_Text_3">Add notes to your observation or Skip to the site description.</string>
 <string name="Unknown_Plant_Text_4">Add site name and optional description, then select Done.</string>
+<string name="Floracache_Mid_Level_Text">Find floracache species.</string>
 <string name="Submit">Submit</string>
 <string name="Cannot_Change">You cannot change the name of this species</string>
 <string name="DoSyncFirst_For_UnknownPlant">Please synchronize first if you have unofficial species</string>
@@ -342,6 +349,7 @@
 <string name="InValid_ID_PW">Incorrect Username/Password. Please try again.</string>
 <string name="Menu_Lists">Plant Lists</string>
 <string name="Menu_Maps">Map View</string>
+<string name="Menu_Floracaching">Floracache Group Lists</string>
 <string name="Menu_Refresh">Refresh the lists</string>
 <string name="Local_BudBurst">Local plants</string>
 <string name="Local_Invasive">Local plants</string>
@@ -353,19 +361,23 @@
 <string name="Button_Cancel">Cancel</string>
 <string name="Button_Photo">Photo</string>
 <string name="Button_NoPhoto">No Photo</string>
+<string name="Start_Downloading">Start downloading local species</string>
 <string name="Still_Downloading">Still Downloading the lists</string>
 <string name="Download_complete_local">Successfully download local plant lists</string>
 <string name="Start_Downloading_UCLA_Tree_Lists">Start Downloading user defined lists</string>
+<string name="Start_Downloading_Floracache_Lists">Start Downloading floracache lists</string>
 <string name="List_Budburst">Local BudBurst plants</string>
 <string name="List_Whatsinvasive">Help locate local invasives</string>
 <string name="List_Whats_endangered">Local endangered species from the USDA</string>
 <string name="List_Whats_poisonous">Local poisonous plants from the USDA</string>
+<string name="List_Whats_native">Local native plants from the USDA</string>
 <string name="List_User_Plant_UCLA_trees">Tree species on campus</string>
 <string name="List_User_Plant_SAMO">Santa Monica blooming plants</string>
 <string name="List_Official_Header">Local plants from national plant lists</string>
 <string name="List_User_Plant_Header">Locally created lists of interest</string>
 <string name="List_Project_Budburst_title">Project BudBurst</string>
 <string name="List_Whatsinvasive_title">Local Invasives</string>
+<string name="List_Native_title">Local Native</string>
 <string name="List_Whatsendangered_title">Local Endangered</string>
 <string name="List_Whatspoisonous_title">Local Poisonous</string>
 <string name="List_Whatsblooming_title">What\'s Blooming</string>
@@ -375,5 +387,8 @@
 <string name="mapKeyDeveloper">0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ</string>
 <string name="mapKey">0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ</string>
 <string name="otherCategoryMap">Choose a list</string>
+<string name="DownLoad_Tree_Lists">Download Treelists</string>
+<string name="List_ask_connectivity">Make sure you have a good connectivity. Proceed?</string>
+<string name="List_Download_Title">Download local species</string>
 <item type="id" name="app_notification_id"/>
 </resources>

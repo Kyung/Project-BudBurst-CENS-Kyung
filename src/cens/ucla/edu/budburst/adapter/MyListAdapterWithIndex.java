@@ -19,23 +19,23 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.SpeciesDetail;
-import cens.ucla.edu.budburst.helper.FunctionsHelper;
-import cens.ucla.edu.budburst.helper.PlantItem;
-import cens.ucla.edu.budburst.helper.Values;
-import cens.ucla.edu.budburst.lists.ListsDetail;
-import cens.ucla.edu.budburst.onetime.Whatsinvasive;
+import cens.ucla.edu.budburst.DetailPlantInfo;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.lists.ListDetail;
+import cens.ucla.edu.budburst.onetime.OneTimeAddMyPlant;
 
 public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndexer {
 	private Context maincon;
 	private LayoutInflater Inflater;
-	private ArrayList<PlantItem> items;
+	private ArrayList<HelperPlantItem> items;
 	private int resourceID;
 	private HashMap<String, Integer> alphaIndexer;
 	private String[] sections;
 	private String oldChar = "";
 
-	public MyListAdapterWithIndex(Context context, int resource, ArrayList<PlantItem> items){
+	public MyListAdapterWithIndex(Context context, int resource, ArrayList<HelperPlantItem> items){
 		super(context, 0, items);
 		
 		resourceID = resource;
@@ -47,7 +47,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		int size = items.size();
 		
 		for(int i = 0 ; i < size ; i++) {
-			PlantItem pi = items.get(i);
+			HelperPlantItem pi = items.get(i);
 			String firstChar = pi.CommonName.substring(0,1);
 			firstChar = firstChar.toUpperCase();
 			
@@ -80,7 +80,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		//current_position = arSrc.get(position).SpeciesID;
 		
 		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-		String imagePath = Values.TREE_PATH + items.get(position).SpeciesID + ".jpg";
+		String imagePath = HelperValues.TREE_PATH + items.get(position).SpeciesID + ".jpg";
 		Log.i("K", "imagePath : " + imagePath);
 		
 		//File existPhoto = new File(imagePath);
@@ -88,7 +88,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		//	imagePath = Values.TREE_PATH + "s1000.jpg";
 		//}
 		
-		FunctionsHelper helper = new FunctionsHelper();
+		HelperFunctionCalls helper = new HelperFunctionCalls();
 		img.setImageBitmap(helper.showImage(maincon, imagePath));
 
 		TextView cname = (TextView)convertView.findViewById(R.id.commonname);
@@ -107,6 +107,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		/*
 		 *  Call View from the xml and link the view to current position.
 		 */
+		/*
 		View thumbnail = convertView.findViewById(R.id.wrap_icon);
 		thumbnail.setTag(items.get(position));
 		thumbnail.setOnClickListener(new View.OnClickListener() {
@@ -114,14 +115,14 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				PlantItem pi = (PlantItem)v.getTag();
+				HelperPlantItem pi = (HelperPlantItem)v.getTag();
 
-				Intent intent = new Intent(maincon, ListsDetail.class);
+				Intent intent = new Intent(maincon, ListDetail.class);
 				intent.putExtra("id", pi.SpeciesID);
 				maincon.startActivity(intent);
 			}
 		});
-		
+		*/
 		
 		return convertView;
 	}

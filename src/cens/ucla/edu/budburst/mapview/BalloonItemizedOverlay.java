@@ -28,9 +28,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cens.ucla.edu.budburst.PlantList;
+import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.onetime.WPinfo;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -136,7 +135,7 @@ public abstract class BalloonItemizedOverlay<Item> extends ItemizedOverlay<Speci
 	/**
 	 * Sets the visibility of this overlay's balloon view to GONE. 
 	 */
-	private void hideBalloon() {
+	protected void hideBalloon() {
 		if (balloonView != null) {
 			balloonView.setVisibility(View.GONE);
 		}
@@ -173,6 +172,7 @@ public abstract class BalloonItemizedOverlay<Item> extends ItemizedOverlay<Speci
 				public boolean onTouch(View v, MotionEvent event) {
 
 					View l =  ((View) v.getParent()).findViewById(R.id.balloon_main_layout);
+					Log.i("K", "" + l);
 					Drawable d = l.getBackground();
 
 					if (event.getAction() == MotionEvent.ACTION_DOWN) {

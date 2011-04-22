@@ -5,6 +5,9 @@
 		<item name="android:windowIsFloating">false</item>
 		<item name="android:windowNoTitle">true</item>
 	</style>
+	<style name="PBBLightBackgroundTweak">
+		<item name="android:windowBackground">@color/BudBurstLightBackground</item>
+	</style>
 	<style name="PBBTitleBackground">     
         <item name="android:background">@color/pbb_title_background</item>                   
     </style>

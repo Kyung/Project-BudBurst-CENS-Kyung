@@ -1,6 +1,6 @@
 package cens.ucla.edu.budburst.helper;
 
-import cens.ucla.edu.budburst.MainPage;
+import cens.ucla.edu.budburst.PBBMainPage;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,7 +23,7 @@ public class MyAlertDialog extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(MyAlertDialog.this, BackgroundService.class);
+				Intent intent = new Intent(MyAlertDialog.this, HelperBackgroundService.class);
 				stopService(intent);
 				finish();
 			}

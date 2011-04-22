@@ -7,6 +7,10 @@
 		<item>Evergreen Trees and Shrubs</item>
 		<item>Conifer</item>
 	</string-array>
+	<string-array name="category_only_trees">
+		<item>Deciduous Trees and Shrubs</item>
+		<item>Evergreen Trees and Shrubs</item>
+	</string-array>
 	<string-array name="recommend">
 		<item>"What's Blooming"</item>
 		<item>"What's Invasive"</item>
@@ -30,5 +34,10 @@
 		<item>Trees and Shrubs</item>
 		<item>Wild Flowers</item>
 		<item>Grasses</item>
+	</string-array>
+	<string-array name="floracache_level">
+		<item>Easy</item>
+		<item>Medium</item>
+		<item>Hard</item>
 	</string-array>
 </resources>

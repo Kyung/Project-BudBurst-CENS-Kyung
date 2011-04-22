@@ -22,8 +22,8 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 	private List<OverlayItem> items = new ArrayList<OverlayItem>();
 	private Drawable marker = null;
 	private Context mContext;
-	private Double latitude = 0.0;
-	private Double longitude = 0.0;
+	private Double mLatitude = 0.0;
+	private Double mLongitude = 0.0;
 	
 	public SitesOverlay(Context context, Drawable marker) {
 		super(marker);
@@ -65,15 +65,11 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 			Projection proj = mapView.getProjection();
 			GeoPoint loc = proj.fromPixels((int)event.getX(), (int)event.getY());
 			
-			latitude = loc.getLatitudeE6() / 1E6;
-			longitude = loc.getLongitudeE6() / 1E6;
+			mLatitude = loc.getLatitudeE6() / 1E6;
+			mLongitude = loc.getLongitudeE6() / 1E6;
 			
 			items.add(new OverlayItem(loc, "", ""));
 		}
-		
-		//GeoPoint gPoint = mapView.getProjection().fromPixels((int)event.getX(), (int)event.getY());
-		Log.i("K", "Item Added!");
-		
 		populate();
 		
 		return true;
@@ -81,11 +77,11 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 	}
 	
 	public double getLatitude() {
-		return latitude;
+		return mLatitude;
 	}
 	
 	public double getLongitude() {
-		return longitude;
+		return mLongitude;
 	}
 
 }

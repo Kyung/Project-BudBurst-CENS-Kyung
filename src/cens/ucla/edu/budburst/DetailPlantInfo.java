@@ -1,0 +1,192 @@
+package cens.ucla.edu.budburst;
+
+
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.SyncDBHelper;
+import cens.ucla.edu.budburst.helper.AnimationHelper;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperLocalPlantListItem;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.utils.PBBItems;
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
+
+//public class SpeciesDetail extends Activity implements View.OnTouchListener{
+public class DetailPlantInfo extends Activity {
+	private StaticDBHelper sDBH;
+	private SyncDBHelper syncDBH;
+	
+	private int mSpeciesID;
+	private int mCategory = 1;
+	private String mCommonName;
+	private String mScienceName;
+	
+	
+    private float oldTouchValue;
+    private float oldTouchValue2;
+    
+    private ImageView image;
+    private TextView snameTxt;
+    private TextView cnameTxt;
+    private TextView notesTxt;
+    
+    private HelperFunctionCalls mHelper;
+	
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.species_detail);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+		
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(" " + getString(R.string.SpeciesDetail_info));
+	    // end set-title-bar
+		
+		mHelper = new HelperFunctionCalls();
+		
+		// get previous intent information
+		//Intent intent = getIntent();
+		Bundle b = getIntent().getExtras();
+		PBBItems pbbItem = b.getParcelable("pbbItem");
+		
+		//mSpeciesID = intent.getExtras().getInt("species_id");
+		//mCategory = intent.getExtras().getInt("category");
+		//mCommonName = intent.getExtras().getString("cname");
+		
+		mSpeciesID = pbbItem.getSpeciesID();
+		mCategory = pbbItem.getCategory();
+		mCommonName = pbbItem.getCommonName();
+		mScienceName = pbbItem.getScienceName();
+		
+		Log.i("K", "speciesID : " + mSpeciesID + ", Category:" +mCategory + 
+				",Cname:" +mCommonName +
+				",Sname:" + mScienceName);
+		
+		
+	    // set the layout
+	    image = (ImageView) findViewById(R.id.species_image);
+	    snameTxt = (TextView) findViewById(R.id.science_name);
+	    cnameTxt = (TextView) findViewById(R.id.common_name);
+	    notesTxt = (TextView) findViewById(R.id.text);
+	    
+	    // open database
+	    SQLiteDatabase db;
+	    //Cursor cursor;
+	    sDBH = new StaticDBHelper(DetailPlantInfo.this);
+	    db = sDBH.getReadableDatabase();
+	    
+	    switch(mCategory) {
+	    case 0:case 1:
+	    	printOfficialSpecies(db);
+	    	break;
+	    case 2:case 3:case 4:case 5:
+	    	printLocalSpecies(mCategory);
+	    	break;
+	    case 10:case 11:
+	    	printUserCreatedSpecies();
+	    }
+	    
+		db.close();
+		sDBH.close();
+	    // TODO Auto-generated method stub
+
+	}
+	
+	public void printUserCreatedSpecies() {
+		
+		OneTimeDBHelper otDBH = new OneTimeDBHelper(DetailPlantInfo.this);
+		SQLiteDatabase db = otDBH.getReadableDatabase();
+		
+		Cursor cursor = db.rawQuery("SELECT id, common_name, science_name, credit FROM userDefineLists WHERE science_name = \"" 
+				+ mScienceName + "\" AND category =" + mCategory + ";", null);
+
+	    while(cursor.moveToNext()) {
+	    	snameTxt.setText(" " + cursor.getString(2) + " ");
+	    	cnameTxt.setText(" " + cursor.getString(1) + " ");
+	    	notesTxt.setText("" + cursor.getString(3) + " ");
+	    	
+	    	Bitmap icon = null;
+	    	icon = mHelper.getUserDefinedListImageFromSDCard(DetailPlantInfo.this, cursor.getInt(0), icon);
+	    	
+	    	image.setImageBitmap(icon);
+	    }
+	    
+	    cursor.close();
+	    db.close();
+	}
+	
+	public void printOfficialSpecies(SQLiteDatabase db) {
+		Cursor cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + mSpeciesID + ";", null);
+
+	    while(cursor.moveToNext()) {
+	    	snameTxt.setText(" " + cursor.getString(1) + " ");
+	    	cnameTxt.setText(" " + cursor.getString(2) + " ");
+	    	notesTxt.setText("" + cursor.getString(3) + " ");
+			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+mSpeciesID, null, null);
+			image.setImageResource(resID);
+	    }
+	    
+	    cursor.close();
+	}
+	
+	public void printLocalSpecies(int category) {
+		
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(DetailPlantInfo.this);
+		HelperLocalPlantListItem pItem = oDBH.getLocalPlantList(DetailPlantInfo.this, mCommonName, category);
+		
+		Log.i("K", "pItem : " + pItem);
+		
+		snameTxt.setText(" " + pItem.ScienceName + " ");
+    	cnameTxt.setText(" " + pItem.CommonName + " ");
+    	notesTxt.setText("" + pItem.CopyRight + " ");
+
+    	if(category == HelperValues.LOCAL_WHATSINVASIVE_LIST ||
+	    		category == HelperValues.LOCAL_POISONOUS_LIST ||
+	    		category == HelperValues.LOCAL_THREATENED_ENDANGERED_LIST) {
+	    	
+	    	Bitmap icon = null;
+	    	icon = mHelper.getImageFromSDCard(DetailPlantInfo.this, pItem.ImageID, icon);
+	    	
+	    	image.setImageBitmap(icon);
+	    }
+	    else if(category == HelperValues.USER_DEFINED_TREE_LISTS) {
+    		String imagePath = HelperValues.TREE_PATH + mSpeciesID + ".jpg";
+    		image.setImageBitmap(mHelper.showImage(DetailPlantInfo.this, imagePath));
+	    }
+	}
+	
+	public void onResume() {
+		super.onResume();
+	}
+}
