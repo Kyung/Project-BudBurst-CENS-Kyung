@@ -1,16 +1,21 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
 import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -203,15 +208,36 @@ public class GetPhenophaseShared extends ListActivity {
 			Log.i("K", "Note:" + note);
 			
 			if(cursor2.getCount() > 0) {
-				HelperPlantItem pi = new HelperPlantItem(resID, phenoDesc, 
-						phenoID, phenoIcon, phenoType, true, 
-						imageName, date, mPlantID, note, header);
+				//int aPicture, String aDescription, int aPheno_ID, int aPhenoImageID, String aPheno_name, boolean aFlag, String aCamera_image, String aDate, int aOneTimePlantID, String aNote, boolean aHeader)
+				HelperPlantItem pi = new HelperPlantItem();
+				pi.setPicture(resID);
+				pi.setDescription(phenoDesc);
+				pi.setPhenoID(phenoID);
+				pi.setPhenoImageID(phenoIcon);
+				pi.setPhenoName(phenoType);
+				pi.setFlag(true);
+				pi.setImageName(imageName);
+				pi.setDate(date);
+				pi.setPlantID(mPlantID);
+				pi.setNote(note);
+				pi.setHeader(header);
+				
 				pItem.add(pi);
 			}
 			else {
-				HelperPlantItem pi = new HelperPlantItem(resID, phenoDesc, 
-						phenoID, phenoIcon, phenoType, false, 
-						imageName, date, mPlantID, note, header);
+				HelperPlantItem pi = new HelperPlantItem();
+				pi.setPicture(resID);
+				pi.setDescription(phenoDesc);
+				pi.setPhenoID(phenoID);
+				pi.setPhenoImageID(phenoIcon);
+				pi.setPhenoName(phenoType);
+				pi.setFlag(false);
+				pi.setImageName(imageName);
+				pi.setDate(date);
+				pi.setPlantID(mPlantID);
+				pi.setNote(note);
+				pi.setHeader(header);
+			
 				pItem.add(pi);
 			}
 			
@@ -245,7 +271,7 @@ public class GetPhenophaseShared extends ListActivity {
 	}
 	
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		boolean observed_phenophase = pItem.get(position).Flag;
+		boolean observed_phenophase = pItem.get(position).getFlag();
 		
 		mCurrentPosition = position;
 
@@ -254,21 +280,21 @@ public class GetPhenophaseShared extends ListActivity {
 		pbbItem.setScienceName(mScienceName);
 		pbbItem.setCategory(mCategory);
 		pbbItem.setProtocolID(mProtocolID);
-		pbbItem.setDate(pItem.get(position).Date);
-		pbbItem.setNote(pItem.get(position).Note);
-		pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
-		pbbItem.setLocalImageName(pItem.get(position).ImageName);
-		pbbItem.setPlantID(pItem.get(position).OneTimePlantID);
+		pbbItem.setDate(pItem.get(position).getDate());
+		pbbItem.setNote(pItem.get(position).getNote());
+		pbbItem.setPhenophaseID(pItem.get(position).getPhenoID());
+		pbbItem.setLocalImageName(pItem.get(position).getImageName());
+		pbbItem.setPlantID(pItem.get(position).getPlantID());
 		pbbItem.setLatitude(0.0);
 		pbbItem.setLongitude(0.0);
 		pbbItem.setSiteID(0);
 				
-		Log.i("K", "Note: " + pItem.get(position).Note);
+		Log.i("K", "Note: " + pItem.get(position).getNote());
 		
 		if(observed_phenophase) {
 			Log.i("K","go PlantSummary");
 			
-			Intent intent = new Intent(GetPhenophaseShared.this, SummaryPlantInfo.class);
+			Intent intent = new Intent(GetPhenophaseShared.this, PBBObservationSummary.class);
 			intent.putExtra("pbbItem", pbbItem);
 			intent.putExtra("from", HelperValues.FROM_QUICK_CAPTURE);
 			startActivity(intent);
@@ -341,7 +367,7 @@ public class GetPhenophaseShared extends ListActivity {
 		}
 		
 		public String getItem(int position){
-			return arSrc.get(position).Note;
+			return arSrc.get(position).getNote();
 		}
 		
 		public long getItemId(int position){
@@ -354,19 +380,19 @@ public class GetPhenophaseShared extends ListActivity {
 			
 			ImageView img = (ImageView)convertView.findViewById(R.id.pheno_img);
 			
-			if(arSrc.get(position).Flag) {
-				Bitmap icon = overlay(BitmapFactory.decodeResource(getResources(), arSrc.get(position).Picture));
+			if(arSrc.get(position).getFlag()) {
+				Bitmap icon = overlay(BitmapFactory.decodeResource(getResources(), arSrc.get(position).getPicture()));
 				icon = overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.check_mark));
 				img.setImageBitmap(icon);
 			}
 			else {
-				img.setImageResource(arSrc.get(position).Picture);
+				img.setImageResource(arSrc.get(position).getPicture());
 			}
 			
 			
 			TextView header = (TextView)convertView.findViewById(R.id.list_header);
-			if(arSrc.get(position).Header) {
-				header.setText(arSrc.get(position).PhenoName);
+			if(arSrc.get(position).getHeader()) {
+				header.setText(arSrc.get(position).getPhenoName());
 				header.setVisibility(View.VISIBLE);
 			}
 			else {
@@ -382,8 +408,8 @@ public class GetPhenophaseShared extends ListActivity {
 					// TODO Auto-generated method stub
 					HelperPlantItem pi = (HelperPlantItem)v.getTag();
 					
-					Intent intent = new Intent(GetPhenophaseShared.this, PhenophaseDetail.class);
-					intent.putExtra("id", pi.PhenoID);
+					Intent intent = new Intent(GetPhenophaseShared.this, PBBPhenophaseInfo.class);
+					intent.putExtra("id", pi.getPhenoID());
 					intent.putExtra("frome", HelperValues.FROM_QC_PHENOPHASE);
 					startActivity(intent);
 				}
@@ -395,7 +421,7 @@ public class GetPhenophaseShared extends ListActivity {
 			//pheno_name.setText(arSrc.get(position).Pheno_name);
 			
 			TextView textname = (TextView)convertView.findViewById(R.id.pheno_text);
-			textname.setText(arSrc.get(position).Description);
+			textname.setText(arSrc.get(position).getDescription());
 		
 			return convertView;
 		}

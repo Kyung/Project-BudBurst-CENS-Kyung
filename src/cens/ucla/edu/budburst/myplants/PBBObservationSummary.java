@@ -1,18 +1,25 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
@@ -23,8 +30,10 @@ import cens.ucla.edu.budburst.mapview.SpeciesItemizedOverlay;
 import cens.ucla.edu.budburst.utils.PBBItems;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -46,7 +55,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SummaryPlantInfo extends MapActivity {
+public class PBBObservationSummary extends MapActivity {
 
 	private OneTimeDBHelper otDBH = null;
 	private String mCommonName = null;
@@ -66,8 +75,8 @@ public class SummaryPlantInfo extends MapActivity {
 	private int mProtocolID = 0;
 	private int mCategory;
 	
-	private double mLatitude = 0.0;
-	private double mLongitude = 0.0;
+	private double mLatitude;
+	private double mLongitude;
 	protected static final int GET_CHANGE_CODE = 1;
 
 	private PopupWindow popup = null;
@@ -86,7 +95,7 @@ public class SummaryPlantInfo extends MapActivity {
 		setContentView(R.layout.plantsummary);
 		
 	    // set database
-	    otDBH = new OneTimeDBHelper(SummaryPlantInfo.this);
+	    otDBH = new OneTimeDBHelper(PBBObservationSummary.this);
 	    
 	    Bundle b = getIntent().getExtras();
 	    pbbItem = b.getParcelable("pbbItem");
@@ -95,16 +104,17 @@ public class SummaryPlantInfo extends MapActivity {
 	    mScienceName = pbbItem.getScienceName();
 	    mDate = pbbItem.getDate();
 	    mNotes = pbbItem.getNote();
-	    mPhotoName = pbbItem.getImageName();
+	    mPhotoName = pbbItem.getCameraImageName();
 	    mCategory = pbbItem.getCategory();
 	    mPhenoID = pbbItem.getPhenophaseID();
 	    mProtocolID = pbbItem.getProtocolID();
 	    mSpeciesID = pbbItem.getSpeciesID();
 	    mSiteID = pbbItem.getSiteID();
+	    mPlantID = pbbItem.getPlantID(); 
 	    mPreviousActivity = b.getInt("from");
 	    
 	    if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
-	    	SyncDBHelper syncDBHelper = new SyncDBHelper(SummaryPlantInfo.this);
+	    	SyncDBHelper syncDBHelper = new SyncDBHelper(PBBObservationSummary.this);
 			SQLiteDatabase syncDB  = syncDBHelper.getReadableDatabase();
 			
 			Cursor cur = syncDB.rawQuery("SELECT latitude, longitude FROM my_sites WHERE site_id = " + mSiteID, null);
@@ -117,7 +127,7 @@ public class SummaryPlantInfo extends MapActivity {
 			syncDB.close();
 	    }
 	    if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE) {
-	    	OneTimeDBHelper otDBHelper = new OneTimeDBHelper(SummaryPlantInfo.this);
+	    	OneTimeDBHelper otDBHelper = new OneTimeDBHelper(PBBObservationSummary.this);
 			SQLiteDatabase otDB  = otDBHelper.getReadableDatabase();
 			
 			Cursor cur = otDB.rawQuery("SELECT lat, lng FROM oneTimeObservation WHERE plant_id = " + mPlantID, null);
@@ -132,9 +142,6 @@ public class SummaryPlantInfo extends MapActivity {
 			otDB.close();
 	    }
 	    
-	    
-	    Log.i("K", "previous_activity : " + mPreviousActivity + " , plant_id :" + mPhenoID + " , pheno_image_id : " + mPhenoIcon + " onetimeplant_id : " + mPlantID);
-
 	    // setting up layout
 	    phone_image = (ImageView) findViewById(R.id.phone_image);
 	    ImageView species_image = (ImageView) findViewById(R.id.species_image);
@@ -161,7 +168,7 @@ public class SummaryPlantInfo extends MapActivity {
 	    Drawable marker = getResources().getDrawable(R.drawable.marker);
 	    itemizedOverlay = new SpeciesItemizedOverlay(marker, this);
 	    
-	    OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found");
+	    OverlayItem overlayitem = new OverlayItem(p, "", "");
 	    
 		itemizedOverlay.addOverlay(overlayitem);
 		mapOverlays.add(itemizedOverlay);
@@ -186,7 +193,14 @@ public class SummaryPlantInfo extends MapActivity {
 		// should be dealt differently by category
 		species_image.setVisibility(View.VISIBLE);
 		mHelper = new HelperFunctionCalls();
-		mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+		
+		if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE
+				|| mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
+			mHelper.showSpeciesThumbNailObserver(this, mCategory, mSpeciesID, mScienceName, species_image);
+		}
+		else {
+			mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+		}
 
 	    // when click species image
 	    species_image.setOnClickListener(new View.OnClickListener() {
@@ -194,7 +208,7 @@ public class SummaryPlantInfo extends MapActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(SummaryPlantInfo.this, DetailPlantInfo.class);
+				Intent intent = new Intent(PBBObservationSummary.this, DetailPlantInfo.class);
 				intent.putExtra("pbbItem", pbbItem);
 				startActivity(intent);
 			}
@@ -259,10 +273,10 @@ public class SummaryPlantInfo extends MapActivity {
 			public void onClick(View v) {
 				phone_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 				
-				final RelativeLayout linear = (RelativeLayout) View.inflate(SummaryPlantInfo.this, R.layout.image_popup, null);
+				final RelativeLayout linear = (RelativeLayout) View.inflate(PBBObservationSummary.this, R.layout.image_popup, null);
 				
 				// TODO Auto-generated method stub
-				AlertDialog.Builder dialog = new AlertDialog.Builder(SummaryPlantInfo.this);
+				AlertDialog.Builder dialog = new AlertDialog.Builder(PBBObservationSummary.this);
 				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
 				
 			    String imagePath = "/sdcard/pbudburst/" + mPhotoName + ".jpg";
@@ -309,7 +323,7 @@ public class SummaryPlantInfo extends MapActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(SummaryPlantInfo.this, UpdatePlantInfo.class);
+				Intent intent = new Intent(PBBObservationSummary.this, UpdatePlantInfo.class);
 				intent.putExtra("pbbItem", pbbItem);
 				
 				if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE) {
@@ -325,14 +339,11 @@ public class SummaryPlantInfo extends MapActivity {
 	    // TODO Auto-generated method stub
 	}
 	
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// You can use the requestCode to select between multiple child
 		// activities you may have started. Here there is only one thing
-		// we launch.
-		Log.d("K", "onActivityResult");
-		
+		// we launch.	
 		if(resultCode == Activity.RESULT_OK) {			
 
 			if (requestCode == GET_CHANGE_CODE) {
@@ -349,5 +360,5 @@ public class SummaryPlantInfo extends MapActivity {
 	protected boolean isRouteDisplayed() {
 		// TODO Auto-generated method stub
 		return false;
-	}
+	}	
 }

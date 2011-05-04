@@ -2,10 +2,10 @@ package cens.ucla.edu.budburst.helper;
 
 import java.util.ArrayList;
 
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.DetailPlantInfo;
 import cens.ucla.edu.budburst.lists.ListDetail;
+import cens.ucla.edu.budburst.myplants.DetailPlantInfo;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -75,10 +75,10 @@ public class HelperLazyAdapter extends BaseAdapter {
         else
             holder = (ViewHolder)vi.getTag();
         
-        holder.cname.setText(localArray.get(position).CommonName);
-        holder.sname.setText(localArray.get(position).SpeciesName);
-        holder.image.setTag(localArray.get(position).imageUrl);
-        imageLoader.DisplayImage(localArray.get(position).imageUrl, context, holder.image);
+        holder.cname.setText(localArray.get(position).getCommonName());
+        holder.sname.setText(localArray.get(position).getSpeciesName());
+        holder.image.setTag(localArray.get(position).getImageURL());
+        imageLoader.DisplayImage(localArray.get(position).getImageURL(), context, holder.image);
         
         /*
         holder.thumbnail.setTag(localArray.get(position));

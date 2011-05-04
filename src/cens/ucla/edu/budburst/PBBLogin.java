@@ -69,8 +69,8 @@ public class PBBLogin extends Activity{
 			// Only user first login, the background service is working.
 			
 			// Start service
-		    Intent service = new Intent(PBBLogin.this, HelperBackgroundService.class);
-		    startService(service);
+		    //Intent service = new Intent(PBBLogin.this, HelperBackgroundService.class);
+		    //startService(service);
 		}
 		
 		OneTimeDBHelper onetime = new OneTimeDBHelper(PBBLogin.this);

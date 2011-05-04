@@ -2,30 +2,30 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
   <PreferenceCategory
-  	android:title="Downloads Species Lists"
+  	android:title="@string/Pref_Category1"
   >
     <Preference
-  		android:title="Download Local Lists"
-  		android:summary="Download Local Lists"
+  		android:title="@string/Pref_Category2"
+  		android:summary="@string/Pref_Category2"
   		android:key="downloadLists"
   	/>
   	<Preference
-  		android:title="Download Tree Lists"
-  		android:summary="UCLA Tree Lists"
-  		android:key="downloadTreeLists"
+  		android:title="@string/Pref_Category3"
+  		android:summary="@string/Pref_Category3"
+  		android:key="downloadDefinedLists"
   	/>
   	<Preference
-  		android:title="Download Floracache Lists"
-  		android:summary="Floracache Lists"
+  		android:title="@string/Pref_Category4"
+  		android:summary="@string/Pref_Category4"
   		android:key="downloadFloracache"
   	/>
   	
   </PreferenceCategory>
   <PreferenceCategory
-  	android:title="User Account"
+  	android:title="@string/Pref_Category5"
   >
     <Preference
-  		android:title="Logout"  		
+  		android:title="@string/Pref_Category6"  		
   		android:key="userlogout"
   	/>
   	

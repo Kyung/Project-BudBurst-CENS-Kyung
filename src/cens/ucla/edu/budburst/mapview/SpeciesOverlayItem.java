@@ -13,8 +13,9 @@ public class SpeciesOverlayItem extends OverlayItem {
 	private String mImageUrl;
 	private int mCategory = 1;
 	private boolean mIsFloracache = false;
+	private String mCredit;
 	
-	public SpeciesOverlayItem(GeoPoint pt, int SpeciesID, String name, 
+	public SpeciesOverlayItem(GeoPoint pt, int SpeciesID, String name, String credit,
 			String snippet, String imageUrl, Drawable marker, 
 			Drawable heart, int category, boolean isFloracache) {
 		super(pt, name, snippet);
@@ -24,6 +25,7 @@ public class SpeciesOverlayItem extends OverlayItem {
 		mImageUrl = imageUrl;
 		mCategory = category;
 		mIsFloracache = isFloracache;
+		mCredit = credit;
 	}
 	
 	@Override
@@ -41,6 +43,10 @@ public class SpeciesOverlayItem extends OverlayItem {
 	
 	public String getImageUrl() {
 		return mImageUrl;
+	}
+	
+	public String getCredit() {
+		return mCredit;
 	}
 	
 	public int getSpeciesID() {

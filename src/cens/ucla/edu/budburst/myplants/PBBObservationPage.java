@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -7,6 +7,11 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
@@ -38,7 +43,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlantObservationSummary extends Activity {
+public class PBBObservationPage extends Activity {
 
 	private String mCommonName;
 	private String mScienceName;
@@ -108,7 +113,7 @@ public class PlantObservationSummary extends Activity {
 		pbbItem = bundle.getParcelable("pbbItem");
 		mCommonName = pbbItem.getCommonName();
 		mScienceName = pbbItem.getScienceName();
-		mCameraImageID = pbbItem.getImageName();
+		mCameraImageID = pbbItem.getCameraImageName();
 		mProtocolID = pbbItem.getProtocolID();
 		mSpeciesID = pbbItem.getSpeciesID();
 		mPhenoID = pbbItem.getPhenophaseID();
@@ -142,7 +147,13 @@ public class PlantObservationSummary extends Activity {
 		// species_image view
 		// should be dealt differently by category
 		species_image.setVisibility(View.VISIBLE);
-		mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+		if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
+			mHelper.showSpeciesThumbNailObserver(this, mCategory, mSpeciesID, mScienceName, species_image);
+		}
+		else {
+			mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+		}
+
 		
 		/*
 		 *  Set xml
@@ -158,7 +169,7 @@ public class PlantObservationSummary extends Activity {
 		 *   - 2. Quick Share Phenophase
 		 */
 		if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
-			StaticDBHelper sDBHelper = new StaticDBHelper(PlantObservationSummary.this);
+			StaticDBHelper sDBHelper = new StaticDBHelper(PBBObservationPage.this);
 			SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 			
 			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Phenophase_Name, description FROM Phenophase_Protocol_Icon WHERE Phenophase_ID=" + mPhenoID + " AND Protocol_ID=" + mProtocolID, null);
@@ -174,7 +185,7 @@ public class PlantObservationSummary extends Activity {
 		}
 		
 		if(mPreviousActivity == HelperValues.FROM_QC_PHENOPHASE) {
-			StaticDBHelper sDBHelper = new StaticDBHelper(PlantObservationSummary.this);
+			StaticDBHelper sDBHelper = new StaticDBHelper(PBBObservationPage.this);
 			SQLiteDatabase sDB = sDBHelper.getReadableDatabase();
 			
 			Cursor getPhenoInfo = sDB.rawQuery("SELECT Phenophase_Icon, Type, Description FROM Onetime_Observation WHERE _id =" + mPhenoID, null);
@@ -232,7 +243,7 @@ public class PlantObservationSummary extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(PlantObservationSummary.this, DetailPlantInfo.class);
+				Intent intent = new Intent(PBBObservationPage.this, DetailPlantInfo.class);
 				intent.putExtra("pbbItem", pbbItem);
 				startActivity(intent);
 			}
@@ -246,7 +257,7 @@ public class PlantObservationSummary extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(PlantObservationSummary.this, PhenophaseDetail.class);
+				Intent intent = new Intent(PBBObservationPage.this, PBBPhenophaseInfo.class);
 				if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
 					intent.putExtra("from", HelperValues.FROM_PBB_PHENOPHASE);
 					intent.putExtra("protocol_id", mProtocolID);
@@ -278,9 +289,9 @@ public class PlantObservationSummary extends Activity {
 				
 				photo_image.setBackgroundResource(R.drawable.shapedrawable_yellow);
 				// TODO Auto-generated method stub
-				final RelativeLayout linear = (RelativeLayout) View.inflate(PlantObservationSummary.this, R.layout.image_popup, null);
+				final RelativeLayout linear = (RelativeLayout) View.inflate(PBBObservationPage.this, R.layout.image_popup, null);
 				// TODO Auto-generated method stub
-				AlertDialog.Builder dialog = new AlertDialog.Builder(PlantObservationSummary.this);
+				AlertDialog.Builder dialog = new AlertDialog.Builder(PBBObservationPage.this);
 				ImageView image_view = (ImageView) linear.findViewById(R.id.image_btn);
 				
 			    String imagePath = HelperValues.BASE_PATH + mCameraImageID + ".jpg";
@@ -324,13 +335,13 @@ public class PlantObservationSummary extends Activity {
 					File file = new File(HelperValues.BASE_PATH);
 					if (file.exists()) {
 						if(!file.isDirectory()) {
-							Toast.makeText(PlantObservationSummary.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+							Toast.makeText(PBBObservationPage.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
 							finish();
 						}
 					}
 					else {
 						if (!file.mkdir()) {
-							Toast.makeText(PlantObservationSummary.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+							Toast.makeText(PBBObservationPage.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
 							finish();
 						}
 					}
@@ -370,13 +381,13 @@ public class PlantObservationSummary extends Activity {
 				if (ld.exists()) {
 					if (!ld.isDirectory()) {
 						// Should probably inform user ... hmm!
-						Toast.makeText(PlantObservationSummary.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
-						PlantObservationSummary.this.finish();
+						Toast.makeText(PBBObservationPage.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+						PBBObservationPage.this.finish();
 					}
 				} else {
 					if (!ld.mkdir()) {
-						Toast.makeText(PlantObservationSummary.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
-						PlantObservationSummary.this.finish();
+						Toast.makeText(PBBObservationPage.this, getString(R.string.Alert_errorCheckSD), Toast.LENGTH_SHORT).show();
+						PBBObservationPage.this.finish();
 					}
 				}
 
@@ -429,7 +440,7 @@ public class PlantObservationSummary extends Activity {
 					Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 					vibrator.vibrate(500);
 					
-					Intent intent = new Intent(PlantObservationSummary.this, PBBPlantList.class);
+					Intent intent = new Intent(PBBObservationPage.this, PBBPlantList.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
 					
@@ -446,7 +457,7 @@ public class PlantObservationSummary extends Activity {
 	 * Add Monitored Plant Observation into the database.
 	 */
 	public void addSpeciesFromPlantlist() {
-		SyncDBHelper syncDBHelper = new SyncDBHelper(PlantObservationSummary.this);
+		SyncDBHelper syncDBHelper = new SyncDBHelper(PBBObservationPage.this);
 
 		SQLiteDatabase db = syncDBHelper.getWritableDatabase();
 		String dt_taken = new SimpleDateFormat("dd MMMMM yyy").format(new Date());
@@ -466,7 +477,7 @@ public class PlantObservationSummary extends Activity {
 		syncDBHelper.close();
 		
 		
-		Toast.makeText(PlantObservationSummary.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
+		Toast.makeText(PBBObservationPage.this, getString(R.string.PlantInfo_successAdded), Toast.LENGTH_SHORT).show();
 
 
 	}
@@ -476,10 +487,10 @@ public class PlantObservationSummary extends Activity {
 	 */
 	public void addSpeciesFromQuickcapture() {
 		
-		mHelper.insertNewObservation(PlantObservationSummary.this, mPlantID, mPhenoID,
+		mHelper.insertNewObservation(PBBObservationPage.this, mPlantID, mPhenoID,
 				mLatitude, mLongitude, 0, mCameraImageID, noteTxt.getText().toString());
 
-		Toast.makeText(PlantObservationSummary.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
+		Toast.makeText(PBBObservationPage.this, getString(R.string.QuickCapture_Added), Toast.LENGTH_SHORT).show();
 
 	}
 	

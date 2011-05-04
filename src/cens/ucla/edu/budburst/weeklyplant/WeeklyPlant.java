@@ -16,8 +16,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-import cens.ucla.edu.budburst.PBBAddSite;
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
@@ -25,8 +23,11 @@ import cens.ucla.edu.budburst.helper.HelperDrawableManager;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.lists.ListDetail;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
+import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -54,12 +55,11 @@ import android.widget.Toast;
 
 public class WeeklyPlant extends Activity {
 
-	
-	private int mSpeciesID;
-	private int mProtocolID;
+	private int mSpeciesID = HelperValues.UNKNOWN_SPECIES;
+	private int mProtocolID = 2;
 	private int mCategory = HelperValues.LOCAL_BUDBURST_LIST;
-	private String mCommonName;
-	private String mScienceName;
+	private String mCommonName = "Unknown/Other";
+	private String mScienceName = "Unknown/Other";
 	private String mGetWeeklyPlant;
 	
 	private List<String> mList;
@@ -92,7 +92,6 @@ public class WeeklyPlant extends Activity {
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.WeeklyPlant));
 	    
-	    
 	    mList = new ArrayList<String>();
 	    mMapUserSiteNameID = new HashMap<String, Integer>();
 	    
@@ -114,6 +113,7 @@ public class WeeklyPlant extends Activity {
 		mMapUserSiteNameID = mHelper.getUserSiteIDMap(WeeklyPlant.this);
 		
 		if(!isNetworkAvailable()) {
+			Toast.makeText(this, "No connection. Make sure you are in the area with good connectivity.", Toast.LENGTH_SHORT).show();
 			finish();
 		}
 		else {
@@ -132,6 +132,10 @@ public class WeeklyPlant extends Activity {
 			(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		
 		NetworkInfo nInfo = cManager.getActiveNetworkInfo();
+		
+		if(nInfo == null) {
+			return false;
+		}
 		
 		Log.i("K", "info : " + nInfo.isConnectedOrConnecting());
 		
@@ -175,14 +179,12 @@ public class WeeklyPlant extends Activity {
 				 * We already know the Shared Plant category if we choose species from official budburst lists.
 				 * - hardcoded mProtocolID
 				 */
-				
-				int getSpeciesID = mSpeciesID;
-				int getProtocolID = 2;
+				int getProtocolID = 2; // temporary set to 2
 				
 				StaticDBHelper staticDBH = new StaticDBHelper(WeeklyPlant.this);
 				SQLiteDatabase staticDB = staticDBH.getReadableDatabase();
 				
-				Cursor cursor = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id=" + getSpeciesID + ";", null);
+				Cursor cursor = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id=" + mSpeciesID + ";", null);
 				while(cursor.moveToNext()) {
 					getProtocolID = cursor.getInt(0);
 				}
@@ -224,16 +226,16 @@ public class WeeklyPlant extends Activity {
 						 */
 						
 						Intent intent = new Intent(WeeklyPlant.this, QuickCapture.class);
-						
-						intent.putExtra("cname", mCommonName);
-						intent.putExtra("sname", mScienceName);
-						intent.putExtra("protocol_id", mProtocolID);
-						intent.putExtra("category", mCategory);
+						PBBItems pbbItem = new PBBItems();
+						pbbItem.setCommonName(mCommonName);
+						pbbItem.setScienceName(mScienceName);
+						pbbItem.setProtocolID(mProtocolID);
+						pbbItem.setSpeciesID(mSpeciesID);
+						pbbItem.setCategory(mCategory);
+					
+						intent.putExtra("pbbItem", pbbItem);
 						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
-						
 						startActivity(intent);
-
-						
 						
 					}
 				})
@@ -246,15 +248,17 @@ public class WeeklyPlant extends Activity {
 						/*
 						 * Move to Getphenophase without a photo.
 						 */
-						Intent intent = new Intent(WeeklyPlant.this, GetPhenophase.class);
-						intent.putExtra("camera_image_id", "");
-						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
-						intent.putExtra("cname", mCommonName);
-						intent.putExtra("sname", mScienceName);
-						intent.putExtra("protocol_id", mProtocolID);
-						intent.putExtra("species_id", mSpeciesID);
-						intent.putExtra("category", mCategory);
+						Intent intent = new Intent(WeeklyPlant.this, OneTimePhenophase.class);
+						PBBItems pbbItem = new PBBItems();
+						pbbItem.setCommonName(mCommonName);
+						pbbItem.setScienceName(mScienceName);
+						pbbItem.setProtocolID(mProtocolID);
+						pbbItem.setSpeciesID(mSpeciesID);
+						pbbItem.setCategory(mCategory);
+						pbbItem.setLocalImageName("");
 						
+						intent.putExtra("pbbItem", pbbItem);
+						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
 						startActivity(intent);
 
 					}
@@ -292,9 +296,14 @@ public class WeeklyPlant extends Activity {
 				
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(WeeklyPlant.this, PBBAddSite.class);
-					intent.putExtra("species_id", mSpeciesID);
-					intent.putExtra("common_name", mCommonName);
-					intent.putExtra("protocol_id", mProtocolID);
+					PBBItems pbbItem = new PBBItems();
+					pbbItem.setSpeciesID(mSpeciesID);
+					pbbItem.setCommonName(mCommonName);
+					pbbItem.setScienceName(mScienceName);
+					pbbItem.setProtocolID(mProtocolID);
+					pbbItem.setCategory(mCategory);
+					
+					intent.putExtra("pbbItem", pbbItem);
 					intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
 					startActivity(intent);
 				}
@@ -352,10 +361,11 @@ public class WeeklyPlant extends Activity {
 		@Override
 		protected void onPreExecute() {
 			
-			mDialog = ProgressDialog.show(mContext, "Please wait...", "Plant of the week!", true);
+			mDialog = ProgressDialog.show(mContext, getString(R.string.Alert_pleaseWait), 
+					getString(R.string.Weekly_Plant_Text), true);
 			mDialog.setCancelable(true);
 			
-			mGetWeeklyPlant = "http://networkednaturalist.org/python_scripts/plant_of_the_week_scrape.py";
+			mGetWeeklyPlant = getString(R.string.plant_of_week);
 		}
 
 		@Override
@@ -394,9 +404,12 @@ public class WeeklyPlant extends Activity {
 					OneTimeDBHelper onetimeDBHelper = new OneTimeDBHelper(WeeklyPlant.this);
 					
 					mSpeciesID = staticDBHelper.getSpeciesID(WeeklyPlant.this, getSpecies);
-					getSpeciesInfo = staticDBHelper.getSpeciesName(WeeklyPlant.this, getSpecies);
+					getSpeciesInfo = staticDBHelper.getSpeciesName(WeeklyPlant.this, mSpeciesID);
 					mScienceName = getSpeciesInfo[0];
 					mCommonName = getSpecies;
+					
+					Log.i("K", "Week of plant, SpeciesID: " + mSpeciesID + 
+							" ScienceName: " + mScienceName);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

@@ -50,7 +50,6 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 		boundCenter(marker);
 	}
 
-	
 	@Override
 	public boolean onTouchEvent(MotionEvent event, MapView mapView) {
 		
@@ -58,10 +57,7 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 		
 		if(action == MotionEvent.ACTION_UP) {
 			items.clear();
-			
-			/*
-			 * Convert the touched point to geoPoint
-			 */
+			//Convert the touched point to geoPoint
 			Projection proj = mapView.getProjection();
 			GeoPoint loc = proj.fromPixels((int)event.getX(), (int)event.getY());
 			
@@ -73,7 +69,6 @@ public class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 		populate();
 		
 		return true;
-	
 	}
 	
 	public double getLatitude() {

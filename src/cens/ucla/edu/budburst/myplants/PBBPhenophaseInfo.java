@@ -1,5 +1,9 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.AnimationHelper;
@@ -22,7 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-public class PhenophaseDetail extends Activity {
+public class PBBPhenophaseInfo extends Activity {
 
 	private StaticDBHelper sDBH;
 	private int pheno_id;
@@ -60,7 +64,7 @@ public class PhenophaseDetail extends Activity {
 	    SQLiteDatabase db;
 	    Cursor cursor;
 	    
-	    sDBH = new StaticDBHelper(PhenophaseDetail.this);
+	    sDBH = new StaticDBHelper(PBBPhenophaseInfo.this);
 	    
 	    db = sDBH.getReadableDatabase();
 	    

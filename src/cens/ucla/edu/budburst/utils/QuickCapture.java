@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst.onetime;
+package cens.ucla.edu.budburst.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,14 +11,15 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import cens.ucla.edu.budburst.PBBAddNotes;
-import cens.ucla.edu.budburst.PBBAddSite;
 import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
 import cens.ucla.edu.budburst.helper.HelperMedia;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.myplants.PBBAddNotes;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -174,13 +175,13 @@ public class QuickCapture extends Activity {
 				
 				Log.i("K","CAMERA_IMAGE_ID : " + mCameraImageID);
 				
+				
 				HelperMedia media = new HelperMedia();
 
 				Bitmap bitmap = media.ShowPhotoTaken(HelperValues.BASE_PATH + mCameraImageID + ".jpg");
 				
 				Intent intent = null;
 				
-				PBBItems pbbItem = new PBBItems();
 				pbbItem.setScienceName(mScienceName);
 				pbbItem.setCommonName(mCommonName);
 				pbbItem.setCategory(mCategory);
@@ -189,15 +190,15 @@ public class QuickCapture extends Activity {
 				pbbItem.setProtocolID(mProtocolID);
 				
 				
-				if(mPreviousActivity == HelperValues.FROM_UCLA_TREE_LISTS) {
-					intent = new Intent(QuickCapture.this, GetPhenophase.class);
+				if(mPreviousActivity == HelperValues.FROM_USER_DEFINED_LISTS) {
+					intent = new Intent(QuickCapture.this, OneTimePhenophase.class);
 					intent.putExtra("pbbItem", pbbItem);
 					
-					intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
+					intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 					
 				}
 				else if(mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS) {
-					intent = new Intent(QuickCapture.this, GetPhenophase.class);
+					intent = new Intent(QuickCapture.this, OneTimePhenophase.class);
 					intent.putExtra("pbbItem", pbbItem);
 					intent.putExtra("image_id", mImageID);
 					
@@ -206,14 +207,13 @@ public class QuickCapture extends Activity {
 				}
 				else if(mPreviousActivity == HelperValues.FROM_PLANT_LIST_ADD_SAMESPECIES
 						|| mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
-					intent = new Intent(QuickCapture.this, GetPhenophase.class);
+					intent = new Intent(QuickCapture.this, OneTimePhenophase.class);
 					intent.putExtra("pbbItem", pbbItem);
 					
 					intent.putExtra("from", mPreviousActivity);
 				}
 				else if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE) {
 					intent = new Intent(QuickCapture.this, OneTimeMainPage.class);
-					intent.putExtra("pbbItem", pbbItem);
 					intent.putExtra("pbbItem", pbbItem);
 					
 					intent.putExtra("from", HelperValues.FROM_QUICK_CAPTURE);

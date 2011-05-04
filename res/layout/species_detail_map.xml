@@ -127,11 +127,18 @@
 		>
 		
 		<ProgressBar
-			android:layout_gravity="center"
-	  		android:gravity="center"
-	  		android:layout_width="50dp"
-			android:layout_height="50dp"
+			android:adjustViewBounds="true"
+			android:scaleType="centerInside"
+			android:layout_marginLeft="22dp"
+			android:layout_marginRight="8dp"
+			android:paddingLeft="42dp"
+			android:paddingRight="42dp"
+			android:paddingTop="40dp"
+			android:paddingBottom="40dp"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
 	  		android:id="@+id/progressbar"
+	  		android:layout_weight="0.5"
 		/>
 		
 		<ImageView
@@ -144,10 +151,11 @@
 			android:layout_height="fill_parent"
 			android:id="@+id/phone_image"
 			android:layout_weight="0.5"
+			android:visibility="gone"
 		/>
 		
 		<com.google.android.maps.MapView 
-			android:layout_weight="0.56"
+			android:layout_weight="0.5"
 			android:id="@+id/simpleGM_map"
 			android:layout_width="fill_parent"
 			android:layout_height="100dp"
@@ -155,7 +163,7 @@
 			android:clickable="true"
 			android:layout_marginTop="3dp"
 			android:layout_marginBottom="3dp"
-			android:layout_marginRight="15dp"
+			android:layout_marginRight="25dp"
 			android:layout_marginLeft="8dp"
 		/>
 

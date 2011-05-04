@@ -15,11 +15,8 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
-import cens.ucla.edu.budburst.GetPhenophaseObserver;
-import cens.ucla.edu.budburst.GetPhenophaseShared;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.FloracacheItem;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
@@ -28,8 +25,11 @@ import cens.ucla.edu.budburst.mapview.BalloonItemizedOverlay;
 import cens.ucla.edu.budburst.mapview.PopupPanel;
 import cens.ucla.edu.budburst.mapview.SpeciesDetailMap;
 import cens.ucla.edu.budburst.mapview.SpeciesOverlayItem;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.myplants.GetPhenophaseObserver;
+import cens.ucla.edu.budburst.myplants.GetPhenophaseShared;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
+import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
@@ -56,12 +56,11 @@ public class FloraCacheOverlay extends BalloonItemizedOverlay<SpeciesOverlayItem
 			GeoPoint geoPoint = getPoint(mPlantList.get(i).getLatitude(), 
 					mPlantList.get(i).getLongitude());
 
-			//SpeciesOverlayItem(GeoPoint pt, int SpeciesID, String name, String snippet, String imageUrl,
-			// Drawable marker, Drawable heart, int category)
 			mSItem.add(new SpeciesOverlayItem(geoPoint, 
 					mPlantList.get(i).getUserSpeciesID(), 
-					mPlantList.get(i).getFloracacheNotes(),
-					"", 
+					mPlantList.get(i).getCommonName(),
+					mPlantList.get(i).getUserName(), 
+					mPlantList.get(i).getFloracacheNotes(), 
 					"",
 					getMarker(R.drawable.full_marker), 
 					mMarker, 
@@ -125,11 +124,11 @@ public class FloraCacheOverlay extends BalloonItemizedOverlay<SpeciesOverlayItem
 		
 		Location.distanceBetween(latitude, longitude, curLat, curLon, distResult);
 
-		if(distResult[0] < 1000) {
+		if(distResult[0] <= 6.0) {
 			showDialog();
 		}
 		else {
-			Toast.makeText(mContext, "distResult : " + distResult[0] + "m", Toast.LENGTH_SHORT).show();	
+			Toast.makeText(mContext, "Not close enough. Dist: " + String.format("%5.2f", distResult[0]) + "m", Toast.LENGTH_SHORT).show();	
 		}
 			
 		hideBalloon();
@@ -139,69 +138,45 @@ public class FloraCacheOverlay extends BalloonItemizedOverlay<SpeciesOverlayItem
 	
 	private void showDialog() {
 		
+		/*
+		 * Intent intent = new Intent(FloraCacheMidLevel.this, FloracacheDetail.class);
+			PBBItems pbbItem = new PBBItems();
+			pbbItem.setCommonName(mListArr.get(mIndex).getCommonName());
+			pbbItem.setScienceName(mListArr.get(mIndex).getSpeciesName());
+			pbbItem.setSpeciesID(mListArr.get(mIndex).getSpeciesID());
+			pbbItem.setProtocolID(mListArr.get(mIndex).getProtocolID());
+			pbbItem.setCategory(mListArr.get(mIndex).getCategory());
+			pbbItem.setFloracacheID(mListArr.get(mIndex).getFloracacheID());
+			pbbItem.setIsFloracache(HelperValues.IS_FLORACACHE_YES);
+			pbbItem.setSpeciesImageID(mImageID);
+			
+			intent.putExtra("pbbItem", pbbItem);
+			intent.putExtra("image_id", mImageID);
+			startActivity(intent);
+		 */
+		
 		if(mPlantList.get(mIndex).getUserSpeciesCategoryID() != HelperValues.LOCAL_BUDBURST_LIST) {
 			OneTimeDBHelper oDBH = new OneTimeDBHelper(mContext);
 			mImageID = oDBH.getImageID(mContext, mPlantList.get(mIndex).getScienceName(), mPlantList.get(mIndex).getUserSpeciesCategoryID());
 		}
 		
-		Log.i("K", "mPlantList.get(mIndex).getUserSpeciesID() : " + mPlantList.get(mIndex).getUserSpeciesID());
+		Intent intent = new Intent(mContext, FloracacheDetail.class);
+		PBBItems pbbItem = new PBBItems();
+		pbbItem.setCommonName(mPlantList.get(mIndex).getCommonName());
+		pbbItem.setScienceName(mPlantList.get(mIndex).getScienceName());
+		pbbItem.setSpeciesID(mPlantList.get(mIndex).getUserSpeciesID());
+		pbbItem.setProtocolID(mPlantList.get(mIndex).getProtocolID());
+		pbbItem.setCategory(mPlantList.get(mIndex).getUserSpeciesCategoryID());
+		pbbItem.setIsFloracache(HelperValues.IS_FLORACACHE_YES); // set floracacheID to easy value
+		pbbItem.setFloracacheID(mPlantList.get(mIndex).getFloracacheID());
+		pbbItem.setLatitude(mPlantList.get(mIndex).getLatitude());
+		pbbItem.setLongitude(mPlantList.get(mIndex).getLongitude());
 		
-		new AlertDialog.Builder(mContext)
-		.setTitle("Make an observation")
-		.setMessage("Great! You are very close to the species. Proceed to make an observation?")
-		.setPositiveButton(mContext.getString(R.string.Button_Photo), new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				/*
-				 * Move to QuickCapture
-				 */
-				Intent intent = new Intent(mContext, QuickCapture.class);
-				
-				intent.putExtra("cname", mPlantList.get(mIndex).getCommonName());
-				intent.putExtra("sname", mPlantList.get(mIndex).getScienceName());
-				intent.putExtra("species_id", mPlantList.get(mIndex).getUserSpeciesID());
-				intent.putExtra("protocol_id", mPlantList.get(mIndex).getProtocolID());				
-				intent.putExtra("category", mPlantList.get(mIndex).getUserSpeciesCategoryID());
-				intent.putExtra("image_id", mImageID);
-				intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
-				
-				mContext.startActivity(intent);
-
-			}
-		})
-		.setNeutralButton(mContext.getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				/*
-				 * Move to Getphenophase without a photo.
-				 */
-
-				Intent intent = new Intent(mContext, GetPhenophase.class);
-				intent.putExtra("camera_image_id", "");
-				intent.putExtra("cname", mPlantList.get(mIndex).getCommonName());
-				intent.putExtra("sname", mPlantList.get(mIndex).getScienceName());
-				intent.putExtra("protocol_id", mPlantList.get(mIndex).getProtocolID());
-				intent.putExtra("species_id", mPlantList.get(mIndex).getUserSpeciesID());
-				intent.putExtra("category", mPlantList.get(mIndex).getUserSpeciesCategoryID());
-				intent.putExtra("image_id", mImageID);
-				intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
-				
-				mContext.startActivity(intent);
-
-			}
-		})
-		.setNegativeButton(mContext.getString(R.string.Button_Cancel), new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-			}
-		})
-		.show();
+		intent.putExtra("pbbItem", pbbItem);
+		intent.putExtra("image_id", mImageID);
+		intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
+		
+		mContext.startActivity(intent);
 	}
 
 

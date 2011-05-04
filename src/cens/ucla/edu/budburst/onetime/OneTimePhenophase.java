@@ -3,14 +3,7 @@ package cens.ucla.edu.budburst.onetime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cens.ucla.edu.budburst.PBBAddNotes;
-import cens.ucla.edu.budburst.PBBAddPlant;
-import cens.ucla.edu.budburst.PBBAddSite;
-import cens.ucla.edu.budburst.GetPhenophaseShared;
 import cens.ucla.edu.budburst.PBBMainPage;
-import cens.ucla.edu.budburst.PhenophaseDetail;
-import cens.ucla.edu.budburst.UpdatePlantInfo;
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapter2;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
@@ -20,6 +13,13 @@ import cens.ucla.edu.budburst.helper.HelperBackgroundService;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.myplants.GetPhenophaseShared;
+import cens.ucla.edu.budburst.myplants.PBBAddNotes;
+import cens.ucla.edu.budburst.myplants.PBBAddPlant;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.myplants.PBBPhenophaseInfo;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
+import cens.ucla.edu.budburst.myplants.UpdatePlantInfo;
 import cens.ucla.edu.budburst.utils.PBBItems;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -52,7 +52,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GetPhenophase extends ListActivity {
+public class OneTimePhenophase extends ListActivity {
 	
 	private ArrayList<HelperPlantItem> pItem;
 	private String mCommonName = null;
@@ -96,7 +96,7 @@ public class GetPhenophase extends ListActivity {
 		
 		mCommonName = pbbItem.getCommonName();
 		mScienceName = pbbItem.getScienceName();
-		mCameraImageID = pbbItem.getImageName();
+		mCameraImageID = pbbItem.getCameraImageName();
 		mProtocolID = pbbItem.getProtocolID();
 		mSpeciesID = pbbItem.getSpeciesID();
 		mCategory = pbbItem.getCategory();
@@ -105,6 +105,7 @@ public class GetPhenophase extends ListActivity {
 		Log.i("K", "Previous_activity (GetPhenophase) : " + mPreviousActivity);
 		Log.i("K", "Category (Getphenophase) : " + mCategory);
 		Log.i("K", "protocolID (Getphenophase) : " + mProtocolID);
+		Log.i("K", "mCameraImageID (Getphenophase) : " + mCameraImageID);
 		// if the previous activity is from LOCAL_PLANT_LISTS,
 		// there is one more value, "image_id"
 		if(mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS) {
@@ -116,7 +117,7 @@ public class GetPhenophase extends ListActivity {
 		pItem = new ArrayList<HelperPlantItem>();
 
 		SQLiteDatabase db;
-		StaticDBHelper staticDB = new StaticDBHelper(GetPhenophase.this);
+		StaticDBHelper staticDB = new StaticDBHelper(OneTimePhenophase.this);
 		
 		db = staticDB.getReadableDatabase();
 		
@@ -168,14 +169,21 @@ public class GetPhenophase extends ListActivity {
 			}
 			
 			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(2), null, null);
-			HelperPlantItem pi = new HelperPlantItem(resID, cursor.getString(3), cursor.getInt(2), cursor.getString(1), cursor.getInt(0), header);
+			//public HelperPlantItem(int aPicture, String aNote, int aPhenoImageID, String aPhenoName, int aPhenoID, Boolean aHeader){
+			HelperPlantItem pi = new HelperPlantItem();
+			pi.setPicture(resID);
+			pi.setNote(cursor.getString(3));
+			pi.setPhenoImageID(cursor.getInt(2));
+			pi.setPhenoName(cursor.getString(1));
+			pi.setPhenoID(cursor.getInt(0));
+			pi.setHeader(header);
 			pItem.add(pi);
 		}
 		
 		cursor.close();
 		db.close();
 
-		MyAdapter = new MyListAdapter2(GetPhenophase.this, R.layout.phenophaselist, pItem);
+		MyAdapter = new MyListAdapter2(OneTimePhenophase.this, R.layout.phenophaselist, pItem);
 		myList = getListView(); 
 		myList.setAdapter(MyAdapter);
 	}
@@ -184,17 +192,17 @@ public class GetPhenophase extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 
 		//GetPhenophase.this.unregisterReceiver(receiver);
-		if(mPreviousActivity == HelperValues.FROM_UCLA_TREE_LISTS) {
-			Intent intent = new Intent(GetPhenophase.this, PBBAddNotes.class);
-			pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
+		if(mPreviousActivity == HelperValues.FROM_USER_DEFINED_LISTS) {
+			Intent intent = new Intent(OneTimePhenophase.this, PBBAddNotes.class);
+			pbbItem.setPhenophaseID(pItem.get(position).getPhenoID());
 			intent.putExtra("pbbItem", pbbItem);
-			intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
+			intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 			startActivity(intent);
 		}
 		else if(mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS 
 				|| mPreviousActivity == HelperValues.FROM_PLANT_LIST_ADD_SAMESPECIES) {
-			Intent intent = new Intent(GetPhenophase.this, PBBAddNotes.class);
-			pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
+			Intent intent = new Intent(OneTimePhenophase.this, PBBAddNotes.class);
+			pbbItem.setPhenophaseID(pItem.get(position).getPhenoID());
 			intent.putExtra("pbbItem", pbbItem);
 			intent.putExtra("image_id", mImageID);
 			intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
@@ -202,8 +210,8 @@ public class GetPhenophase extends ListActivity {
 		}
 		else if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE
 				|| mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE_ADD_SAMESPECIES) {
-			Intent intent = new Intent(GetPhenophase.this, PBBAddNotes.class);
-			pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
+			Intent intent = new Intent(OneTimePhenophase.this, PBBAddNotes.class);
+			pbbItem.setPhenophaseID(pItem.get(position).getPhenoID());
 			intent.putExtra("pbbItem", pbbItem);
 			intent.putExtra("from", HelperValues.FROM_QUICK_CAPTURE);
 			startActivity(intent);

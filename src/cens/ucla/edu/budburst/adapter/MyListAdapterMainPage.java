@@ -1,16 +1,23 @@
 package cens.ucla.edu.budburst.adapter;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.helper.HelperDrawableManager;
 import cens.ucla.edu.budburst.helper.HelperListItem;
+import cens.ucla.edu.budburst.helper.HelperValues;
 
 public class MyListAdapterMainPage extends BaseAdapter{
 	Context maincon;
@@ -30,7 +37,7 @@ public class MyListAdapterMainPage extends BaseAdapter{
 	}
 	
 	public String getItem(int position){
-		return arSrc.get(position).Title;
+		return arSrc.get(position).getTitle();
 	}
 	
 	public long getItemId(int position){
@@ -43,7 +50,24 @@ public class MyListAdapterMainPage extends BaseAdapter{
 		
 		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
 		
-		img.setImageResource(maincon.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/"+arSrc.get(position).ImageUrl, null, null));
+		if(maincon.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/"+arSrc.get(position).getImageURL(), null, null) == 0) {
+			File existFile = new File(HelperValues.TREE_PATH 
+					+ "group_"
+					+ arSrc.get(position).getImageURL() + ".jpg");
+			
+			if(existFile.exists()) {
+				Bitmap bitmap = BitmapFactory.decodeFile(HelperValues.TREE_PATH 
+						+ "group_"
+						+ arSrc.get(position).getImageURL() + ".jpg");
+				img.setImageBitmap(bitmap);
+			}
+			else {
+				img.setImageResource(maincon.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+			}
+		}
+		else {
+			img.setImageResource(maincon.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/"+arSrc.get(position).getImageURL(), null, null));
+		}
 		//img.setBackgroundResource(R.drawable.shapedrawable);
 		
 		
@@ -54,16 +78,16 @@ public class MyListAdapterMainPage extends BaseAdapter{
 		/*
 		 *  If the header is not "none", show the header on the screen.
 		 */
-		if(!arSrc.get(position).Header.equals("none")) {
-			header_view.setText(" " + arSrc.get(position).Header);
+		if(!arSrc.get(position).getHeaderText().equals("none")) {
+			header_view.setText(" " + arSrc.get(position).getHeaderText());
 			header_view.setVisibility(View.VISIBLE);
 		}
 		else {
 			header_view.setVisibility(View.GONE);
 		}
 		
-		title_view.setText(arSrc.get(position).Title);
-		title_desc.setText(arSrc.get(position).Description + " ");
+		title_view.setText(arSrc.get(position).getTitle());
+		title_desc.setText(arSrc.get(position).getDescription() + " ");
 
 		return convertView;
 	}

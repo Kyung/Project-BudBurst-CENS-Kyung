@@ -23,8 +23,11 @@ import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.floracaching.FloraCacheEasyLevel;
 import cens.ucla.edu.budburst.floracaching.FloraCacheOverlay;
 import cens.ucla.edu.budburst.floracaching.FloracacheGetLists;
+import cens.ucla.edu.budburst.lists.ListGroupItem;
+import cens.ucla.edu.budburst.lists.ListItems;
 import cens.ucla.edu.budburst.lists.ListMain;
-import cens.ucla.edu.budburst.lists.ListUserPlants;
+import cens.ucla.edu.budburst.lists.ListUserDefinedCategory;
+import cens.ucla.edu.budburst.lists.ListUserDefinedSpeciesDownload;
 import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,6 +35,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -50,11 +54,16 @@ public class HelperSettings extends PreferenceActivity {
 	private String mUsername;
 	private int mPreviousActivity;
 	private int mOneTimeMainPreviousActivity;
+	private ArrayList<ListGroupItem> mArr;
+	private boolean[] mSelect;
+	private String[] mGroupName;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+	    
+	    mArr = new ArrayList<ListGroupItem>();
 	    
 	    pref = getSharedPreferences("userinfo", 0);
 	    Intent pIntent = getIntent();
@@ -78,14 +87,14 @@ public class HelperSettings extends PreferenceActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						stopService(new Intent(HelperSettings.this, HelperBackgroundService.class));
 						
 						HelperFunctionCalls helper = new HelperFunctionCalls();
 						helper.changeSharedPreference(HelperSettings.this);
 
 						// getting contents again...
 						Toast.makeText(HelperSettings.this, getString(R.string.Start_Downloading), Toast.LENGTH_SHORT).show();
-						startService(new Intent(HelperSettings.this, HelperBackgroundService.class));					
+						HelperRefreshPlantLists getLocalList = new HelperRefreshPlantLists(HelperSettings.this);
+						getLocalList.execute();
 					}
 				})
 				.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
@@ -102,45 +111,13 @@ public class HelperSettings extends PreferenceActivity {
 	    	
 	    });
 	    
-	    Preference downloadTreeListPref = (Preference) findPreference("downloadTreeLists");
-	    downloadTreeListPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+	    Preference downloadUserDefinedListPref = (Preference) findPreference("downloadDefinedLists");
+	    downloadUserDefinedListPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
 				// TODO Auto-generated method stub
-				new AlertDialog.Builder(HelperSettings.this)
-				.setTitle(getString(R.string.DownLoad_Tree_Lists))
-				.setMessage(getString(R.string.List_ask_connectivity))
-				.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-
-						Toast.makeText(HelperSettings.this, getString(R.string.Start_Downloading_UCLA_Tree_Lists), Toast.LENGTH_SHORT).show();
-						
-						HelperFunctionCalls helper = new HelperFunctionCalls();
-						helper.changedSharedPreferenceTree(HelperSettings.this);
-						HelperSharedPreference hPref = new HelperSharedPreference(HelperSettings.this);
-						hPref.setPreferencesBoolean("firstDownloadTreeList", false);
-						//SharedPreferences.Editor edit = pref.edit();
-						//edit.putBoolean("firstDownloadTreeList", false);
-						//edit.commit();
-
-						ListUserPlants userPlant = new ListUserPlants(HelperSettings.this);
-						userPlant.execute();
-							
-					}
-				})
-				.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-					}
-				})
-				.show();
-
+				checkConnectivity();
 				return true;
 			}
 	    });
@@ -177,8 +154,6 @@ public class HelperSettings extends PreferenceActivity {
 					}
 				})
 				.show();
-				
-				
 				return true;
 			}
 	    	
@@ -217,20 +192,22 @@ public class HelperSettings extends PreferenceActivity {
 						edit.putBoolean("Update", false);
 						edit.putBoolean("localbudburst", false);
 						edit.putBoolean("localwhatsinvasive", false);
-						edit.putBoolean("localnative", false);
 						edit.putBoolean("localpoisonous", false);
+						edit.putBoolean("localendangered", false);
 						edit.putBoolean("listDownloaded", false);
 						edit.putBoolean("firstDownloadTreeList", true);
 						edit.putBoolean("floracache", false);
 						edit.commit();
 
 						//Drop user table in database
-						SyncDBHelper dbhelper = new SyncDBHelper(HelperSettings.this);
-						OneTimeDBHelper onehelper = new OneTimeDBHelper(HelperSettings.this);
-						dbhelper.clearAllTable(HelperSettings.this);
-						onehelper.clearAllTable(HelperSettings.this);
-						dbhelper.close();
-						onehelper.close();
+						SyncDBHelper sDBH = new SyncDBHelper(HelperSettings.this);
+						OneTimeDBHelper oDBH = new OneTimeDBHelper(HelperSettings.this);
+						SQLiteDatabase oDB = oDBH.getWritableDatabase();
+						
+						sDBH.clearAllTable(HelperSettings.this);
+						oDBH.clearAllTable(HelperSettings.this);
+						sDBH.close();
+						oDBH.close();
 
 						HelperFunctionCalls helper = new HelperFunctionCalls();
 						helper.deleteContents(HelperValues.BASE_PATH);
@@ -257,6 +234,88 @@ public class HelperSettings extends PreferenceActivity {
 	    });
 	}
 	
+	private void checkConnectivity() {
+		new AlertDialog.Builder(HelperSettings.this)
+		.setTitle(getString(R.string.DownLoad_Tree_Lists))
+		.setMessage(getString(R.string.List_ask_connectivity))
+		.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub				
+				showUserDefinedLists();
+
+			}
+		})
+		.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+			}
+		})
+		.show();
+
+	}
+	
+	private void showUserDefinedLists() {
+
+		// call user defined lists
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(HelperSettings.this);
+		mArr = oDBH.getListGroupItem(HelperSettings.this);
+		
+		int groupCnt = mArr.size();
+		mGroupName = new String[groupCnt];
+		mSelect = new boolean[groupCnt];
+		
+		for(int i = 0 ; i < groupCnt ; i++) {
+			mGroupName[i] = mArr.get(i).getCategoryName();
+			mSelect[i] = false;
+		}
+		
+		new AlertDialog.Builder(HelperSettings.this)
+		.setTitle("Select User Defined Lists")
+		.setSingleChoiceItems(mGroupName, -1, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				mSelect[which] = true;
+			}
+		})
+		.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				for(int i = 0 ; i < mSelect.length ; i++) {
+					if(mSelect[i]) {
+						ListUserDefinedSpeciesDownload userPlant = new ListUserDefinedSpeciesDownload(HelperSettings.this
+								, mArr.get(i).getCategoryID());
+						userPlant.execute();
+					}
+				}
+			}
+		})
+		.setNeutralButton("Refresh Lists", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				ListUserDefinedCategory userCategory = new ListUserDefinedCategory(HelperSettings.this);
+				
+				HelperSharedPreference pref = new HelperSharedPreference(HelperSettings.this);
+				
+				double getLatitude = Double.parseDouble(pref.getPreferenceString("latitude", "0.0"));
+				double getLongitude = Double.parseDouble(pref.getPreferenceString("longitude", "0.0"));
+				
+				ListItems lItem = new ListItems(getLatitude, getLongitude);
+				userCategory.execute(lItem);
+			}
+		})
+		.show();
+	}
+	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
@@ -275,4 +334,5 @@ public class HelperSettings extends PreferenceActivity {
 		}
 		return false;
 	}	
+	
 }

@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapterMainPage;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.FloracacheItem;
 import cens.ucla.edu.budburst.helper.HelperGpsHandler;
 import cens.ucla.edu.budburst.helper.HelperListItem;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
@@ -24,7 +23,9 @@ import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.lists.ListMain;
 import cens.ucla.edu.budburst.mapview.MyLocOverlay;
+import cens.ucla.edu.budburst.mapview.MapViewMain;
 import cens.ucla.edu.budburst.mapview.SpeciesMapOverlay;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -50,6 +51,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -74,6 +77,9 @@ public class FloraCacheEasyLevel extends MapActivity {
 	private ArrayList<FloracacheItem> mPlantList;
 	private HelperPlantItem pItem;
 	private Drawable mMarker;
+	private int mGroupID;
+	
+	private boolean viewFlag = false;
 
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -153,13 +159,12 @@ public class FloraCacheEasyLevel extends MapActivity {
 			else {
 				new AlertDialog.Builder(FloraCacheEasyLevel.this)
 				.setTitle("Weak Gps Signal")
-				.setMessage("Cannot get Gps Signal, Make sure you are in the good connectivity area")
+				.setMessage("Low GPS signal, Make sure you are in the good connectivity area")
 				.setPositiveButton(getString(R.string.Button_back), new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						finish();
 					}
 				})
 				.show();
@@ -179,6 +184,9 @@ public class FloraCacheEasyLevel extends MapActivity {
 	    super.onCreate(savedInstanceState);
 	
 	    setContentView(R.layout.pbb_map);
+	    
+	    Intent gIntent = getIntent();
+	    mGroupID = gIntent.getExtras().getInt("group_id");
 		
 		mLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		// Set MapView
@@ -228,7 +236,9 @@ public class FloraCacheEasyLevel extends MapActivity {
 				mMapController.setCenter(getPoint(mLatitude, mLongitude));
 			}
 			
+			// bind GPS service to current activity
 			doBindService();
+			// call plantlists from the database
 			showSpeciesOnMap(false);
 			
 		}
@@ -286,7 +296,7 @@ public class FloraCacheEasyLevel extends MapActivity {
 		}
 		else {
 			OneTimeDBHelper oDBH = new OneTimeDBHelper(this);
-			mPlantList = oDBH.getFloracacheLists(FloraCacheEasyLevel.this, HelperValues.FLORACACHE_EASY);
+			mPlantList = oDBH.getFloracacheLists(FloraCacheEasyLevel.this, HelperValues.FLORACACHE_EASY, mGroupID);
 			
 			Log.i("K", "PlantList size : " + mPlantList.size());
 			
@@ -307,5 +317,46 @@ public class FloraCacheEasyLevel extends MapActivity {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	public boolean onCreateOptionsMenu(Menu menu){
+		super.onCreateOptionsMenu(menu);
+		
+		menu.add(0, 1, 0, getString(R.string.PBBMapMenu_myLocation)).setIcon(android.R.drawable.ic_menu_mylocation);
+		menu.add(0, 2, 0, getString(R.string.PBBMapMenu_changeView)).setIcon(android.R.drawable.ic_menu_mapmode);
+			
+		return true;
+	}
+	
+	//Menu option selection handling
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+			case 1:
+				GeoPoint current_point = null;
+				if(mLatitude == 0.0) {
+					Toast.makeText(FloraCacheEasyLevel.this, getString(R.string.Alert_gettingGPS), Toast.LENGTH_SHORT).show();
+				}
+				else {
+					current_point = new GeoPoint((int)(mLatitude * 1000000), (int)(mLongitude * 1000000));
+
+					mMapController = mMapView.getController();
+					mMapController.animateTo(current_point);
+					mMapController.setZoom(15);
+				}
+				return true;
+			case 2:
+				if(!viewFlag) {
+					mMapView.setSatellite(true);
+					viewFlag = true;
+				}
+				else {
+					mMapView.setSatellite(false);
+					viewFlag = false;
+				}
+				
+				return true;
+		}
+		return false;
+	}
+
 
 }

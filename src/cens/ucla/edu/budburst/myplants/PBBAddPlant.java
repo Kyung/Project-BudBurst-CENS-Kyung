@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +31,11 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.array;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.adapter.MyListAdapter;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
@@ -127,13 +132,23 @@ public class PBBAddPlant extends ListActivity{
 				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
 				
 				HelperPlantItem pi;
-				pi = new HelperPlantItem(resID, commonName, scienceName, id);
+				pi = new HelperPlantItem();
+				pi.setPicture(resID);
+				pi.setCommonName(commonName);
+				pi.setSpeciesName(scienceName);
+				pi.setSpeciesID(id);
+				
 				arPlantList.add(pi);
 			}
 		}
 			
 		// add plant at the last.
-		HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", HelperValues.UNKNOWN_SPECIES);
+		HelperPlantItem pi = new HelperPlantItem();
+		pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+		pi.setCommonName("Unknown/Other");
+		pi.setSpeciesName("Unknown/Other");
+		pi.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
+		
 		arPlantList.add(pi);
 			
 		mylistapdater = new MyListAdapter(PBBAddPlant.this, R.layout.plantlist_item2, arPlantList);
@@ -176,14 +191,21 @@ public class PBBAddPlant extends ListActivity{
 									
 					int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
 						
-					HelperPlantItem pi;
+					HelperPlantItem pi = new HelperPlantItem();
 					//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-					pi = new HelperPlantItem(resID, commonName, scienceName, id);
+					pi.setPicture(resID);
+					pi.setCommonName(commonName);
+					pi.setSpeciesName(scienceName);
+					pi.setSpeciesID(id);
 					arPlantList.add(pi);
 				}
 				
 				// add plant at the last.
-				HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", HelperValues.UNKNOWN_SPECIES);
+				HelperPlantItem pi = new HelperPlantItem();
+				pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+				pi.setCommonName("Unknown/Other");
+				pi.setSpeciesName("Unknown/Other");
+				pi.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(PBBAddPlant.this, R.layout.plantlist_item2, arPlantList);
@@ -239,17 +261,24 @@ public class PBBAddPlant extends ListActivity{
 							String species_name = cursor.getString(1);
 							String common_name = cursor.getString(2);
 							Integer protocol_id = cursor.getInt(3);
-										
-							HelperPlantItem pi;
 							
 							int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
 							
 							//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-							pi = new HelperPlantItem(resID, common_name, species_name, id);
+							HelperPlantItem pi = new HelperPlantItem();
+							//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
+							pi.setPicture(resID);
+							pi.setCommonName(common_name);
+							pi.setSpeciesName(species_name);
+							pi.setSpeciesID(id);
 							arPlantList.add(pi);
 						}
 						
-						HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", HelperValues.UNKNOWN_SPECIES);
+						HelperPlantItem pi = new HelperPlantItem();
+						pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+						pi.setCommonName("Unknown/Other");
+						pi.setSpeciesName("Unknown/Other");
+						pi.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
 						arPlantList.add(pi);
 						
 						mylistapdater = new MyListAdapter(PBBAddPlant.this, R.layout.plantlist_item2, arPlantList);
@@ -286,9 +315,13 @@ public class PBBAddPlant extends ListActivity{
 						String species_name = cursor.getString(1);
 						String common_name = cursor.getString(2);
 						
-						HelperPlantItem pi;
+						HelperPlantItem pi = new HelperPlantItem();
 						//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-						pi = new HelperPlantItem(resID, common_name, species_name, cursor.getInt(0));
+						pi.setPicture(resID);
+						pi.setCommonName(common_name);
+						pi.setSpeciesName(species_name);
+						pi.setSpeciesID(cursor.getInt(0));
+					
 						arPlantList.add(pi);
 					}
 					
@@ -314,8 +347,8 @@ public class PBBAddPlant extends ListActivity{
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		
-		mNewPlantSpeciesID = arPlantList.get(position).SpeciesID;
-		mNewPlantSpeciesName = arPlantList.get(position).CommonName;
+		mNewPlantSpeciesID = arPlantList.get(position).getSpeciesID();
+		mNewPlantSpeciesName = arPlantList.get(position).getCommonName();
 		//Retreive user sites from database.
 		mSeqUserSite = mHelper.getUserSite(PBBAddPlant.this);
 		

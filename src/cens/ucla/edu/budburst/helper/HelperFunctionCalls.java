@@ -17,11 +17,11 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 
-import cens.ucla.edu.budburst.GetPhenophaseShared;
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.lists.ListMain;
+import cens.ucla.edu.budburst.myplants.GetPhenophaseShared;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
 
 import android.R;
 import android.content.Context;
@@ -248,7 +248,9 @@ public class HelperFunctionCalls {
 		}
 	}
 	
-	public boolean insertNewSharedPlantToDB(Context context, int speciesid, int siteid, int protocolid, String cname, String sname, int category, String imageID, int isFloracache){
+	public boolean insertNewSharedPlantToDB(Context context, int speciesid, 
+			int siteid, int protocolid, String cname, String sname, int category, 
+			String imageID, int isFloracache, int floracacheID){
 		
 		try{
 			OneTimeDBHelper onetime = new OneTimeDBHelper(context);
@@ -270,9 +272,11 @@ public class HelperFunctionCalls {
 					"\"" + sname + "\","+
 					HelperValues.ACTIVE_SPECIES + "," + // active
 					category + "," + 
-					SyncDBHelper.SYNCED_NO + "," + 
-					"\"" + imageID + "\","
-					+ isFloracache + ");"
+					SyncDBHelper.SYNCED_NO + "," //+ 
+					//"\"" + imageID + "\","
+					+ isFloracache + ","
+					+ floracacheID
+					+ ");"
 					);
 			onetime.close();
 			ot.close();
@@ -554,7 +558,9 @@ public class HelperFunctionCalls {
 	public void showSpeciesThumbNail(Context context, int category, int speciesID, String scienceName, ImageView imgView) {
 		// why 0 in here?
 		// - the old version of the app still has 0 as a category number.
-		if(category == 0 || category == HelperValues.LOCAL_BUDBURST_LIST) {
+		if(category == 0 || 
+				category == HelperValues.LOCAL_BUDBURST_LIST ||
+				category == HelperValues.LOCAL_FLICKR) {
 			imgView.setImageResource(context.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + speciesID, null, null));
 	    }
 	    else if(category == HelperValues.LOCAL_WHATSINVASIVE_LIST ||
@@ -570,14 +576,50 @@ public class HelperFunctionCalls {
 	    	
 	    	imgView.setImageBitmap(icon);
 	    }
-	    else if(category == HelperValues.USER_DEFINED_TREE_LISTS) {
+	    else if(category >= HelperValues.USER_DEFINED_TREE_LISTS) {
 	    	OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 	    	
-	    	int imageID = onetime.getTreeImageID(context, scienceName, HelperValues.USER_DEFINED_TREE_LISTS);
+	    	//int imageID = onetime.getUserDefinedImageID(context, scienceName, category);
+	    	
+	    	//Log.i("K", "ImageID: " + imageID + ", scienceName:" + scienceName);
+	    	
+    		String imagePath = HelperValues.TREE_PATH + speciesID + ".jpg";
+    		HelperFunctionCalls helper = new HelperFunctionCalls();
+    		imgView.setImageBitmap(helper.showImage(context, imagePath));
+	    }
+	    else {
+	    	
+	    }
+	}
+	
+	public void showSpeciesThumbNailObserver(Context context, int category, int speciesID, String scienceName, ImageView imgView) {
+		// why 0 in here?
+		// - the old version of the app still has 0 as a category number.
+		if(category == 0 || 
+				category == HelperValues.LOCAL_BUDBURST_LIST ||
+				category == HelperValues.LOCAL_FLICKR) {
+			imgView.setImageResource(context.getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + speciesID, null, null));
+	    }
+	    else if(category == HelperValues.LOCAL_WHATSINVASIVE_LIST ||
+	    		category == HelperValues.LOCAL_POISONOUS_LIST ||
+	    		category == HelperValues.LOCAL_THREATENED_ENDANGERED_LIST) {
+	    	String imagePath = HelperValues.LOCAL_LIST_PATH + speciesID + ".jpg";
+	    	
+	    	OneTimeDBHelper onetime = new OneTimeDBHelper(context);
+	    	
+	    	int imageID = onetime.getImageID(context, scienceName, category);
+	    	Bitmap icon = null;
+	    	icon = getImageFromSDCard(context, imageID, icon);
+	    	
+	    	imgView.setImageBitmap(icon);
+	    }
+	    else if(category >= HelperValues.USER_DEFINED_TREE_LISTS) {
+	    	OneTimeDBHelper onetime = new OneTimeDBHelper(context);
+	    	int imageID = onetime.getUserDefinedImageID(context, scienceName, category);
+
     		String imagePath = HelperValues.TREE_PATH + imageID + ".jpg";
     		HelperFunctionCalls helper = new HelperFunctionCalls();
     		imgView.setImageBitmap(helper.showImage(context, imagePath));
-
 	    }
 	    else {
 	    	

@@ -132,8 +132,11 @@ public class SyncNetworkHelper extends Activity{
 		return null;
 	}
 
-	static public String upload_onetime_ob(String username, String password, int plant_id, int species_id, int site_id,
-			int protocol_id, String cname, String sname, int active, int category) {
+	static public String upload_onetime_ob(String username, String password, 
+			int plant_id, int species_id, int site_id,
+			int protocol_id, String cname, String sname, 
+			int active, int category, int isFloracache,
+			int floracacheID) {
 		try{
 			
 			Log.i("K", "plant id : " + plant_id + " species_id : " + species_id + " site_id : " + site_id + " protocol_id : " + protocol_id + " cname : " + cname + " sname : " + sname + " active : " + active);
@@ -154,6 +157,8 @@ public class SyncNetworkHelper extends Activity{
         	nameValuePairs.add(new BasicNameValuePair("sname", sname));
         	nameValuePairs.add(new BasicNameValuePair("active", Integer.toString(active)));
         	nameValuePairs.add(new BasicNameValuePair("category", Integer.toString(category)));
+        	nameValuePairs.add(new BasicNameValuePair("is_floracache", Integer.toString(isFloracache)));
+        	nameValuePairs.add(new BasicNameValuePair("floracache_id", Integer.toString(floracacheID)));
         	httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 

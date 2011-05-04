@@ -51,15 +51,6 @@ public class PBBHelloscr extends Activity{
 	final private int MENU_ADD_SITE = 3;
 	final private int MENU_LOGOUT = 4;
 	
-	//Sync constants
-	final private int UPLOAD_ADDED_SITE = 1;
-	final private int UPLOAD_ADDED_PLANT = 2;
-	final private int UPLOAD_OBSERVATION = 3;
-	final private int DOWNLOAD_MY_SPECIES_IN_MY_STATION = 4;
-	final private int DOWNLOAD_OBSERVATION = 5;
-	final private int DOWNLOAD_OBSERVATION_IMG = 6;
-	final private int NETWORK_COMPLETED = 7;
-	
 	public SyncDBHelper syncDBHelper;
 			
 	@Override
@@ -115,59 +106,4 @@ public class PBBHelloscr extends Activity{
 			
 		return true;
 	}
-	
-	
-	/*
-	//Menu option selection handling
-	public boolean onOptionsItemSelected(MenuItem item){
-		Intent intent;
-		switch(item.getItemId()){
-			case MENU_LOGOUT:
-				new AlertDialog.Builder(PBBHelloscr.this)
-					.setTitle(getString(R.string.Alert_titleQuestion))
-					.setMessage(getString(R.string.Alert_logout))
-					.setPositiveButton(getString(R.string.Button_yes),mClick)
-					.setNegativeButton(getString(R.string.Button_no),mClick)
-					.show();
-				return true;
-		}
-		return false;
-	}
-	
-
-	
-	//Dialog confirm message if user clicks logout button
-	DialogInterface.OnClickListener mClick =
-		new DialogInterface.OnClickListener(){
-		public void onClick(DialogInterface dialog, int whichButton){
-			if(whichButton == DialogInterface.BUTTON1){
-				
-				SharedPreferences.Editor edit = pref.edit();				
-				edit.putString("Username","");
-				edit.putString("Password","");
-				edit.putString("synced", "false");
-				edit.commit();
-				
-				//Drop user table in database
-				SyncDBHelper dbhelper = new SyncDBHelper(PBBHelloscr.this);
-				dbhelper.clearAllTable(PBBHelloscr.this);
-				dbhelper.close(); 
-				
-				String[] filelist = fileList();
-				File sdcard = new File("/sdcard/pbudburst/");
-				String[] files = sdcard.list();
-				
-				for(int i=0; i<files.length; i++){
-					File file = new File("/sdcard/pbudburst/" + files[i]);
-					file.delete();
-				}
-				
-				Intent intent = new Intent(PBBHelloscr.this, PBBLogin.class);
-				startActivity(intent);
-				finish();
-			}else{
-			}
-		}
-	};
-	*/
 }

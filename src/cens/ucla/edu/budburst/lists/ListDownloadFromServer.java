@@ -51,13 +51,14 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 	private ArrayList <HelperPlantItem> localArray;
 	private boolean running = true;
 	private ListItems item;
-	private int category;
+	private int mCategory;
 	
-	public ListDownloadFromServer(Context context, ListView list, HelperLazyAdapter lazyadapter, ListItems item) {
+	public ListDownloadFromServer(Context context, ListView list, HelperLazyAdapter lazyadapter, ListItems item, int category) {
 		this.context = context;
 		this.list = list;
 		this.lazyadapter = lazyadapter;
 		this.item = item;
+		mCategory = category;
 		
 		// Initialize ArrayList
 		localArray = new ArrayList<HelperPlantItem>();
@@ -134,9 +135,7 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 			String url = "http://networkednaturalist.org/python_scripts/cens-dylan/list.py?lat=" 
 				+ item[0].latitude
 				+ "&lon=" + item[0].longitude 
-				+ "&type=" + item[0].category;
-			
-			category = item[0].category;
+				+ "&type=" + mCategory;
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(url);
@@ -232,11 +231,11 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 					 * Retrieve values from the table and put that into the PlantItem class.
 					 */
 
-					if(category == HelperValues.LOCAL_BUDBURST_LIST) {
+					if(mCategory == HelperValues.LOCAL_BUDBURST_LIST) {
 						otDB = otDBH.getReadableDatabase();
 
 						Cursor cursor = otDB.rawQuery("SELECT science_name FROM localPlantLists WHERE category=" 
-								+ category 
+								+ mCategory 
 								+ " ORDER BY LOWER(common_name) ASC;", null);
 						
 						while(cursor.moveToNext()) {
@@ -258,8 +257,14 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 								
 								/*
 								 * Insert into PlantItem object
+								 * public HelperPlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aProtocolID){
 								 */
-								pi = new HelperPlantItem(resID, getSpeciesInfo.getString(2), getSpeciesInfo.getString(1), getSpeciesInfo.getInt(0), getSpeciesInfo.getInt(3));
+								pi = new HelperPlantItem();
+								pi.setPicture(resID);
+								pi.setCommonName(getSpeciesInfo.getString(2));
+								pi.setSpeciesName(getSpeciesInfo.getString(1));
+								pi.setSpeciesID(getSpeciesInfo.getInt(0));
+								pi.setProtocolID(getSpeciesInfo.getInt(3));
 
 								localArray.add(pi);
 							}
@@ -272,14 +277,17 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 					}
 					else {
 						Cursor cursor = otDB.rawQuery("SELECT category, common_name, science_name, photo_url FROM localPlantLists WHERE category=" 
-								+ category 
+								+ mCategory 
 								+ " ORDER BY LOWER(common_name) ASC;", null);
 						
+						//public HelperPlantItem(String aCommonName, String aSpeciesName, String aImageUrl, int aCategory) {
 						while(cursor.moveToNext()) {
-							HelperPlantItem pi = new HelperPlantItem(cursor.getString(1) 
-									, cursor.getString(2)
-									, cursor.getString(3)
-									, cursor.getInt(0));
+							HelperPlantItem pi = new HelperPlantItem();
+							pi.setCommonName(cursor.getString(1));
+							pi.setSpeciesName(cursor.getString(2));
+							pi.setImageURL(cursor.getString(3));
+							pi.setCategory(cursor.getInt(0));
+									
 							localArray.add(pi);
 						}
 						
@@ -347,10 +355,9 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 	protected void onPostExecute(Void unused) {
 		dialog.dismiss();
 		
-		int doneCategory = item.category;
 		String doneCategoryString = "";
 		
-		switch(doneCategory) {
+		switch(mCategory) {
 		case 1:
 			doneCategoryString = "localbudburst";
 			break;
@@ -374,7 +381,7 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 		edit.commit();
 		
 		
-		if(category == HelperValues.LOCAL_BUDBURST_LIST) {
+		if(mCategory == HelperValues.LOCAL_BUDBURST_LIST) {
 			MyListAdapter mylistapdater = new MyListAdapter(context, R.layout.plantlist_item2, localArray);
 			list.setAdapter(mylistapdater);
 		}

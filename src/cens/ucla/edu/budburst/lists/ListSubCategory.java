@@ -72,8 +72,8 @@ public class ListSubCategory extends ListActivity {
 		/*
 		 *  Receive intent value from the previous activity
 		 */
-		Intent p_intent = getIntent();
-		mCategory = p_intent.getExtras().getInt("category");
+		Bundle bundle = getIntent().getExtras();
+		mCategory = bundle.getInt("category");
 		
 		Log.i("K", "ListSubCategory - category : " + mCategory);
 		
@@ -96,7 +96,7 @@ public class ListSubCategory extends ListActivity {
 		/*
 		 * Set Items object to pass to the DownloadListFromServer
 		 */
-		item = new ListItems(mLatitude, mLongitude, mCategory);
+		item = new ListItems(mLatitude, mLongitude);
 		 
 		mList = getListView();
 				
@@ -127,7 +127,7 @@ public class ListSubCategory extends ListActivity {
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item, HelperValues.LOCAL_BUDBURST_LIST);
 			downloadlist.execute(item);
 			
 			/*
@@ -151,7 +151,7 @@ public class ListSubCategory extends ListActivity {
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item, HelperValues.LOCAL_WHATSINVASIVE_LIST);
 			downloadlist.execute(item);
 			
 			/*
@@ -175,7 +175,7 @@ public class ListSubCategory extends ListActivity {
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item, HelperValues.LOCAL_POISONOUS_LIST);
 			downloadlist.execute(item);
 			/*
 			 * Set localbudburst preferece to true 
@@ -198,7 +198,7 @@ public class ListSubCategory extends ListActivity {
 			 *  Download list from the server
 			 *  - be based on the type
 			 */
-			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item);
+			ListDownloadFromServer downloadlist = new ListDownloadFromServer(this, mList, mLazyadapter, item, HelperValues.LOCAL_THREATENED_ENDANGERED_LIST);
 			downloadlist.execute(item);
 			/*
 			 * Set localbudburst preferece to true 
@@ -244,8 +244,14 @@ public class ListSubCategory extends ListActivity {
 				
 				/*
 				 * Insert into PlantItem object
+				 * public HelperPlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aProtocolID){
 				 */
-				pi = new HelperPlantItem(resID, getSpeciesInfo.getString(2), getSpeciesInfo.getString(1), getSpeciesInfo.getInt(0), getSpeciesInfo.getInt(3));
+				pi = new HelperPlantItem();
+				pi.setPicture(resID);
+				pi.setCommonName(getSpeciesInfo.getString(2));
+				pi.setSpeciesName(getSpeciesInfo.getString(1));
+				pi.setSpeciesID(getSpeciesInfo.getInt(0));
+				pi.setProtocolID(getSpeciesInfo.getInt(3));
 
 				localArray.add(pi);
 			}
@@ -281,10 +287,13 @@ public class ListSubCategory extends ListActivity {
 				+ " ORDER BY LOWER(common_name) ASC;", null);
 		
 		while(cursor.moveToNext()) {
-			HelperPlantItem pi = new HelperPlantItem(cursor.getString(0) 
-					, cursor.getString(1)
-					, cursor.getString(2)
-					, mCategory);
+			
+			HelperPlantItem pi = new HelperPlantItem();
+			pi.setCommonName(cursor.getString(0));
+			pi.setSpeciesName(cursor.getString(1));
+			pi.setImageURL(cursor.getString(2));
+			pi.setCategory(mCategory);
+			
 			localArray.add(pi);
 		}
 		
@@ -310,9 +319,9 @@ public class ListSubCategory extends ListActivity {
 		Intent intent = new Intent(ListSubCategory.this, ListDetail.class);
 		
 		PBBItems pbbItem = new PBBItems();
-		pbbItem.setScienceName(localArray.get(position).SpeciesName);
-		pbbItem.setCommonName(localArray.get(position).CommonName);
-		pbbItem.setSpeciesID(localArray.get(position).SpeciesID);
+		pbbItem.setScienceName(localArray.get(position).getSpeciesName());
+		pbbItem.setCommonName(localArray.get(position).getCommonName());
+		pbbItem.setSpeciesID(localArray.get(position).getSpeciesID());
 		pbbItem.setCategory(mCategory);
 		
 		intent.putExtra("pbbItem", pbbItem);
@@ -340,7 +349,7 @@ public class ListSubCategory extends ListActivity {
 
 		switch(_item.getItemId()){
 			case 1:
-				ListDownloadFromServer downloadlist = new ListDownloadFromServer(ListSubCategory.this, mList, mLazyadapter, item);
+				ListDownloadFromServer downloadlist = new ListDownloadFromServer(ListSubCategory.this, mList, mLazyadapter, item, mCategory);
 				downloadlist.execute(item);
 
 				return true;

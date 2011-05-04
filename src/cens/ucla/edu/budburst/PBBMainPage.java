@@ -15,10 +15,11 @@ import cens.ucla.edu.budburst.helper.HelperSettings;
 import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.lists.ListMain;
-import cens.ucla.edu.budburst.lists.ListUserTrees;
-import cens.ucla.edu.budburst.mapview.PBBMapMain;
+import cens.ucla.edu.budburst.lists.ListUserDefinedSpecies;
+import cens.ucla.edu.budburst.mapview.MapViewMain;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
 import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import cens.ucla.edu.budburst.weeklyplant.WeeklyPlant;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -84,10 +85,12 @@ public class PBBMainPage extends Activity {
 			}
 		});
 		
+		
+		
+		// check sync
 		int synced = checkSync();
- 
-	    myPlantBtn = (ImageButton)findViewById(R.id.my_plant);
 	    
+	    // if the app has not been synced.
 	    if(synced == SyncDBHelper.SYNCED_NO) {
 	    	LinearLayout sync_layout = (LinearLayout)findViewById(R.id.my_plant_sync);
 	    	LinearLayout unsync_layout = (LinearLayout)findViewById(R.id.my_plant_unsync);
@@ -107,6 +110,8 @@ public class PBBMainPage extends Activity {
 			});
 	    }
 	    
+	    // myPlant button
+	    myPlantBtn = (ImageButton)findViewById(R.id.my_plant);
 	    myPlantBtn.setOnClickListener(new View.OnClickListener(){
 
 			@Override
@@ -117,6 +122,7 @@ public class PBBMainPage extends Activity {
 			}
 	    });
 	    
+	    // local list button
 	    myResultBtn = (Button) findViewById(R.id.myresults);
 	    myResultBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -128,6 +134,7 @@ public class PBBMainPage extends Activity {
 			}
 	    });
 	    
+	    // plant maps button
 	    mapBtn = (Button)findViewById(R.id.map);
 	    mapBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -135,13 +142,14 @@ public class PBBMainPage extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				//Toast.makeText(MainPage.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
-				Intent intent = new Intent(PBBMainPage.this, PBBMapMain.class);
+				Intent intent = new Intent(PBBMainPage.this, MapViewMain.class);
 				intent.putExtra("type", 100);
 				startActivity(intent);
 			}
 	    	
 	    });
 	    
+	    // plant news button
 	    newsBtn = (Button)findViewById(R.id.news);
 	    newsBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -153,6 +161,7 @@ public class PBBMainPage extends Activity {
 	    	
 	    });
 	    
+	    // weekly plant button
 	    weeklyBtn = (Button)findViewById(R.id.weekly);
 	    weeklyBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -167,6 +176,7 @@ public class PBBMainPage extends Activity {
 	    	
 	    });
 	    
+	    // floracaching button
 	    floraBtn = (Button)findViewById(R.id.flora);
 	    floraBtn.setOnClickListener(new View.OnClickListener() {
 			
@@ -182,7 +192,7 @@ public class PBBMainPage extends Activity {
 					startActivity(intent);
 				}
 				else {
-					Toast.makeText(PBBMainPage.this, "To download the list, Go 'Settings' page", Toast.LENGTH_SHORT).show();
+					Toast.makeText(PBBMainPage.this, getString(R.string.go_to_settings_page), Toast.LENGTH_SHORT).show();
 				}
 				
 			}

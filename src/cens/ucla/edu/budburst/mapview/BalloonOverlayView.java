@@ -45,6 +45,7 @@ public class BalloonOverlayView extends FrameLayout {
 	private ImageView speciesImage;
 	private LinearLayout layout;
 	private TextView title;
+	private TextView credit;
 	private TextView snippet;
 	private HelperDrawableManager dm;
 	private Context mContext;
@@ -71,10 +72,9 @@ public class BalloonOverlayView extends FrameLayout {
 		View v = inflater.inflate(R.layout.balloon_overlay, layout);
 		
 		title = (TextView) v.findViewById(R.id.balloon_item_title);
+		credit = (TextView) v.findViewById(R.id.balloon_item_credit);
 		snippet = (TextView) v.findViewById(R.id.balloon_item_snippet);
 
-		
-		
 		speciesImage = (ImageView) v.findViewById(R.id.species_img);
 		mSpinner = (ProgressBar) v.findViewById(R.id.progressbar);
 		
@@ -125,25 +125,47 @@ public class BalloonOverlayView extends FrameLayout {
 			snippet.setVisibility(GONE);
 		}
 		
+		if(item.getCredit() != null && item.getCredit().length() > 0) {
+			credit.setVisibility(View.VISIBLE);
+			credit.setText("Credit: " + item.getCredit());
+		}
+		else {
+			credit.setVisibility(View.GONE);
+		}
+		
 		if (item.getImageUrl() != null) {
 			speciesImage.setVisibility(VISIBLE);
 			if(item.getCategory() == HelperValues.LOCAL_FLICKR) {
-				dm.fetchDrawableOnThread(item.getImageUrl(), speciesImage);
+				
+				snippet.setText(item.getSnippet() + "\n" + "- from Flickr");
+				
+				if(item.getImageUrl().equals("99999")) {
+					showThumbNail(item);
+				}
+				else {
+					dm.fetchDrawableOnThread(item.getImageUrl(), speciesImage);
+				}
 			}
 			else {
-				mSpinner.setVisibility(View.GONE);
-				
-				OneTimeDBHelper oDBH = new OneTimeDBHelper(mContext);
-				String scienceName = oDBH.getScienceName(mContext, item.getTitle(), item.getCategory());
-				
-				HelperFunctionCalls helper = new HelperFunctionCalls();
-				Log.i("K", "Category : " + item.getCategory() + " Id : " + item.getSpeciesID());
-				helper.showSpeciesThumbNail(mContext, item.getCategory(), item.getSpeciesID(), scienceName, speciesImage);
+				showThumbNail(item);
 			}
 			
 		} else {
 			speciesImage.setVisibility(GONE);
 		}
+	}
+	
+	private void showThumbNail(SpeciesOverlayItem item) {
+		mSpinner.setVisibility(View.GONE);
+		
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(mContext);
+		String scienceName = oDBH.getScienceName(mContext, item.getTitle(), item.getCategory());
+		
+		Log.i("K", "item.title:" + item.getTitle() + ", scienceName:" + scienceName);
+		
+		HelperFunctionCalls helper = new HelperFunctionCalls();
+		Log.i("K", "Category : " + item.getCategory() + " Id : " + item.getSpeciesID());
+		helper.showSpeciesThumbNail(mContext, item.getCategory(), item.getSpeciesID(), scienceName, speciesImage);
 	}
 }
 

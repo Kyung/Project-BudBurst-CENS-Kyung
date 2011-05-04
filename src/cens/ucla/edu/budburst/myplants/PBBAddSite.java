@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,6 +49,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
@@ -56,11 +60,10 @@ import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperGpsHandler;
 import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.mapview.MyLocation;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
 import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
 import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 
 public class PBBAddSite extends Activity{
 
@@ -71,6 +74,9 @@ public class PBBAddSite extends Activity{
 	private Integer mProtocolID;
 	private Integer mPreviousActivity;
 	private Integer mCategory;
+	private Integer mFloracacheID;
+	private Integer mIsFloracache;
+	private Integer mIsFlickr;
 	
 	private Double mLatitude;
 	private Double mLongitude;
@@ -101,14 +107,10 @@ public class PBBAddSite extends Activity{
 	
 	//private Location mCurrentLocation = null;
 	private LocationManager mLocationManager = null;
-	ArrayAdapter<CharSequence> adspin;
-	private HelperFunctionCalls helper;
-	
+	private HelperFunctionCalls mHelper;
 	private HelperSharedPreference mPref;
 	private Handler mHandler = new Handler();
-	private Thread thread;
-	
-	private Dialog dialog;
+	private Dialog mDialog;
 	
 	//protected String[] list_hdistance = {getString(R.string.AddSite_Urban_Highly_Modified), getString(R.string.AddSite_Suburban), getString(R.string.AddSite_Rural), getString(R.string.AddSite_Wildland_or_natural_area)};
 	//protected String[] list_shading = {getString(R.string.AddSite_Open), getString(R.string.AddSite_Partially_Shaded), getString(R.string.AddSite_Shaded)};
@@ -150,7 +152,7 @@ public class PBBAddSite extends Activity{
 		         createLocationServiceDisabledAlert();  
 		}
 
-		helper = new HelperFunctionCalls();
+		mHelper = new HelperFunctionCalls();
 		
 		/*
 		 * Initialize the layouts
@@ -162,52 +164,62 @@ public class PBBAddSite extends Activity{
 		Irrigation = (Button)findViewById(R.id.irrigation_text);
 		Habitat = (Button)findViewById(R.id.habitat_text);
 		SwitchToMap = (Button)findViewById(R.id.switch_to_mapview);
+		UpdateGPS = (Button) findViewById(R.id.update_gps);
 		
 	}
 	
 	public void onResume(){
 		super.onResume();
-		
-		/*
-		 *  Get GPS - Latitude / Longitude / Accuracy
-		 */
+		// Get GPS - Latitude / Longitude / Accuracy
 		mPref = new HelperSharedPreference(this);
 		mLatitude = Double.parseDouble(mPref.getPreferenceString("latitude", "0.0"));
 		mLongitude = Double.parseDouble(mPref.getPreferenceString("longitude", "0.0"));
 		mAccuracy = Float.parseFloat(mPref.getPreferenceString("accuracy", "0"));
 		
-		String strLoc = String.format("%10.6f / %10.6f \u00b1 %4.1fm", mLatitude, mLongitude, mAccuracy);
-		
-		geolocationEdit.setText(strLoc);
-		
 		Bundle bundle = getIntent().getExtras();
 		pbbItem = bundle.getParcelable("pbbItem");
 		mCommonName = pbbItem.getCommonName();
 		mScienceName = pbbItem.getScienceName();
-		mCameraImageID = pbbItem.getImageName();
+		mCameraImageID = pbbItem.getCameraImageName();
 		mProtocolID = pbbItem.getProtocolID();
 		mSpeciesID = pbbItem.getSpeciesID();
 		mPhenoID = pbbItem.getPhenophaseID();
+		mIsFloracache = pbbItem.getIsFloracache();
+		mFloracacheID = pbbItem.getFloracacheID();
+		mIsFlickr = pbbItem.getIsFlickr();
 		mCategory = pbbItem.getCategory();
 		mNotes = pbbItem.getNote();
 		
+		Log.i("K", "mIsFloracache : " + mIsFloracache);
+		Log.i("K", "mFloracacheID : " + mFloracacheID);
+		Log.i("K", "mIsFlickr : " + mIsFlickr);
 		
 		Intent p_intent = getIntent();
 		mPreviousActivity = p_intent.getExtras().getInt("from");
 
 		if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE || 
-				mPreviousActivity == HelperValues.FROM_UCLA_TREE_LISTS || 
+				mPreviousActivity == HelperValues.FROM_USER_DEFINED_LISTS || 
 				mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS){
-			
-			
 			// change the text when from quick capture.
-			 
 			TextView addSiteTxt = (TextView) findViewById(R.id.add_site_text);
 			addSiteTxt.setText(getString(R.string.Unknown_Plant_Text_2));
 			mImageID = p_intent.getExtras().getString("image_id");
 			sitename.setVisibility(View.GONE);
 			gpsUpdate();
 		}
+		
+		if(mIsFloracache != HelperValues.IS_FLORACACHE_NO ||
+				mIsFlickr == HelperValues.IS_FLICKR_YES) {
+			
+			mLatitude = pbbItem.getLatitude();
+			mLongitude = pbbItem.getLongitude();
+			
+			SwitchToMap.setVisibility(View.GONE);
+			UpdateGPS.setVisibility(View.GONE);
+		}
+		
+		String strLoc = String.format("%10.6f / %10.6f \u00b1 %4.1fm", mLatitude, mLongitude, mAccuracy);
+		geolocationEdit.setText(strLoc);
 		
 		buttonListener();
 		saveButtonListener();
@@ -308,12 +320,10 @@ public class PBBAddSite extends Activity{
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				startActivity(new Intent(PBBAddSite.this, MyLocation.class));
+				startActivity(new Intent(PBBAddSite.this, PBBChangeMyPosition.class));
 			}
 		});
 		
-		// updateGPS button
-		UpdateGPS = (Button) findViewById(R.id.update_gps);
 		UpdateGPS.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -442,15 +452,15 @@ public class PBBAddSite extends Activity{
 	};
 	
 	public void addCustomName() {
-		dialog = new Dialog(PBBAddSite.this);
+		mDialog = new Dialog(PBBAddSite.this);
 		
-		dialog.setContentView(R.layout.species_name_custom_dialog);
-		dialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
-		dialog.setCancelable(true);
-		dialog.show();
+		mDialog.setContentView(R.layout.species_name_custom_dialog);
+		mDialog.setTitle(getString(R.string.GetPhenophase_PBB_message));
+		mDialog.setCancelable(true);
+		mDialog.show();
 		
-		et1 = (EditText)dialog.findViewById(R.id.custom_common_name);
-		Button doneBtn = (Button)dialog.findViewById(R.id.custom_done);
+		et1 = (EditText)mDialog.findViewById(R.id.custom_common_name);
+		Button doneBtn = (Button)mDialog.findViewById(R.id.custom_done);
 		
 		doneBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -465,9 +475,11 @@ public class PBBAddSite extends Activity{
 				String epochStr = Long.toString(mEpoch);
 				int epochInt = Integer.parseInt(epochStr);
 				
-				helper.insertNewSharedPlantToDB(PBBAddSite.this, HelperValues.UNKNOWN_SPECIES, epochInt, mProtocolID, mCommonName, "", mCategory, mImageID, HelperValues.IS_FLORACACHE_NO);
-				int getID = helper.getID(PBBAddSite.this);
-				helper.insertNewObservation(PBBAddSite.this, getID, mPhenoID, mLatitude, mLongitude, mAccuracy, mCameraImageID, mNotes);
+				mHelper.insertNewSharedPlantToDB(PBBAddSite.this, HelperValues.UNKNOWN_SPECIES, epochInt, 
+						mProtocolID, mCommonName, "", mCategory, 
+						mImageID, mIsFloracache, mFloracacheID);
+				int getID = mHelper.getID(PBBAddSite.this);
+				mHelper.insertNewObservation(PBBAddSite.this, getID, mPhenoID, mLatitude, mLongitude, mAccuracy, mCameraImageID, mNotes);
 				
 				Intent intent = new Intent(PBBAddSite.this, PBBPlantList.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -480,7 +492,7 @@ public class PBBAddSite extends Activity{
 				Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 				vibrator.vibrate(500);
 				
-				dialog.cancel();
+				mDialog.cancel();
 				
 				finish();
 			}
@@ -584,7 +596,7 @@ public class PBBAddSite extends Activity{
 			 *  If the activity is from SHARED_PLANTS
 			 */
 			if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE || 
-				mPreviousActivity == HelperValues.FROM_UCLA_TREE_LISTS || 
+				mPreviousActivity == HelperValues.FROM_USER_DEFINED_LISTS || 
 				mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS) {
 
 				if(mCommonName.equals("Unknown/Other")) {
@@ -621,7 +633,10 @@ public class PBBAddSite extends Activity{
 						sDBH.close();
 					}
 					
-					if(helper.insertNewSharedPlantToDB(PBBAddSite.this, mSpeciesID, Integer.parseInt(c.getString(0)), mProtocolID, mCommonName, mScienceName, mCategory, mImageID, HelperValues.IS_FLORACACHE_NO)) {
+					if(helper.insertNewSharedPlantToDB(PBBAddSite.this, 
+							mSpeciesID, Integer.parseInt(c.getString(0)), 
+							mProtocolID, mCommonName, mScienceName, 
+							mCategory, mImageID, mIsFloracache, mFloracacheID)) {
 						int getID = helper.getID(PBBAddSite.this);
 
 						helper.insertNewObservation(PBBAddSite.this, getID, mPhenoID, mLatitude, mLongitude, mAccuracy, mCameraImageID, mNotes);
@@ -649,7 +664,7 @@ public class PBBAddSite extends Activity{
 			 *  If other previous activities
 			 */
 			else {
-				if(helper.insertNewMyPlantToDB(PBBAddSite.this, mSpeciesID, mCommonName, Integer.parseInt(c.getString(0)), c.getString(1), mProtocolID, mCategory)){
+				if(mHelper.insertNewMyPlantToDB(PBBAddSite.this, mSpeciesID, mCommonName, Integer.parseInt(c.getString(0)), c.getString(1), mProtocolID, mCategory)){
 					Intent intent = new Intent(PBBAddSite.this, PBBPlantList.class);
 					Toast.makeText(PBBAddSite.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 					

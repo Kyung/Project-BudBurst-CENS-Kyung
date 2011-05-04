@@ -34,20 +34,27 @@
 			android:layout_height="wrap_content"
 			android:orientation="vertical" 
 			android:layout_weight="1"
-			android:paddingTop="10dp"
+			android:paddingTop="2dp"
 			android:paddingLeft="5dp" 
 			android:id="@+id/balloon_inner_layout">
 			<TextView android:layout_height="wrap_content"
 				android:layout_width="fill_parent" 
 				android:id="@+id/balloon_item_title"
 				android:text="balloon_item_title" 
-				android:textSize="16dip"
-				android:textColor="#FF000000"></TextView>
+				android:textSize="16sp"
+				android:textStyle="bold"
+				android:textColor="#FF000000"/>
+			<TextView android:layout_height="wrap_content"
+				android:layout_width="fill_parent" 
+				android:id="@+id/balloon_item_credit"
+				android:text="balloon_item_snippet"
+				android:textStyle="bold|italic" 
+				android:textSize="14sp"/>
 			<TextView android:layout_height="wrap_content"
 				android:layout_width="fill_parent" 
 				android:id="@+id/balloon_item_snippet"
 				android:text="balloon_item_snippet" 
-				android:textSize="12dip"></TextView>
+				android:textSize="14sp"/>
 		</LinearLayout>
 	
 		<ImageView android:layout_width="wrap_content"

@@ -1,5 +1,6 @@
 package cens.ucla.edu.budburst.utils;
 
+import cens.ucla.edu.budburst.helper.HelperValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,20 +12,31 @@ public class PBBItems implements Parcelable{
 	private int mCategory;
 	private int mSiteID;
 	private int mPlantID;
+	private int mFloracacheID;
+	private int mIsFloracache;
+	private int mUserDefinedGroupID;
+	private int mSpeciesImageID;
+	private int mIsFlickr;
 	//private int mPhenoIconID;
 	
 	private String mCommonName;
 	private String mScienceName;
 	private String mDate;
 	private String mNote;
-	private String mLocalImageName;
+	private String mCameraImageName;
+	
 	//private String mPhenoText;
 	//private String mPhenoDescription;
 	
 	private double mLatitude;
 	private double mLongitude;
 	
-	public PBBItems() {;};
+	public PBBItems() {
+		// setting variables below with a default.
+		mFloracacheID = HelperValues.IS_FLORACACHE_NO;
+		mUserDefinedGroupID = HelperValues.IS_USER_DEFINED_NO;
+		mIsFlickr = HelperValues.IS_FLICKR_NO;
+	};
 	
 	public PBBItems(Parcel source) {
 		
@@ -35,18 +47,23 @@ public class PBBItems implements Parcelable{
 		mSiteID = source.readInt();
 		mPlantID = source.readInt();
 		//mPhenoIconID = source.readInt();
-		
+		mFloracacheID = source.readInt();
+		mIsFloracache = source.readInt();
+		mUserDefinedGroupID = source.readInt();
+		mSpeciesImageID = source.readInt();
+		mIsFlickr = source.readInt();
 		
 		mCommonName = source.readString();
 		mScienceName = source.readString();
 		mDate = source.readString();
 		mNote = source.readString();
-		mLocalImageName = source.readString();
+		mCameraImageName = source.readString();
 		//mPhenoText = source.readString();
 		//mPhenoDescription = source.readString();
 		
 		mLatitude = source.readDouble();
 		mLongitude = source.readDouble();
+			
 	}
 	
 	public void setSpeciesID(int speciesID) {
@@ -73,6 +90,22 @@ public class PBBItems implements Parcelable{
 		mPlantID = plantID;
 	}
 	
+	public void setIsFloracache(int isFloracache) {
+		mIsFloracache = isFloracache;
+	}
+	
+	public void setFloracacheID(int floracacheID) {
+		mFloracacheID = floracacheID;
+	}
+	
+	public void setUserDefinedGroupID(int userDefinedGroupID) {
+		mUserDefinedGroupID = userDefinedGroupID;
+	}
+	
+	public void setIsFlicker(int isFlickr) {
+		mIsFlickr = isFlickr;
+	}
+	
 	/*
 	public void setPhenoIconID(int phenoIconID) {
 		mPhenoIconID = phenoIconID;
@@ -95,7 +128,11 @@ public class PBBItems implements Parcelable{
 	}
 	
 	public void setLocalImageName(String imageName) {
-		mLocalImageName = imageName;
+		mCameraImageName = imageName;
+	}
+	
+	public void setSpeciesImageID(int speciesImageName) {
+		mSpeciesImageID = speciesImageName;
 	}
 	
 	/*
@@ -127,6 +164,21 @@ public class PBBItems implements Parcelable{
 		return mPhenophaseID;
 	}
 	
+	public int getFloracacheID() {
+		return mFloracacheID;
+	}
+	
+	public int getUserDefinedGroupID() {
+		return mUserDefinedGroupID;
+	}
+
+	public int getIsFloracache() {
+		return mIsFloracache;
+	}
+	
+	public int getIsFlickr() {
+		return mIsFlickr;
+	}
 	/*
 	public int getPhenoIconID() {
 		return mPhenoIconID;
@@ -160,8 +212,12 @@ public class PBBItems implements Parcelable{
 		return mNote;
 	}
 	
-	public String getImageName() {
-		return mLocalImageName;
+	public String getCameraImageName() {
+		return mCameraImageName;
+	}
+	
+	public int getSpeciesImageID() {
+		return mSpeciesImageID;
 	}
 	/*
 	public String getPhenoText() {
@@ -196,12 +252,17 @@ public class PBBItems implements Parcelable{
 		dest.writeInt(mCategory);
 		dest.writeInt(mSiteID);
 		dest.writeInt(mPlantID);
+		dest.writeInt(mFloracacheID);
+		dest.writeInt(mIsFloracache);
+		dest.writeInt(mUserDefinedGroupID);
+		dest.writeInt(mSpeciesImageID);
+		dest.writeInt(mIsFlickr);
 		
 		dest.writeString(mCommonName);
 		dest.writeString(mScienceName);
 		dest.writeString(mDate);
 		dest.writeString(mNote);
-		dest.writeString(mLocalImageName);
+		dest.writeString(mCameraImageName);
 		
 		dest.writeDouble(mLatitude);
 		dest.writeDouble(mLongitude);

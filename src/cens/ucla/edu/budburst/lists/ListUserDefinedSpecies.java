@@ -17,9 +17,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import cens.ucla.edu.budburst.PBBAddNotes;
-import cens.ucla.edu.budburst.PBBAddSite;
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapterWithIndex;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
@@ -28,11 +25,14 @@ import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperJSONParser;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
+import cens.ucla.edu.budburst.myplants.PBBAddNotes;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
 import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
 import cens.ucla.edu.budburst.onetime.OneTimeAddMyPlant;
 import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -52,9 +52,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ListUserTrees extends ListActivity {
+public class ListUserDefinedSpecies extends ListActivity {
 	
-	private ArrayList<HelperPlantItem> treeLists;
+	private ArrayList<HelperPlantItem> mArr;
 	private MyListAdapterWithIndex MyAdapter = null;
 	private ListView myList = null;
 	private ProgressDialog dialog = null;
@@ -71,6 +71,7 @@ public class ListUserTrees extends ListActivity {
 	private int mProtocolID;
 	private int mPreviousActivity = 0;
 	private int mNewPlantSpeciesID;
+	private int mCategory;
 	
 	private Double mLatitude;
 	private Double mLongitude;
@@ -78,14 +79,14 @@ public class ListUserTrees extends ListActivity {
 	private CharSequence[] mSeqUserSite;
 	
 	private PBBItems pbbItem;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    
 	    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-	    setContentView(R.layout.getphenophase);
+	    setContentView(R.layout.locallist);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
 		
 		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
@@ -94,36 +95,60 @@ public class ListUserTrees extends ListActivity {
 		
 		Bundle bundle = getIntent().getExtras();
 		pbbItem = bundle.getParcelable("pbbItem");
+		mCategory = pbbItem.getCategory();
 		mPreviousActivity = bundle.getInt("from");
 		
 		TextView myTitleText = (TextView) findViewById(R.id.my_title);
-		myTitleText.setText(" UCLA Tree Lists");
+		myTitleText.setText(" User Defined Lists");
 	
 		helper = new HelperFunctionCalls();
 		mapUserSiteNameID = helper.getUserSiteIDMap(this);
 		
-		getTreeLists();
+		getLists();
 		// TODO Auto-generated method stub
 	}
 	
-	public void getTreeLists() {
+	private int setProtocol(int protocolID) {
+		int getProtocolID = 0;
+		
+		switch(protocolID) {
+		case 2:
+			getProtocolID = HelperValues.QUICK_WILD_FLOWERS;
+			break;
+		case 4:case 6:
+			getProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
+			break;
+		case 3:
+			getProtocolID = HelperValues.QUICK_GRASSES;
+			break;
+		}
+		
+		return getProtocolID;
+		
+	}
+	
+	public void getLists() {
 		// initialize treeLists
-		treeLists = null;
-		treeLists = new ArrayList<HelperPlantItem>();
+		mArr = new ArrayList<HelperPlantItem>();
 		
 		// open database and put all tree lists into the PlantItem
-		OneTimeDBHelper otDBH = new OneTimeDBHelper(ListUserTrees.this);
+		OneTimeDBHelper otDBH = new OneTimeDBHelper(ListUserDefinedSpecies.this);
 		SQLiteDatabase otDB = otDBH.getReadableDatabase();
 		
 		Cursor cursor;
-		cursor = otDB.rawQuery("SELECT id, common_name, science_name, credit FROM userDefineLists WHERE category = " + HelperValues.USER_DEFINED_TREE_LISTS + " ORDER BY common_name;", null);
+		cursor = otDB.rawQuery("SELECT id, common_name, science_name, credit, protocol_id FROM userDefineLists WHERE category = " + mCategory + " ORDER BY common_name;", null);
 		while(cursor.moveToNext()) {
-			HelperPlantItem pi;
-			pi = new HelperPlantItem(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3));
-			treeLists.add(pi);
+			//public HelperPlantItem(int aSpeciesID, String aCommonName, String aSpeciesName, String aCredit) {
+			HelperPlantItem pi = new HelperPlantItem();
+			pi.setSpeciesID(cursor.getInt(0));
+			pi.setCommonName(cursor.getString(1));
+			pi.setSpeciesName(cursor.getString(2));
+			pi.setCredit(cursor.getString(3));
+			pi.setProtocolID(setProtocol(cursor.getInt(4)));
+			mArr.add(pi);
 		}
 		
-		MyAdapter = new MyListAdapterWithIndex(ListUserTrees.this, R.layout.plantlist_item, treeLists);
+		MyAdapter = new MyListAdapterWithIndex(ListUserDefinedSpecies.this, R.layout.plantlist_item, mArr);
 		myList = getListView();
 		// need to add setFastScrollEnalbed(true) for showing the index box in the list...
 		myList.setFastScrollEnabled(true);
@@ -132,6 +157,11 @@ public class ListUserTrees extends ListActivity {
 		cursor.close();
 		otDBH.close();
 		otDB.close();
+		
+		if(mArr.size() == 0) {
+			TextView instruction = (TextView)findViewById(R.id.instruction);
+			instruction.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	@Override
@@ -151,27 +181,27 @@ public class ListUserTrees extends ListActivity {
 		}
 		else if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE) {
 			
-			Intent intent = new Intent(ListUserTrees.this, GetPhenophase.class);
+			Intent intent = new Intent(ListUserDefinedSpecies.this, OneTimePhenophase.class);
 
-			pbbItem.setSpeciesID(treeLists.get(mCurrentPosition).SpeciesID);
-			pbbItem.setCommonName(treeLists.get(mCurrentPosition).CommonName);
-			pbbItem.setScienceName(treeLists.get(mCurrentPosition).SpeciesName);
-			pbbItem.setProtocolID(HelperValues.QUICK_TREES_AND_SHRUBS);
+			pbbItem.setSpeciesID(mArr.get(mCurrentPosition).getSpeciesID());
+			pbbItem.setCommonName(mArr.get(mCurrentPosition).getCommonName());
+			pbbItem.setScienceName(mArr.get(mCurrentPosition).getSpeciesName());
+			pbbItem.setProtocolID(mArr.get(mCurrentPosition).getProtocolID());
 			
 			intent.putExtra("pbbItem", pbbItem);
-			intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
+			intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 			
 			startActivity(intent);
 		}
 		else {
-			Intent intent = new Intent(ListUserTrees.this, ListDetail.class);
-			pbbItem.setSpeciesID(treeLists.get(mCurrentPosition).SpeciesID);
-			pbbItem.setCommonName(treeLists.get(mCurrentPosition).CommonName);
-			pbbItem.setScienceName(treeLists.get(mCurrentPosition).SpeciesName);
-			pbbItem.setProtocolID(HelperValues.QUICK_TREES_AND_SHRUBS);
+			Intent intent = new Intent(ListUserDefinedSpecies.this, ListDetail.class);
+			pbbItem.setSpeciesID(mArr.get(mCurrentPosition).getSpeciesID());
+			pbbItem.setCommonName(mArr.get(mCurrentPosition).getCommonName());
+			pbbItem.setScienceName(mArr.get(mCurrentPosition).getSpeciesName());
+			pbbItem.setProtocolID(mArr.get(mCurrentPosition).getProtocolID());
 			
 			intent.putExtra("pbbItem", pbbItem);
-			intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
+			intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 
 			startActivity(intent);
 		}
@@ -182,7 +212,7 @@ public class ListUserTrees extends ListActivity {
 		
 		mCurrentPosition = position;
 		
-		new AlertDialog.Builder(ListUserTrees.this)
+		new AlertDialog.Builder(ListUserDefinedSpecies.this)
 		.setTitle(getString(R.string.AddPlant_SelectCategory))
 		.setIcon(android.R.drawable.ic_menu_more)
 		.setItems(R.array.category_only_trees, new DialogInterface.OnClickListener() {
@@ -209,12 +239,11 @@ public class ListUserTrees extends ListActivity {
 				 * Else, move to AddNotes page.
 				 */
 				else {
-					
-					Intent intent = new Intent(ListUserTrees.this, PBBAddNotes.class);
+					Intent intent = new Intent(ListUserDefinedSpecies.this, PBBAddNotes.class);
 				
-					pbbItem.setSpeciesID(treeLists.get(mCurrentPosition).SpeciesID);
-					pbbItem.setCommonName(treeLists.get(mCurrentPosition).CommonName);
-					pbbItem.setScienceName(treeLists.get(mCurrentPosition).SpeciesName);
+					pbbItem.setSpeciesID(mArr.get(mCurrentPosition).getSpeciesID());
+					pbbItem.setCommonName(mArr.get(mCurrentPosition).getCommonName());
+					pbbItem.setScienceName(mArr.get(mCurrentPosition).getSpeciesName());
 					pbbItem.setProtocolID(mProtocolID);
 					pbbItem.setDate(mDate);
 					pbbItem.setLatitude(mLatitude);
@@ -234,10 +263,10 @@ public class ListUserTrees extends ListActivity {
 	
 	private void popupDialog(int position) {
 		//Pop up choose site dialog box
-		mNewPlantSpeciesID = treeLists.get(position).SpeciesID;
-		mNewPlantSpeciesName = treeLists.get(position).CommonName;
+		mNewPlantSpeciesID = mArr.get(position).getSpeciesID();
+		mNewPlantSpeciesName = mArr.get(position).getCommonName();
 		
-		mSeqUserSite = helper.getUserSite(ListUserTrees.this);
+		mSeqUserSite = helper.getUserSite(ListUserDefinedSpecies.this);
 		
 		//Pop up choose site dialog box
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -251,9 +280,9 @@ public class ListUserTrees extends ListActivity {
 				String new_plant_site_name = mSeqUserSite[which].toString();
 				
 				if(new_plant_site_name == "Add New Site") {
-					Intent intent = new Intent(ListUserTrees.this, PBBAddSite.class);
+					Intent intent = new Intent(ListUserDefinedSpecies.this, PBBAddSite.class);
 					pbbItem.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
-					pbbItem.setCommonName(treeLists.get(mCurrentPosition).CommonName);
+					pbbItem.setCommonName(mArr.get(mCurrentPosition).getCommonName());
 					pbbItem.setProtocolID(mProtocolID);
 					
 					intent.putExtra("pbbItem", pbbItem);
@@ -263,20 +292,20 @@ public class ListUserTrees extends ListActivity {
 				}
 				else {
 					if(helper.checkIfNewPlantAlreadyExists(HelperValues.UNKNOWN_SPECIES, 
-							new_plant_site_id, ListUserTrees.this)){
-						Toast.makeText(ListUserTrees.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
+							new_plant_site_id, ListUserDefinedSpecies.this)){
+						Toast.makeText(ListUserDefinedSpecies.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
 					}else{
-						if(helper.insertNewMyPlantToDB(ListUserTrees.this, HelperValues.UNKNOWN_SPECIES, 
+						if(helper.insertNewMyPlantToDB(ListUserDefinedSpecies.this, HelperValues.UNKNOWN_SPECIES, 
 								mNewPlantSpeciesName, new_plant_site_id, new_plant_site_name, 
-								mProtocolID, HelperValues.USER_DEFINED_TREE_LISTS)){
-							Intent intent = new Intent(ListUserTrees.this, PBBPlantList.class);
-							Toast.makeText(ListUserTrees.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+								mProtocolID, mCategory)){
+							Intent intent = new Intent(ListUserDefinedSpecies.this, PBBPlantList.class);
+							Toast.makeText(ListUserDefinedSpecies.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
 							//clear all stacked activities.
 							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							startActivity(intent);
 							finish();
 						}else{
-							Toast.makeText(ListUserTrees.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+							Toast.makeText(ListUserDefinedSpecies.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
 						}
 					}
 				}

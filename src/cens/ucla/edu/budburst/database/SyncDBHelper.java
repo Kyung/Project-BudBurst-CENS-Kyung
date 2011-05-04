@@ -18,7 +18,7 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 	public static final int SYNCED_NO = 9;
 	
 	public SyncDBHelper(Context context){
-		super(context, "syncBudburst.db", null, 33);
+		super(context, "syncBudburst.db", null, 34);
 	}
 	
 	public void onCreate(SQLiteDatabase db){
@@ -174,9 +174,24 @@ public class SyncDBHelper extends SQLiteOpenHelper{
 				 
 				 Log.i("K", "Lat: " + latitude + ", Lng: " + longitude);
 				 
-				 pi = new HelperPlantItem(HelperValues.MY_PLANT_LIST, HelperValues.FROM_PLANT_LIST, 
-						 speciesID, siteID, category, "" ,commonName, scienceName, phenophaseID, 
-						 protocolID, latitude, longitude, imageName, dtTaken, notes);
+				 
+				 pi = new HelperPlantItem();
+				 pi.setWhichList(HelperValues.MY_PLANT_LIST);
+				 pi.setWhere(HelperValues.FROM_PLANT_LIST);
+				 pi.setSpeciesID(speciesID);
+				 pi.setPlantID(siteID);
+				 pi.setCategory(category);
+				 pi.setUserName("");
+				 pi.setCommonName(commonName);
+				 pi.setSpeciesName(scienceName);
+				 pi.setPhenoID(phenophaseID);
+				 pi.setProtocolID(protocolID);
+				 pi.setLatitude(latitude);
+				 pi.setLongitude(longitude);
+				 pi.setImageName(imageName);
+				 pi.setDate(dtTaken);
+				 pi.setNote(notes);
+				 
 				 plantList.add(pi);
 			 }
 			 cursor2.close();

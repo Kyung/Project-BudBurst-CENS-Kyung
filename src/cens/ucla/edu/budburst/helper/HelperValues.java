@@ -15,7 +15,7 @@ public class HelperValues {
 	public static final int FROM_ONETIME_DIRECT = 102;
 	public static final int FROM_MAIN_PAGE = 103;
 	public static final int FROM_ONE_TIME_MAIN = 104;
-	public static final int FROM_UCLA_TREE_LISTS = 105;
+	public static final int FROM_USER_DEFINED_LISTS = 105;
 	public static final int FROM_PLANT_LIST_ADD_SAMESPECIES = 106;
 	public static final int FROM_QUICK_CAPTURE_ADD_SAMESPECIES = 107;
 	public static final int FROM_SETTINGS = 108;
@@ -104,10 +104,22 @@ public class HelperValues {
 	public static final int FLORACACHE_MID = 2;
 	public static final int FLORACACHE_HARD = 3;
 	
-	// isFloracache?
-	public static final int IS_FLORACACHE_YES = 0;
-	public static final int IS_FLORACACHE_NO = 1;
+	// isFloracache
+	public static final int IS_FLORACACHE_NO = 0;
+	public static final int IS_FLORACACHE_YES = 1;
+	
+	// isUserDefinedList
+	public static final int IS_USER_DEFINED_NO = 0;
+	public static final int IS_USER_DEFINED_YES = 1;
+	
+	// isFlickr
+	public static final int IS_FLICKR_NO = 0;
+	public static final int IS_FLICKR_YES = 1;
+	
+	// Notification ID
+	public static final int NOTIFI_LOCAL_LISTS = 12345678;
+	public static final int NOTIFI_USER_DEFINED_LISTS = 12345670;
+	public static final int NOTIFI_FLORACACHE_LISTS = 12345679;
 	
 	
-
 }

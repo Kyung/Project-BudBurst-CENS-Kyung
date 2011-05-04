@@ -1,18 +1,20 @@
-package cens.ucla.edu.budburst.mapview;
+package cens.ucla.edu.budburst.myplants;
 
-import cens.ucla.edu.budburst.PBBHelpPage;
-import cens.ucla.edu.budburst.PBBLogin;
-import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.PBBSync;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.mapview.SitesOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,27 +29,31 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MyLocation extends MapActivity {
+public class PBBChangeMyPosition extends MapActivity {
 
 	private SharedPreferences pref;
 	private static GpsListener gpsListener;
 	private LocationManager locManager = null;
 	private MapView mMapView = null;
 	private MapController mapCon = null;
-	private MyLocOverlay mOver = null;
+	//private MyLocOverlay mOver = null;
+	private MyLocationOverlay mOver;
 	private SitesOverlay sOverlay = null;
 	private double mLatitude = 0.0;
 	private double mLongitude = 0.0;
 	private float mAccuracy = 0;
 	private TextView mylocInfo;
 	private boolean first_myLoc = true;
-	private boolean satelliteView = false;
+	private boolean satelliteView = true;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -59,22 +65,20 @@ public class MyLocation extends MapActivity {
 	    
 	    mylocInfo = (TextView) findViewById(R.id.myloc_accuracy);
 	    
-	    mapCon = mMapView.getController();
-	    mapCon.setZoom(19);
 	    /*
 	     * Add Mylocation Overlay
 	     */
-	    mOver = new MyLocOverlay(MyLocation.this, mMapView);
+	    //mOver = new MyLocOverlay(MyLocation.this, mMapView);
+	    mOver = new MyLocationOverlay(PBBChangeMyPosition.this, mMapView);
 	    mOver.enableMyLocation();
 	    mMapView.getOverlays().add(mOver);
 	    mMapView.setSatellite(true);
-	    mMapView.setBuiltInZoomControls(true);
 	    /*
 	     * Add ItemizedOverlay Overlay
 	     */
 	    Drawable marker = getResources().getDrawable(R.drawable.marker);
 	    marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-	    sOverlay = new SitesOverlay(MyLocation.this, marker);	    
+	    sOverlay = new SitesOverlay(PBBChangeMyPosition.this, marker);	    
 	    mMapView.getOverlays().add(sOverlay);
 	    
 	    
@@ -83,14 +87,67 @@ public class MyLocation extends MapActivity {
 	    mLatitude = Double.parseDouble(pref.getString("latitude", "0.0"));
 	    mLongitude = Double.parseDouble(pref.getString("longitude", "0.0"));
 	    
+	    mapCon = mMapView.getController();
 	    GeoPoint geoPoint = getPoint(mLatitude, mLongitude);
 	    mapCon.animateTo(geoPoint);
+	    mapCon.setZoom(19);
 	   
 	    gpsListener = new GpsListener();
 	    locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-	    locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
+	    locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 1000, 5, gpsListener);
+	    
+	    showButtonOnMap();
+		
 	     
 	    // TODO Auto-generated method stub
+	}
+	
+	private void showButtonOnMap() {
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		int width = display.getWidth();
+		int height = display.getHeight();
+		
+		MapView.LayoutParams screenLP;
+
+		// Zoom out
+	    screenLP = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
+											MapView.LayoutParams.WRAP_CONTENT,
+											width-50, 10,
+											MapView.LayoutParams.TOP_LEFT);
+
+	    Button mapBtnZoomOut = new Button(getApplicationContext());
+	    mapBtnZoomOut.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_zoom_out));
+
+	    mMapView.addView(mapBtnZoomOut, screenLP);
+		
+	    screenLP = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
+	    									MapView.LayoutParams.WRAP_CONTENT,
+	    									width-50, 55,
+	    									MapView.LayoutParams.TOP_LEFT);
+	    // Zoom in
+	    Button mapBtnZoomIn = new Button(getApplicationContext());
+	    mapBtnZoomIn.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_zoom_in));
+
+	    mMapView.addView(mapBtnZoomIn, screenLP);
+	    
+	    mapBtnZoomIn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mapCon.zoomIn();
+			}
+		});
+
+	    mapBtnZoomOut.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mapCon.zoomOut();
+			}
+		});
 	}
 	
 	private class GpsListener implements LocationListener {
@@ -104,12 +161,9 @@ public class MyLocation extends MapActivity {
 				
 				GeoPoint geoPoint = getPoint(mLatitude, mLongitude);
 				
-				mylocInfo.setText("Accuracy : " + mAccuracy + "\u00b1m");
+				mapCon.animateTo(geoPoint);
 				
-				if(first_myLoc) {
-					mapCon.animateTo(geoPoint);
-					first_myLoc = false;
-				}
+				mylocInfo.setText("Accuracy : " + mAccuracy + "\u00b1m");
 				
 				mOver.onLocationChanged(loc);
 				
@@ -151,14 +205,14 @@ public class MyLocation extends MapActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 			
-			new AlertDialog.Builder(MyLocation.this)
+			new AlertDialog.Builder(PBBChangeMyPosition.this)
 	   		.setTitle(getString(R.string.Message_Save_GPS))
 	   		.setPositiveButton(getString(R.string.Button_GPS), new DialogInterface.OnClickListener() {
 	   			public void onClick(DialogInterface dialog, int whichButton) {
 	   				pref = getSharedPreferences("userinfo", 0);
 	   				SharedPreferences.Editor edit = pref.edit();
-	   				edit.putBoolean("new", true);
-	   				edit.putBoolean("highly", true);
+	   				//edit.putBoolean("new", true);
+	   				//edit.putBoolean("highly", true);
 	   				edit.putString("latitude", Double.toString(mLatitude));
 	   				edit.putString("longitude", Double.toString(mLongitude));
 	   				edit.putString("accuracy", Float.toHexString(mAccuracy));
@@ -181,8 +235,8 @@ public class MyLocation extends MapActivity {
 					// TODO Auto-generated method stub
 					pref = getSharedPreferences("userinfo", 0);
 	   				SharedPreferences.Editor edit = pref.edit();
-	   				edit.putBoolean("new", true);
-	   				edit.putBoolean("highly", true);
+	   				//edit.putBoolean("new", true);
+	   				//edit.putBoolean("highly", true);
 	   				edit.putString("latitude", Double.toString(sOverlay.getLatitude()));
 	   				edit.putString("longitude", Double.toString(sOverlay.getLongitude()));
 	   				edit.putString("accuracy", Float.toHexString(mAccuracy));
@@ -218,7 +272,7 @@ public class MyLocation extends MapActivity {
 
 		switch(item.getItemId()){
 			case 1:
-				Toast.makeText(MyLocation.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
+				Toast.makeText(PBBChangeMyPosition.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
 				return true;
 			case 2:
 				if(!satelliteView) {

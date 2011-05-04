@@ -8,10 +8,14 @@ import java.util.HashMap;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -48,6 +52,7 @@ public class HelperDrawableManager {
 	public void fetchDrawableOnThread(final String url, final ImageView imageView) {
 		
 		if(drawableMap.containsKey(url)) {
+			Log.i("K", "url : " + drawableMap.get(url));
 			imageView.setImageDrawable(drawableMap.get(url));
 		}
 		
@@ -79,9 +84,19 @@ public class HelperDrawableManager {
 	}
 	
 	public InputStream fetch(String url) throws MalformedURLException, IOException {
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		HttpGet request = new HttpGet(url);
-		HttpResponse response = httpClient.execute(request);
+		
+		HttpGet httpGet = new HttpGet(url);
+		
+		HttpParams httpParams = new BasicHttpParams();
+		int timeoutConnection = 3000;
+		HttpConnectionParams.setConnectionTimeout(httpParams, timeoutConnection);
+		
+		int timeoutSocket = 5000;
+		HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
+		
+		DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
+		HttpResponse response = httpClient.execute(httpGet);
+		
 		return response.getEntity().getContent();
 	}
 }

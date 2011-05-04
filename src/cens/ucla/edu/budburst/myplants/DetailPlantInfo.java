@@ -1,6 +1,10 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
@@ -34,7 +38,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-//public class SpeciesDetail extends Activity implements View.OnTouchListener{
 public class DetailPlantInfo extends Activity {
 	private StaticDBHelper sDBH;
 	private SyncDBHelper syncDBH;
@@ -44,10 +47,6 @@ public class DetailPlantInfo extends Activity {
 	private String mCommonName;
 	private String mScienceName;
 	
-	
-    private float oldTouchValue;
-    private float oldTouchValue2;
-    
     private ImageView image;
     private TextView snameTxt;
     private TextView cnameTxt;
@@ -75,14 +74,8 @@ public class DetailPlantInfo extends Activity {
 		
 		mHelper = new HelperFunctionCalls();
 		
-		// get previous intent information
-		//Intent intent = getIntent();
-		Bundle b = getIntent().getExtras();
-		PBBItems pbbItem = b.getParcelable("pbbItem");
-		
-		//mSpeciesID = intent.getExtras().getInt("species_id");
-		//mCategory = intent.getExtras().getInt("category");
-		//mCommonName = intent.getExtras().getString("cname");
+		Bundle bundle = getIntent().getExtras();
+		PBBItems pbbItem = bundle.getParcelable("pbbItem");
 		
 		mSpeciesID = pbbItem.getSpeciesID();
 		mCategory = pbbItem.getCategory();
@@ -92,7 +85,6 @@ public class DetailPlantInfo extends Activity {
 		Log.i("K", "speciesID : " + mSpeciesID + ", Category:" +mCategory + 
 				",Cname:" +mCommonName +
 				",Sname:" + mScienceName);
-		
 		
 	    // set the layout
 	    image = (ImageView) findViewById(R.id.species_image);
@@ -107,13 +99,17 @@ public class DetailPlantInfo extends Activity {
 	    db = sDBH.getReadableDatabase();
 	    
 	    switch(mCategory) {
-	    case 0:case 1:
+	    case 0:
+	    	case HelperValues.LOCAL_BUDBURST_LIST:
+	    	case HelperValues.LOCAL_FLICKR:
 	    	printOfficialSpecies(db);
 	    	break;
-	    case 2:case 3:case 4:case 5:
+	    case HelperValues.LOCAL_WHATSINVASIVE_LIST:
+	    	case HelperValues.LOCAL_POISONOUS_LIST:
+	    	case HelperValues.LOCAL_THREATENED_ENDANGERED_LIST:
 	    	printLocalSpecies(mCategory);
 	    	break;
-	    case 10:case 11:
+	    default: // User Defined Lists
 	    	printUserCreatedSpecies();
 	    }
 	    
@@ -128,8 +124,11 @@ public class DetailPlantInfo extends Activity {
 		OneTimeDBHelper otDBH = new OneTimeDBHelper(DetailPlantInfo.this);
 		SQLiteDatabase db = otDBH.getReadableDatabase();
 		
-		Cursor cursor = db.rawQuery("SELECT id, common_name, science_name, credit FROM userDefineLists WHERE science_name = \"" 
-				+ mScienceName + "\" AND category =" + mCategory + ";", null);
+		Cursor cursor = db.rawQuery("" +
+				"SELECT id, common_name, science_name, credit " +
+				"FROM userDefineLists " +
+				"WHERE science_name = \"" + mScienceName + "\" " +
+				"AND category =" + mCategory + ";", null);
 
 	    while(cursor.moveToNext()) {
 	    	snameTxt.setText(" " + cursor.getString(2) + " ");
@@ -147,7 +146,10 @@ public class DetailPlantInfo extends Activity {
 	}
 	
 	public void printOfficialSpecies(SQLiteDatabase db) {
-		Cursor cursor = db.rawQuery("SELECT _id, species_name, common_name, description FROM species WHERE _id = " + mSpeciesID + ";", null);
+		Cursor cursor = db.rawQuery("" +
+				"SELECT _id, species_name, common_name, description " +
+				"FROM species " +
+				"WHERE _id = " + mSpeciesID + ";", null);
 
 	    while(cursor.moveToNext()) {
 	    	snameTxt.setText(" " + cursor.getString(1) + " ");
@@ -165,25 +167,25 @@ public class DetailPlantInfo extends Activity {
 		OneTimeDBHelper oDBH = new OneTimeDBHelper(DetailPlantInfo.this);
 		HelperLocalPlantListItem pItem = oDBH.getLocalPlantList(DetailPlantInfo.this, mCommonName, category);
 		
-		Log.i("K", "pItem : " + pItem);
-		
-		snameTxt.setText(" " + pItem.ScienceName + " ");
-    	cnameTxt.setText(" " + pItem.CommonName + " ");
-    	notesTxt.setText("" + pItem.CopyRight + " ");
+		if(pItem != null) {
+			snameTxt.setText(" " + pItem.ScienceName + " ");
+	    	cnameTxt.setText(" " + pItem.CommonName + " ");
+	    	notesTxt.setText("Credit: " + pItem.CopyRight + " ");
 
-    	if(category == HelperValues.LOCAL_WHATSINVASIVE_LIST ||
-	    		category == HelperValues.LOCAL_POISONOUS_LIST ||
-	    		category == HelperValues.LOCAL_THREATENED_ENDANGERED_LIST) {
-	    	
-	    	Bitmap icon = null;
-	    	icon = mHelper.getImageFromSDCard(DetailPlantInfo.this, pItem.ImageID, icon);
-	    	
-	    	image.setImageBitmap(icon);
-	    }
-	    else if(category == HelperValues.USER_DEFINED_TREE_LISTS) {
-    		String imagePath = HelperValues.TREE_PATH + mSpeciesID + ".jpg";
-    		image.setImageBitmap(mHelper.showImage(DetailPlantInfo.this, imagePath));
-	    }
+	    	if(category == HelperValues.LOCAL_WHATSINVASIVE_LIST ||
+		    		category == HelperValues.LOCAL_POISONOUS_LIST ||
+		    		category == HelperValues.LOCAL_THREATENED_ENDANGERED_LIST) {
+		    	
+		    	Bitmap icon = null;
+		    	icon = mHelper.getImageFromSDCard(DetailPlantInfo.this, pItem.ImageID, icon);
+		    	
+		    	image.setImageBitmap(icon);
+		    }
+		    else if(category == HelperValues.USER_DEFINED_TREE_LISTS) {
+	    		String imagePath = HelperValues.TREE_PATH + mSpeciesID + ".jpg";
+	    		image.setImageBitmap(mHelper.showImage(DetailPlantInfo.this, imagePath));
+		    }
+		}
 	}
 	
 	public void onResume() {

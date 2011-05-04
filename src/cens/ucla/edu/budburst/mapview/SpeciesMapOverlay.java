@@ -23,11 +23,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import cens.ucla.edu.budburst.GetPhenophaseShared;
-import cens.ucla.edu.budburst.GetPhenophaseObserver;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.myplants.GetPhenophaseObserver;
+import cens.ucla.edu.budburst.myplants.GetPhenophaseShared;
+import cens.ucla.edu.budburst.utils.PBBItems;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -52,24 +53,20 @@ public class SpeciesMapOverlay extends BalloonItemizedOverlay<SpeciesOverlayItem
 
 		// read data from the table
 		for(int i = 0 ; i < mPlantList.size() ; i++) {
-			GeoPoint geoPoint = getPoint(mPlantList.get(i).Latitude, 
-					mPlantList.get(i).Longitude);
+			GeoPoint geoPoint = getPoint(mPlantList.get(i).getLatitude(), 
+					mPlantList.get(i).getLongitude());
 		
-			int speciesID = mPlantList.get(i).SpeciesID;
-			
-			Log.i("K", "speciesID: " + mPlantList.get(i).SpeciesID +
-					", Category : " + mPlantList.get(i).Category + 
-					", ImageName : " + mPlantList.get(i).ImageName +
-					", Lat: " + mPlantList.get(i).Latitude +
-					", Lng: " + mPlantList.get(i).Longitude);
+			int speciesID = mPlantList.get(i).getSpeciesID();
+
 			
 			mSItem.add(new SpeciesOverlayItem(geoPoint, speciesID, 
-					mPlantList.get(i).CommonName,
-					mPlantList.get(i).Date, 
-					mPlantList.get(i).ImageName, 
+					mPlantList.get(i).getCommonName(),
+					mPlantList.get(i).getCredit(),
+					mPlantList.get(i).getDate(), 
+					mPlantList.get(i).getImageName(), 
 					getMarker(R.drawable.full_marker), 
 					mMarker, 
-					mPlantList.get(i).Category,
+					mPlantList.get(i).getCategory(),
 					false));
 		}
 	
@@ -116,53 +113,53 @@ public class SpeciesMapOverlay extends BalloonItemizedOverlay<SpeciesOverlayItem
 		// Observed species are from PlantList and Shared Plant
 		// need to separate.
 		
-		if(mPlantList.get(index).WhichList == HelperValues.MY_PLANT_LIST) {
-			if(mPlantList.get(index).Where == HelperValues.FROM_PLANT_LIST) {
+		if(mPlantList.get(index).getWhichList() == HelperValues.MY_PLANT_LIST) {
+			if(mPlantList.get(index).getWhere() == HelperValues.FROM_PLANT_LIST) {
 				Intent intent = new Intent(mContext, GetPhenophaseObserver.class);
+				
+				PBBItems pbbItem = new PBBItems();
+				pbbItem.setSpeciesID(mPlantList.get(index).getSpeciesID());
+				pbbItem.setProtocolID(mPlantList.get(index).getProtocolID());
+				pbbItem.setSiteID(mPlantList.get(index).getPlantID());
+				pbbItem.setCommonName(mPlantList.get(index).getCommonName());
+				pbbItem.setScienceName(mPlantList.get(index).getSpeciesName());
+				pbbItem.setIsFlicker(HelperValues.IS_FLICKR_YES);
 
-				Log.i("K", "specise_id : " + mPlantList.get(index).SpeciesID
-						+ " protocol_id : " + mPlantList.get(index).ProtocolID
-						+ " site_id : " + mPlantList.get(index).PlantID
-						+ " cname : " + mPlantList.get(index).CommonName
-						+ " sname : " + mPlantList.get(index).SpeciesName);
-				
-				
-				intent.putExtra("species_id", mPlantList.get(index).SpeciesID);
-				intent.putExtra("protocol_id", mPlantList.get(index).ProtocolID);
-				// actually this name should be called as siteID but use PlantID field as this.
-				intent.putExtra("site_id", mPlantList.get(index).PlantID); 
-				intent.putExtra("cname", mPlantList.get(index).CommonName);
-				intent.putExtra("sname", mPlantList.get(index).SpeciesName);
+				intent.putExtra("pbbItem", pbbItem);
 				intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
 				
 				mContext.startActivity(intent);
 			}
 			else {
 				Intent intent = new Intent(mContext, GetPhenophaseShared.class);
-				Log.i("K", "PlantID: " + mPlantList.get(index).PlantID);
-				intent.putExtra("id", mPlantList.get(index).PlantID);
+				intent.putExtra("id", mPlantList.get(index).getPlantID());
+				//intent.putExtra("id", );
 				mContext.startActivity(intent);
 			}
 		}
 		// If the marker is from other users' list
-		else if(mPlantList.get(index).WhichList == HelperValues.OTHERS_PLANT_LIST){
+		else if(mPlantList.get(index).getWhichList() == HelperValues.OTHERS_PLANT_LIST){
 			// move to species Info.
-			
-			Log.i("K", "Species ID : " + mPlantList.get(index).SpeciesID);
-			
 			Intent intent = new Intent(mContext, SpeciesDetailMap.class);
-			intent.putExtra("cname", mPlantList.get(index).CommonName);
-			intent.putExtra("sname", mPlantList.get(index).SpeciesName);
-			intent.putExtra("dt_taken", mPlantList.get(index).Date);
-			intent.putExtra("notes", mPlantList.get(index).Note);
-			intent.putExtra("species_id", mPlantList.get(index).SpeciesID);
-			intent.putExtra("category", mPlantList.get(index).Category);
-			intent.putExtra("username", mPlantList.get(index).UserName);
-			intent.putExtra("phenophase_id", mPlantList.get(index).PhenoID);
-			intent.putExtra("protocol_id", mPlantList.get(index).ProtocolID);
-			intent.putExtra("latitude", mPlantList.get(index).Latitude);
-			intent.putExtra("longitude", mPlantList.get(index).Longitude);
-			intent.putExtra("imageID", mPlantList.get(index).ImageName);
+			
+			PBBItems pbbItem = new PBBItems();
+			pbbItem.setSpeciesID(mPlantList.get(index).getSpeciesID());
+			pbbItem.setProtocolID(mPlantList.get(index).getProtocolID());
+			pbbItem.setSiteID(mPlantList.get(index).getPlantID());
+			pbbItem.setCommonName(mPlantList.get(index).getCommonName());
+			pbbItem.setScienceName(mPlantList.get(index).getSpeciesName());
+			pbbItem.setDate(mPlantList.get(index).getDate());
+			pbbItem.setNote(mPlantList.get(index).getNote());
+			pbbItem.setCategory(mPlantList.get(index).getCategory());
+			pbbItem.setPhenophaseID(mPlantList.get(index).getPhenoID());
+			pbbItem.setLatitude(mPlantList.get(index).getLatitude());
+			pbbItem.setLongitude(mPlantList.get(index).getLongitude());
+			pbbItem.setIsFlicker(HelperValues.IS_FLICKR_YES);
+			
+			intent.putExtra("pbbItem", pbbItem);
+			
+			intent.putExtra("username", mPlantList.get(index).getUserName());
+			intent.putExtra("imageID", mPlantList.get(index).getImageName());
 		
 			mContext.startActivity(intent);
 		
@@ -172,10 +169,8 @@ public class SpeciesMapOverlay extends BalloonItemizedOverlay<SpeciesOverlayItem
 		}
 		
 		hideBalloon();
-		
 		return true;
 	}
-
 
 	@Override
 	public int size() {

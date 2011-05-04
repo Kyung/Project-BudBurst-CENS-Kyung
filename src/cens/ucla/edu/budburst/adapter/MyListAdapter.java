@@ -10,8 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.DetailPlantInfo;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.myplants.DetailPlantInfo;
 import cens.ucla.edu.budburst.utils.PBBItems;
 
 public class MyListAdapter extends BaseAdapter{
@@ -33,7 +33,7 @@ public class MyListAdapter extends BaseAdapter{
 	}
 	
 	public String getItem(int position){
-		return arSrc.get(position).CommonName;
+		return arSrc.get(position).getCommonName();
 	}
 	
 	public long getItemId(int position){
@@ -47,18 +47,18 @@ public class MyListAdapter extends BaseAdapter{
 		//current_position = arSrc.get(position).SpeciesID;
 		
 		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-		img.setImageResource(arSrc.get(position).Picture);
+		img.setImageResource(arSrc.get(position).getPicture());
 
 		TextView textname = (TextView)convertView.findViewById(R.id.commonname);
-		textname.setText(arSrc.get(position).CommonName);
+		textname.setText(arSrc.get(position).getCommonName());
 		
 		TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
 		
-		if(arSrc.get(position).SpeciesName.equals("Unknown/Other")) {
+		if(arSrc.get(position).getSpeciesName().equals("Unknown/Other")) {
 			textdesc.setText("Unknown/Other");
 		}
 		else {
-			String [] splits = arSrc.get(position).SpeciesName.split(" ");
+			String [] splits = arSrc.get(position).getSpeciesName().split(" ");
 			textdesc.setText(splits[0] + " " + splits[1]);
 		}
 		
@@ -74,9 +74,9 @@ public class MyListAdapter extends BaseAdapter{
 				
 				Intent intent = new Intent(maincon, DetailPlantInfo.class);
 				PBBItems pbbItem = new PBBItems();
-				pbbItem.setSpeciesID(pi.SpeciesID);
-				pbbItem.setCommonName(pi.CommonName);
-				pbbItem.setCategory(pi.Category);
+				pbbItem.setSpeciesID(pi.getSpeciesID());
+				pbbItem.setCommonName(pi.getCommonName());
+				pbbItem.setCategory(pi.getCategory());
 				intent.putExtra("pbbItem", pbbItem);
 				maincon.startActivity(intent);
 			}

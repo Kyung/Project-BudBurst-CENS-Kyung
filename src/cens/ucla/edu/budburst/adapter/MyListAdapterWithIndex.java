@@ -19,11 +19,11 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.DetailPlantInfo;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.lists.ListDetail;
+import cens.ucla.edu.budburst.myplants.DetailPlantInfo;
 import cens.ucla.edu.budburst.onetime.OneTimeAddMyPlant;
 
 public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndexer {
@@ -48,7 +48,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		
 		for(int i = 0 ; i < size ; i++) {
 			HelperPlantItem pi = items.get(i);
-			String firstChar = pi.CommonName.substring(0,1);
+			String firstChar = pi.getCommonName().substring(0,1);
 			firstChar = firstChar.toUpperCase();
 			
 			if(oldChar.equals(firstChar)) {
@@ -80,7 +80,7 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		//current_position = arSrc.get(position).SpeciesID;
 		
 		ImageView img = (ImageView)convertView.findViewById(R.id.icon);
-		String imagePath = HelperValues.TREE_PATH + items.get(position).SpeciesID + ".jpg";
+		String imagePath = HelperValues.TREE_PATH + items.get(position).getSpeciesID() + ".jpg";
 		Log.i("K", "imagePath : " + imagePath);
 		
 		//File existPhoto = new File(imagePath);
@@ -92,10 +92,10 @@ public class MyListAdapterWithIndex extends ArrayAdapter implements SectionIndex
 		img.setImageBitmap(helper.showImage(maincon, imagePath));
 
 		TextView cname = (TextView)convertView.findViewById(R.id.commonname);
-		cname.setText(items.get(position).CommonName);
+		cname.setText(items.get(position).getCommonName());
 		
 		TextView sname = (TextView)convertView.findViewById(R.id.speciesname);
-		sname.setText(items.get(position).SpeciesName);
+		sname.setText(items.get(position).getSpeciesName());
 		
 		// we don' need to show the stat of phenophase in this view
 		TextView phenoStat = (TextView)convertView.findViewById(R.id.pheno_stat);

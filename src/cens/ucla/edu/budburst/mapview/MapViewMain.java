@@ -28,7 +28,6 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.R.drawable;
 import cens.ucla.edu.budburst.R.id;
@@ -39,9 +38,13 @@ import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperGpsHandler;
 import cens.ucla.edu.budburst.helper.HelperJSONParser;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperSettings;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.lists.ListGroupItem;
+import cens.ucla.edu.budburst.lists.ListUserDefinedSpeciesDownload;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -90,7 +93,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PBBMapMain extends MapActivity{//implements LocationListener {
+public class MapViewMain extends MapActivity{ //implements LocationListener {
 	
 	private HelperGpsHandler gpsHandler;
 	private boolean mIsBound;
@@ -125,6 +128,10 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 	private HelperPlantItem pItem;
 	
 	private Drawable mMarker;
+	
+	private String[] mPlantCategory;
+	private boolean[] mSelect;
+	private ArrayList<ListGroupItem> mArr;
 	
 	// timer variables
 	private Timer timer;
@@ -165,7 +172,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 		
 		Log.i("K", "BindService");
 		
-		bindService(new Intent(PBBMapMain.this, HelperGpsHandler.class), mConnection,
+		bindService(new Intent(MapViewMain.this, HelperGpsHandler.class), mConnection,
 				Context.BIND_AUTO_CREATE);
 		mIsBound = true;
 		//Toast.makeText(PBBMapMain.this, "bindService", Toast.LENGTH_SHORT).show();
@@ -198,12 +205,13 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 		// Set MapView
 		mMapView = (MapView)findViewById(R.id.map);
 		mMapView.setBuiltInZoomControls(true);
+		mMapView.setSatellite(false);
 		// Set mapController
 		mMapController = mMapView.getController();
 		mMapController.setZoom(12);
 		
 		// Add mylocation overlay
-		mMyOverLay = new MyLocationOverlay(PBBMapMain.this, mMapView);
+		mMyOverLay = new MyLocationOverlay(MapViewMain.this, mMapView);
 		mMyOverLay.enableMyLocation();
 		mMyOverLay.enableCompass();
 		
@@ -231,14 +239,8 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 	
 	@Override
 	public void onResume() {
-		mMapController.setZoom(12);
-		
-		GeoPoint gPoint = getPoint(mLatitude, mLongitude);
-		mMapController.setCenter(gPoint);
-		
 		super.onResume();
 	}
-
 	
 	@Override
 	public void onPause() {
@@ -248,12 +250,8 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 			mMapView.invalidate();
 			mMapView.postInvalidate();
 		}
-		
-		//unregisterReceiver(gpsReceiver);
 	}
 
-	
-	
 	public void checkGpsIsOn() {
 		// check if GPS is turned on...
 		if (mLocManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
@@ -271,7 +269,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 		}
 		else {
 		   	
-		 new AlertDialog.Builder(PBBMapMain.this)
+		 new AlertDialog.Builder(MapViewMain.this)
 		   		.setTitle("Turn On GPS")
 		   		.setMessage(getString(R.string.Message_locationDisabledTurnOn))
 		   		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -305,7 +303,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 	public void showSpeciesOnMap(boolean hasHandler) {
 		
 		// TODO Auto-generated method stub
-		otDBH = new OneTimeDBHelper(PBBMapMain.this);
+		otDBH = new OneTimeDBHelper(MapViewMain.this);
 		
 		GeoPoint gPoint = new GeoPoint((int)(mLatitude * 1000000), (int)(mLongitude * 1000000));
 		
@@ -338,7 +336,8 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 		OneTimeDBHelper oDBH = new OneTimeDBHelper(this);
 		
 		// add myPlantList from Monitored Plants
-		mPlantList = sDBH.getAllMyListInformation(this);
+		// temporary stop
+		//mPlantList = sDBH.getAllMyListInformation(this);
 		
 		// add myPlantList from Shared Plants
 		mPlantList.addAll(oDBH.getAllMyListInformation(this));
@@ -356,9 +355,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 	
 	
 	public void getOtherUsersListsFromServer(int category) {
-		
-		SpeciesOthersFromServer getSpecies = new SpeciesOthersFromServer(PBBMapMain.this, mMapView, mMyOverLay, category);
-		
+		SpeciesOthersFromServer getSpecies = new SpeciesOthersFromServer(MapViewMain.this, mMapView, mMyOverLay, category);
 		getSpecies.execute(getString(R.string.get_onetimeob_others) + 
 				"?latitude=" + mLatitude + "&longitude=" + mLongitude);
 	}
@@ -369,9 +366,8 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 		
 		menu.add(0, 1, 0, getString(R.string.PBBMapMenu_myLocation)).setIcon(android.R.drawable.ic_menu_mylocation);
 		menu.add(0, 2, 0, getString(R.string.PBBMapMenu_changeView)).setIcon(android.R.drawable.ic_menu_mapmode);
-		//menu.add(0, 3, 0, getString(R.string.PBBMapMenu_seeLists)).setIcon(android.R.drawable.ic_menu_recent_history);
-		menu.add(0, 4, 0, getString(R.string.PBBMapMenu_refresh)).setIcon(android.R.drawable.ic_menu_rotate);
-		//menu.add(0, 5, 0, getString(R.string.otherCategoryMap)).setIcon(android.R.drawable.ic_menu_gallery);
+		menu.add(0, 3, 0, getString(R.string.PBBMapMenu_refresh)).setIcon(android.R.drawable.ic_menu_rotate);
+		menu.add(0, 4, 0, getString(R.string.otherCategoryMap)).setIcon(android.R.drawable.ic_menu_sort_by_size);
 			
 		return true;
 	}
@@ -382,7 +378,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 			case 1:
 				GeoPoint current_point = null;
 				if(mLatitude == 0.0) {
-					Toast.makeText(PBBMapMain.this, getString(R.string.Alert_gettingGPS), Toast.LENGTH_SHORT).show();
+					Toast.makeText(MapViewMain.this, getString(R.string.Alert_gettingGPS), Toast.LENGTH_SHORT).show();
 				}
 				else {
 					current_point = new GeoPoint((int)(mLatitude * 1000000), (int)(mLongitude * 1000000));
@@ -403,44 +399,78 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 				}
 				
 				return true;				
-			case 3:	
-				Intent intent = new Intent(PBBMapMain.this, PBBPlantList.class);
-				startActivity(intent);
-					
-				return true;
-			case 4:
+			case 3:
 				getNewGPS();
 				return true;
-			case 5:
-				new AlertDialog.Builder(PBBMapMain.this)
-		   		.setTitle("Category")
-		   		.setNegativeButton("Back", null)
-		   		.setItems(R.array.plantcategory, new DialogInterface.OnClickListener() {
-			
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						String[] category = getResources().getStringArray(R.array.plantcategory);
-
-						if(category[which].equals("Shared Plants")) {
-							
-							getOtherUsersListsFromServer(0);
-						}
-						else if(category[which].equals("Trees")){
-							getOtherUsersListsFromServer(1);
-							
-						}
-						else {
-							
-						}
-					}
-		   		})
-		   		.show();
-				
-				
+			case 4:
+				showCategory();
 				return true;
 		}
 		return false;
+	}
+	
+	private void showCategory() {
+		mArr = new ArrayList<ListGroupItem>(); 
+		
+		ListGroupItem gItem = new ListGroupItem();
+		gItem.setCategoryID(1);
+		gItem.setCategoryName("Local Budburst");
+		mArr.add(gItem);
+		
+		gItem = new ListGroupItem();
+		gItem.setCategoryID(2);
+		gItem.setCategoryName("Local Invasive");
+		mArr.add(gItem);
+		
+		gItem = new ListGroupItem();
+		gItem.setCategoryID(3);
+		gItem.setCategoryName("Local Poisonous");
+		mArr.add(gItem);
+		
+		gItem = new ListGroupItem();
+		gItem.setCategoryID(4);
+		gItem.setCategoryName("Local Endangered");
+		mArr.add(gItem);
+		
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(MapViewMain.this);
+		mArr.addAll(oDBH.getListGroupItem(MapViewMain.this));
+		
+		int arrLength = mArr.size();
+		
+		Log.i("K", "length : " + arrLength);
+		
+		mPlantCategory = new String[arrLength];
+		mSelect = new boolean[arrLength];
+
+		for(int i = 0 ; i < arrLength ; i++) {
+			mPlantCategory[i] = mArr.get(i).getCategoryName();
+			mSelect[i] = false;
+		}
+		
+		new AlertDialog.Builder(MapViewMain.this)
+   		.setTitle(getString(R.string.cateogory_text))
+   		.setSingleChoiceItems(mPlantCategory, -1, new DialogInterface.OnClickListener() {
+	
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				mSelect[which] = true;
+			}
+   		})
+   		.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+	
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				for(int i = 0 ; i < mSelect.length ; i++) {
+					if(mSelect[i]) {
+						getOtherUsersListsFromServer(mArr.get(i).getCategoryID());
+					}
+				}
+			}
+		})
+		.setNegativeButton(getString(R.string.Button_back), null)
+   		.show();
 	}
 	
 	private void getNewGPS() {
@@ -457,7 +487,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 				Looper.prepare();
 				// set update the location data in 1secs or 5meters
 				unbindService(mConnection);
-				bindService(new Intent(PBBMapMain.this, HelperGpsHandler.class), mConnection,
+				bindService(new Intent(MapViewMain.this, HelperGpsHandler.class), mConnection,
 						Context.BIND_AUTO_CREATE);
 				
 				Looper.loop();
@@ -517,7 +547,7 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 			}
 			// if Gps signal is bad
 			else {
-				new AlertDialog.Builder(PBBMapMain.this)
+				new AlertDialog.Builder(MapViewMain.this)
 				.setTitle("Weak Gps Signal")
 				.setMessage("Cannot get Gps Signal, Make sure you are in the good connectivity area")
 				.setPositiveButton(getString(R.string.Button_back), new DialogInterface.OnClickListener() {
@@ -525,7 +555,6 @@ public class PBBMapMain extends MapActivity{//implements LocationListener {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						finish();
 					}
 				})
 				.show();

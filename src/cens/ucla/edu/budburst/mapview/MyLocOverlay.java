@@ -83,16 +83,17 @@ public class MyLocOverlay extends MyLocationOverlay{
 		
 		mRadius = mCenter.x - mLeft.x;
 		//Toast.makeText(mContext, "" + zoomLevel, Toast.LENGTH_SHORT).show();
-		//double levelToMeters = (20-zoomLevel) * 38.31482042;
+		//double levelToMeters = (mapView.getMaxZoomLevel() - mapView.getZoomLevel()) * 38.31482042;
 		
+		//Log.i("K", "levelToMeters : " + levelToMeters);
 
 		mAccuracyPaint.setColor(0xff6666ff);
 		mAccuracyPaint.setStyle(Style.STROKE);
-        canvas.drawCircle(mCenter.x, mCenter.y, 30, mAccuracyPaint);
+        canvas.drawCircle(mCenter.x, mCenter.y, 6, mAccuracyPaint);
 
         mAccuracyPaint.setColor(0x186666ff);
         mAccuracyPaint.setStyle(Style.FILL);
-        canvas.drawCircle(mCenter.x, mCenter.y, 30, mAccuracyPaint);
+        canvas.drawCircle(mCenter.x, mCenter.y, 6, mAccuracyPaint);
 
         mDrawable.setBounds(mCenter.x - mWidth / 2, mCenter.y - mHeight / 2, mCenter.x + mWidth / 2, mCenter.y + mHeight / 2);
         mDrawable.draw(canvas);
@@ -100,9 +101,6 @@ public class MyLocOverlay extends MyLocationOverlay{
         Paint backPaint = new Paint();
 		backPaint.setARGB(50, 50, 50, 50);
 		backPaint.setAntiAlias(true);
-		
-		//drawCircle(canvas, Color.RED, item.getPoint(), item.radius, alpha, border);
-        
 		
 	}
 	
@@ -130,15 +128,10 @@ public class MyLocOverlay extends MyLocationOverlay{
 		}
 	}
 
-	
-	//drawCircle(canvas, Color.RED, item.getPoint(), item.radius, alpha, border);
-	
 	@Override
 	protected boolean dispatchTap() {
 		GeoPoint current_point = new GeoPoint((int)(mLatitude * 1000000), (int)(mLongitude * 1000000));
 		//mc.setCenter(current_point);
-		
-		Toast.makeText(mContext, "Hello", Toast.LENGTH_SHORT).show();
 		//Toast.makeText(mContext, "Current radius : " + radius + "m" , Toast.LENGTH_SHORT).show();
 		return true;
 	}

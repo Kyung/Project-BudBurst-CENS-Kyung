@@ -61,12 +61,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import cens.ucla.edu.budburst.PBBAddPlant;
-import cens.ucla.edu.budburst.PBBAddSite;
 import cens.ucla.edu.budburst.PBBLogin;
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.DetailPlantInfo;
 import cens.ucla.edu.budburst.adapter.MyListAdapter;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
@@ -79,6 +75,10 @@ import cens.ucla.edu.budburst.helper.HelperLazyAdapter;
 import cens.ucla.edu.budburst.lists.ListDownloadFromServer;
 import cens.ucla.edu.budburst.lists.ListItems;
 import cens.ucla.edu.budburst.lists.ListSubCategory;
+import cens.ucla.edu.budburst.myplants.DetailPlantInfo;
+import cens.ucla.edu.budburst.myplants.PBBAddPlant;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
 import cens.ucla.edu.budburst.utils.PBBItems;
 
 public class OneTimeAddMyPlant extends ListActivity {
@@ -155,10 +155,11 @@ public class OneTimeAddMyPlant extends ListActivity {
 				+ " ORDER BY LOWER(common_name) ASC;", null);
 		
 		while(cursor.moveToNext()) {
-			HelperPlantItem pi = new HelperPlantItem(cursor.getString(1) 
-					, cursor.getString(2)
-					, cursor.getString(3)
-					, cursor.getInt(0));
+			HelperPlantItem pi = new HelperPlantItem();
+			pi.setCommonName(cursor.getString(1)); 
+			pi.setSpeciesName(cursor.getString(2));
+			pi.setImageURL(cursor.getString(3));
+			pi.setCategory(cursor.getInt(0));
 			arSpeciesList.add(pi);
 		}
 		
@@ -247,10 +248,10 @@ public class OneTimeAddMyPlant extends ListActivity {
 						mProtocolID = 3;
 					}
 					
-					Intent intent = new Intent(OneTimeAddMyPlant.this, GetPhenophase.class);
+					Intent intent = new Intent(OneTimeAddMyPlant.this, OneTimePhenophase.class);
 
-					pbbItem.setCommonName(arSpeciesList.get(mCurrentPosition).CommonName);
-					pbbItem.setScienceName(arSpeciesList.get(mCurrentPosition).SpeciesName);
+					pbbItem.setCommonName(arSpeciesList.get(mCurrentPosition).getCommonName());
+					pbbItem.setScienceName(arSpeciesList.get(mCurrentPosition).getSpeciesName());
 					pbbItem.setCategory(mCategory);
 					pbbItem.setProtocolID(mProtocolID);
 					pbbItem.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
@@ -270,7 +271,7 @@ public class OneTimeAddMyPlant extends ListActivity {
 		 * Pop up choose site dialog box
 		 */
 		mNewPlantSpeciesID = HelperValues.UNKNOWN_SPECIES;
-		mNewPlantSpeciesName = arSpeciesList.get(position).CommonName;
+		mNewPlantSpeciesName = arSpeciesList.get(position).getCommonName();
 		
 		mSeqUserSite = helper.getUserSite(OneTimeAddMyPlant.this);
 		
@@ -290,8 +291,8 @@ public class OneTimeAddMyPlant extends ListActivity {
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(OneTimeAddMyPlant.this, PBBAddSite.class);
 
-					pbbItem.setCommonName(arSpeciesList.get(mCurrentPosition).CommonName);
-					pbbItem.setScienceName(arSpeciesList.get(mCurrentPosition).SpeciesName);
+					pbbItem.setCommonName(arSpeciesList.get(mCurrentPosition).getCommonName());
+					pbbItem.setScienceName(arSpeciesList.get(mCurrentPosition).getSpeciesName());
 					pbbItem.setCategory(mCategory);
 					pbbItem.setProtocolID(mProtocolID);
 					pbbItem.setSpeciesID(HelperValues.UNKNOWN_SPECIES);

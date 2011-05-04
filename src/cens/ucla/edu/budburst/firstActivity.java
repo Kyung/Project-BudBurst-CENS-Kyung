@@ -6,13 +6,17 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.apache.http.util.ByteArrayBuffer;
-
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperRefreshPlantLists;
+import cens.ucla.edu.budburst.helper.HelperSettings;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.lists.ListUserDefinedSpeciesDownload;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -36,32 +40,35 @@ import android.widget.Toast;
 
 public class firstActivity extends Activity{
 	
-	private String getCurrentVersion;
-	private String getOldVersion;
-	private SharedPreferences pref;
-	private LocationManager lm;
+	private String mGetCurrentVersion;
+	private String mGetOldVersion;
+	private SharedPreferences mPref;
+	private LocationManager mLocManager;
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-
 	    setContentView(R.layout.splash);
 	    // TODO Auto-generated method stub	    
 	}
 	
 	public void onResume() {
 		super.onResume();
+		
+		Intent service = new Intent(firstActivity.this, HelperBackgroundService.class);
+	    startService(service);
+		
 		getCurrentVersion();
 		moveToMainPage();
 	}
 	
 	public void getCurrentVersion() {
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		mLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		
 		ComponentName comp = new ComponentName(firstActivity.this, "");
 		
 		try {
 			PackageInfo pInfo = this.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
-			getCurrentVersion = pInfo.versionName;
+			mGetCurrentVersion = pInfo.versionName;
 		} catch (NameNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,16 +76,14 @@ public class firstActivity extends Activity{
 	}
 	
 	public void moveToMainPage() {
-		pref = getSharedPreferences("userinfo", 0);
-		getOldVersion = pref.getString("version", getCurrentVersion);
+		mPref = getSharedPreferences("userinfo", 0);
+		mGetOldVersion = mPref.getString("version", mGetCurrentVersion);
 		
-		//Toast.makeText(firstActivity.this, "getOldVersion : " + getOldVersion + " getCurrentVersion : " + getCurrentVersion , Toast.LENGTH_SHORT).show();
-		
-	 	SharedPreferences.Editor edit = pref.edit();				
-		edit.putString("version", getCurrentVersion);
+	 	SharedPreferences.Editor edit = mPref.edit();				
+		edit.putString("version", mGetCurrentVersion);
 		edit.commit();
 		
-		if(!getCurrentVersion.equals(getOldVersion)) {
+		if(!mGetCurrentVersion.equals(mGetOldVersion)) {
 	    	/*
 		     * Upgrade Database...
 		     */
@@ -97,36 +102,19 @@ public class firstActivity extends Activity{
 			
 		 	Log.i("K", "application database has been upgraded");
 		 	
-		 	Intent intent = new Intent(firstActivity.this, firstActivity.class);
-			startActivity(intent);
-			finish();
-		 	
-		 	/*
-			new AlertDialog.Builder(this)
-	    	.setTitle("Upgrade Database")
-	    	.setMessage("Database Upgrade Complete.")
-	    	.setPositiveButton("Next", new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					
-				}
-			})
-			.show();
-			*/
+		 	downloadPlantLists();
 		}
 		else {
-			if(!lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+			if(!mLocManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
 		    	new AlertDialog.Builder(this)
 		    	.setTitle("Turn on GPS")
-		    	.setMessage("Please turn on GPS to use this system. Press Redirect button to move to the settings page.")
+		    	.setMessage(getString(R.string.Update_Database_Table))
 		    	.setPositiveButton("Redirect", new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						Intent myIntent = new Intent( Settings.ACTION_SECURITY_SETTINGS );
+						Intent myIntent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
 			        	startActivity(myIntent);
 					}
 				})
@@ -145,7 +133,22 @@ public class firstActivity extends Activity{
 
 		    }		
 		}
+	}
+	
+	private void downloadPlantLists() {
+		
+		HelperFunctionCalls helper = new HelperFunctionCalls();
+		helper.changedSharedPreferenceTree(firstActivity.this);
+		
+		HelperSharedPreference hPref = new HelperSharedPreference(firstActivity.this);
+		hPref.setPreferencesBoolean("firstDownloadTreeList", false);
 
+		HelperRefreshPlantLists refreshList = new HelperRefreshPlantLists(firstActivity.this);
+		refreshList.execute();
+		
+	 	Intent intent = new Intent(firstActivity.this, firstActivity.class);
+		startActivity(intent);
+		finish();
 	}
 		
 	@Override
@@ -160,7 +163,7 @@ public class firstActivity extends Activity{
 	public void checkUpdate() {
 		
 		try {
-			URL urls = new URL(getString(R.string.check_version_number) + "?version=" + getCurrentVersion);
+			URL urls = new URL(getString(R.string.check_version_number) + "?version=" + mGetCurrentVersion);
 			Object getContent = urls.getContent();
 			
 			Log.i("K", "getContent : " + getContent);
@@ -208,10 +211,7 @@ public class firstActivity extends Activity{
             else {
             	moveToMainPage();
             }
-			
 		}
-		catch(Exception e) {
-			
-		}
+		catch(Exception e) {}
 	}
 }

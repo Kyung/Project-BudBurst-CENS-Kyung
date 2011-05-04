@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,18 +41,28 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.PBBHelpPage;
+import cens.ucla.edu.budburst.PBBMainPage;
+import cens.ucla.edu.budburst.PBBSync;
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.array;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.lists.ListDetail;
 import cens.ucla.edu.budburst.onetime.OneTimePBBLists;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
 import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
 import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 
 public class PBBPlantList extends ListActivity {
 	
@@ -68,7 +78,7 @@ public class PBBPlantList extends ListActivity {
 	private String commonName;
 	//private static boolean mFirst_site_flag = true;
 	
-	private SharedPreferences pref;
+	private HelperSharedPreference mPref;
 	private SyncDBHelper syncDBHelper;
 	private StaticDBHelper staticDBHelper;
 	
@@ -97,12 +107,9 @@ public class PBBPlantList extends ListActivity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.plantlist);
-	}
-	
-	public void onResume(){
-		super.onResume();
-
-		mHelper = new HelperFunctionCalls();
+		
+		
+mHelper = new HelperFunctionCalls();
 		
 		MyList = getListView();
 		
@@ -126,9 +133,9 @@ public class PBBPlantList extends ListActivity {
 		user_species_list = new ArrayList<HelperPlantItem>();
 		
 		//Retrieve username and password
-		pref = getSharedPreferences("userinfo",0);
-		String username = pref.getString("Username","");
-		String password = pref.getString("Password","");
+		mPref = new HelperSharedPreference(this);
+		String username = mPref.getPreferenceString("Username","");
+		String password = mPref.getPreferenceString("Password","");
 		
 		
 		arPlantItem = new ArrayList<HelperPlantItem>();
@@ -141,31 +148,30 @@ public class PBBPlantList extends ListActivity {
 		SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
 		
 		//Check user plant is empty.			
-		Cursor number_of_my_plants = syncDB.rawQuery("SELECT site_id FROM my_plants;", null);
-		Cursor number_of_my_ob = ot.rawQuery("SELECT _id FROM oneTimePlant", null);
+		Cursor numPlants = syncDB.rawQuery("SELECT site_id FROM my_plants", null);
+		Cursor numObservations = ot.rawQuery("SELECT _id FROM oneTimePlant", null);
 		
-		if(number_of_my_plants.getCount() == 0 && number_of_my_ob.getCount() == 0)
+		if(numPlants.getCount() == 0 && numObservations.getCount() == 0)
 		{	
-			number_of_my_plants.close();
-			number_of_my_ob.close();
+			numPlants.close();
+			numObservations.close();
 			
 			TextView instruction = (TextView)findViewById(R.id.instruction);
 			instruction.setVisibility(View.VISIBLE);
 			MyList.setVisibility(View.GONE); 
 			return;
 		}else{
-			number_of_my_plants.close();
-			number_of_my_ob.close();
+			numPlants.close();
+			numObservations.close();
 		}
 		
-		number_of_my_plants.close();
-		number_of_my_ob.close();
+		numPlants.close();
+		numObservations.close();
 		
 		/*
 		 * Show the current data in the database...(debug purpose)
 		 * 
 		 */
-		
 		Cursor ccc = staticDB.rawQuery("SELECT _id, Phenophase_ID, Protocol_ID FROM Phenophase_Protocol_Icon", null);
 		while(ccc.moveToNext()) {
 			Log.i("K", "id : " + ccc.getInt(0) + " Phenophase_ID : " + ccc.getInt(1) + " Protocol_ID : " + ccc.getInt(2));
@@ -190,12 +196,10 @@ public class PBBPlantList extends ListActivity {
 			Log.i("K", "MY SITES : " + cursorss.getInt(0) + " ,name : " + cursorss.getString(1) + " , official : " + cursorss.getInt(2)+ " , synced : " + cursorss.getInt(3) + ", lat:" + cursorss.getString(4) + ",lng:" + cursorss.getString(5));
 		}
 		cursorss.close();
-		
-		
 
-		cursorss = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, cname, sname, active, synced, category, image_id FROM oneTimePlant;", null);
+		cursorss = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, cname, sname, active, synced, category, is_floracache, floracache_id FROM oneTimePlant;", null);
 		while(cursorss.moveToNext()) {
-			Log.i("K", "ONETIME OB : " + cursorss.getInt(0) + ", plant_id : " + cursorss.getInt(1) + ", species_id " + cursorss.getInt(2) + " , site_id : " + cursorss.getString(3) + " , cname : " + cursorss.getString(4) + " , sname : " + cursorss.getString(5) + ", Active " + cursorss.getInt(6) + " , SYNCED : " + cursorss.getInt(7) + ", CATEGORY : " + cursorss.getInt(8) + ", ImageID : " + cursorss.getString(9));
+			Log.i("K", "ONETIME OB : " + cursorss.getInt(0) + ", plant_id : " + cursorss.getInt(1) + ", species_id " + cursorss.getInt(2) + " , site_id : " + cursorss.getString(3) + " , cname : " + cursorss.getString(4) + " , sname : " + cursorss.getString(5) + ", Active " + cursorss.getInt(6) + " , SYNCED : " + cursorss.getInt(7) + ", CATEGORY : " + cursorss.getInt(8) + ",is_floracache : " + cursorss.getInt(9) + ",floracacheID : " + cursorss.getInt(10));
 		}
 		cursorss.close();
 		
@@ -393,24 +397,28 @@ public class PBBPlantList extends ListActivity {
 					String total_pheno = "SELECT Phenophase_ID FROM Phenophase_Protocol_Icon WHERE Protocol_ID = " + cursor2.getInt(3) + ";";
 					Cursor cursor5 = staticDB.rawQuery(total_pheno, null);
 					
+					pi = new HelperPlantItem();
+					pi.setPicture(resID);
+					pi.setCommonName(common_name);
+					pi.setSpeciesName(scienceName);
+					pi.setSpeciesID(cursor2.getInt(0));
+					pi.setSiteID(user_station_id.get(i));
+					pi.setProtocolID(cursor2.getInt(3));
+					pi.setCurrentPheno(cursor4.getCount());
+					pi.setTotalPheno(cursor5.getCount());
+					pi.setSiteName(user_station_name.get(i));
+					pi.setMonitor(true);
+					pi.setSynced(synced_species);
+					pi.setCategory(category);
+					pi.setImageID(imageID);
+					
 					// put values into HelperPlantItem class
 					if(!header) {
-						//pi = new HelperPlantItem(resID, cursor.getString(5), cursor.getString(6), speciesID,
-						//cursor.getInt(3), cursor.getInt(4), pheno_current, totalNumPheno, true, "", false, synced, cursor.getInt(8), imageID);
-						
-						pi = new HelperPlantItem(resID, common_name, scienceName
-								, cursor2.getInt(0), user_station_id.get(i), 
-								cursor2.getInt(3), cursor4.getCount(), cursor5.getCount(), 
-								true, user_station_name.get(i), true, synced_species, 
-								category, imageID);
+						pi.setHeader(true);						
 						header = true;
 					}
 					else {
-						pi = new HelperPlantItem(resID, common_name, scienceName
-								, cursor2.getInt(0), user_station_id.get(i),
-								cursor2.getInt(3), cursor4.getCount(), cursor5.getCount(), 
-								false, user_station_name.get(i), true, synced_species, 
-								category, imageID);
+						pi.setHeader(false);
 					}
 					
 					// Add PlantItem into Array
@@ -438,7 +446,11 @@ public class PBBPlantList extends ListActivity {
 			syncDBHelper.close();
 			syncDB.close();
 		}
-		
+	}
+	
+	public void onResume(){
+		super.onResume();
+
 	}
 
 	private void add_oneTimeObs() {
@@ -447,7 +459,7 @@ public class PBBPlantList extends ListActivity {
 		SQLiteDatabase ot  = onetime.getReadableDatabase();
 		
 		Cursor cursor = ot.rawQuery("SELECT _id, plant_id, species_id, site_id, protocol_id, " +
-				"cname, sname, synced, category, image_id FROM oneTimePlant WHERE active=1", null);
+				"cname, sname, synced, category FROM oneTimePlant WHERE active=1", null);
 		HelperPlantItem pi;
 		
 		// header is called only once. (top)
@@ -466,8 +478,7 @@ public class PBBPlantList extends ListActivity {
 			 *  category == 4 : poisonous
 			 *  category == 5 : endangered
 			 *  
-			 *  category == 10 : tree lists
-			 *  category == 11 : blooming
+			 *  >= 10 : user_defined_lists
 			 *  and more later.
 			 *  
 			 */
@@ -476,7 +487,8 @@ public class PBBPlantList extends ListActivity {
 			String commonName = cursor.getString(5);
 			String scienceName = cursor.getString(6);
 			
-			if(category == HelperValues.LOCAL_BUDBURST_LIST) {
+			if(category == HelperValues.LOCAL_BUDBURST_LIST ||
+				category == HelperValues.LOCAL_FLICKR) {
 				resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + speciesID, null, null);
 			}
 			else if(category == HelperValues.LOCAL_WHATSINVASIVE_LIST ||
@@ -488,8 +500,7 @@ public class PBBPlantList extends ListActivity {
 				imageID = onetime.getImageIDByCName(PBBPlantList.this, commonName, category);
 				scienceName = onetime.getScienceName(PBBPlantList.this, commonName, category);
 			}
-			else if(category == HelperValues.USER_DEFINED_TREE_LISTS ||
-					category == HelperValues.USER_DEFINED_WHATS_BLOOMING){
+			else if(category >= HelperValues.USER_DEFINED_TREE_LISTS){
 				resID = 0;
 			
 				scienceName = onetime.getUserListsScienceName(PBBPlantList.this, commonName, category);
@@ -542,19 +553,29 @@ public class PBBPlantList extends ListActivity {
 			 *  If site_id == 0 meaning one-time observations are added to the database in "OneTimeMain.class" activity
 			 */
 			
+			pi = new HelperPlantItem();
+			
+			pi.setPicture(resID);
+			pi.setCommonName(commonName);
+			pi.setSpeciesName(scienceName);
+			pi.setSpeciesID(speciesID);
+			pi.setSiteID(cursor.getInt(3));
+			pi.setProtocolID(cursor.getInt(4));
+			pi.setCurrentPheno(pheno_current);
+			pi.setTotalPheno(totalNumPheno);
+			pi.setSiteName("");
+			pi.setMonitor(false);
+			pi.setSynced(synced);
+			pi.setCategory(cursor.getInt(8));
+			pi.setImageID(imageID);
+			
+			
 			if(!header) {
-				pi = new HelperPlantItem(resID, commonName, scienceName, speciesID,
-						cursor.getInt(3), cursor.getInt(4), pheno_current, 
-						totalNumPheno, true, "", false, synced, cursor.getInt(8), imageID);
-				/*
-				 *  Make header true (not called any more)
-				 */
+				pi.setHeader(true);
 				header = true;
 			}
 			else {
-				pi = new HelperPlantItem(resID, commonName, scienceName, speciesID,
-						cursor.getInt(3), cursor.getInt(4), pheno_current, 
-						totalNumPheno, false, "", false, synced, cursor.getInt(8), imageID);
+				pi.setHeader(false);		
 			}
 					
 			arPlantItem.add(pi);
@@ -572,7 +593,7 @@ public class PBBPlantList extends ListActivity {
 		Log.i("K", "POSITION : " + position);
 		
 		// if the position is in the pbb-list and the species id is 999 (which is unknown)
-		if((position <= mOnetimeStartPoint - 1) && arPlantItem.get(position).SpeciesID == 999) {
+		if((position <= mOnetimeStartPoint - 1) && arPlantItem.get(position).getSpeciesID() == 999) {
 			Toast.makeText(PBBPlantList.this, getString(R.string.DoSyncFirst_For_UnknownPlant), Toast.LENGTH_SHORT).show();
 		}
 		else {
@@ -590,12 +611,12 @@ public class PBBPlantList extends ListActivity {
 			else {
 				Intent intent = new Intent(this, GetPhenophaseObserver.class);
 				pbbItem = new PBBItems();
-				pbbItem.setSpeciesID(arPlantItem.get(position).SpeciesID);
-				pbbItem.setSiteID(arPlantItem.get(position).SiteID);
-				pbbItem.setProtocolID(arPlantItem.get(position).ProtocolID);
-				pbbItem.setCommonName(arPlantItem.get(position).CommonName);
-				pbbItem.setScienceName(arPlantItem.get(position).SpeciesName);
-				pbbItem.setCategory(arPlantItem.get(position).Category);
+				pbbItem.setSpeciesID(arPlantItem.get(position).getSpeciesID());
+				pbbItem.setSiteID(arPlantItem.get(position).getSiteID());
+				pbbItem.setProtocolID(arPlantItem.get(position).getProtocolID());
+				pbbItem.setCommonName(arPlantItem.get(position).getCommonName());
+				pbbItem.setScienceName(arPlantItem.get(position).getSpeciesName());
+				pbbItem.setCategory(arPlantItem.get(position).getCategory());
 				intent.putExtra("pbbItem", pbbItem);
 				intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
 				startActivity(intent);
@@ -606,7 +627,7 @@ public class PBBPlantList extends ListActivity {
 	protected boolean onLongListItemClick(View v, int position, long id) {
 		mPosition = position;
 		
-		Log.i("K", "arPlantItem.get(pos).SpeciesID : " + arPlantItem.get(mPosition).SpeciesID);
+		Log.i("K", "arPlantItem.get(pos).SpeciesID : " + arPlantItem.get(mPosition).getSpeciesID());
 
 		new AlertDialog.Builder(PBBPlantList.this)
 		.setTitle("Select one")
@@ -629,10 +650,10 @@ public class PBBPlantList extends ListActivity {
 					 * If user choose Monitored Plant 
 					 */
 					if(mPosition <= mOnetimeStartPoint - 1) {
-						mSpeciesID = arPlantItem.get(mPosition).SpeciesID;
-						commonName = arPlantItem.get(mPosition).CommonName;
-						mProtocolID = arPlantItem.get(mPosition).ProtocolID;
-						mCategory = arPlantItem.get(mPosition).Category;
+						mSpeciesID = arPlantItem.get(mPosition).getSpeciesID();
+						commonName = arPlantItem.get(mPosition).getCommonName();
+						mProtocolID = arPlantItem.get(mPosition).getProtocolID();
+						mCategory = arPlantItem.get(mPosition).getCategory();
 						chooseSiteDialog();
 					}
 					/*
@@ -652,13 +673,13 @@ public class PBBPlantList extends ListActivity {
 								 */
 								Intent intent = new Intent(PBBPlantList.this, QuickCapture.class);
 								pbbItem = new PBBItems();
-								pbbItem.setSpeciesID(arPlantItem.get(mPosition).SpeciesID);
-								pbbItem.setProtocolID(arPlantItem.get(mPosition).ProtocolID);
-								pbbItem.setPlantID(arPlantItem.get(mPosition).PlantID);
-								pbbItem.setCommonName(arPlantItem.get(mPosition).CommonName);
-								pbbItem.setScienceName(arPlantItem.get(mPosition).SpeciesName);
-								pbbItem.setCategory(arPlantItem.get(mPosition).Category);
-								pbbItem.setNote(arPlantItem.get(mPosition).Note);
+								pbbItem.setSpeciesID(arPlantItem.get(mPosition).getSpeciesID());
+								pbbItem.setProtocolID(arPlantItem.get(mPosition).getProtocolID());
+								pbbItem.setPlantID(arPlantItem.get(mPosition).getPlantID());
+								pbbItem.setCommonName(arPlantItem.get(mPosition).getCommonName());
+								pbbItem.setScienceName(arPlantItem.get(mPosition).getSpeciesName());
+								pbbItem.setCategory(arPlantItem.get(mPosition).getCategory());
+								pbbItem.setNote(arPlantItem.get(mPosition).getNote());
 								
 								intent.putExtra("from", HelperValues.FROM_QUICK_CAPTURE_ADD_SAMESPECIES);
 								intent.putExtra("pbbItem", pbbItem);
@@ -671,14 +692,14 @@ public class PBBPlantList extends ListActivity {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								// TODO Auto-generated method stub
-								Intent intent = new Intent(PBBPlantList.this, GetPhenophase.class);
+								Intent intent = new Intent(PBBPlantList.this, OneTimePhenophase.class);
 								pbbItem = new PBBItems();
-								pbbItem.setSpeciesID(arPlantItem.get(mPosition).SpeciesID);
-								pbbItem.setProtocolID(arPlantItem.get(mPosition).ProtocolID);
-								pbbItem.setPlantID(arPlantItem.get(mPosition).PlantID);
-								pbbItem.setCommonName(arPlantItem.get(mPosition).CommonName);
-								pbbItem.setScienceName(arPlantItem.get(mPosition).SpeciesName);
-								pbbItem.setCategory(arPlantItem.get(mPosition).Category);
+								pbbItem.setSpeciesID(arPlantItem.get(mPosition).getSpeciesID());
+								pbbItem.setProtocolID(arPlantItem.get(mPosition).getProtocolID());
+								pbbItem.setPlantID(arPlantItem.get(mPosition).getPlantID());
+								pbbItem.setCommonName(arPlantItem.get(mPosition).getCommonName());
+								pbbItem.setScienceName(arPlantItem.get(mPosition).getSpeciesName());
+								pbbItem.setCategory(arPlantItem.get(mPosition).getCategory());
 								pbbItem.setNote("");
 								pbbItem.setLocalImageName("");
 								
@@ -702,11 +723,11 @@ public class PBBPlantList extends ListActivity {
 					/*
 					 * if pbb list chosen and 0 < species_id < 77, we don't allow users to change the value
 					 */
-					if((mPosition <= mOnetimeStartPoint - 1) && arPlantItem.get(mPosition).SpeciesID > 0 && arPlantItem.get(mPosition).SpeciesID < 77) {
+					if((mPosition <= mOnetimeStartPoint - 1) && arPlantItem.get(mPosition).getSpeciesID() > 0 && arPlantItem.get(mPosition).getSpeciesID() < 77) {
 						Toast.makeText(PBBPlantList.this, getString(R.string.Cannot_Change), Toast.LENGTH_SHORT).show();
 					}
 					else {
-						dialog(arPlantItem.get(mPosition).SpeciesID, arPlantItem.get(mPosition).SiteID);	
+						dialog(arPlantItem.get(mPosition).getSpeciesID(), arPlantItem.get(mPosition).getSiteID());	
 					}
 				}
 			}
@@ -738,9 +759,9 @@ public class PBBPlantList extends ListActivity {
 				if(new_plant_site_name == "Add New Site") {
 					Intent intent = new Intent(PBBPlantList.this, PBBAddSite.class);
 					pbbItem = new PBBItems();
-					pbbItem.setSpeciesID(arPlantItem.get(mPosition).SpeciesID);
-					pbbItem.setProtocolID(arPlantItem.get(mPosition).ProtocolID);
-					pbbItem.setCommonName(arPlantItem.get(mPosition).CommonName);
+					pbbItem.setSpeciesID(arPlantItem.get(mPosition).getSpeciesID());
+					pbbItem.setProtocolID(arPlantItem.get(mPosition).getProtocolID());
+					pbbItem.setCommonName(arPlantItem.get(mPosition).getCommonName());
 					intent.putExtra("pbbItem", pbbItem);
 					
 					intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
@@ -789,11 +810,11 @@ public class PBBPlantList extends ListActivity {
 					
 					// if the position is in the pbb list
 					if(mPosition <= mOnetimeStartPoint - 1) {
-						syncDB.execSQL("UPDATE my_plants SET active = 0 AND synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(mPosition).SpeciesID 
-								+ " AND site_id=" + arPlantItem.get(mPosition).SiteID + ";");
-						syncDB.execSQL("UPDATE my_plants SET synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(mPosition).SpeciesID 
-								+ " AND site_id=" + arPlantItem.get(mPosition).SiteID + ";");
-						syncDB.execSQL("DELETE FROM my_observation WHERE species_id=" + arPlantItem.get(mPosition).SpeciesID + " AND site_id=" + arPlantItem.get(mPosition).SiteID);
+						syncDB.execSQL("UPDATE my_plants SET active = 0 AND synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(mPosition).getSpeciesID() 
+								+ " AND site_id=" + arPlantItem.get(mPosition).getSiteID() + ";");
+						syncDB.execSQL("UPDATE my_plants SET synced = " + SyncDBHelper.SYNCED_NO + " WHERE species_id=" + arPlantItem.get(mPosition).getSpeciesID() 
+								+ " AND site_id=" + arPlantItem.get(mPosition).getSiteID() + ";");
+						syncDB.execSQL("DELETE FROM my_observation WHERE species_id=" + arPlantItem.get(mPosition).getSpeciesID() + " AND site_id=" + arPlantItem.get(mPosition).getSiteID());
 					}
 					// else if the position is in the quick capture list
 					else {
@@ -1033,7 +1054,7 @@ public class PBBPlantList extends ListActivity {
 		}
 		
 		public String getItem(int position){
-			return arSrc.get(position).CommonName;
+			return arSrc.get(position).getCommonName();
 		}
 		
 		public long getItemId(int position){
@@ -1046,8 +1067,8 @@ public class PBBPlantList extends ListActivity {
 			
 			TextView site_header = (TextView)convertView.findViewById(R.id.list_header);
 
-			if(arSrc.get(position).Monitor) {
-				if(arSrc.get(position).TopItem) {
+			if(arSrc.get(position).getMonitor()) {
+				if(arSrc.get(position).getHeader()) {
 					site_header.setVisibility(View.VISIBLE);
 					site_header.setText(getString(R.string.Monitor_Plant));
 				}
@@ -1055,8 +1076,8 @@ public class PBBPlantList extends ListActivity {
 					site_header.setVisibility(View.GONE);
 				}
 			}
-			else if(!arSrc.get(position).Monitor) {
-				if(arSrc.get(position).TopItem) {
+			else if(!arSrc.get(position).getMonitor()) {
+				if(arSrc.get(position).getHeader()) {
 					site_header.setVisibility(View.VISIBLE);
 					site_header.setText(getString(R.string.Quick_Plant));
 				}
@@ -1082,61 +1103,58 @@ public class PBBPlantList extends ListActivity {
 				 * 10 - Treelists
 				 * 11 - Blooming 
 				 */
-				Log.i("K", "PBBPlantList(Name, Picture) : " 
-						+ arSrc.get(position).CommonName + ", " + arSrc.get(position).Picture + ", " + arSrc.get(position).Category + ", category: " +
-						arSrc.get(position).Category);
 				
-				switch(arSrc.get(position).Category) {
-				case 0: case HelperValues.LOCAL_BUDBURST_LIST:
+				switch(arSrc.get(position).getCategory()) {
+				case 0: case HelperValues.LOCAL_BUDBURST_LIST: case HelperValues.LOCAL_FLICKR:
 					
-					icon = mHelper.overlay(BitmapFactory.decodeResource(getResources(), arSrc.get(position).Picture));
+					icon = mHelper.overlay(BitmapFactory.decodeResource(getResources(), arSrc.get(position).getPicture()));
 					
 					//If not synced, put the icon on the species image.
-					if(arSrc.get(position).Synced == SyncDBHelper.SYNCED_NO) {
+					if(arSrc.get(position).getSynced() == SyncDBHelper.SYNCED_NO) {
 						icon = mHelper.overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.unsynced));
 					}
 					break;
 					
 				case HelperValues.LOCAL_WHATSINVASIVE_LIST:					
-					Log.i("K", "PBBPlantList(Picture, ImageID) : " + arSrc.get(position).Picture 
-							+ " , " + arSrc.get(position).ImageID);
+					Log.i("K", "PBBPlantList(Picture, ImageID) : " + arSrc.get(position).getPicture() 
+							+ " , " + arSrc.get(position).getImageID());
 					
-					icon = mHelper.getImageFromSDCard(PBBPlantList.this, arSrc.get(position).ImageID, icon);
+					icon = mHelper.getImageFromSDCard(PBBPlantList.this, arSrc.get(position).getImageID(), icon);
 					
 					//If not synced, put the icon on the species image.
-					if(arSrc.get(position).Synced == SyncDBHelper.SYNCED_NO) {
+					if(arSrc.get(position).getSynced() == SyncDBHelper.SYNCED_NO) {
 						icon = mHelper.overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.unsynced));
 					}
 					break;
 				case HelperValues.LOCAL_POISONOUS_LIST:
-					Log.i("K", "PBBPlantList(Picture, ImageID) : " + arSrc.get(position).Picture 
-							+ " , " + arSrc.get(position).ImageID);
+					Log.i("K", "PBBPlantList(Picture, ImageID) : " + arSrc.get(position).getPicture() 
+							+ " , " + arSrc.get(position).getImageID());
 					
-					icon = mHelper.getImageFromSDCard(PBBPlantList.this, arSrc.get(position).ImageID, icon);
+					icon = mHelper.getImageFromSDCard(PBBPlantList.this, arSrc.get(position).getImageID(), icon);
 					
 					//If not synced, put the icon on the species image.
-					if(arSrc.get(position).Synced == SyncDBHelper.SYNCED_NO) {
+					if(arSrc.get(position).getSynced() == SyncDBHelper.SYNCED_NO) {
 						icon = mHelper.overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.unsynced));
 					}
 					break;
 				case HelperValues.LOCAL_THREATENED_ENDANGERED_LIST:
-					Log.i("K", "PBBPlantList(Picture, ImageID) : " + arSrc.get(position).Picture 
-							+ " , " + arSrc.get(position).ImageID);
+					Log.i("K", "PBBPlantList(Picture, ImageID) : " + arSrc.get(position).getPicture() 
+							+ " , " + arSrc.get(position).getImageID());
 					
-					icon = mHelper.getImageFromSDCard(PBBPlantList.this, arSrc.get(position).ImageID, icon);
+					icon = mHelper.getImageFromSDCard(PBBPlantList.this, arSrc.get(position).getImageID(), icon);
 					
 					//If not synced, put the icon on the species image.
-					if(arSrc.get(position).Synced == SyncDBHelper.SYNCED_NO) {
+					if(arSrc.get(position).getSynced() == SyncDBHelper.SYNCED_NO) {
 						icon = mHelper.overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.unsynced));
 					}
 					break;
-				case HelperValues.USER_DEFINED_TREE_LISTS:
+				default:
 					// Call images from the TREE_PATH
 					OneTimeDBHelper oDBH = new OneTimeDBHelper(PBBPlantList.this);
-					String imagePath = HelperValues.TREE_PATH + arSrc.get(position).ImageID + ".jpg";
+					String imagePath = HelperValues.TREE_PATH + arSrc.get(position).getImageID() + ".jpg";
 					
 					Log.i("K", "PBBPlantList(imagePath Tree) : " + imagePath +
-							"SpeciesName : " + arSrc.get(position).SpeciesName);
+							"SpeciesName : " + arSrc.get(position).getSpeciesName());
 					
 					File checkExistFile = new File(imagePath);
 					if(checkExistFile.exists()) {
@@ -1148,37 +1166,33 @@ public class PBBPlantList extends ListActivity {
 					}
 					
 					// If not synced, put the icon on the species image.
-					if(arSrc.get(position).Synced == SyncDBHelper.SYNCED_NO) {
+					if(arSrc.get(position).getSynced() == SyncDBHelper.SYNCED_NO) {
 						icon = mHelper.overlay(icon, BitmapFactory.decodeResource(getResources(), R.drawable.unsynced));
 					}
 					break;
-				case HelperValues.USER_DEFINED_WHATS_BLOOMING:
-					break;
-				
 				}				
 		
 			img.setImageBitmap(icon);
 		
 			
-			TextView textname = (TextView)convertView.findViewById(R.id.commonname);
-			textname.setText(arSrc.get(position).CommonName);
+			TextView textName = (TextView)convertView.findViewById(R.id.commonname);
+			textName.setText(arSrc.get(position).getCommonName());
 			
-			TextView textdesc = (TextView)convertView.findViewById(R.id.speciesname);
-			if(arSrc.get(position).Monitor) {
-				textdesc.setText(arSrc.get(position).SiteName);
-				textdesc.setVisibility(View.VISIBLE);
+			TextView textDesc = (TextView)convertView.findViewById(R.id.speciesname);
+			if(arSrc.get(position).getMonitor()) {
+				textDesc.setText(arSrc.get(position).getSiteName());
+				textDesc.setVisibility(View.VISIBLE);
 			}
 			else {
-				textdesc.setVisibility(View.GONE);
+				textDesc.setVisibility(View.GONE);
 			}
 			
 			/*
 			 *  Call View from the xml and link the view to current position.
 			 */
-			
-			View thumbnail = convertView.findViewById(R.id.wrap_icon);
-			thumbnail.setTag(arSrc.get(position));
-			thumbnail.setOnClickListener(new View.OnClickListener() {
+			View thumbNail = convertView.findViewById(R.id.wrap_icon);
+			thumbNail.setTag(arSrc.get(position));
+			thumbNail.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
@@ -1187,10 +1201,10 @@ public class PBBPlantList extends ListActivity {
 					
 					Intent intent = new Intent(PBBPlantList.this, DetailPlantInfo.class);
 					pbbItem = new PBBItems();
-					pbbItem.setSpeciesID(pi.SpeciesID);
-					pbbItem.setCommonName(pi.CommonName);
-					pbbItem.setScienceName(pi.SpeciesName);
-					pbbItem.setCategory(pi.Category);
+					pbbItem.setSpeciesID(pi.getSpeciesID());
+					pbbItem.setCommonName(pi.getCommonName());
+					pbbItem.setScienceName(pi.getSpeciesName());
+					pbbItem.setCategory(pi.getCategory());
 					intent.putExtra("pbbItem", pbbItem);
 					
 					startActivity(intent);
@@ -1200,12 +1214,12 @@ public class PBBPlantList extends ListActivity {
 			/*
 			 * Show the current phenophase observed and total phenophase
 			 */
-			TextView pheno_stat = (TextView)convertView.findViewById(R.id.pheno_stat);
-			if(arSrc.get(position).total_pheno != 0) {
-				pheno_stat.setText(arSrc.get(position).current_pheno + " / " + arSrc.get(position).total_pheno + " ");
+			TextView phenoStat = (TextView)convertView.findViewById(R.id.pheno_stat);
+			if(arSrc.get(position).getTotalPheno() != 0) {
+				phenoStat.setText(arSrc.get(position).getCurrentPheno() + " / " + arSrc.get(position).getTotalPheno() + " ");
 			}
 			else {
-				pheno_stat.setVisibility(View.GONE);
+				phenoStat.setVisibility(View.GONE);
 			}
 
 			return convertView;

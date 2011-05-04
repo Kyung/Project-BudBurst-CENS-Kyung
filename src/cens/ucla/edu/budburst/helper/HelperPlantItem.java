@@ -1,195 +1,326 @@
 package cens.ucla.edu.budburst.helper;
 
-public class HelperPlantItem{
+public class HelperPlantItem implements Cloneable{
 	
-	public HelperPlantItem(String aCommonName, String aSpeciesName, String aImageUrl, int aCategory) {
-		Category = aCategory;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		imageUrl = aImageUrl;
+	private String mCommonName;
+	private String mSpeciesName;
+	private String mImageName;
+	private String mSiteName;
+	private String mPhenoName;
+	private String mDescription;
+	private String mImageUrl;
+	private String mNote;
+	private String mCredit;
+	private String mDate;
+	private String mUserName;
+	
+	private int mImageID;
+	private int mSynced;
+	private int mCategory;
+	private int mWhichList;
+	private int mWhere;
+	private int mPicture;
+	private int mSpeciesID;
+	private int mProtocolID;
+	private int mPhenoID;
+	private int mPhenoImageID;
+	private int mSiteID;
+	private int mCurrentPheno;
+	private int mTotalPheno;
+	private int mPlantID;
+	private int mOneTimePlantID;
+	private int mFloracacheID;
+	
+	private double mLatitude;
+	private double mLongitude;
+	private float mDistance;
+	
+	private boolean mHeader;
+	private boolean mTopItem;
+	private boolean mMonitor;
+	private boolean mFlag;
+	
+	public HelperPlantItem clone() throws CloneNotSupportedException {
+		HelperPlantItem pItem = (HelperPlantItem)super.clone();
+		
+		return pItem;
 	}
 	
-	public HelperPlantItem(String aCommonName, String aSpeciesName) {
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
+	
+	public void setCommonName(String commonName) {
+		mCommonName = commonName;
 	}
 	
-	public HelperPlantItem(int aSpeciesID, String aCommonName, String aSpeciesName) {
-		SpeciesID = aSpeciesID;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
+	public String getCommonName() {
+		return mCommonName;
 	}
 	
-	public HelperPlantItem(int aSpeciesID, String aCommonName, String aSpeciesName, String aCredit) {
-		SpeciesID = aSpeciesID;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		Credit = aCredit;
+	public void setSpeciesName(String speciesName) {
+		mSpeciesName = speciesName;
 	}
 	
-	public HelperPlantItem(int aSpeciesID, String aCommonName, String aSpeciesName, String aCredit, int aProtocolID) {
-		SpeciesID = aSpeciesID;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		Credit = aCredit;
-		ProtocolID = aProtocolID;
+	public String getSpeciesName() {
+		return mSpeciesName;
 	}
 	
-	public HelperPlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
+	public void setImageName(String imageName) {
+		mImageName = imageName;
+	}
+	
+	public String getImageName() {
+		return mImageName;
+	}
+	
+	public void setSiteName(String siteName) {
+		mSiteName = siteName;
+	}
+	
+	public String getSiteName() {
+		return mSiteName;
+	}
+	
+	public void setPhenoName(String phenoName) {
+		mPhenoName = phenoName;
+	}
+	
+	public String getPhenoName() {
+		return mPhenoName;
+	}
+	
+	public void setDescription(String description) {
+		mDescription = description;
+	}
+	
+	public String getDescription() {
+		return mDescription;
+	}
+	
+	public void setImageURL(String imageUrl) {
+		mImageUrl = imageUrl;
+	}
+	
+	public String getImageURL() {
+		return mImageUrl;
+	}
+	
+	public void setNote(String note) {
+		mNote = note;
+	}
+	
+	public String getNote() {
+		return mNote;
+	}
+	
+	public void setCredit(String credit) {
+		mCredit = credit;
+	}
+	
+	public String getCredit() {
+		return mCredit;
+	}
+	
+	public void setDate(String date) {
+		mDate = date;
+	}
+	
+	public String getDate() {
+		return mDate;
+	}
+	
+	public void setUserName(String userName) {
+		mUserName = userName;
+	}
+	
+	public String getUserName() {
+		return mUserName;
+	}
+	
+	public void setImageID(int imageID) {
+		mImageID = imageID;
+	}
+	
+	public int getImageID() {
+		return mImageID;
+	}
+	
+	public void setWhichList(int whichList) {
+		mWhichList = whichList;
+	}
+	
+	public int getWhichList() {
+		return mWhichList;
+	}
+	
+	public void setWhere(int where) {
+		mWhere = where;
+	}
+	
+	public int getWhere() {
+		return mWhere;
+	}
+	
+	public void setPicture(int picture) {
+		mPicture = picture;
+	}
+	
+	public int getPicture() {
+		return mPicture;
+	}
+	
+	public void setSpeciesID(int speciesID) {
+		mSpeciesID = speciesID;
+	}
+	
+	public int getSpeciesID() {
+		return mSpeciesID;
+	}
+	
+	public void setPlantID(int plantID) {
+		mPlantID = plantID;
+	}
+	
+	public int getPlantID() {
+		return mPlantID;
+	}
+	
+	public void setProtocolID(int protocolID) {
+		mProtocolID = protocolID;
+	}
+	
+	public int getProtocolID() {
+		return mProtocolID;
+	}
+	
+	public void setPhenoID(int phenoID) {
+		mPhenoID = phenoID;
+	}
+	
+	public int getPhenoID() {
+		return mPhenoID;
+	}
+	
+	public void setPhenoImageID(int phenoImageID) {
+		mPhenoImageID = phenoImageID;
+	}
+	
+	public int getPhenoImageID() {
+		return mPhenoImageID;
 	}
 
-	public HelperPlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aProtocolID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SpeciesID = aSpeciesID;
-		ProtocolID = aProtocolID;
+	public void setSiteID(int siteID) {
+		mSiteID = siteID;
 	}
 	
-	//Species(String aTitle, String aCommon_name, String aScience_name, String aText, String aImage_url)
-	
-	public HelperPlantItem(String aCommonName, String aSpeciesName, String aText, String aImage_url) {
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		Description = aText;
-		imageUrl = aImage_url;
+	public int getSiteID() {
+		return mSiteID;
 	}
 	
-	public HelperPlantItem(String aCommonName, String aSpeciesName, String aText, String aImageName, String aImageUrl) {
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		Description = aText;
-		ImageName = aImageName;
-		imageUrl = aImageUrl;
+	public void setCurrentPheno(int currentPheno) {
+		mCurrentPheno = currentPheno;
 	}
 	
-	public HelperPlantItem(int aPicture, String aNote, int aPhenoImageID, String aPhenoName, int aPhenoID, Boolean aHeader){
-		Picture = aPicture;
-		Note = aNote;
-		PhenoImageID = aPhenoImageID;
-		PhenoName = aPhenoName;
-		Header = aHeader;
-		PhenoID = aPhenoID;
+	public int getCurrentPheno() {
+		return mCurrentPheno;
 	}
 	
-	public HelperPlantItem(int aWhichList, int aWhere, int aSpeciesID, int aPlantID, int aCategory, String aUserName, String aCommonName, String aScienceName, int aPhenoID, int aProtocolID, double aLatitude, double aLongitude, String aImageName, String aDate, String aNotes) {
-		
-		WhichList = aWhichList;
-		Where = aWhere;
-		SpeciesID = aSpeciesID;
-		PlantID = aPlantID;
-		Category = aCategory;
-		UserName = aUserName;
-		CommonName = aCommonName;
-		SpeciesName = aScienceName;
-		PhenoID = aPhenoID;
-		ProtocolID = aProtocolID;
-		Latitude = aLatitude;
-		Longitude = aLongitude;
-		ImageName = aImageName;
-		Date = aDate;
-		Note = aNotes;
-		
+	public void setTotalPheno(int totalPheno) {
+		mTotalPheno = totalPheno;
 	}
 	
-	public HelperPlantItem(int aPhenoID, int aPhenoIcon, int aProtocolID, String aDescription, String aPhenoName, String aImageName, int aSpeciesID, int aSite_id, String aDate, String aNotes, boolean aFlag){
-		
-		PhenoID = aPhenoID;
-		PhenoImageID = aPhenoIcon;
-		ProtocolID = aProtocolID;
-		Description = aDescription;
-		PhenoName = aPhenoName;
-		ImageName = aImageName;
-		SpeciesID = aSpeciesID;
-		SiteID = aSite_id;
-		Date = aDate;
-		Note = aNotes;
-		Flag = aFlag;
+	public int getTotalPheno() {
+		return mTotalPheno;
 	}
 	
-	public HelperPlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName, boolean aMonitor, int aSynced, int aCategory){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SiteName = aSiteName;
-		SpeciesID = aSpeciesID;
-		SiteID = aSiteID;
-		ProtocolID = aProtocolID;
-		current_pheno = aPheno_done;
-		total_pheno = aTotal_pheno;
-		TopItem = aTopItem;
-		Monitor = aMonitor;
-		Synced = aSynced;
-		Category = aCategory;
+	public void setSynced(int synced) {
+		mSynced = synced;
 	}
 	
-	public HelperPlantItem(int aPicture, String aCommonName, String aSpeciesName, int aSpeciesID, int aSiteID, int aProtocolID, int aPheno_done, int aTotal_pheno, boolean aTopItem, String aSiteName, boolean aMonitor, int aSynced, int aCategory, int aImageID){
-		Picture = aPicture;
-		CommonName = aCommonName;
-		SpeciesName = aSpeciesName;
-		SiteName = aSiteName;
-		SpeciesID = aSpeciesID;
-		SiteID = aSiteID;
-		ProtocolID = aProtocolID;
-		current_pheno = aPheno_done;
-		total_pheno = aTotal_pheno;
-		TopItem = aTopItem;
-		Monitor = aMonitor;
-		Synced = aSynced;
-		Category = aCategory;
-		ImageID = aImageID;
+	public int getSynced() {
+		return mSynced;
 	}
 	
-	public HelperPlantItem (int aPicture, String aDescription, int aPheno_ID, int aPhenoImageID, String aPheno_name, boolean aFlag, String aCamera_image, String aDate, int aOneTimePlantID, String aNote, boolean aHeader) {
-		Picture = aPicture;
-		Description = aDescription;
-		PhenoID = aPheno_ID;
-		PhenoImageID = aPhenoImageID;
-		PhenoName = aPheno_name;
-		Flag = aFlag;
-		ImageName = aCamera_image;
-		Date = aDate;
-		OneTimePlantID = aOneTimePlantID;
-		Note = aNote;
-		Header = aHeader;
+	public void setOneTimePlantID(int oneTimePlantID) {
+		mOneTimePlantID = oneTimePlantID;
+	}
+	
+	public int getOneTimePlantID() {
+		return mOneTimePlantID;
+	}
+	
+	public void setCategory(int category) {
+		mCategory = category;
+	}
+	
+	public int getCategory() {
+		return mCategory;
+	}
+	
+	public void setLatitude(double latitude) {
+		mLatitude = latitude;
+	}
+	
+	public double getLatitude() {
+		return mLatitude;
+	}
+	
+	public void setLongitude(double longitude) {
+		mLongitude = longitude;
+	}
+	
+	public double getLongitude() {
+		return mLongitude;
+	}
+	
+	public void setHeader(boolean header) {
+		mHeader = header;
+	}
+	
+	public boolean getHeader() {
+		return mHeader;
 	}
 
+	public void setTopItem(boolean topItem) {
+		mTopItem = topItem;
+	}
 	
-	public String CommonName;
-	public String SpeciesName;
-	public String ImageName;
-	public String SiteName;
-	public String PhenoName;	
-	public String Description;
-	public String imageUrl;
-	public String Note;
-	public String Credit;
-	public String Date;
-	public String UserName;
-	public int ImageID;
-	public int WhichList;
-	public int Where;
-	public int Picture;
-	public int SpeciesID;
-	public int PlantID;
-	public int ProtocolID;
-	public int PhenoID;
-	public int PhenoImageID;
-	public int SiteID;
-	public int current_pheno;
-	public int total_pheno;
-	public int Synced;
-	public int OneTimePlantID;
-	public int Category;
-	public double Latitude;
-	public double Longitude;
-	public boolean Header;
-	public boolean TopItem;
-	public boolean Monitor;
-	public boolean Flag;
+	public boolean getTopItem() {
+		return mTopItem;
+	}
+	
+	public void setMonitor(boolean monitor) {
+		mMonitor = monitor;
+	}
+	
+	public boolean getMonitor() {
+		return mMonitor;
+	}
+	
+	public void setFlag(boolean flag) {
+		mFlag = flag;
+	}
+	
+	public boolean getFlag() {
+		return mFlag;
+	}
+	
+	public void setDistance(float distance) {
+		mDistance = distance;
+	}
+	
+	public float getDistance() {
+		return mDistance;
+	}
+	
+	public void setFloracacheID(int floacacheID) {
+		mFloracacheID = floacacheID;
+	}
+	
+	public int getFloracacheID() {
+		return mFloracacheID;
+	}
+	
+	public HelperPlantItem() {
+		
+	}
 	
 }

@@ -14,10 +14,11 @@ import org.apache.http.util.EntityUtils;
 import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.PBBSplash;
 import cens.ucla.edu.budburst.firstActivity;
-import cens.ucla.edu.budburst.lists.ListDownloadByService;
-import cens.ucla.edu.budburst.lists.ListUserPlants;
+import cens.ucla.edu.budburst.lists.ListLocalDownload;
+import cens.ucla.edu.budburst.lists.ListUserDefinedCategory;
+import cens.ucla.edu.budburst.lists.ListUserDefinedSpeciesDownload;
 import cens.ucla.edu.budburst.lists.ListItems;
-import cens.ucla.edu.budburst.mapview.PBBMapMain;
+import cens.ucla.edu.budburst.mapview.MapViewMain;
 import android.R;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -42,42 +43,39 @@ import android.widget.Toast;
 
 public class HelperBackgroundService extends Service{
 
-	private NotificationManager notificationMgr;
-	private LocationManager lm	= null;
-	private Double latitude = 0.0;
-	private Double longitude = 0.0;
-	private float accuracy = 0;
-	private Intent background_intent;
-	private SharedPreferences pref;
-	private Criteria criteria;
-	private String provider;
+	private NotificationManager mNotiManager;
+	private LocationManager mLocManager	= null;
+	private Double mLatitude = 0.0;
+	private Double mLongitude = 0.0;
+	private float mAccuracy = 0;
+	private HelperSharedPreference mPref;
 	private Context mContext;
-	private Timer timer;
-	private boolean gpsEnabled = false;
-	private boolean networkEnabled = false;
+	private Timer mTimer;
+	private boolean mGpsEnabled = false;
+	private boolean mNetworkEnabled = false;
 	private int SIMPLE_NOTFICATION_ID = 1234567890;
 	private Handler mHandler = new Handler();
 	
 	private boolean mQuit = false;
-	private boolean stopListDownload = false;
+	private boolean mStopDownload = false;
 	/*
 	 * Network Listener
 	 */
-	private LocationListener networkListener = new LocationListener() {
+	private LocationListener mNetworkListener = new LocationListener() {
 
 		@Override
 		public void onLocationChanged(Location loc) {
 			// TODO Auto-generated method stub
 			
 			if(mQuit) {
-				lm.removeUpdates(this);
+				mLocManager.removeUpdates(this);
 				stopSelf();
 			}
 			if(loc != null) {
 				/*
 				 * Stop Timer and start downloading data
 				 */
-				timer.cancel();
+				mTimer.cancel();
 				downloadingDataFromServer(loc);
 			}
 		}
@@ -104,20 +102,20 @@ public class HelperBackgroundService extends Service{
 	/*
 	 * GPS Listener
 	 */
-	private LocationListener gpsListener = new LocationListener() {
+	private LocationListener mGpsListener = new LocationListener() {
 		
 		@Override
 		public void onLocationChanged(Location loc) {
 			// TODO Auto-generated method stub
 			if(mQuit) {
-				lm.removeUpdates(this);
+				mLocManager.removeUpdates(this);
 				stopSelf();
 			}
 			if(loc != null) {
 				/*
 				 * Stop Timer and start downloading data
 				 */
-				timer.cancel();
+				mTimer.cancel();
 				downloadingDataFromServer(loc);
 			}
 		}
@@ -143,44 +141,41 @@ public class HelperBackgroundService extends Service{
 		
 		mContext = this;
 		
-		notificationMgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		
 		mQuit = false;
-		pref = getSharedPreferences("userinfo", 0);
-		SharedPreferences.Editor edit = pref.edit();
-		edit.putBoolean("new", false);
-		edit.putBoolean("highly", false);
-		edit.putString("latitude","0.0");
-		edit.putString("longitude","0.0");
-		edit.putString("accuracy", "0");
-		edit.commit();
 		
-	    lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		mPref = new HelperSharedPreference(mContext);		
+		mPref.setPreferencesString("latitude", "0.0");
+		mPref.setPreferencesString("longitude", "0.0");
+		mPref.setPreferencesString("accuracy", "0");
+		
+		mLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	    
 	    try {
-	    	gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+	    	mGpsEnabled = mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	    }
 	    catch(Exception ex) {}
 	    
 	    try {
-	    	networkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+	    	mNetworkEnabled = mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 	    }	    
 	    catch(Exception ex) {}
 	    
-	    int minTimeBetweenUpdatesms = 1000;
-		int minDistanceBetweenUpdatesMeters = 0;
+	    int minTimeBetweenUpdatesms = 3*1000;
+		int minDistanceBetweenUpdatesMeters = 5;
 	    
-	    if(gpsEnabled) {
+	    if(mGpsEnabled) {
 	    	Log.i("K", "GPS enabled");
-			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, gpsListener);
+	    	mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, mGpsListener);
 	    }
-	    if(networkEnabled) {
+	    if(mNetworkEnabled) {
 	    	Log.i("K", "Network enabled");
-	    	lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, networkListener);
+	    	mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, mNetworkListener);
 	    }
 
-		timer = new Timer();
-		timer.schedule(new GetLastLocation(), 30000);
+	    mTimer = new Timer();
+		mTimer.schedule(new GetLastLocation(), 30 * 1000);
 	}
 	
 	class GetLastLocation extends TimerTask {
@@ -196,20 +191,20 @@ public class HelperBackgroundService extends Service{
 						public void run() {
 							// TODO Auto-generated method stub
 							Log.i("K", "Time elapse.");
-							Log.i("K", "gpsListener : " + gpsListener);
-							Log.i("K", "networkListener : " + networkListener);
+							Log.i("K", "gpsListener : " + mGpsListener);
+							Log.i("K", "networkListener : " + mNetworkListener);
 							
-							lm.removeUpdates(gpsListener);
-							lm.removeUpdates(networkListener);
+							mLocManager.removeUpdates(mGpsListener);
+							mLocManager.removeUpdates(mNetworkListener);
 							
 							Location networkLoc = null;
 							Location gpsLoc = null;
 							
-							if(gpsEnabled) {
-								gpsLoc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+							if(mGpsEnabled) {
+								gpsLoc = mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 							}
-							if(networkEnabled) {
-								networkLoc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+							if(mNetworkEnabled) {
+								networkLoc = mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 							}
 							
 							if(gpsLoc != null && networkLoc != null) {
@@ -235,28 +230,24 @@ public class HelperBackgroundService extends Service{
 
 	private void displayNotificationMessage(String message) {
 		Notification notification = new Notification(R.drawable.stat_sys_download_done, message, System.currentTimeMillis());
-		
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, null, PendingIntent.FLAG_CANCEL_CURRENT);
-		
 		notification.setLatestEventInfo(this, "Project Budburst", message, contentIntent);
-		
-		notificationMgr.notify(SIMPLE_NOTFICATION_ID, notification);
+		mNotiManager.notify(SIMPLE_NOTFICATION_ID, notification);
 	}
 	
 	@Override
 	public void onDestroy() {
 		Log.i("K", "Destory background service");
-		if(lm != null) {
-			lm.removeUpdates(gpsListener);
-			lm.removeUpdates(networkListener);
-			lm = null;
+		if(mLocManager != null) {
+			mLocManager.removeUpdates(mGpsListener);
+			mLocManager.removeUpdates(mNetworkListener);
+			mLocManager = null;
 		}
 		
 		super.onDestroy();
 		mQuit = true;
-		timer.cancel();
+		mTimer.cancel();
 	}
 	
 	@Override
@@ -270,29 +261,6 @@ public class HelperBackgroundService extends Service{
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	/*
-	 * When the app receives my location, it will send my location information to the server.
-	 * When the server gets my location info, the server will be getting a bunch of species information related to my location.
-	 */
-	public void announceMyLocToServer(Location loc) {
-		latitude = loc.getLatitude();
-		longitude = loc.getLongitude();
-		accuracy = loc.getAccuracy();
-		
-		String getResponse = getRequest("http://networkednaturalist.org/python_scripts/cens-dylan/announce.py?lat=" + latitude + "&lon=" + longitude);
-		
-		Log.i("K", "Response Message(Early announcement) : " + getResponse + " Class : " + getResponse.getClass());
-		
-		if(getResponse.equals("OK")) {
-			Log.i("K", "Early announcement with the server - SUCCESS");
-		}
-		else {
-			Log.i("K", "Early announcement with the server - ERROR");
-		}
-		
-		// need to do request later.
 	}
 	
 	public String getRequest(String getUrl) {
@@ -317,98 +285,33 @@ public class HelperBackgroundService extends Service{
 	}
 	
 	public void downloadingDataFromServer(Location loc) {
+
+		mLatitude = loc.getLatitude();
+		mLongitude = loc.getLongitude();
+		mAccuracy = loc.getAccuracy();
+		
+		//ListItems item = new ListItems(loc.getLatitude(), loc.getLongitude());
+		
+		//ListUserDefinedCategory listGroup = new ListUserDefinedCategory(mContext);
+		//listGroup.execute(item);
 		
 		/*
-		 * If all boolean values are true, (meaning all lists are downloaded..)
-		 * show the notification message and stop the service.
+		 * When the app receives my location, it will send my location information to the server.
+		 * When the server gets my location info, the server will be getting a bunch of species information related to my location.
 		 */
-		if((pref.getBoolean("localbudburst", false))
-				&&(pref.getBoolean("localwhatsinvasive", false))
-				&&(pref.getBoolean("localpoisonous", false))
-				&&(pref.getBoolean("localendangered", false))) {
-			
-					mQuit = true;
-				
-					displayNotificationMessage("Successfully download local plant lists");
-					
-					/*
-					 * The list download process should be done only once.
-					 * So, we are using preference value to guarantee this process happens only once.
-					 * 
-					 */
-
-					SharedPreferences.Editor edit = pref.edit();
-					edit.putBoolean("listDownloaded", true);
-					edit.commit();
-										
-					stopSelf();
-		
-		}
-		
-		if(!stopListDownload) {
-			/*
-			 * Get USDA Plant Lists
-			 * 
-			 */
-			ListItems item = new ListItems(mContext, loc.getLatitude(), loc.getLongitude(), HelperValues.LOCAL_BUDBURST_LIST);
-			new ListDownloadByService().execute(item);
-			
-			item = new ListItems(mContext, loc.getLatitude(), loc.getLongitude(), HelperValues.LOCAL_WHATSINVASIVE_LIST);
-			new ListDownloadByService().execute(item);
-			
-			item = new ListItems(mContext, loc.getLatitude(), loc.getLongitude(), HelperValues.LOCAL_POISONOUS_LIST);
-			new ListDownloadByService().execute(item);
-			
-			item = new ListItems(mContext, loc.getLatitude(), loc.getLongitude(), HelperValues.LOCAL_THREATENED_ENDANGERED_LIST);
-			new ListDownloadByService().execute(item);
-			
-			stopListDownload = true;
-		}
-		
-		
-		latitude = loc.getLatitude();
-		longitude = loc.getLongitude();
-		accuracy = loc.getAccuracy();
+		HelperAnnounceMyLocation announceLoc = new HelperAnnounceMyLocation(mLatitude,
+				mLongitude);
+		announceLoc.execute();
 		
 		Date date = new Date();
+		Log.i("K", "Date : " + date.getTime() + "=> lat : " 
+				+ mLatitude.toString() + " lng : " 
+				+ mLongitude.toString() + " accuracy : " + loc.getAccuracy());
 		
-		Log.i("K", "Date : " + date.getTime() + "=> lat : " + latitude.toString() + " lng : " + longitude.toString() + " accuracy : " + loc.getAccuracy());
-		pref = getSharedPreferences("userinfo", 0);
-		SharedPreferences.Editor edit = pref.edit();
+		mPref.setPreferencesString("latitude", mLatitude.toString());
+		mPref.setPreferencesString("longitude", mLongitude.toString());
+		mPref.setPreferencesString("accuracy", Float.toHexString(mAccuracy));
 		
-		/*
-		 *  If the accuracy is less than 20 meters,
-		 *  turn off the GPS.
-		 */
-		
-		if(loc.getAccuracy() <= 20) {
-			edit.putBoolean("new", true);
-			edit.putBoolean("highly", true);
-			edit.putString("latitude",latitude.toString());
-			edit.putString("longitude",longitude.toString());
-			edit.putString("accuracy", Float.toHexString(accuracy));
-			edit.commit();
-			
-			//lm.removeUpdates(gpsListener);
-			//lm.removeUpdates(networkListener);
-			
-			Log.i("K","Receive GPS within 20 meters. Turned off GPS.");
-			
-			/*
-			 * Getting local species lists from the server
-			 * This is called only once when the app firstly receives GPS data.
-			 * 
-			 */
-			//announceMyLocToServer(loc);
-			
-		}
-		else {
-			edit.putBoolean("new", true);
-			edit.putBoolean("highly", false);
-			edit.putString("latitude",latitude.toString());
-			edit.putString("longitude",longitude.toString());
-			edit.putString("accuracy", Float.toHexString(accuracy));
-			edit.commit();
-		}
+		mQuit = true;
 	}
 }

@@ -68,7 +68,7 @@
 			android:layout_height="wrap_content"
 			android:textColor="@drawable/black" 
 			android:layout_gravity="left"
-			android:text="Notes"
+			android:text="@string/No_Info_Species_Detail"
 			android:textSize="17sp"
 			android:id="@+id/text"
 		/>	

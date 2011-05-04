@@ -3,10 +3,7 @@ package cens.ucla.edu.budburst.mapview;
 import java.io.File;
 import java.util.List;
 
-import cens.ucla.edu.budburst.DetailPlantInfo;
 import cens.ucla.edu.budburst.R;
-import cens.ucla.edu.budburst.SummaryPlantInfo;
-import cens.ucla.edu.budburst.UpdatePlantInfo;
 import cens.ucla.edu.budburst.R.drawable;
 import cens.ucla.edu.budburst.R.id;
 import cens.ucla.edu.budburst.R.layout;
@@ -17,8 +14,12 @@ import cens.ucla.edu.budburst.helper.HelperDrawableManager;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.lists.ListDetail;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.myplants.DetailPlantInfo;
+import cens.ucla.edu.budburst.myplants.PBBObservationSummary;
+import cens.ucla.edu.budburst.myplants.UpdatePlantInfo;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
+import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -72,21 +73,20 @@ public class SpeciesDetailMap extends MapActivity {
 	private double mLatitude = 0.0;
 	private double mLongitude = 0.0;
 	protected static final int GET_CHANGE_CODE = 1;
-
-	private PopupWindow popup = null;
-	private View popupview = null;
-	private ImageView phone_image = null;
-	private ImageView species_image = null;
-	private TextView pheno_title = null;
+	
+	private ImageView phoneImage = null;
+	private TextView creditTxt = null;
 	private TextView cnameTxt = null;
 	private TextView snameTxt = null;
-	private TextView dt_takenTxt = null;
+	private TextView dateTxt = null;
 	private EditText notesTxt = null;
-	private Button AddBtn = null;
-	private List<Overlay> mapOverlays = null;
-	private SpeciesItemizedOverlay itemizedOverlay = null;
-	private HelperDrawableManager dm;
+	private Button addBtn = null;
+	
+	private List<Overlay> mListOverlay = null;
+	private SpeciesItemizedOverlay mOverlay = null;
+	private HelperDrawableManager mDrawManager;
 	private ProgressBar mSpinner;
+	private PBBItems pbbItem;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -96,13 +96,11 @@ public class SpeciesDetailMap extends MapActivity {
 		getIntentValue();
 		setUpLayout();
 	    showMapView();
+	    layoutControl();
 	}
 	
-	@Override
-	public void onResume() {
-		super.onResume();
-	
-	    AddBtn.setOnClickListener(new View.OnClickListener() {
+	private void layoutControl() {
+		addBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -119,11 +117,7 @@ public class SpeciesDetailMap extends MapActivity {
 						 * Move to QuickCapture
 						 */
 						Intent intent = new Intent(SpeciesDetailMap.this, QuickCapture.class);
-						
-						intent.putExtra("cname", mCommonName);
-						intent.putExtra("sname", mScienceName);
-						intent.putExtra("protocol_id", mProtocolID);
-						intent.putExtra("category", mCategory);
+						intent.putExtra("pbbItem", pbbItem);
 						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
 						
 						startActivity(intent);
@@ -140,18 +134,17 @@ public class SpeciesDetailMap extends MapActivity {
 						Log.i("K", "ScienceName (SpeciesDetailMap) : " + mScienceName);
 						Log.i("K", "ProtocolID (SpeciesDetailMap) : " + mProtocolID);
 						Log.i("K", "category (SpeciesDetailMap) : " + mCategory);
+						Log.i("K", "Latitude (SpeciesDetailMap) : " + mLatitude);
+						Log.i("K", "Longitude (SpeciesDetailMap) : " + mLongitude);
 						
 						/*
 						 * Move to Getphenophase without a photo.
 						 */
-						Intent intent = new Intent(SpeciesDetailMap.this, GetPhenophase.class);
-						intent.putExtra("camera_image_id", "");
+						Intent intent = new Intent(SpeciesDetailMap.this, OneTimePhenophase.class);
 						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
-						intent.putExtra("cname", mCommonName);
-						intent.putExtra("sname", mScienceName);
-						intent.putExtra("protocol_id", mProtocolID);
-						intent.putExtra("species_id", mSpeciesID);
-						intent.putExtra("category", mCategory);
+						pbbItem.setLocalImageName("");
+						intent.putExtra("pbbItem", pbbItem);
+						
 												
 						startActivity(intent);
 
@@ -173,9 +166,9 @@ public class SpeciesDetailMap extends MapActivity {
 	    mSpinner = (ProgressBar) findViewById(R.id.progressbar);
 	    
 	    if(mCategory == HelperValues.LOCAL_FLICKR) {
-	    	dm = new HelperDrawableManager(mSpinner);
+	    	mDrawManager = new HelperDrawableManager(mSpinner);
 		    if(mImageID != null)
-		    	dm.fetchDrawableOnThread(mImageID, phone_image);
+		    	mDrawManager.fetchDrawableOnThread(mImageID, phoneImage);
 		    
 		    notesTxt.setEnabled(false);
 		    notesTxt.setClickable(false);
@@ -189,8 +182,47 @@ public class SpeciesDetailMap extends MapActivity {
 	    }
 	    else {
 	    	mSpinner.setVisibility(View.GONE);
-	    	phone_image.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + mSpeciesID, null, null));
+	    	phoneImage.setVisibility(View.VISIBLE);
+	    	phoneImage.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + mSpeciesID, null, null));
 	    }
+	    
+	    phoneImage.setBackgroundResource(R.drawable.shapedrawable);
+	    phoneImage.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				final RelativeLayout rLayout = (RelativeLayout) View.inflate(SpeciesDetailMap.this, R.layout.image_popup, null);
+				
+				// TODO Auto-generated method stub
+				AlertDialog.Builder dialog = new AlertDialog.Builder(SpeciesDetailMap.this);
+				ImageView imageView = (ImageView) rLayout.findViewById(R.id.image_btn);
+				
+				
+				if(mCategory == HelperValues.LOCAL_FLICKR) {
+					mDrawManager.fetchDrawableOnThread(mImageID, imageView);
+				}
+				else {
+					imageView.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + mSpeciesID, null, null));
+				}
+			    			    
+			    // when press 'Back', close the dialog
+				dialog.setPositiveButton(getString(R.string.Button_back), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+					}
+				});
+		        dialog.setView(rLayout);
+		        dialog.show();
+			}
+		});
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
 	}
 	
 	public void setTitleBar() {
@@ -207,23 +239,28 @@ public class SpeciesDetailMap extends MapActivity {
 	}
 	
 	public void getIntentValue() {
-		Intent intent = getIntent();
-	    mCommonName = intent.getExtras().getString("cname");
-	    mScienceName = intent.getExtras().getString("sname");
-	    mUserName = intent.getExtras().getString("username");
-	    mDate = intent.getExtras().getString("dt_taken");
-	    mNotes = intent.getExtras().getString("notes");
-	    mImageID = intent.getExtras().getString("imageID");
-	    mSpeciesID = intent.getExtras().getInt("species_id", 0);
-	    mPhenoID = intent.getExtras().getInt("phenophase_id", 0);
-	    mProtocolID = intent.getExtras().getInt("protocol_id", 0);
-	    mLatitude = intent.getExtras().getDouble("latitude", 0.0);
-	    mLongitude = intent.getExtras().getDouble("longitude", 0.0);
-	    mCategory = intent.getExtras().getInt("category", 0);
+		Bundle bundle = getIntent().getExtras();
+		pbbItem = bundle.getParcelable("pbbItem");
+		
+	    mCommonName = pbbItem.getCommonName();
+	    mScienceName = pbbItem.getScienceName();
+	    mUserName = bundle.getString("username");
+	    mDate = pbbItem.getDate();
+	    mNotes = pbbItem.getNote();
+	    mImageID = bundle.getString("imageID");
+	    mSpeciesID = pbbItem.getSpeciesID();
+	    mPhenoID = pbbItem.getPhenophaseID();
+	    mProtocolID = pbbItem.getProtocolID();
+	    mLatitude = pbbItem.getLatitude();
+	    mLongitude = pbbItem.getLongitude();
+	    mCategory = pbbItem.getCategory();
 	    
 	    StaticDBHelper sDBH = new StaticDBHelper(SpeciesDetailMap.this);
 	    SQLiteDatabase sDB = sDBH.getReadableDatabase();
-	    Cursor cursor = sDB.rawQuery("SELECT Phenophase_Icon, Type, Description FROM Onetime_Observation WHERE _id=" + mPhenoID, null);
+	    Cursor cursor = sDB.rawQuery("" +
+	    		"SELECT Phenophase_Icon, Type, Description " +
+	    		"FROM Onetime_Observation " +
+	    		"WHERE _id=" + mPhenoID, null);
 	    while(cursor.moveToNext()) {
 	    	mPhenoIcon = cursor.getInt(0);
 	    	mPhenoName = cursor.getString(2);
@@ -236,25 +273,24 @@ public class SpeciesDetailMap extends MapActivity {
 	
 	public void setUpLayout() {
 	    // setting up layout
-	    phone_image = (ImageView) findViewById(R.id.phone_image);
+		phoneImage = (ImageView) findViewById(R.id.phone_image);
 	    //ImageView pheno_image = (ImageView) findViewById(R.id.pheno_image);
-	    pheno_title = (TextView) findViewById(R.id.pheno_title);
+		creditTxt = (TextView) findViewById(R.id.pheno_title);
 	    cnameTxt = (TextView) findViewById(R.id.common_name);
 	    snameTxt = (TextView) findViewById(R.id.science_name);
-	    dt_takenTxt = (TextView) findViewById(R.id.timestamp_text);
+	    dateTxt = (TextView) findViewById(R.id.timestamp_text);
 	    notesTxt = (EditText) findViewById(R.id.mynotes);
-	    AddBtn = (Button) findViewById(R.id.edit);
-	    phone_image.setVisibility(View.VISIBLE);
+	    addBtn = (Button) findViewById(R.id.edit);
+	    phoneImage.setVisibility(View.VISIBLE);
 	    
-	    AddBtn.setText(getString(R.string.PlantInfo_makeObs));
+	    addBtn.setText(getString(R.string.PlantInfo_makeObs));
 
 	    // put cname and sname in the textView
-	    pheno_title.setText("Credit: " + mUserName);
-	    dt_takenTxt.setText(mDate + " ");
+	    creditTxt.setText("Credit: " + mUserName);
+	    dateTxt.setText(mDate + " ");
 	    
 	    cnameTxt.setText(mCommonName + " ");
 	    snameTxt.setText(mScienceName + " ");
-
 	}
 	
 	public void showMapView() {
@@ -266,14 +302,14 @@ public class SpeciesDetailMap extends MapActivity {
 	    mc.animateTo(p);
 	    mc.setZoom(10);
 	    
-	    mapOverlays = myMap.getOverlays();
+	    mListOverlay = myMap.getOverlays();
 	    Drawable marker = getResources().getDrawable(R.drawable.marker);
-	    itemizedOverlay = new SpeciesItemizedOverlay(marker, this);
+	    mOverlay = new SpeciesItemizedOverlay(marker, this);
 	    
 	    OverlayItem overlayitem = new OverlayItem(p, "spot", "Species found");
 	    
-		itemizedOverlay.addOverlay(overlayitem);
-		mapOverlays.add(itemizedOverlay);
+	    mOverlay.addOverlay(overlayitem);
+	    mListOverlay.add(mOverlay);
 		
 		myMap.setSatellite(false);
 		myMap.setBackgroundResource(R.drawable.shapedrawable);

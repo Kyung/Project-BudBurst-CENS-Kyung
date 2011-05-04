@@ -27,8 +27,10 @@
 		<item>Delete Species</item>
 	</string-array>
 	<string-array name="plantcategory">
-		<item>Shared Plants</item>
-		<item>Trees</item>
+		<item>Local Budburst</item>
+		<item>Local Invasive</item>
+		<item>Local Poisonous</item>
+		<item>Local Endangered</item>
 	</string-array>
 	<string-array name="quick_capture_phenophase_category">
 		<item>Trees and Shrubs</item>

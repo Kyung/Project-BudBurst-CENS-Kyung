@@ -33,22 +33,23 @@ import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 
-public class ListUserPlants extends AsyncTask<Void, Void, Void>{
+public class ListUserDefinedSpeciesDownload extends AsyncTask<Void, Void, Void>{
 
 	private Context mContext;
-	private int mCategory = 10;
+	private int mCategory;
 	private NotificationManager notificationMgr = null;
 	private Notification noti = null;
-	private int SIMPLE_NOTFICATION_ID = 1234567890;
+	private int SIMPLE_NOTFICATION_ID = HelperValues.NOTIFI_USER_DEFINED_LISTS;
 	
-	public ListUserPlants(Context context) {
+	public ListUserDefinedSpeciesDownload(Context context, int category) {
 		mContext = context;
+		mCategory = category;
 	}
 	
 	@Override
 	protected void onPreExecute() {
 		notificationMgr = (NotificationManager)mContext.getSystemService(mContext.NOTIFICATION_SERVICE);
-		noti = new Notification(android.R.drawable.stat_sys_download, "Start downloading - Tree lists", System.currentTimeMillis());
+		noti = new Notification(android.R.drawable.stat_sys_download, "Start downloading - User Defined Lists", System.currentTimeMillis());
 		noti.flags |= Notification.FLAG_AUTO_CANCEL;
 		
 		PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0, null, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -61,10 +62,31 @@ public class ListUserPlants extends AsyncTask<Void, Void, Void>{
 	@Override
 	protected Void doInBackground(Void... unused) {
 
-		Log.i("K", "Start Downloading User-Defined-Lists : UCLA Tree List.");
+		downloadUserDefinedList();
+		return null;
+	}
+	
+	@Override
+	protected void onPostExecute(Void unused) {
+		
+		setPreference();
+		
+		noti = new Notification(R.drawable.s1000, "Download complete - user plant lists", System.currentTimeMillis());
+		noti.flags |= Notification.FLAG_AUTO_CANCEL;
+		
+		PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0, null, PendingIntent.FLAG_CANCEL_CURRENT);
+		
+		noti.setLatestEventInfo(mContext, "Project Budburst", "Successfully download user plant lists", contentIntent);
+		
+		notificationMgr.notify(SIMPLE_NOTFICATION_ID, noti);
+	}
+	
+	public void downloadUserDefinedList() {
+		
+		Log.i("K", "Start Downloading User-Defined-Lists.");
 		
 		HttpClient httpClient = new DefaultHttpClient();
-		String url = new String("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_tree_lists.php");
+		String url = new String(mContext.getString(R.string.get_user_defined_species_lists));
 		HttpPost httpPost = new HttpPost(url);
 		
 		try {
@@ -83,7 +105,7 @@ public class ListUserPlants extends AsyncTask<Void, Void, Void>{
 				 * Delete values in UCLAtreeLists table
 				 */
 				OneTimeDBHelper onehelper = new OneTimeDBHelper(mContext);
-				onehelper.clearUserDefineList(mContext);
+				onehelper.clearUserDefineListByCategory(mContext, mCategory);
 				onehelper.close();
 				
 				
@@ -95,31 +117,30 @@ public class ListUserPlants extends AsyncTask<Void, Void, Void>{
 				JSONObject jsonObj = new JSONObject(serverResponse);
 				if(jsonObj.getBoolean("success")) {
 					JSONArray jsonAry = jsonObj.getJSONArray("results");
+					
+					OneTimeDBHelper otDBH = new OneTimeDBHelper(mContext);
+					SQLiteDatabase otDB = otDBH.getWritableDatabase();
 
 					for(int i = 0 ; i < jsonAry.length() ; i++) {
 						
-						OneTimeDBHelper otDBH = new OneTimeDBHelper(mContext);
-						SQLiteDatabase otDB = otDBH.getWritableDatabase();
+						
 						HelperFunctionCalls helper = new HelperFunctionCalls();
 						
 						try {
+							String cat = jsonAry.getJSONObject(i).getString("Category");
+							if(Integer.parseInt(cat) != mCategory) {
+								continue;
+							}
 							
 							otDB.execSQL("INSERT INTO userDefineLists VALUES(" +
 									jsonAry.getJSONObject(i).getString("Tree_ID") + "," +
-									"'" + jsonAry.getJSONObject(i).getString("Common_Name") + "'," +
-									"'" + jsonAry.getJSONObject(i).getString("Science_Name") + "'," + 
-									"'" + jsonAry.getJSONObject(i).getString("Credit") + "'," +
-									"" + mCategory +
+									"\"" + jsonAry.getJSONObject(i).getString("Common_Name") + "\"," +
+									"\"" + jsonAry.getJSONObject(i).getString("Science_Name") + "\"," + 
+									"\"" + jsonAry.getJSONObject(i).getString("Credit") + "\"," +
+									"" + mCategory + "," +
+									jsonAry.getJSONObject(i).getString("Protocol_ID") + 
 									");"
 									);
-							
-							Log.i("K", "INSERT INTO userDefineLists VALUES(" +
-									jsonAry.getJSONObject(i).getString("Tree_ID") + "," +
-									"'" + jsonAry.getJSONObject(i).getString("Common_Name") + "'," +
-									"'" + jsonAry.getJSONObject(i).getString("Science_Name") + "'," + 
-									"'" + jsonAry.getJSONObject(i).getString("Credit") + "'," +
-									"" + mCategory +
-									");");
 							
 							URL urls = new URL("http://networkednaturalist.org/User_Plant_Lists_Images/" + jsonAry.getJSONObject(i).getString("Tree_ID") + "_thumb.jpg");
 							HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
@@ -167,15 +188,15 @@ public class ListUserPlants extends AsyncTask<Void, Void, Void>{
 									
 								}
 							}
-
-							otDBH.close();
-							otDB.close();
 						}
 						catch(Exception e) {
 							otDBH.close();
 							otDB.close();
 						}
 					}
+					
+					otDBH.close();
+					otDB.close();
 				}
 			}
 			
@@ -186,26 +207,14 @@ public class ListUserPlants extends AsyncTask<Void, Void, Void>{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return null;
 	}
 	
-	@Override
-	protected void onPostExecute(Void unused) {
+	public void setPreference() {
 		/*
 		 * Set the boolean variable to TRUE
 		 */
 		HelperSharedPreference hPref = new HelperSharedPreference(mContext);
 		hPref.setPreferencesBoolean("getTreeLists", true);
 		hPref.setPreferencesBoolean("firstDownloadTreeList", true);
-		
-		noti = new Notification(R.drawable.s1000, "Download complete - user plant lists", System.currentTimeMillis());
-		noti.flags |= Notification.FLAG_AUTO_CANCEL;
-		
-		PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0, null, PendingIntent.FLAG_CANCEL_CURRENT);
-		
-		noti.setLatestEventInfo(mContext, "Project Budburst", "Successfully download user plant lists", contentIntent);
-		
-		notificationMgr.notify(SIMPLE_NOTFICATION_ID, noti);
 	}
 }

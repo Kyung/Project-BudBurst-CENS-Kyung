@@ -35,9 +35,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import cens.ucla.edu.budburst.PBBAddNotes;
-import cens.ucla.edu.budburst.PBBAddPlant;
-import cens.ucla.edu.budburst.PBBAddSite;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapter;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
@@ -45,6 +42,9 @@ import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.myplants.PBBAddNotes;
+import cens.ucla.edu.budburst.myplants.PBBAddPlant;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
 import cens.ucla.edu.budburst.utils.PBBItems;
 
 public class OneTimePBBLists extends ListActivity{
@@ -119,13 +119,22 @@ public class OneTimePBBLists extends ListActivity{
 				
 				HelperPlantItem pi;
 				//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-				pi = new HelperPlantItem(resID, common_name, species_name, id, protocol_id);
+				pi = new HelperPlantItem();
+				pi.setPicture(resID);
+				pi.setCommonName(common_name);
+				pi.setSpeciesName(species_name);
+				pi.setSpeciesID(id);
+				pi.setProtocolID(protocol_id);
 				arPlantList.add(pi);
 			}
 		}
  		
 		// add plant at the last.
-		HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
+		HelperPlantItem pi = new HelperPlantItem();
+		pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+		pi.setCommonName("Unknown/Other");
+		pi.setSpeciesName("Unknown/Other");
+		pi.setSpeciesID(999);
 		arPlantList.add(pi);
 		
 		mylistapdater = new MyListAdapter(OneTimePBBLists.this, R.layout.plantlist_item2, arPlantList);
@@ -163,13 +172,22 @@ public class OneTimePBBLists extends ListActivity{
 						
 						HelperPlantItem pi;
 						//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-						pi = new HelperPlantItem(resID, common_name, species_name, id, protocol_id);
+						pi = new HelperPlantItem();
+						pi.setPicture(resID);
+						pi.setCommonName(common_name);
+						pi.setSpeciesName(species_name);
+						pi.setSpeciesID(id);
+						pi.setProtocolID(protocol_id);
 						arPlantList.add(pi);
 					}
 				}
 				
 				// add plant at the last.
-				HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
+				HelperPlantItem pi = new HelperPlantItem();
+				pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+				pi.setCommonName("Unknown/Other");
+				pi.setSpeciesName("Unknown/Other");
+				pi.setSpeciesID(999);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(OneTimePBBLists.this, R.layout.plantlist_item2, arPlantList);
@@ -195,12 +213,21 @@ public class OneTimePBBLists extends ListActivity{
 						
 					HelperPlantItem pi;
 					//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-					pi = new HelperPlantItem(resID, common_name, species_name, id, protocol_id);
+					pi = new HelperPlantItem();
+					pi.setPicture(resID);
+					pi.setCommonName(common_name);
+					pi.setSpeciesName(species_name);
+					pi.setSpeciesID(id);
+					pi.setProtocolID(protocol_id);
 					arPlantList.add(pi);
 				}
 				
 				// add plant at the last.
-				HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
+				HelperPlantItem pi = new HelperPlantItem();
+				pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+				pi.setCommonName("Unknown/Other");
+				pi.setSpeciesName("Unknown/Other");
+				pi.setSpeciesID(999);
 				arPlantList.add(pi);
 				
 				mylistapdater = new MyListAdapter(OneTimePBBLists.this, R.layout.plantlist_item2, arPlantList);
@@ -257,12 +284,21 @@ public class OneTimePBBLists extends ListActivity{
 							int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+id, null, null);
 							
 							//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-							pi = new HelperPlantItem(resID, common_name, species_name, id, protocol_id);
+							pi = new HelperPlantItem();
+							pi.setPicture(resID);
+							pi.setCommonName(common_name);
+							pi.setSpeciesName(species_name);
+							pi.setSpeciesID(id);
+							pi.setProtocolID(protocol_id);
 							arPlantList.add(pi);
 						}
 						
 						// add plant at the last.
-						HelperPlantItem pi = new HelperPlantItem(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null), "Unknown/Other", "Unknown/Other", 999);
+						HelperPlantItem pi = new HelperPlantItem();
+						pi.setPicture(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s999", null, null));
+						pi.setCommonName("Unknown/Other");
+						pi.setSpeciesName("Unknown/Other");
+						pi.setSpeciesID(999);
 						arPlantList.add(pi);
 						
 						mylistapdater = new MyListAdapter(OneTimePBBLists.this, R.layout.plantlist_item2, arPlantList);
@@ -301,7 +337,11 @@ public class OneTimePBBLists extends ListActivity{
 						
 						HelperPlantItem pi;
 						//pi = aPicture, String aCommonName, String aSpeciesName, int aSpeciesID
-						pi = new HelperPlantItem(resID, common_name, species_name, cursor.getInt(0));
+						pi = new HelperPlantItem();
+						pi.setPicture(resID);
+						pi.setCommonName(common_name);
+						pi.setSpeciesName(species_name);
+						pi.setSpeciesID(cursor.getInt(0));
 						arPlantList.add(pi);
 					}
 					
@@ -330,7 +370,7 @@ public class OneTimePBBLists extends ListActivity{
 		/*
 		 * If user chooses Unknown/Plant, show the popup dialog adding common name.
 		 */
-		if(arPlantList.get(position).SpeciesID == HelperValues.UNKNOWN_SPECIES) {
+		if(arPlantList.get(position).getSpeciesID() == HelperValues.UNKNOWN_SPECIES) {
 			dialog = new Dialog(OneTimePBBLists.this);
 			
 			dialog.setContentView(R.layout.species_name_custom_dialog);
@@ -371,15 +411,13 @@ public class OneTimePBBLists extends ListActivity{
 									mProtocolID = 3;
 								}
 								
-								Intent intent = new Intent(OneTimePBBLists.this, GetPhenophase.class);
+								Intent intent = new Intent(OneTimePBBLists.this, OneTimePhenophase.class);
 								
-								PBBItems pbbItem = new PBBItems();
 								pbbItem.setCommonName(mCommonName);
 								pbbItem.setScienceName("Unknown/Other");
 								pbbItem.setProtocolID(mProtocolID);
 								pbbItem.setPhenophaseID(mPhenoID);
 								pbbItem.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
-								pbbItem.setCategory(HelperValues.USER_DEFINED_TREE_LISTS);
 								
 								intent.putExtra("pbbItem", pbbItem);
 								intent.putExtra("from", HelperValues.FROM_QUICK_CAPTURE);
@@ -392,10 +430,9 @@ public class OneTimePBBLists extends ListActivity{
 					else {
 						Intent intent = new Intent(OneTimePBBLists.this, PBBAddNotes.class);
 
-						PBBItems pbbItem = new PBBItems();
 						pbbItem.setCommonName(mCommonName);
 						pbbItem.setScienceName("Unknown/Other");
-						pbbItem.setProtocolID(arPlantList.get(mCurrentPosition).ProtocolID);
+						pbbItem.setProtocolID(arPlantList.get(mCurrentPosition).getProtocolID());
 						pbbItem.setPhenophaseID(mPhenoID);
 						pbbItem.setSpeciesID(HelperValues.UNKNOWN_SPECIES);
 						
@@ -417,7 +454,7 @@ public class OneTimePBBLists extends ListActivity{
 			
 			if(mPreviousActivity == HelperValues.FROM_QUICK_CAPTURE) {
 				
-				int getSpeciesID = arPlantList.get(position).SpeciesID;
+				int getSpeciesID = arPlantList.get(position).getSpeciesID();
 				int getProtocolID = 2;
 				
 				StaticDBHelper staticDBH = new StaticDBHelper(OneTimePBBLists.this);
@@ -454,14 +491,13 @@ public class OneTimePBBLists extends ListActivity{
 				cursor.close();
 				staticDB.close();
 				
-				Intent intent = new Intent(OneTimePBBLists.this, GetPhenophase.class);
+				Intent intent = new Intent(OneTimePBBLists.this, OneTimePhenophase.class);
 				
-				PBBItems pbbItem = new PBBItems();
-				pbbItem.setCommonName(arPlantList.get(mCurrentPosition).CommonName);
-				pbbItem.setScienceName(arPlantList.get(mCurrentPosition).SpeciesName);
+				pbbItem.setCommonName(arPlantList.get(mCurrentPosition).getCommonName());
+				pbbItem.setScienceName(arPlantList.get(mCurrentPosition).getSpeciesName());
 				pbbItem.setProtocolID(mProtocolID);
 				pbbItem.setPhenophaseID(mPhenoID);
-				pbbItem.setSpeciesID(arPlantList.get(mCurrentPosition).SpeciesID);
+				pbbItem.setSpeciesID(arPlantList.get(mCurrentPosition).getSpeciesID());
 				pbbItem.setCategory(HelperValues.LOCAL_BUDBURST_LIST);
 				
 				intent.putExtra("pbbItem", pbbItem);
@@ -472,12 +508,11 @@ public class OneTimePBBLists extends ListActivity{
 			else {
 				Intent intent = new Intent(OneTimePBBLists.this, PBBAddNotes.class);
 				
-				PBBItems pbbItem = new PBBItems();
-				pbbItem.setCommonName(arPlantList.get(position).CommonName);
-				pbbItem.setScienceName(arPlantList.get(position).SpeciesName);
-				pbbItem.setProtocolID(arPlantList.get(position).ProtocolID);
+				pbbItem.setCommonName(arPlantList.get(position).getCommonName());
+				pbbItem.setScienceName(arPlantList.get(position).getSpeciesName());
+				pbbItem.setProtocolID(arPlantList.get(position).getProtocolID());
 				pbbItem.setPhenophaseID(mPhenoID);
-				pbbItem.setSpeciesID(arPlantList.get(position).SpeciesID);
+				pbbItem.setSpeciesID(arPlantList.get(position).getSpeciesID());
 				pbbItem.setCategory(HelperValues.LOCAL_BUDBURST_LIST);
 				
 				intent.putExtra("pbbItem", pbbItem);

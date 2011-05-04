@@ -2,10 +2,11 @@ package cens.ucla.edu.budburst.database;
 
 import java.util.ArrayList;
 
-import cens.ucla.edu.budburst.helper.FloracacheItem;
+import cens.ucla.edu.budburst.floracaching.FloracacheItem;
 import cens.ucla.edu.budburst.helper.HelperLocalPlantListItem;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.lists.ListGroupItem;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,7 +16,7 @@ import android.util.Log;
 public class OneTimeDBHelper extends SQLiteOpenHelper {
 
 	public OneTimeDBHelper(Context context){
-		super(context, "onetimeBudburst.db", null, 46);
+		super(context, "onetimeBudburst.db", null, 58);
 	}
 	
 	@Override
@@ -34,8 +35,8 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"active NUMERIC," + // deleted(0) or not(1)
 				"category NUMERIC, " +
 				"synced NUMERIC, " +
-				"image_id TEXT, " + 
-				"is_floracache NUMERIC DEFAULT 0" +
+				"is_floracache NUMERIC DEFAULT 0, " +
+				"floracache_id NUMERIC DEFAULT -1" +
 				");");
 		
 		db.execSQL("CREATE TABLE oneTimeObservation (" +
@@ -72,7 +73,8 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"common_name TEXT, " +
 				"science_name TEXT, " +
 				"credit TEXT, " +
-				"category INTEGER" +
+				"category INTEGER, " +
+				"protocol_id INTEGER" +
 				"); ");
 		
 		db.execSQL("CREATE TABLE localPlantLists (" +
@@ -86,10 +88,22 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"copy_right TEXT, " +
 				"image_id NUMERIC); ");
 		
+		db.execSQL("CREATE TABLE userDefinedGroup (" +
+				"category_id INTEGER, " +
+				"category_name TEXT, " +
+				"user_admin_id TEXT, " +
+				"latitude NUMERIC, " +
+				"longitude NUMERIC, " +
+				"description TEXT, " +
+				"long_description TEXT, " +
+				"icon_url TEXT, " +
+				"distance NUMERIC); ");
+		
 		db.execSQL("CREATE TABLE floracacheLists (" +
 				"id INTEGER, " +
-				"user_id INTEGER, " +
+				"user_name TEXT, " +
 				"species_id INTEGER, " +
+				"user_plant_id INTEGER, " + // temporarily
 				"category INTEGER, " +
 				"station INTEGER, " +
 				"notes TEXT, " +
@@ -99,7 +113,10 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				"longitude NUMERIC, " + 
 				"common_name TEXT, " +
 				"science_name TEXT, " +
-				"protocol_id INTEGER" + "); ");
+				"protocol_id INTEGER, " + 
+				"group_id INTEGER, " +
+				"image_id TEXT, " +
+				"observed_date TEXT" + "); ");
 		
 		db.execSQL("CREATE TABLE floracacheGroups (" +
 				"id INTEGER, " +
@@ -131,6 +148,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS speciesLists");
 		db.execSQL("DROP TABLE IF EXISTS pbbFlickrLists");
 		db.execSQL("DROP TABLE IF EXISTS userDefineLists");
+		db.execSQL("DROP TABLE IF EXISTS userDefinedGroup");
 		db.execSQL("DROP TABLE IF EXISTS localPlantLists");
 		db.execSQL("DROP TABLE IF EXISTS floracacheLists");
 		db.execSQL("DROP TABLE IF EXISTS floracacheGroups");
@@ -156,6 +174,16 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
 		db.execSQL("DELETE FROM userDefineLists;");
+		
+		db.close();
+	 	dbhelper.close();
+	}
+	
+	public void clearUserDefineListByCategory(Context cont, int category) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		
+		db.execSQL("DELETE FROM userDefineLists WHERE category=" + category + ";");
 		
 		db.close();
 	 	dbhelper.close();
@@ -187,6 +215,16 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		
 		db.execSQL("DELETE FROM localPlantLists WHERE category=" + category + ";");
+		
+		db.close();
+	 	dbhelper.close();
+	}
+	
+	public void clearUserDefinedGroup(Context cont) {
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		
+		db.execSQL("DELETE FROM userDefinedGroup;");
 		
 		db.close();
 	 	dbhelper.close();
@@ -226,7 +264,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		
 		HelperPlantItem pi = null;
 		
-		Cursor cursor = db.rawQuery("SELECT _id, species_id, plant_id, protocol_id, cname, sname, category, image_id FROM oneTimePlant;", null);
+		Cursor cursor = db.rawQuery("SELECT _id, species_id, plant_id, protocol_id, cname, sname, category FROM oneTimePlant;", null);
 		while(cursor.moveToNext()) {
 			
 			 Cursor cursor2 = db.rawQuery("SELECT plant_id, phenophase_id, lat, lng, image_id, dt_taken, notes FROM oneTimeObservation WHERE plant_id = " + cursor.getInt(2) + " ORDER BY dt_taken;", null);
@@ -236,7 +274,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 			 int category = cursor.getInt(6);
 			 String commonName = cursor.getString(4);
 			 String scienceName = cursor.getString(5);
-			 String imageID = cursor.getString(6);
+			 String imageName = cursor.getString(6);
 			 
 			 
 			 while(cursor2.moveToNext()) {
@@ -244,13 +282,29 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 				 int phenophaseID = cursor2.getInt(1);
 				 double latitude = cursor2.getDouble(2);
 				 double longitude = cursor2.getDouble(3);
-				 String imageName = cursor2.getString(4);
+				 //String imageName = cursor2.getString(4);
 				 String dtTaken = cursor2.getString(5);
 				 String notes = cursor2.getString(6);
 				 
-				 pi = new HelperPlantItem(HelperValues.MY_PLANT_LIST, HelperValues.FROM_QUICK_CAPTURE, 
-						 speciesID, plantID, category, "", commonName, scienceName, 
-						 phenophaseID, protocolID, latitude, longitude, imageID, dtTaken, notes);
+				 //int aWhichList, int aWhere, int aSpeciesID, int aPlantID, int aCategory, String aUserName, String aCommonName, String aScienceName, int aPhenoID, int aProtocolID, double aLatitude, double aLongitude, String aImageName, String aDate, String aNotes
+				 
+				 pi = new HelperPlantItem();
+				 pi.setWhichList(HelperValues.MY_PLANT_LIST);
+				 pi.setWhere(HelperValues.FROM_QUICK_CAPTURE);
+				 pi.setSpeciesID(speciesID);
+				 pi.setPlantID(plantID);
+				 pi.setCategory(category);
+				 pi.setUserName("");
+				 pi.setCommonName(commonName);
+				 pi.setSpeciesName(scienceName);
+				 pi.setPhenoID(phenophaseID);
+				 pi.setProtocolID(protocolID);
+				 pi.setLatitude(latitude);
+				 pi.setLongitude(longitude);
+				 pi.setImageName(imageName);
+				 pi.setDate(dtTaken);
+				 pi.setNote(notes);
+				
 				 plantList.add(pi);
 			 }
 			 cursor2.close();
@@ -371,7 +425,7 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		return scienceName; 
 	}
 	
-	public int getTreeImageID(Context cont, String ScienceName, int Category) {
+	public int getUserDefinedImageID(Context cont, String ScienceName, int Category) {
 		//userDefineLists
 		
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
@@ -421,6 +475,12 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		 * public HelperLocalPlantListItem(int Category, String CommonName, String ScienceName, String County,
 			String State, String UsdaUrl, String CopyRight) {
 		 */
+		if(getImageID.getCount() == 0) {
+			getImageID.close();
+			db.close();
+			return null;
+		}
+		
 		while(getImageID.moveToNext()) {
 			pItem = new HelperLocalPlantListItem(getImageID.getInt(0), getImageID.getString(1), 
 					getImageID.getString(2), getImageID.getString(3), getImageID.getString(4),
@@ -433,60 +493,139 @@ public class OneTimeDBHelper extends SQLiteOpenHelper {
 		return pItem; 
 	}
 	
-	/*
-	 * 		db.execSQL("CREATE TABLE floracacheLists (" +
-				"id INTEGER, " +
-				"user_id INTEGER, " +
-				"species_id INTEGER, " +
-				"category INTEGER, " +
-				"station INTEGER, " +
-				"notes TEXT, " +
-				"date TEXT, " +
-				"rank INTEGER, " +
-				"latitude NUMERIC," +
-				"longitude NUMERIC" + "); ");
-	 */
-	
-	/*
-	if(floracacheRank == HelperValues.FLORACACHE_EASY) {
-		//FloracacheItem mItem = new FloracacheItem(floracacheID, 
-			//	userID, userSpeciesID, userSpeciesCategoryID, userStationID,
-				//latitude, longitude,
-				//floracacheName, floracacheDate);
-		//mPlantList.add(mItem);
+	public ArrayList<ListGroupItem> getListGroupItem(Context cont) {
+		
+		ArrayList<ListGroupItem> fArr = new ArrayList<ListGroupItem>();
+		
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		Cursor getGroupItem = db.rawQuery("SELECT " +
+				"category_id, category_name, user_admin_id, latitude, " +
+				"longitude, description, long_description," +
+				"icon_url, distance " +
+				"FROM userDefinedGroup ORDER BY distance ASC", null);
+		
+		while(getGroupItem.moveToNext()) {
+			ListGroupItem gItem = new ListGroupItem();
+			
+			gItem.setCategoryID(getGroupItem.getInt(0));
+			gItem.setCategoryName(getGroupItem.getString(1));
+			gItem.setUserAdminID(getGroupItem.getInt(2));
+			gItem.setLatitude(getGroupItem.getDouble(3));
+			gItem.setLongitude(getGroupItem.getDouble(4));
+			gItem.setDescription(getGroupItem.getString(5));
+			gItem.setLongDescription(getGroupItem.getString(6));
+			gItem.setIconURL(getGroupItem.getString(7));
+			gItem.setDistance(getGroupItem.getFloat(8));
+			
+			fArr.add(gItem);
+		}
+		
+		getGroupItem.close();
+		db.close();
+		
+		return fArr;
 	}
-	*/
 	
-
-	
-	public ArrayList<FloracacheItem> getFloracacheLists(Context cont, int rank) {
+	public ArrayList<FloracacheItem> getFloracacheLists(Context cont, int rank, int groupID) {
 		
 		ArrayList<FloracacheItem> fArr = new ArrayList<FloracacheItem>();
 		
 		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
 		SQLiteDatabase db = dbhelper.getReadableDatabase();
 		
-		Cursor getLists = db.rawQuery("SELECT id, user_id, species_id, " +
-				"category, station, notes, date, latitude, longitude, common_name, science_name, protocol_id FROM floracacheLists WHERE " +
-				"rank=" + rank, null);
+		Cursor getLists = db.rawQuery("SELECT id, user_name, species_id, " +
+				"category, station, notes, date, latitude, longitude, common_name, " +
+				"science_name, protocol_id, user_plant_id " +
+				"FROM floracacheLists " +
+				"WHERE rank=" + rank + " " + 
+					"AND group_id=" + groupID + ";", null);
+				
 		
 		FloracacheItem fItem = null;
 		
-		
-		
 		while(getLists.moveToNext()) {
-			fItem = new FloracacheItem(getLists.getInt(0), getLists.getInt(1), getLists.getInt(2),
-					getLists.getInt(3), getLists.getInt(4), getLists.getDouble(7), getLists.getDouble(8), 
-					getLists.getString(5), getLists.getString(6),
-					getLists.getString(9), getLists.getString(10),
-					getLists.getInt(11));
-			fArr.add(fItem);
+			
+			Cursor ifFloracache = db.rawQuery("SELECT floracache_id " +
+					"FROM oneTimePlant " +
+					"WHERE is_floracache=1;", null);
+			
+			boolean isFloracache = false;
+			
+			while(ifFloracache.moveToNext()) {
+				if(ifFloracache.getInt(0) == getLists.getInt(0)) {
+					isFloracache = true;
+					break;
+				}
+			}
+			
+			ifFloracache.close();
+			
+			if(!isFloracache) {
+				fItem = new FloracacheItem();
+				fItem.setFloracacheID(getLists.getInt(0));
+				fItem.setUserName(getLists.getString(1));
+				fItem.setUserSpeciesID(getLists.getInt(2));
+				fItem.setUserSpeciesCategoryID(getLists.getInt(3));
+				fItem.setUserStationID(getLists.getInt(4));
+				fItem.setLatitude(getLists.getDouble(7));
+				fItem.setLongitude(getLists.getDouble(8));
+				fItem.setFloracacheNotes(getLists.getString(5));
+				fItem.setDate(getLists.getString(6));
+				fItem.setCommonName(getLists.getString(9));
+				fItem.setScienceName(getLists.getString(10));
+				fItem.setProtocolID(getLists.getInt(11));
+				
+				fArr.add(fItem);
+			}
 		}
 		
 		getLists.close();
 		db.close();
 		
+		Log.i("K", "Length : " + fArr.size());
+		
 		return fArr;
 		
+	}
+	
+	public FloracacheItem getFloracacheInfo(Context cont, int floracacheID) {
+		
+		OneTimeDBHelper dbhelper = new OneTimeDBHelper(cont);
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		
+		Cursor getLists = db.rawQuery("SELECT id, user_name, species_id, " +
+				"category, station, notes, date, latitude, longitude, common_name, " +
+				"science_name, protocol_id, user_plant_id, image_id, observed_date " +
+				"FROM floracacheLists " +
+				"WHERE id=" + floracacheID + ";", null);
+				
+		
+		FloracacheItem fItem = null;
+		
+		while(getLists.moveToNext()) {
+			
+			fItem = new FloracacheItem();
+			fItem.setFloracacheID(getLists.getInt(0));
+			fItem.setUserName(getLists.getString(1));
+			fItem.setUserSpeciesID(getLists.getInt(2));
+			fItem.setUserSpeciesCategoryID(getLists.getInt(3));
+			fItem.setUserStationID(getLists.getInt(4));
+			fItem.setLatitude(getLists.getDouble(7));
+			fItem.setLongitude(getLists.getDouble(8));
+			fItem.setFloracacheNotes(getLists.getString(5));
+			fItem.setDate(getLists.getString(6));
+			fItem.setCommonName(getLists.getString(9));
+			fItem.setScienceName(getLists.getString(10));
+			fItem.setProtocolID(getLists.getInt(11));
+			fItem.setImageID(getLists.getInt(13));
+			fItem.setObservedDate(getLists.getString(14));
+		}
+		
+		getLists.close();
+		db.close();
+		
+		return fItem;
 	}
 }

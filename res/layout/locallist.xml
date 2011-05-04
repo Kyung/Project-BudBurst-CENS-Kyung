@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" 
-        android:layout_weight="1"/>
-	<TextView
+    <TextView
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="To see the species_list, press Menu -> Settings -> Download Local Lists"
+		android:text="Please download the local species lists. Press Menu -> Settings -> Download Local Lists"
 		android:textSize="17sp"
 		android:visibility="gone"
 		android:id="@+id/instruction"
 		android:gravity="center"
-		android:layout_gravity="center"
+    	android:layout_centerVertical="true"
+    	android:layout_centerHorizontal="true"
 	/>
-</LinearLayout>
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+</RelativeLayout>

@@ -36,7 +36,7 @@ public class HelperGpsHandler extends Service {
 	public void onCreate() {
 		gpsListener = new GpsListener();
 		mLocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
+		mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3 * 1000, 3, gpsListener);
 		
 		mTimer.schedule(new GetLastLocation(), TIME_LIMIT);
 		

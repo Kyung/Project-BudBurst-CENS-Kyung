@@ -35,6 +35,7 @@ import cens.ucla.edu.budburst.database.SyncNetworkHelper;
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
 import cens.ucla.edu.budburst.helper.HelperShowAll;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
 
 public class PBBSync extends Activity{
 	
@@ -774,7 +775,9 @@ class doSyncThread extends Thread{
 				SQLiteDatabase otRDB = otDBHelper.getReadableDatabase();
 		    	//SQLiteDatabase otWDB = otDBHelper.getWritableDatabase();
 				
-				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, sname, active, category FROM oneTimePlant " +
+				query = "SELECT plant_id, species_id, site_id, protocol_id, cname, " +
+						"sname, active, category, is_floracache, floracache_id " +
+						"FROM oneTimePlant " +
 						"WHERE synced=" + SyncDBHelper.SYNCED_NO + ";";
 				cursor = otRDB.rawQuery(query, null);
 				
@@ -794,9 +797,16 @@ class doSyncThread extends Thread{
 						String sname = cursor.getString(5);
 						int active = cursor.getInt(6);
 						int category = cursor.getInt(7);
+						int isFloracache = cursor.getInt(8);
+						int floracacheID = cursor.getInt(9);
+						
+						Log.i("K", "floracacheID : " + floracacheID);
 						
 						serverResponse = 
-							SyncNetworkHelper.upload_onetime_ob(username, password, plant_id, species_id, site_id, protocol_id, cname, sname, active, category);
+							SyncNetworkHelper.upload_onetime_ob(username, password, 
+									plant_id, species_id, site_id, protocol_id, 
+									cname, sname, active, category, isFloracache,
+									floracacheID);
 						
 						if(!serverResponse.equals("UPLOADED_OK")) {
 							msgToMain.what = PBBSync.SERVER_ERROR;
@@ -983,12 +993,12 @@ class doSyncThread extends Thread{
 						syncWDB.execSQL("INSERT INTO my_sites " +
 								"(site_id, site_name, latitude, longitude, state, comments, synced, official)" +
 								"VALUES(" +
-								"'" + jsonresult.getJSONObject(i).getString("_id") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("name") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("latitude") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("longitude") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("state") + "'," +
-								"'" + jsonresult.getJSONObject(i).getString("comments") + "'," +
+								"\"" + jsonresult.getJSONObject(i).getString("_id") + "\"," +
+								"\"" + jsonresult.getJSONObject(i).getString("name") + "\"," +
+								"\"" + jsonresult.getJSONObject(i).getString("latitude") + "\"," +
+								"\"" + jsonresult.getJSONObject(i).getString("longitude") + "\"," +
+								"\"" + jsonresult.getJSONObject(i).getString("state") + "\"," +
+								"\"" + jsonresult.getJSONObject(i).getString("comments") + "\"," +
 								SyncDBHelper.SYNCED_YES + "," +
 								1 + ");");
 					}
@@ -1048,11 +1058,11 @@ class doSyncThread extends Thread{
 								"VALUES(" +
 								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
-								"'"+
-								jsonresult.getJSONObject(i).getString("st_name") + "'," +
+								"\""+
+								jsonresult.getJSONObject(i).getString("st_name") + "\"," +
 								jsonresult.getJSONObject(i).getString("pro_id") + "," +
-								"'"+
-								jsonresult.getJSONObject(i).getString("c_name") + "'," +
+								"\""+
+								jsonresult.getJSONObject(i).getString("c_name") + "\"," +
 								"1," +
 								SyncDBHelper.SYNCED_YES + "," +
 								jsonresult.getJSONObject(i).getString("category") + ");");
@@ -1068,11 +1078,11 @@ class doSyncThread extends Thread{
 								"VALUES(" +
 								species_id + "," +
 								jsonresult.getJSONObject(i).getString("st_id") + "," +
-								"'"+
-								jsonresult.getJSONObject(i).getString("st_name") + "'," +
+								"\""+
+								jsonresult.getJSONObject(i).getString("st_name") + "\"," +
 								jsonresult.getJSONObject(i).getString("pro_id") + "," +
-								"'"+
-								jsonresult.getJSONObject(i).getString("c_name") + "'," +
+								"\""+
+								jsonresult.getJSONObject(i).getString("c_name") + "\"," +
 								"1," +
 								SyncDBHelper.SYNCED_YES + "," +
 								jsonresult.getJSONObject(i).getString("category") + ");");
@@ -1130,12 +1140,12 @@ class doSyncThread extends Thread{
 						jsonresult.getJSONObject(i).getString("species_id") + "," +
 						jsonresult.getJSONObject(i).getString("site_id") + "," +
 						jsonresult.getJSONObject(i).getString("phenophase_id") + "," +
-						"'"+
-						jsonresult.getJSONObject(i).getString("image_id") + "'," +
-						"'"+
-						jsonresult.getJSONObject(i).getString("time") + "'," +
-						"'"+
-						jsonresult.getJSONObject(i).getString("note") + "'," + 
+						"\""+
+						jsonresult.getJSONObject(i).getString("image_id") + "\"," +
+						"\""+
+						jsonresult.getJSONObject(i).getString("time") + "\"," +
+						"\""+
+						jsonresult.getJSONObject(i).getString("note") + "\"," + 
 						SyncDBHelper.IMG_FILE_NEED_TO_BE_DOWNLOADED + ");";
 						
 						syncWDB.execSQL(query);
@@ -1159,8 +1169,8 @@ class doSyncThread extends Thread{
 		    	msgToMain.arg1 = mProgressVal + 5;
 		    	
 		    	Log.i("K", "Start DOWNLOAD_QUICK_CAPTURE_PLANT");
-		    	otDBHelper.clearAllTable(context);
 		    	SQLiteDatabase onetime = otDBHelper.getWritableDatabase();
+		    	otDBHelper.clearAllTable(context);
 		    	
 		    	Log.i("K", "URL : " + context.getString(R.string.get_onetime_plant_URL)
 						+"?username="+ username	+"&password="+ password);
@@ -1201,17 +1211,22 @@ class doSyncThread extends Thread{
 					for(int i=0; i<jsonresult.length(); i++){
 						
 						onetime.execSQL("INSERT INTO oneTimePlant " +
-								"(plant_id, species_id, site_id, protocol_id, cname, sname, active, category, synced)" +
+								"(plant_id, species_id, site_id, protocol_id, " +
+								"cname, sname, active, category, synced, is_floracache," +
+								"floracache_id)" +
 								"VALUES(" +
 								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
 								jsonresult.getJSONObject(i).getString("Species_ID") + "," +
 								jsonresult.getJSONObject(i).getString("Site_ID") + "," +
-								jsonresult.getJSONObject(i).getString("Protocol_ID") + ",'" +
-								jsonresult.getJSONObject(i).getString("Common_Name") + "','" +
-								jsonresult.getJSONObject(i).getString("Science_Name") + "'," +
-								1 + "," + // set active to 1
+								jsonresult.getJSONObject(i).getString("Protocol_ID") + ",\"" +
+								jsonresult.getJSONObject(i).getString("Common_Name") + "\",\"" +
+								jsonresult.getJSONObject(i).getString("Science_Name") + "\"," +
+								HelperValues.ACTIVE_SPECIES + "," + // set active to 1
 								jsonresult.getJSONObject(i).getString("Category") + "," +
-								SyncDBHelper.SYNCED_YES + ");");
+								SyncDBHelper.SYNCED_YES + "," +
+								jsonresult.getJSONObject(i).getString("is_Floracache") + "," +
+								jsonresult.getJSONObject(i).getString("Floracache_ID") +
+								");");
 					}
 					onetime.close();
 					Log.d(TAG, "DOWNLOAD_ONETIME_PLANTS: success to store into db");
@@ -1286,10 +1301,10 @@ class doSyncThread extends Thread{
 								jsonresult.getJSONObject(i).getString("Plant_ID") + "," +
 								jsonresult.getJSONObject(i).getString("Phenophase_ID") + "," +
 								jsonresult.getJSONObject(i).getString("Latitude") + "," +
-								jsonresult.getJSONObject(i).getString("Longitude") + ",'" +
-								image_name + "','" +
-								jsonresult.getJSONObject(i).getString("Dates") + "','" +
-								jsonresult.getJSONObject(i).getString("Notes") + "'," +
+								jsonresult.getJSONObject(i).getString("Longitude") + ",\"" +
+								image_name + "\",\"" +
+								jsonresult.getJSONObject(i).getString("Dates") + "\",\"" +
+								jsonresult.getJSONObject(i).getString("Notes") + "\"," +
 								SyncDBHelper.SYNCED_YES + ");");
 	
 						

@@ -120,15 +120,20 @@ public class StaticDBHelper extends SQLiteOpenHelper{
 	public void onCreate(SQLiteDatabase db) {
 		
 		Log.i("K", "inside onCreate in StaticDBHelper");
+		//db.beginTransaction();
+		//db.execSQL("DROP TABLE IF EXISTS android_metadata;");
+		//db.execSQL("CREATE TABLE android_metadata (locale TEXT DEFAULT en_US);");
+		//db.endTransaction();
 		
-		//this.getReadableDatabase();
-   	 
 		boolean dbExist = checkDataBase();
 		
 		if(dbExist) {
-			
+			Log.i("K", "already exists");
 		}
 		else {
+			
+			//this.getReadableDatabase();
+			
 			try {
 	 			copyDataBase();
 	 		} catch (IOException e) {
@@ -136,7 +141,6 @@ public class StaticDBHelper extends SQLiteOpenHelper{
 	     		throw new Error("Error copying database");
 	     	}
 		}
-   	
 	}
 	
 	private boolean checkDataBase() {
@@ -144,6 +148,7 @@ public class StaticDBHelper extends SQLiteOpenHelper{
 		 
     	try{
     		String myPath = DB_PATH + DB_NAME;
+    		Log.i("K", "myPath : " + myPath);
     		checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
  
     	}catch(SQLiteException e){
@@ -191,7 +196,8 @@ public class StaticDBHelper extends SQLiteOpenHelper{
     	 
 	    //Open the database
 	    String myPath = DB_PATH + DB_NAME;
-	    myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY);
+	    myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE 
+	    		| SQLiteDatabase.CREATE_IF_NECESSARY);
 	 
 	}
  
@@ -205,9 +211,7 @@ public class StaticDBHelper extends SQLiteOpenHelper{
 		db.execSQL("DROP TABLE IF EXISTS Onetime_Observation;");
 		db.execSQL("DROP TABLE IF EXISTS Phenophase_Protocol_Icon;");
 		
-
 		createDatabase(db ,DB_NAME_TEMP);
-		
 		
 		/*
 		SharedPreferences pref = myContext.getSharedPreferences("userinfo",0);
@@ -451,7 +455,7 @@ public class StaticDBHelper extends SQLiteOpenHelper{
     	StaticDBHelper staticDBHelper = new StaticDBHelper(cont);
 		SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
 		
-    	Cursor cursor = staticDB.rawQuery("SELECT _id FROM species WHERE common_name = \"" + speciesName + "\"", null);
+    	Cursor cursor = staticDB.rawQuery("SELECT _id FROM species WHERE common_name = \"" + speciesName + "\" COLLATE NOCASE", null);
     	int getID = 999;
     	
     	while(cursor.moveToNext()) {
@@ -463,16 +467,16 @@ public class StaticDBHelper extends SQLiteOpenHelper{
     	return getID;
     }
     
-    public String[] getSpeciesName(Context cont, String speciesName) {
+    public String[] getSpeciesName(Context cont, int speciesID) {
     	StaticDBHelper staticDBHelper = new StaticDBHelper(cont);
 		SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
     	
-    	Cursor cursor = staticDB.rawQuery("SELECT species_name, description FROM species WHERE common_name = \"" + speciesName + "\"", null);
+    	Cursor cursor = staticDB.rawQuery("SELECT species_name, description FROM species WHERE _id = " + speciesID, null);
     	String []getName = new String[2];
     	
     	while(cursor.moveToNext()) {
-    		getName[0] = cursor.getString(0);
-    		getName[1] = cursor.getString(1);
+    		getName[0] = cursor.getString(0); // ScienceName
+    		getName[1] = cursor.getString(1); // Description
     	}
     	cursor.close();
     	staticDB.close();

@@ -24,7 +24,6 @@ import android.util.Log;
 import android.widget.Toast;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
-import cens.ucla.edu.budburst.helper.FloracacheItem;
 import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 
@@ -38,7 +37,7 @@ public class FloracacheGetLists extends AsyncTask<String, Integer, Void> {
 	
 	private NotificationManager notificationMgr = null;
 	private Notification noti = null;
-	private int SIMPLE_NOTFICATION_ID = 1234567890;
+	private int SIMPLE_NOTFICATION_ID = HelperValues.NOTIFI_FLORACACHE_LISTS;
 	
 	public FloracacheGetLists(Context context) {
 		mContext = context;
@@ -90,7 +89,8 @@ public class FloracacheGetLists extends AsyncTask<String, Integer, Void> {
 						//jsonAry.getJSONObject(i).getString("Tree_ID") + "," +
 						
 						int floracacheID = jsonAry.getJSONObject(i).getInt("Floracache_ID");
-						int userID = jsonAry.getJSONObject(i).getInt("User_ID");
+						String userName = jsonAry.getJSONObject(i).getString("User_Name");
+						int userPlantID = jsonAry.getJSONObject(i).getInt("User_Plant_ID");
 						int userSpeciesID = jsonAry.getJSONObject(i).getInt("User_Species_ID");
 						int userSpeciesCategoryID = jsonAry.getJSONObject(i).getInt("User_Species_Category_ID");
 						int userStationID = jsonAry.getJSONObject(i).getInt("User_Station");
@@ -102,24 +102,31 @@ public class FloracacheGetLists extends AsyncTask<String, Integer, Void> {
 						String fCommonName = jsonAry.getJSONObject(i).getString("Common_Name");
 						String fScienceName = jsonAry.getJSONObject(i).getString("Science_Name");
 						int fProtocolID = jsonAry.getJSONObject(i).getInt("Protocol_ID");
+						int fGroupID = jsonAry.getJSONObject(i).getInt("Floracache_Group_ID");
+						int fImageID = jsonAry.getJSONObject(i).getInt("Image_ID");
+						String fObservedDate = jsonAry.getJSONObject(i).getString("Dates");
 						
 						
 						SQLiteDatabase oDB = oDBH.getWritableDatabase();
-						
+
 						oDB.execSQL("INSERT INTO floracacheLists VALUES(" +
-								floracacheID + "," +
-								userID + "," +
+								floracacheID + ",\"" +
+								userName + "\"," +
 								userSpeciesID + "," +
+								userPlantID + "," +
 								userSpeciesCategoryID + "," +
-								userStationID + ",'" +
-								floracacheName + "','" +
-								floracacheDate + "'," +
+								userStationID + ",\"" +
+								floracacheName + "\",\"" +
+								floracacheDate + "\"," +
 								floracacheRank + "," +
 								latitude + "," +
-								longitude + ",'" +
-								fCommonName + "','" +
-								fScienceName + "'," +
-								fProtocolID + ");");
+								longitude + ",\"" +
+								fCommonName + "\",\"" +
+								fScienceName + "\"," +
+								fProtocolID + "," + 
+								fGroupID + "," + 
+								fImageID + ",\"" +
+								fObservedDate + "\"" + ");");
 						
 						oDB.close();
 						
@@ -183,19 +190,6 @@ public class FloracacheGetLists extends AsyncTask<String, Integer, Void> {
 					SQLiteDatabase oDB = oDBH.getWritableDatabase();
 					
 					for(int i = 0 ; i < jsonAry.length() ; i++) {					
-						//jsonAry.getJSONObject(i).getString("Tree_ID") + "," +
-						
-						/*
-						 * db.execSQL("CREATE TABLE floracacheGroups (" +
-				"id INTEGER, " +
-				"name INTEGER, " +
-				"date_created TEXT, " +
-				"latitude NUMERIC, " +
-				"longitude NUMERIC, " +
-				"radius INTEGER, " +
-				"description TEXT, " +
-				"icon_url TEXT, " + "); ");
-						 */
 						
 						int groupID = jsonAry.getJSONObject(i).getInt("Group_ID");
 						String groupName = jsonAry.getJSONObject(i).getString("Name");

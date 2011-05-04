@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -8,6 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
@@ -175,7 +180,7 @@ public class UpdatePlantInfo extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(UpdatePlantInfo.this, PhenophaseDetail.class);
+				Intent intent = new Intent(UpdatePlantInfo.this, PBBPhenophaseInfo.class);
 				if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
 					intent.putExtra("from", HelperValues.FROM_PBB_PHENOPHASE);
 					intent.putExtra("protocol_id", mProtocolID);
@@ -361,7 +366,7 @@ public class UpdatePlantInfo extends Activity {
 	    mScienceName = pbbItem.getScienceName();
 	    mDate = pbbItem.getDate();
 	    mNote = pbbItem.getNote();
-	    mCameraImageID = pbbItem.getImageName();
+	    mCameraImageID = pbbItem.getCameraImageName();
 	    mCategory = pbbItem.getCategory();
 	    mPhenoID = pbbItem.getPhenophaseID();
 	    mProtocolID = pbbItem.getProtocolID();

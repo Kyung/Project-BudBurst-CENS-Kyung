@@ -3,7 +3,9 @@ package cens.ucla.edu.budburst.lists;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -12,9 +14,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import cens.ucla.edu.budburst.PBBAddPlant;
-import cens.ucla.edu.budburst.PBBAddSite;
-import cens.ucla.edu.budburst.PBBPlantList;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
@@ -23,10 +22,12 @@ import cens.ucla.edu.budburst.helper.HelperDrawableManager;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.onetime.OneTimePBBLists;
-import cens.ucla.edu.budburst.onetime.GetPhenophase;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
+import cens.ucla.edu.budburst.myplants.PBBAddPlant;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
 import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -110,13 +111,11 @@ public class ListDetail extends Activity {
 		mScienceName = pbbItem.getScienceName();
 		mCommonName = pbbItem.getCommonName();
 		mSpeciesID = pbbItem.getSpeciesID();
+		mProtocolID = pbbItem.getProtocolID();
 		mPreviousActivity = bundle.getInt("from");
 		
-		Log.i("K", "mCategory : " + mCategory + ", mSpeciesID : " + mSpeciesID );
-		
-    	/*
-    	 * Show footer or not.
-    	 */
+    	
+    	// Show footer or not.
     	if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
     		LinearLayout footer = (LinearLayout)findViewById(R.id.lower);
     		footer.setVisibility(View.GONE);
@@ -131,18 +130,16 @@ public class ListDetail extends Activity {
 		myplantBtn = (Button) findViewById(R.id.to_myplant);
 		sharedplantBtn = (Button) findViewById(R.id.to_shared_plant);
 		
-		/*
-		 * Call FunctionsHelper();
-		 */
+		
+		// Call FunctionsHelper();
 		mHelper = new HelperFunctionCalls();
 		
 		mMapUserSiteNameID = mHelper.getUserSiteIDMap(ListDetail.this);
-
+		
+		getDetailInfo();
 	}
 	
-	@Override
-	public void onResume() {
-		
+	private void getDetailInfo() {
 		/*
 		 * Retreive user sites from database.
 		 */
@@ -158,7 +155,6 @@ public class ListDetail extends Activity {
 	    
 	    /*
 	     * If the previous activity is from "Local plants from national plant lists"
-	     * 
 	     */
 	    if(mPreviousActivity == HelperValues.FROM_LOCAL_PLANT_LISTS) {
 	    	
@@ -202,72 +198,71 @@ public class ListDetail extends Activity {
 				});
 			} 
 		
-				/*
-		    	 * Retrieve information from localPlantLists
-		    	 */
-		    	cursor = db.rawQuery("SELECT common_name, science_name, county, state, usda_url, photo_url, copy_right, image_id FROM localPlantLists WHERE category=" 
-		    			+ mCategory 
-		    			+ " AND science_name=\"" + mScienceName 
-		    			+"\"" , null);
+			/*
+		     * Retrieve information from localPlantLists
+		     */
+		    cursor = db.rawQuery("SELECT common_name, science_name, county, state, usda_url, photo_url, copy_right, image_id FROM localPlantLists WHERE category=" 
+		    		+ mCategory 
+		    		+ " AND science_name=\"" + mScienceName 
+		    		+"\"" , null);
 		    	
-		    	String image_url = "";
+		    String image_url = "";
 		    	
-				while(cursor.moveToNext()) {
+			while(cursor.moveToNext()) {
 					
-					/*
-					 * This is how to link the page dynamically by using Pattern and Linkify.
-					 */
-					
-					cName.setText(cursor.getString(0));
-					sName.setText(cursor.getString(1));
-					credit.setText(
-							"\nCounty - " + cursor.getString(2) +
-							"\n\nState - " + cursor.getString(3) +
-							"\n\nUSDA link : " + cursor.getString(4) +
-							"\n\nPhoto By - " + cursor.getString(6));
-					
-					mImageID = cursor.getString(7);
-					
-					Log.i("K", "ListDetail(imageID) : " + mImageID);
-					
-					/*
-					 * Link the url point to the USDA webpage.
-					 */
-					Linkify.addLinks(credit, Linkify.WEB_URLS);
-					image_url = cursor.getString(5);
-					
-					mCommonName = cursor.getString(0).toString();
-					mScienceName = cursor.getString(1).toString();
-				}
-				otDBH.close();
-				db.close();
-				cursor.close();
-			
-				Log.i("K", "imageURL : " + image_url);
-				
 				/*
-				 * Change the size of it...
+				 * This is how to link the page dynamically by using Pattern and Linkify.
 				 */
-				RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(140,140);
-				speciesImage.setLayoutParams(layoutParams);
+					
+				cName.setText(cursor.getString(0));
+				sName.setText(cursor.getString(1));
+				credit.setText(
+						"\nCounty - " + cursor.getString(2) +
+						"\n\nState - " + cursor.getString(3) +
+						"\n\nUSDA link : " + cursor.getString(4) +
+						"\n\nPhoto By - " + cursor.getString(6));
+					
+				mImageID = cursor.getString(7);
+					
+				Log.i("K", "ListDetail(imageID) : " + mImageID);
+					
+				/*
+				 * Link the url point to the USDA webpage.
+				 */
+				Linkify.addLinks(credit, Linkify.WEB_URLS);
+				image_url = cursor.getString(5);
+					
+				mCommonName = cursor.getString(0).toString();
+				mScienceName = cursor.getString(1).toString();
+			}
 				
-			
-				// If there's a cached image in the sdcard, retrieve it; otherwise, show that on the webpage 
-				String imagePath = HelperValues.LOCAL_LIST_PATH + mImageID + ".jpg";
-				File checkExistFile = new File(imagePath);
-				if(checkExistFile.exists()) {
-					//speciesImage.
-					speciesImage.setImageBitmap(overlay(BitmapFactory.decodeFile(imagePath)));
-					mSpinner.setVisibility(View.GONE);
-				}
-				else {
+			otDBH.close();
+			db.close();
+			cursor.close();
+						
+			Log.i("K", "imageURL : " + image_url);
 				
-					/*
-					 *  Load image from the server
-					 */
-					HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-					dm.fetchDrawableOnThread(image_url, speciesImage);
-				}
+			/*
+			 * Change the size of it...
+			 */
+			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(140,140);
+			speciesImage.setLayoutParams(layoutParams);
+				
+			// If there's a cached image in the sdcard, retrieve it; otherwise, show that on the webpage 
+			String imagePath = HelperValues.LOCAL_LIST_PATH + mImageID + ".jpg";
+			File checkExistFile = new File(imagePath);
+			if(checkExistFile.exists()) {
+				//speciesImage.
+				speciesImage.setImageBitmap(overlay(BitmapFactory.decodeFile(imagePath)));
+				mSpinner.setVisibility(View.GONE);
+			}
+			else {
+				/*
+				 *  Load image from the server
+				 */
+				HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
+				dm.fetchDrawableOnThread(image_url, speciesImage);
+			}
 	
 	    	
 			myplantBtn.setOnClickListener(new View.OnClickListener() {
@@ -357,15 +352,16 @@ public class ListDetail extends Activity {
 					
 	    }
 	    /*
-	     * If from UCLA tree lists
-	     * 
+	     * If from User defined lists
 	     */
-	    else if(mPreviousActivity == HelperValues.FROM_UCLA_TREE_LISTS){
+	    else if(mPreviousActivity == HelperValues.FROM_USER_DEFINED_LISTS){
 	    	
 	    	
 	    	Log.i("K", "speciesID(Tree) : " + mSpeciesID);
 	    	
-	    	cursor = db.rawQuery("SELECT common_name, science_name, credit FROM userDefineLists WHERE id=" + mSpeciesID +";", null);
+	    	cursor = db.rawQuery("SELECT common_name, science_name, credit FROM userDefineLists WHERE id=" 
+	    			+ mSpeciesID +" AND category=" 
+	    			+ mCategory +";", null);
 			while(cursor.moveToNext()) {
 				cName.setText(cursor.getString(0));
 				sName.setText(cursor.getString(1));
@@ -378,11 +374,46 @@ public class ListDetail extends Activity {
 			db.close();
 			cursor.close();
 			
+			HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
+			dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) 
+					+ mSpeciesID + ".jpg", speciesImage);
+			
 			/*
 			 *  Load image from the server
 			 */
-			HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-			dm.fetchDrawableOnThread("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/images/treelists/" + mSpeciesID + ".jpg", speciesImage);
+
+			/*
+			URL urls = null;
+			HttpURLConnection conn = null;
+			try {
+				urls = new URL(getString(R.string.get_user_defined_tree_large_image) + mSpeciesID + "_thumb.jpg");
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				conn = (HttpURLConnection)urls.openConnection();
+				conn.connect();
+				
+				
+				//ResponseCode 404, means there is no photo related to the corresponding id
+				//So in this case, we alternatively link to basic tree photo. (100_thumb.jpg)
+				 
+				if(conn.getResponseCode() == 404) {
+					speciesImage.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s1000", null, null));
+				}
+				else {
+					HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
+					dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) 
+							+ mSpeciesID + ".jpg", speciesImage);
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			*/
+			
 			
 			
 			myplantBtn.setOnClickListener(new View.OnClickListener() {
@@ -418,8 +449,7 @@ public class ListDetail extends Activity {
 							 */
 							Intent intent = new Intent(ListDetail.this, QuickCapture.class);
 							
-							intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
-							pbbItem.setProtocolID(HelperValues.QUICK_TREES_AND_SHRUBS);
+							intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 							intent.putExtra("pbbItem", pbbItem);
 							
 							startActivity(intent);
@@ -436,13 +466,12 @@ public class ListDetail extends Activity {
 							 * Move to Getphenophase without a photo.
 							 */
 							
-							Intent intent = new Intent(ListDetail.this, GetPhenophase.class);
+							Intent intent = new Intent(ListDetail.this, OneTimePhenophase.class);
 							
-							pbbItem.setProtocolID(HelperValues.QUICK_TREES_AND_SHRUBS);
 							pbbItem.setLocalImageName("");
 							
 							intent.putExtra("pbbItem", pbbItem);
-							intent.putExtra("from", HelperValues.FROM_UCLA_TREE_LISTS);
+							intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 							
 							startActivity(intent);
 						}
@@ -480,13 +509,19 @@ public class ListDetail extends Activity {
 			 *  Load image from the server
 			 */
 			HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-			dm.fetchDrawableOnThread("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/images/treelists/" + mSpeciesID + ".jpg", speciesImage);
+			dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) + mSpeciesID + ".jpg", speciesImage);
 	    	
 	    	
 	    	LinearLayout footer = (LinearLayout)findViewById(R.id.lower);
 	    	footer.setVisibility(View.GONE);
 	    }
 	    
+	}
+	
+	@Override
+	public void onResume() {
+		
+		
 	    // TODO Auto-generated method stub
 		super.onResume();
 	}
@@ -521,7 +556,6 @@ public class ListDetail extends Activity {
 				/*
 				 * Move to QuickCapture
 				 */
-				
 				Intent intent = new Intent(ListDetail.this, QuickCapture.class);
 				
 				pbbItem.setProtocolID(mProtocolID);
@@ -532,8 +566,6 @@ public class ListDetail extends Activity {
 				
 				startActivity(intent);
 
-				
-				
 			}
 		})
 		.setNeutralButton(getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
@@ -544,7 +576,7 @@ public class ListDetail extends Activity {
 				/*
 				 * Move to Getphenophase without a photo.
 				 */
-				Intent intent = new Intent(ListDetail.this, GetPhenophase.class);
+				Intent intent = new Intent(ListDetail.this, OneTimePhenophase.class);
 				pbbItem.setProtocolID(mProtocolID);
 				pbbItem.setLocalImageName("");
 				
@@ -633,7 +665,6 @@ public class ListDetail extends Activity {
 		/*
 		 * Pop up choose site dialog box
 		 */
-		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.AddPlant_chooseSite))
 		.setCancelable(true)

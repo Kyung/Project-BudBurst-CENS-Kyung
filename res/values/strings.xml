@@ -2,9 +2,6 @@
 <resources>
     <string name="app_name">Project Budburst</string>
     <string name="signupURL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/register_mobile</string>
-    <string name="instruction_old">You have no plants yet, or you need to synchronize your phone.\n\n (1) Synchronize your phone. \n\n If you just logged in\n\n (2) Start by adding a plant to an existing site (MENU &gt; Add Plant). \n\n (3) Please synchronize your phone with the database (Menu &gt; Synchronize).  If this fails, you may have connectivity problems.</string>
-    <string name="instruction">\n\nYou have just logged in and now need to synchronize your phone with the Project Budburst database.\n\nPlease click the Synchronize button if you have connectivity.\n\nYou can find Synchronize button at any page by clicking the MENU button.</string>
-    <string name="instruction2">\n\nYou have reached the synchronize page again. If you have some network problem while synchronization, please press Synchronize button again.</string>
     <string name="get_my_species_in_my_station_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_species_in_my_station</string>
     <string name="get_my_sites_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_sites</string>
     <string name="get_onetime_plant_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_plant_download.php</string>
@@ -16,9 +13,7 @@
     <string name="get_floracaching_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracaching_list.php</string>
     <string name="get_floracaching_plant_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracaching_plant_lists.php</string>
     <string name="user_plant_lists_image">http://networkednaturalist.org/User_Plant_Lists_Images/</string>
-    <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below.\n \n (1) Add a monitored BudBurst Observer plant. \nClick MENU-&gt;ADD-&gt;Add Observer \n\n (2) Share an Occasional Observer plant.  \nClick MENU-&gt;ADD-&gt;Share Occational \n\n\n If you already have observed species, then click MENU-&gt;SYNCHRONIZE\n\n</string>
-    <string name="get_user_spcies_URL">http://www.google.com</string>
-    <string name="upload_observation_URL">http://www.naver.com</string>
+    <string name="get_user_defined_species_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_tree_lists.php</string>
     <string name="add_site_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/register.php</string>
     <string name="download_obs_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/view.php</string>
     <string name="download_onetime_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/onetime.php</string>
@@ -26,8 +21,20 @@
     <string name="upload_ot_observation">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service</string>
     <string name="request_to_kickoff_background_search">http://networkednaturalist.org/python_scripts/cens-dylan/announce.py</string>
     <string name="request_to_get_result">http://networkednaturalist.org/python_scripts/cens-dylan/search.py</string>
-    <string name="check_version_number">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/checkUpdates.php</string>    
+    <string name="check_version_number">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/checkUpdates.php</string>
+    <string name="plant_of_week">http://networkednaturalist.org/python_scripts/plant_of_the_week_scrape.py</string>
+    <string name="get_floracache_detail_info">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracache_detail.php?floracache_id</string>
+    <string name="get_user_defined_tree_large_image">http://networkednaturalist.org/User_Plant_Lists_Images/</string>    
     <string name="submit_question">You have unsubmitted observations. Do you want to submit them?</string>
+    <string name="get_user_defined_group">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_user_defined_group.php</string>
+    <string name="get_floracache_species_image">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/onetime.php?image_id=</string>
+    <string name="get_user_spcies_URL">http://www.google.com</string>
+    <string name="upload_observation_URL">http://www.naver.com</string>
+    <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below.\n \n (1) Add a monitored BudBurst Observer plant. \nClick MENU-&gt;ADD-&gt;Add Observer \n\n (2) Share an Occasional Observer plant.  \nClick MENU-&gt;ADD-&gt;Share Occational \n\n\n If you already have observed species, then click MENU-&gt;SYNCHRONIZE\n\n</string>
+    <string name="Floracache_Easy_Success">Great! You are very close to the species. Proceed to make an observation?</string>
+    <string name="instruction_old">You have no plants yet, or you need to synchronize your phone.\n\n (1) Synchronize your phone. \n\n If you just logged in\n\n (2) Start by adding a plant to an existing site (MENU &gt; Add Plant). \n\n (3) Please synchronize your phone with the database (Menu &gt; Synchronize).  If this fails, you may have connectivity problems.</string>
+    <string name="instruction">\n\nYou have just logged in and now need to synchronize your phone with the Project Budburst database.\n\nPlease click the Synchronize button if you have connectivity.\n\nYou can find Synchronize button at any page by clicking the MENU button.</string>
+    <string name="instruction2">\n\nYou have reached the synchronize page again. If you have some network problem while synchronization, please press Synchronize button again.</string>
     <string-array name="state">
        <item>AL</item> 
        <item>AK</item> 
@@ -147,6 +154,7 @@
 <string name="Alert_comingSoon">Coming Soon!</string>
 <string name="Alert_thanks">Thank you!</string>
 <string name="Alert_holdBackExit">Hold the Back Button to exit.</string>
+<string name="Weekly_Plant_Text">Plant of the week!</string>
 <string name="Menu_help">Help</string>
 <string name="Menu_settings">Settings</string>
 <string name="Menu_Satellite">Change view</string>
@@ -351,6 +359,7 @@
 <string name="Menu_Maps">Map View</string>
 <string name="Menu_Floracaching">Floracache Group Lists</string>
 <string name="Menu_Refresh">Refresh the lists</string>
+<string name="Menu_Refresh_User_Group">Refresh groups</string>
 <string name="Local_BudBurst">Local plants</string>
 <string name="Local_Invasive">Local plants</string>
 <string name="Local_Native">Local plants</string>
@@ -361,11 +370,16 @@
 <string name="Button_Cancel">Cancel</string>
 <string name="Button_Photo">Photo</string>
 <string name="Button_NoPhoto">No Photo</string>
+<string name="Start_Downloading_All_Lists">Start downloading</string>
+<string name="Down_Downloading_All_Lists">Download complete - plant lists</string>
+<string name="Success_Downloading_All_Lists">Successfully download plant lists</string>
 <string name="Start_Downloading">Start downloading local species</string>
 <string name="Still_Downloading">Still Downloading the lists</string>
 <string name="Download_complete_local">Successfully download local plant lists</string>
 <string name="Start_Downloading_UCLA_Tree_Lists">Start Downloading user defined lists</string>
 <string name="Start_Downloading_Floracache_Lists">Start Downloading floracache lists</string>
+<string name="List_USDA_PlantLists_title">Local Species</string>
+<string name="List_USDA_PlantLists_content">County-wide species from the USDA</string>
 <string name="List_Budburst">Local BudBurst plants</string>
 <string name="List_Whatsinvasive">Help locate local invasives</string>
 <string name="List_Whats_endangered">Local endangered species from the USDA</string>
@@ -384,11 +398,25 @@
 <string name="My_Plant_Summary">My Plant Summary</string>
 <string name="Map_Getting_GPS_Signal">Getting GPS signal...</string>
 <string name="WeeklyPlant"> Weekly Plant</string>
-<string name="mapKeyDeveloper">0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ</string>
-<string name="mapKey">0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ</string>
+<string name="mapKeyDeveloper">0s7Km0gbaIiKBYVtiNAMqhcQ-GxiIzQLk9hfMVw</string>
+<string name="mapKey">0s7Km0gbaIiKs3O3JWd0Z-buRDetHeueWiJGxeA</string>
 <string name="otherCategoryMap">Choose a list</string>
-<string name="DownLoad_Tree_Lists">Download Treelists</string>
+<string name="DownLoad_Tree_Lists">Download User Defined Lists</string>
+<string name="Floracache_Level">Choose a difficulty</string>
 <string name="List_ask_connectivity">Make sure you have a good connectivity. Proceed?</string>
 <string name="List_Download_Title">Download local species</string>
+<string name="No_Info_Species_Detail">This species has no other information or has not been downloaded yet. Please download the local/user plant lists to see the thumbnail.</string>
+<string name="Update_Database_Table">Please turn on GPS to use this system. Press Redirect button to move to the settings page.</string>
+<string name="Downloading_PlantList">Downloading plant lists</string>
+<string name="Pref_Category1">Downloads Species Lists</string>
+<string name="Pref_Category2">Download Local Lists</string>
+<string name="Pref_Category3">Download User Defined Lists</string>
+<string name="Pref_Category4">Download Floracache Lists</string>
+<string name="Pref_Category5">User Account</string>
+<string name="Pref_Category6">Logout</string>
+<string name="Floracache_Game">Floracache</string>
+<string name="Floracache_Hard_Refresh">Refresh the list</string>
+<string name="go_to_settings_page">To download the lists, Go to the \'Settings\' page</string>
+<string name="cateogory_text">Category</string>
 <item type="id" name="app_notification_id"/>
 </resources>

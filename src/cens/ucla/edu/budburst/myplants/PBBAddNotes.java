@@ -1,9 +1,12 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.utils.PBBItems;
@@ -23,22 +26,10 @@ import android.widget.Toast;
 
 public class PBBAddNotes extends Activity {
 
-	private String mCommonName;
-	private String mScienceName;
-	private String mCameraImageID;
-	private String mNotes;
+	
+	private String mNotes;	
 	private String mImageID;
-	
-	private int mProtocolID;
-	private int mPhenoID;
-	private int mSpeciesID;
-	private int mCategory;
 	private int mPreviousActivity;
-	private int mPlantID;
-	private int mSiteID;
-	
-	private double mLatitude;
-	private double mLongitude;
 	
 	private Button doneBtn;
 	private Button skipBtn;
@@ -63,30 +54,15 @@ public class PBBAddNotes extends Activity {
 		//Intent p_intent = getIntent();
 		Bundle bundle = getIntent().getExtras();
 		pbbItem = bundle.getParcelable("pbbItem");
-		mCommonName = pbbItem.getCommonName();
-		mScienceName = pbbItem.getScienceName();
-		mCameraImageID = pbbItem.getImageName();
-		mProtocolID = pbbItem.getProtocolID();
-		mSpeciesID = pbbItem.getSpeciesID();
-		mPhenoID = pbbItem.getPhenophaseID();
-		mLatitude = pbbItem.getLatitude();
-		mLongitude = pbbItem.getLongitude();
-		mCategory = pbbItem.getCategory();
-		mPlantID = pbbItem.getPlantID();
-		mSiteID = pbbItem.getSiteID();
-		
+	
 		mImageID = bundle.getString("image_id");
 		mPreviousActivity = bundle.getInt("from", 0);
 	    
-		Log.i("K", "AddNotes(imageID) : " + mImageID);
-		Log.i("K", "AddNotes(mCategory) : " + mCategory);
-		
 	    doneBtn = (Button) findViewById(R.id.notes_done);
 	    skipBtn = (Button) findViewById(R.id.skip);
 	    noteTxt = (EditText) findViewById(R.id.notes);
 	    
 	    noteTxt.setText("");
-	    
 	    // TODO Auto-generated method stub
 	}
 	
@@ -102,7 +78,7 @@ public class PBBAddNotes extends Activity {
 				
 				if(mPreviousActivity == HelperValues.FROM_QC_PHENOPHASE || mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
 					
-					Intent intent = new Intent(PBBAddNotes.this, PlantObservationSummary.class);
+					Intent intent = new Intent(PBBAddNotes.this, PBBObservationPage.class);
 					intent.putExtra("pbbItem", pbbItem);
 					intent.putExtra("from", mPreviousActivity);
 					startActivity(intent);
@@ -129,7 +105,7 @@ public class PBBAddNotes extends Activity {
 				pbbItem.setNote(noteTxt.getText().toString());
 				// TODO Auto-generated method stub
 				if(mPreviousActivity == HelperValues.FROM_QC_PHENOPHASE || mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE) {
-					Intent intent = new Intent(PBBAddNotes.this, PlantObservationSummary.class);
+					Intent intent = new Intent(PBBAddNotes.this, PBBObservationPage.class);
 					intent.putExtra("pbbItem", pbbItem);
 					intent.putExtra("from", mPreviousActivity);
 				

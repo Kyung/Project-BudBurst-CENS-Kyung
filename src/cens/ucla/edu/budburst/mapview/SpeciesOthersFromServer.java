@@ -20,6 +20,7 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 
 import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.helper.HelperJSONParser;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
@@ -94,7 +95,7 @@ public class SpeciesOthersFromServer extends AsyncTask<String, Void, Void>{
 				
 				for(int i = 0 ; i < jsonAry.length() ; i++) {
 					
-					String imageID = jsonAry.getJSONObject(i).getString("Image_ID");
+					String imageName = jsonAry.getJSONObject(i).getString("Image_ID");
 					int speciesID = Integer.parseInt(jsonAry.getJSONObject(i).getString("Species_ID"));
 					int phenophaseID = Integer.parseInt(jsonAry.getJSONObject(i).getString("Phenophase_ID"));
 					int protocolID = Integer.parseInt(jsonAry.getJSONObject(i).getString("Protocol_ID"));
@@ -111,10 +112,23 @@ public class SpeciesOthersFromServer extends AsyncTask<String, Void, Void>{
 					
 					int plantID = 0;
 					
-					HelperPlantItem pi = new HelperPlantItem(HelperValues.OTHERS_PLANT_LIST, 
-							HelperValues.FROM_QUICK_CAPTURE, speciesID, 
-							plantID, category, userName, commonName, scienceName, phenophaseID, protocolID, 
-							latitude, longitude, imageID, date, notes);
+					HelperPlantItem pi = new HelperPlantItem();
+					//public HelperPlantItem(int aWhichList, int aWhere, int aSpeciesID, int aPlantID, int aCategory, String aUserName, String aCommonName, String aScienceName, int aPhenoID, int aProtocolID, double aLatitude, double aLongitude, String aImageName, String aDate, String aNotes) {
+					pi.setWhichList(HelperValues.OTHERS_PLANT_LIST);
+					pi.setWhere(HelperValues.FROM_QUICK_CAPTURE);
+					pi.setSpeciesID(speciesID);
+					pi.setPlantID(plantID);
+					pi.setCategory(category);
+					pi.setUserName(userName);
+					pi.setCommonName(commonName);
+					pi.setSpeciesName(scienceName);
+					pi.setPhenoID(phenophaseID);
+					pi.setProtocolID(protocolID);
+					pi.setLatitude(latitude);
+					pi.setLongitude(longitude);
+					pi.setImageName(imageName);
+					pi.setDate(date);
+					pi.setNote(notes);
 					
 					mPlantList.add(pi);
 				}
@@ -127,9 +141,10 @@ public class SpeciesOthersFromServer extends AsyncTask<String, Void, Void>{
 			e.printStackTrace();
 		}
 		
-		int numMoreSpecies = MAX_SPEICES - getCount;
-		getFlickrResults(numMoreSpecies);
-				
+		if(mCategory == HelperValues.LOCAL_BUDBURST_LIST) {
+			int numMoreSpecies = MAX_SPEICES - getCount;
+			getFlickrResults(numMoreSpecies);
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -176,8 +191,11 @@ public class SpeciesOthersFromServer extends AsyncTask<String, Void, Void>{
 					JSONArray jsonAry = new JSONArray(result);
 					
 					for(int i = 0 ; i < jsonAry.length() ; i++) {
+						
+						
+						StaticDBHelper sDBH = new StaticDBHelper(mContext);
 						String imageUrl = jsonAry.getJSONObject(i).getString("url");
-						int speciesID = 999;
+						int speciesID = sDBH.getSpeciesID(mContext, jsonAry.getJSONObject(i).getString("common"));
 						int phenophaseID = 0;
 						int protocolID = 1; // temporary put 1
 						int category = HelperValues.LOCAL_FLICKR;
@@ -193,10 +211,23 @@ public class SpeciesOthersFromServer extends AsyncTask<String, Void, Void>{
 						
 						int plantID = 0;
 						
-						HelperPlantItem pi = new HelperPlantItem(HelperValues.OTHERS_PLANT_LIST, 
-								HelperValues.FROM_QUICK_CAPTURE, speciesID, 
-								plantID, category, userName, commonName, scienceName, phenophaseID, protocolID, 
-								latitude, longitude, imageUrl, date, notes);
+						HelperPlantItem pi = new HelperPlantItem();
+						//public HelperPlantItem(int aWhichList, int aWhere, int aSpeciesID, int aPlantID, int aCategory, String aUserName, String aCommonName, String aScienceName, int aPhenoID, int aProtocolID, double aLatitude, double aLongitude, String aImageName, String aDate, String aNotes) {
+						pi.setWhichList(HelperValues.OTHERS_PLANT_LIST);
+						pi.setWhere(HelperValues.FROM_QUICK_CAPTURE);
+						pi.setSpeciesID(speciesID);
+						pi.setPlantID(plantID);
+						pi.setCategory(category);
+						pi.setUserName(userName);
+						pi.setCommonName(commonName);
+						pi.setSpeciesName(scienceName);
+						pi.setPhenoID(phenophaseID);
+						pi.setProtocolID(protocolID);
+						pi.setLatitude(latitude);
+						pi.setLongitude(longitude);
+						pi.setImageName(imageUrl);
+						pi.setDate(date);
+						pi.setNote(notes);
 						
 						mPlantList.add(pi);
 					}

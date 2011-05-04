@@ -1,4 +1,4 @@
-package cens.ucla.edu.budburst;
+package cens.ucla.edu.budburst.myplants;
 
 import java.io.File;
 import java.io.InputStream;
@@ -6,14 +6,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.R.drawable;
+import cens.ucla.edu.budburst.R.id;
+import cens.ucla.edu.budburst.R.layout;
+import cens.ucla.edu.budburst.R.string;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperValues;
-import cens.ucla.edu.budburst.onetime.QuickCapture;
 import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -117,7 +122,7 @@ public class GetPhenophaseObserver extends ListActivity {
 	    science_name.setText(mScienceName);
 	    
 	    mHelper = new HelperFunctionCalls();
-	    mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+	    mHelper.showSpeciesThumbNailObserver(this, mCategory, mSpeciesID, mScienceName, species_image);
 	    
 	    
 	    // setting species information into arraylists
@@ -156,33 +161,36 @@ public class GetPhenophaseObserver extends ListActivity {
 	    	if(cursor2.getCount() > 0) {
 	    		Log.i("K", "item already in the table...observed phenophase");
 	    		
-	    		pi = new HelperPlantItem(cursor.getInt(2), 
-	    				cursor.getInt(0), 
-	    				cursor.getInt(4), 
-	    				cursor.getString(1), 
-	    				cursor.getString(3), 
-	    				cursor2.getString(3), 
-	    				cursor2.getInt(0), 
-	    				cursor2.getInt(1), 
-	    				cursor2.getString(4),
-	    				cursor2.getString(5), 
-	    				true);
+	    		pi = new HelperPlantItem();
+	    		pi.setPhenoImageID(cursor.getInt(0));
+	    		pi.setDescription(cursor.getString(1));
+	    		pi.setPhenoID(cursor.getInt(2));
+	    		pi.setPhenoName(cursor.getString(3));
+	    		pi.setProtocolID(cursor.getInt(4));
+	    		pi.setSpeciesID(cursor2.getInt(0));
+	    		pi.setSiteID(cursor2.getInt(1));
+	    		pi.setImageName(cursor2.getString(3));
+	    		pi.setDate(cursor2.getString(4));
+	    		pi.setNote(cursor2.getString(5));	    				
+	    		pi.setFlag(true);				
 	    		
 		    	pItem.add(pi);
 	    	}
 	    	else {
 
-	    		pi = new HelperPlantItem(cursor.getInt(2), 
-	    				cursor.getInt(0), 
-	    				cursor.getInt(4), 
-	    				cursor.getString(1), 
-	    				cursor.getString(3), 
-	    				"", 
-	    				0, 
-	    				0, 
-	    				"", 
-	    				"", 
-	    				false);
+	    		pi = new HelperPlantItem();
+	    		pi.setPhenoImageID(cursor.getInt(0));
+	    		pi.setDescription(cursor.getString(1));
+	    		pi.setPhenoID(cursor.getInt(2));
+	    		pi.setProtocolID(cursor.getInt(4));
+	    		pi.setPhenoName(cursor.getString(3));
+	    		pi.setSpeciesID(0);
+	    		pi.setSiteID(0);
+	    		pi.setImageName("");
+	    		pi.setDate("");
+	    		pi.setNote("");
+	    		pi.setFlag(false);
+
 	    		pItem.add(pi);
 	 
 	    	}
@@ -205,16 +213,16 @@ public class GetPhenophaseObserver extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		currentPosition = position;
-		pbbItem.setPhenophaseID(pItem.get(position).PhenoID);
-		pbbItem.setDate(pItem.get(position).Date);
-		pbbItem.setNote(pItem.get(position).Note);
-		pbbItem.setLocalImageName(pItem.get(position).ImageName);
+		pbbItem.setPhenophaseID(pItem.get(position).getPhenoID());
+		pbbItem.setDate(pItem.get(position).getDate());
+		pbbItem.setNote(pItem.get(position).getNote());
+		pbbItem.setLocalImageName(pItem.get(position).getImageName());
 		
 		/*
 		 * Flag == True, means this position of phenophase has been observed.
 		 */
-		if(pItem.get(position).Flag) {
-			Intent intent = new Intent(GetPhenophaseObserver.this, SummaryPlantInfo.class);
+		if(pItem.get(position).getFlag()) {
+			Intent intent = new Intent(GetPhenophaseObserver.this, PBBObservationSummary.class);
 			intent.putExtra("pbbItem", pbbItem);
 			intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
 			startActivity(intent);
@@ -281,7 +289,7 @@ public class GetPhenophaseObserver extends ListActivity {
 		}
 		
 		public String getItem(int position){
-			return arSrc.get(position).Description;
+			return arSrc.get(position).getDescription();
 		}
 		
 		public long getItemId(int position){
@@ -294,11 +302,11 @@ public class GetPhenophaseObserver extends ListActivity {
 			
 			String yes_or_no = "";
 			
-			int resId = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).PhenoImageID, null, null);
+			int resId = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+arSrc.get(position).getPhenoImageID(), null, null);
 			Bitmap icon = overlay(BitmapFactory.decodeResource(getResources(), resId));
-			if(arSrc.get(position).Flag == true) {
+			if(arSrc.get(position).getFlag() == true) {
 			
-				File file_size = new File(HelperValues.BASE_PATH + arSrc.get(position).ImageName + ".jpg");
+				File file_size = new File(HelperValues.BASE_PATH + arSrc.get(position).getImageName() + ".jpg");
 				
 			    // if there's a photo in the table show that with replace_photo_button
 			    if(file_size.length() != 0) {
@@ -325,9 +333,9 @@ public class GetPhenophaseObserver extends ListActivity {
 					// TODO Auto-generated method stub
 					HelperPlantItem pi = (HelperPlantItem)v.getTag();
 					
-					Intent intent = new Intent(GetPhenophaseObserver.this, PhenophaseDetail.class);
-					intent.putExtra("id", pi.PhenoID);
-					intent.putExtra("protocol_id", pi.ProtocolID);
+					Intent intent = new Intent(GetPhenophaseObserver.this, PBBPhenophaseInfo.class);
+					intent.putExtra("id", pi.getPhenoID());
+					intent.putExtra("protocol_id", pi.getProtocolID());
 					intent.putExtra("from", HelperValues.FROM_PBB_PHENOPHASE);
 					startActivity(intent);
 				}
@@ -338,8 +346,8 @@ public class GetPhenophaseObserver extends ListActivity {
 			TextView textname = (TextView)convertView.findViewById(R.id.pheno_text);
 			
 			yesorno_photo.setText(yes_or_no);
-			phenoName.setText(arSrc.get(position).PhenoName);
-			textname.setText(arSrc.get(position).Description);
+			phenoName.setText(arSrc.get(position).getPhenoName());
+			textname.setText(arSrc.get(position).getDescription());
 			
 			return convertView;
 		}
