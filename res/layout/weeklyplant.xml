@@ -129,7 +129,7 @@
 	  	android:layout_weight="0.5"
 	  	android:id="@+id/to_myplant"
 	  	android:textSize="16sp"
-	  	android:text="@string/Help_MyList_addPlant"
+	  	android:text="@string/Menu_addPlant"
 	  />
 	<Button
 	  	android:layout_width="fill_parent"
@@ -137,7 +137,7 @@
 	  	android:layout_weight="0.5"
 	  	android:id="@+id/to_shared_plant"
 	  	android:textSize="16sp"
-	  	android:text="@string/Main_quickCapture"
+	  	android:text="@string/Menu_addQCPlant"
 	  />
   </LinearLayout>
   <!-- end Footer -->

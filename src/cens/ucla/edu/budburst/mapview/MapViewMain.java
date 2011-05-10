@@ -385,7 +385,7 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 
 					mMapController = mMapView.getController();
 					mMapController.animateTo(current_point);
-					mMapController.setZoom(15);
+					mMapController.setZoom(17);
 				}
 				return true;
 			case 2:

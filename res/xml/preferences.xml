@@ -22,12 +22,21 @@
   	
   </PreferenceCategory>
   <PreferenceCategory
+  	android:title="@string/Pref_Category8"
+  >
+	<Preference
+  		android:title="@string/Pref_Category7"  		
+  		android:key="update"
+  	/>
+  </PreferenceCategory>
+  <PreferenceCategory
   	android:title="@string/Pref_Category5"
   >
     <Preference
   		android:title="@string/Pref_Category6"  		
   		android:key="userlogout"
   	/>
+
   	
   </PreferenceCategory>
 </PreferenceScreen>

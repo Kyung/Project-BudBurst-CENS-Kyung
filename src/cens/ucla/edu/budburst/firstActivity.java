@@ -9,6 +9,7 @@ import java.net.URL;
 import org.apache.http.util.ByteArrayBuffer;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper2;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
@@ -48,17 +49,17 @@ public class firstActivity extends Activity{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.splash);
-	    // TODO Auto-generated method stub	    
+	    // TODO Auto-generated method stub	
 	}
 	
 	public void onResume() {
 		super.onResume();
 		
-		Intent service = new Intent(firstActivity.this, HelperBackgroundService.class);
-	    startService(service);
-		
 		getCurrentVersion();
 		moveToMainPage();
+		
+		Intent service = new Intent(firstActivity.this, HelperBackgroundService.class);
+	    startService(service);
 	}
 	
 	public void getCurrentVersion() {
@@ -84,24 +85,6 @@ public class firstActivity extends Activity{
 		edit.commit();
 		
 		if(!mGetCurrentVersion.equals(mGetOldVersion)) {
-	    	/*
-		     * Upgrade Database...
-		     */
-		    StaticDBHelper staticDBHelper = new StaticDBHelper(firstActivity.this);
-			SyncDBHelper syncDBHelper = new SyncDBHelper(firstActivity.this);
-			OneTimeDBHelper otDBHelper = new OneTimeDBHelper(firstActivity.this);
-			
-			SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
-			
-			staticDBHelper.onUpgrade(staticDB, 1, 2);
-			
-			staticDB.close();
-		 	staticDBHelper.close();
-		 	syncDBHelper.close();
-		 	otDBHelper.close();
-			
-		 	Log.i("K", "application database has been upgraded");
-		 	
 		 	downloadPlantLists();
 		}
 		else {

@@ -176,12 +176,8 @@ public class PBBObservationSummary extends MapActivity {
 		myMap.setSatellite(false);
 		myMap.setBackgroundResource(R.drawable.shapedrawable);
 		
-		
 		StaticDBHelper sDBH = new StaticDBHelper(this);
-		HashMap pInfo = sDBH.getPhenoName(this, mPhenoID);
 		
-	    // put cname and sname in the textView
-	    pheno_title.setText(pInfo.get("pType") + " ");
 	    dt_takenTxt.setText(mDate + " ");
 	    
 	    cnameTxt.setText(mCommonName + " ");
@@ -197,9 +193,13 @@ public class PBBObservationSummary extends MapActivity {
 		if(mPreviousActivity == HelperValues.FROM_PBB_PHENOPHASE
 				|| mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
 			mHelper.showSpeciesThumbNailObserver(this, mCategory, mSpeciesID, mScienceName, species_image);
+			HashMap pInfo = sDBH.getPhenoNameObserver(this, mPhenoID, mProtocolID);
+			pheno_title.setText(pInfo.get("pType") + " ");
 		}
 		else {
 			mHelper.showSpeciesThumbNail(this, mCategory, mSpeciesID, mScienceName, species_image);
+			HashMap pInfo = sDBH.getPhenoName(this, mPhenoID);
+		    pheno_title.setText(pInfo.get("pType") + " ");
 		}
 
 	    // when click species image

@@ -165,6 +165,7 @@ public class SpeciesDetailMap extends MapActivity {
 	    
 	    mSpinner = (ProgressBar) findViewById(R.id.progressbar);
 	    
+	    // showing the species image differently based on the category
 	    if(mCategory == HelperValues.LOCAL_FLICKR) {
 	    	mDrawManager = new HelperDrawableManager(mSpinner);
 		    if(mImageID != null)
@@ -183,7 +184,10 @@ public class SpeciesDetailMap extends MapActivity {
 	    else {
 	    	mSpinner.setVisibility(View.GONE);
 	    	phoneImage.setVisibility(View.VISIBLE);
-	    	phoneImage.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + mSpeciesID, null, null));
+	    	HelperFunctionCalls helper = new HelperFunctionCalls();
+			helper.showSpeciesThumbNail(SpeciesDetailMap.this, 
+					mCategory, mSpeciesID, 
+					mScienceName, phoneImage);
 	    }
 	    
 	    phoneImage.setBackgroundResource(R.drawable.shapedrawable);
@@ -203,7 +207,11 @@ public class SpeciesDetailMap extends MapActivity {
 					mDrawManager.fetchDrawableOnThread(mImageID, imageView);
 				}
 				else {
-					imageView.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + mSpeciesID, null, null));
+					//imageView.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s" + mSpeciesID, null, null));
+					HelperFunctionCalls helper = new HelperFunctionCalls();
+					helper.showSpeciesThumbNail(SpeciesDetailMap.this, 
+							mCategory, mSpeciesID, 
+							mScienceName, imageView);
 				}
 			    			    
 			    // when press 'Back', close the dialog

@@ -399,7 +399,7 @@
 <string name="Map_Getting_GPS_Signal">Getting GPS signal...</string>
 <string name="WeeklyPlant"> Weekly Plant</string>
 <string name="mapKeyDeveloper">0s7Km0gbaIiKBYVtiNAMqhcQ-GxiIzQLk9hfMVw</string>
-<string name="mapKey">0s7Km0gbaIiKs3O3JWd0Z-buRDetHeueWiJGxeA</string>
+<string name="mapKey">0s7Km0gbaIiLZMleKkk70IIETcEve_rUT-kVErw</string>
 <string name="otherCategoryMap">Choose a list</string>
 <string name="DownLoad_Tree_Lists">Download User Defined Lists</string>
 <string name="Floracache_Level">Choose a difficulty</string>
@@ -414,9 +414,11 @@
 <string name="Pref_Category4">Download Floracache Lists</string>
 <string name="Pref_Category5">User Account</string>
 <string name="Pref_Category6">Logout</string>
+<string name="Pref_Category7">System Updates</string>
+<string name="Pref_Category8">System</string>
 <string name="Floracache_Game">Floracache</string>
 <string name="Floracache_Hard_Refresh">Refresh the list</string>
-<string name="go_to_settings_page">To download the lists, Go to the \'Settings\' page</string>
+<string name="go_to_settings_page">Please download the species list first.\nTo download the lists, Go to the \'Settings\' page</string>
 <string name="cateogory_text">Category</string>
 <item type="id" name="app_notification_id"/>
 </resources>

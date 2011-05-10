@@ -61,6 +61,7 @@ public class ListMain extends ListActivity {
 	private MyListAdapterMainPage mylistapdater;
 	private HelperSharedPreference mPref;
 	private ArrayList<ListGroupItem> mArr = new ArrayList<ListGroupItem>();
+	private boolean isUserDefinedListOn = true;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -77,8 +78,6 @@ public class ListMain extends ListActivity {
 		
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + getString(R.string.Menu_Lists));
-		
-		getLists();
 	    // TODO Auto-generated method stub
 	}
 	
@@ -97,6 +96,13 @@ public class ListMain extends ListActivity {
 		 *  and more later.
 		 */
 		iItem.setHeaderText(getString(R.string.List_Official_Header));
+		iItem.setTitle(getString(R.string.List_Project_Budburst_title));
+		iItem.setImageURL("pbb_icon_main2");
+		iItem.setDescription(getString(R.string.List_Budburst));
+		listArr.add(iItem);
+		
+		iItem = new HelperListItem();
+		iItem.setHeaderText("none");
 		iItem.setTitle(getString(R.string.List_USDA_PlantLists_title));
 		iItem.setImageURL("poisonous");
 		iItem.setDescription(getString(R.string.List_USDA_PlantLists_content));
@@ -106,20 +112,33 @@ public class ListMain extends ListActivity {
 		OneTimeDBHelper oDBH = new OneTimeDBHelper(this);
 		mArr = oDBH.getListGroupItem(this);
 		
-		for(int i = 0 ; i < mArr.size() ; i++) {
-			String header = "none";
-			
-			// index 0 only holds the header at the top.
-			if(i == 0) {
-				header = getString(R.string.List_User_Plant_Header);
-			}
+		if(mArr.size() == 0) {
 			iItem = new HelperListItem();
-			
-			iItem.setHeaderText(header);
-			iItem.setTitle(mArr.get(i).getCategoryName());
-			iItem.setImageURL(String.valueOf(mArr.get(i).getCategoryID()));
-			iItem.setDescription(mArr.get(i).getDescription());
+			iItem.setHeaderText(getString(R.string.List_User_Plant_Header));
+			iItem.setTitle("No list yet");
+			iItem.setImageURL("yellow_triangle_exclamation50");
+			iItem.setDescription("Please download the user defined lists. Menu->Settings->Download User Defined List");
 			listArr.add(iItem);
+			
+			isUserDefinedListOn = false;
+		}
+		else {
+			
+			for(int i = 0 ; i < mArr.size() ; i++) {
+				String header = "none";
+				
+				// index 0 only holds the header at the top.
+				if(i == 0) {
+					header = getString(R.string.List_User_Plant_Header);
+				}
+				iItem = new HelperListItem();
+				
+				iItem.setHeaderText(header);
+				iItem.setTitle(mArr.get(i).getCategoryName());
+				iItem.setImageURL(String.valueOf(mArr.get(i).getCategoryID()));
+				iItem.setDescription(mArr.get(i).getDescription());
+				listArr.add(iItem);
+			}
 		}
 		
 		mylistapdater = new MyListAdapterMainPage(ListMain.this, R.layout.onetime_list ,listArr);
@@ -129,6 +148,8 @@ public class ListMain extends ListActivity {
 
 	public void onResume() {
 		super.onResume();
+		
+		getLists();
 	}
 	
 	@Override
@@ -139,29 +160,45 @@ public class ListMain extends ListActivity {
 		double longitude = Double.parseDouble(mPref.getPreferenceString("longitude", "0.0"));
 	
 		/*
-		 *  Category
 		 *  1 : Project Budburst
 		 *  2 : What's Invasive
-		 *  3 : Poisonous
-		 *  4 : Endangered
-		 *  10 : Tree lists 
-		 *  11 : What's Blooming
+		 *  3 : Native <- temporarily not used
+		 *  4 : Poisonous
+		 *  5 : Endangered
+		 *  > 10 : User Defined Lists
 		 *  and more later.
 		 */
+		
 		if(position == 0) {
+			if(mPref.getPreferenceBoolean("localbudburst")) {
+				Intent intent = new Intent(ListMain.this, ListSubCategory.class);
+				intent.putExtra("category", HelperValues.LOCAL_BUDBURST_LIST);
+				startActivity(intent);
+			}
+			else {
+				Toast.makeText(ListMain.this, getString(R.string.go_to_settings_page), Toast.LENGTH_SHORT).show();
+			}
+		}
+		else if(position == 1) {
 			showLocalListDialog();
 		}
 		// if user defined lists selected.
 		else {
-			Intent intent = new Intent(ListMain.this, ListUserDefinedSpecies.class);
-			PBBItems pbbItem = new PBBItems();			
-			pbbItem.setCategory(mArr.get(position-1).getCategoryID());
-			intent.putExtra("pbbItem", pbbItem);
-			intent.putExtra("from", 0);
-			startActivity(intent);
+			if(isUserDefinedListOn) {
+				Intent intent = new Intent(ListMain.this, ListUserDefinedSpecies.class);
+				PBBItems pbbItem = new PBBItems();			
+				pbbItem.setCategory(mArr.get(position-2).getCategoryID());
+				intent.putExtra("pbbItem", pbbItem);
+				intent.putExtra("from", 0);
+				startActivity(intent);
+			}
+			else {
+				Intent intent = new Intent(ListMain.this, HelperSettings.class);
+				intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
+				startActivity(intent);
+			}
 		}
 	}
-	
 
 	private void showLocalListDialog() {
 		new AlertDialog.Builder(ListMain.this)
@@ -172,17 +209,6 @@ public class ListMain extends ListActivity {
 				
 				switch(which) {
 				case 0:
-					if(mPref.getPreferenceBoolean("localbudburst")) {
-						Intent intent = new Intent(ListMain.this, ListSubCategory.class);
-						intent.putExtra("category", HelperValues.LOCAL_BUDBURST_LIST);
-						startActivity(intent);
-					}
-					else {
-						Toast.makeText(ListMain.this, getString(R.string.go_to_settings_page), Toast.LENGTH_SHORT).show();
-					}
-					break;
-					
-				case 1:
 					if(mPref.getPreferenceBoolean("localwhatsinvasive")) {
 						Intent intent = new Intent(ListMain.this, ListSubCategory.class);
 						intent.putExtra("category", HelperValues.LOCAL_WHATSINVASIVE_LIST);
@@ -193,7 +219,7 @@ public class ListMain extends ListActivity {
 					}
 					break;
 					
-				case 2:
+				case 1:
 					// Poisonous Plants
 					if(mPref.getPreferenceBoolean("localpoisonous")) {
 						Intent intent = new Intent(ListMain.this, ListSubCategory.class);
@@ -206,7 +232,7 @@ public class ListMain extends ListActivity {
 					
 					break;
 					
-				case 3:
+				case 2:
 					// Endangered Plants
 					if(mPref.getPreferenceBoolean("localendangered")) {
 						Intent intent = new Intent(ListMain.this, ListSubCategory.class);

@@ -36,6 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -50,13 +51,14 @@ import android.widget.Toast;
 
 public class HelperSettings extends PreferenceActivity {
 
-	private SharedPreferences pref;
+	private HelperSharedPreference mPref;
 	private String mUsername;
 	private int mPreviousActivity;
 	private int mOneTimeMainPreviousActivity;
 	private ArrayList<ListGroupItem> mArr;
 	private boolean[] mSelect;
 	private String[] mGroupName;
+	static final int UNINSTALL_REQUEST = 0;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -65,7 +67,7 @@ public class HelperSettings extends PreferenceActivity {
 	    
 	    mArr = new ArrayList<ListGroupItem>();
 	    
-	    pref = getSharedPreferences("userinfo", 0);
+	    mPref = new HelperSharedPreference(this);
 	    Intent pIntent = getIntent();
 	    mPreviousActivity = pIntent.getExtras().getInt("from");
 	    
@@ -142,8 +144,6 @@ public class HelperSettings extends PreferenceActivity {
 						
 						FloracacheGetLists fLists = new FloracacheGetLists(HelperSettings.this);
 						fLists.execute(getString(R.string.get_floracaching_plant_lists));
-						
-						//FloraCacheGetGroups fGroups = new FloraCacheGetGroups(HelperSettings.this);
 					}
 				})
 				.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
@@ -159,17 +159,64 @@ public class HelperSettings extends PreferenceActivity {
 	    	
 	    });
 	    
-	    mUsername = pref.getString("Username", "");
+	    mUsername = mPref.getPreferenceString("Username", "");
 	    if(mUsername.equals("test10")){
 	    	mUsername = "Preview";
 	    }
+	    
+	    Preference updatePref = (Preference) findPreference("update");
+	    if(mPref.getPreferenceBoolean("needUpdate")) {
+	    	updatePref.setTitle("Need to update");
+		    updatePref.setSummary("Please update the application");
+	    }
+	    else {
+	    	updatePref.setTitle("No need to update");
+		    updatePref.setSummary("The most recent version");
+	    }
+	    
+	    updatePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+			@Override
+			public boolean onPreferenceClick(Preference arg0) {
+				// TODO Auto-generated method stub
+				if(mPref.getPreferenceBoolean("needUpdate")) {
+					new AlertDialog.Builder(HelperSettings.this)
+					.setTitle("Upgrade the app")
+					.setMessage("Move to the market, you may uninstall and reinstall the app.")
+					.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							Intent intent = new Intent(Intent.ACTION_VIEW);
+							intent.setData(Uri.parse("market://details?id=cens.ucla.edu.budburst"));
+							startActivity(intent);
+						}
+					})
+					.setNegativeButton(getString(R.string.Button_back), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+						}
+					})
+					.show();
+					//Uri packageURI = Uri.parse("package:cens.ucla.edu.budburst");
+					//Intent unInstall = new Intent(Intent.ACTION_DELETE, packageURI);
+					//startActivityForResult(unInstall, UNINSTALL_REQUEST);
+				}
+				else {
+					Toast.makeText(HelperSettings.this, "No need to update", Toast.LENGTH_SHORT).show();
+				}
+				return false;
+			}
+	    });
+	    
 	    
 	    Preference logoutPref = (Preference) findPreference("userlogout");
 	    if(mPreviousActivity != HelperValues.FROM_MAIN_PAGE) {
 	    	logoutPref.setEnabled(false);
 	    	logoutPref.setSummary("Only logout from the main page");
 	    }
-	    
 	    
 	    logoutPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
@@ -183,22 +230,21 @@ public class HelperSettings extends PreferenceActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						pref = getSharedPreferences("userinfo",0);
-						SharedPreferences.Editor edit = pref.edit();				
-						edit.putString("Username","");
-						edit.putString("Password","");
-						edit.putString("synced", "false");
-						edit.putBoolean("getTreeLists", false);
-						edit.putBoolean("Update", false);
-						edit.putBoolean("localbudburst", false);
-						edit.putBoolean("localwhatsinvasive", false);
-						edit.putBoolean("localpoisonous", false);
-						edit.putBoolean("localendangered", false);
-						edit.putBoolean("listDownloaded", false);
-						edit.putBoolean("firstDownloadTreeList", true);
-						edit.putBoolean("floracache", false);
-						edit.commit();
-
+						
+						mPref.setPreferencesString("Username", "");
+						mPref.setPreferencesString("Password", "");
+						mPref.setPreferencesString("synced", "false");
+						mPref.setPreferencesBoolean("getTreeLists", false);
+						mPref.setPreferencesBoolean("Update", false);
+						mPref.setPreferencesBoolean("localbudburst", false);
+						mPref.setPreferencesBoolean("localwhatsinvasive", false);
+						mPref.setPreferencesBoolean("localpoisonous", false);
+						mPref.setPreferencesBoolean("localendangered", false);
+						mPref.setPreferencesBoolean("listDownloaded", false);
+						mPref.setPreferencesBoolean("floracache", false);
+						mPref.setPreferencesBoolean("firstDownloadTreeList", true);
+						mPref.setPreferencesBoolean("needUpdate", false);
+						
 						//Drop user table in database
 						SyncDBHelper sDBH = new SyncDBHelper(HelperSettings.this);
 						OneTimeDBHelper oDBH = new OneTimeDBHelper(HelperSettings.this);
@@ -234,6 +280,17 @@ public class HelperSettings extends PreferenceActivity {
 	    });
 	}
 	
+	protected void onActivityResult(int requestCode, int resultCode,
+            Intent data) {
+        if (requestCode == UNINSTALL_REQUEST) {
+            if (resultCode == RESULT_OK) {
+            	Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse("market://details?id=cens.ucla.edu.budburst"));
+				startActivity(intent);
+            }
+        }
+    }
+	
 	private void checkConnectivity() {
 		new AlertDialog.Builder(HelperSettings.this)
 		.setTitle(getString(R.string.DownLoad_Tree_Lists))
@@ -243,7 +300,7 @@ public class HelperSettings extends PreferenceActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub				
-				showUserDefinedLists();
+				downloadGroupList();
 
 			}
 		})
@@ -258,62 +315,17 @@ public class HelperSettings extends PreferenceActivity {
 
 	}
 	
-	private void showUserDefinedLists() {
+	private void downloadGroupList() {
 
-		// call user defined lists
-		OneTimeDBHelper oDBH = new OneTimeDBHelper(HelperSettings.this);
-		mArr = oDBH.getListGroupItem(HelperSettings.this);
+		ListUserDefinedCategory userCategory = new ListUserDefinedCategory(HelperSettings.this);
 		
-		int groupCnt = mArr.size();
-		mGroupName = new String[groupCnt];
-		mSelect = new boolean[groupCnt];
+		HelperSharedPreference pref = new HelperSharedPreference(HelperSettings.this);
 		
-		for(int i = 0 ; i < groupCnt ; i++) {
-			mGroupName[i] = mArr.get(i).getCategoryName();
-			mSelect[i] = false;
-		}
+		double getLatitude = Double.parseDouble(pref.getPreferenceString("latitude", "0.0"));
+		double getLongitude = Double.parseDouble(pref.getPreferenceString("longitude", "0.0"));
 		
-		new AlertDialog.Builder(HelperSettings.this)
-		.setTitle("Select User Defined Lists")
-		.setSingleChoiceItems(mGroupName, -1, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				mSelect[which] = true;
-			}
-		})
-		.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				for(int i = 0 ; i < mSelect.length ; i++) {
-					if(mSelect[i]) {
-						ListUserDefinedSpeciesDownload userPlant = new ListUserDefinedSpeciesDownload(HelperSettings.this
-								, mArr.get(i).getCategoryID());
-						userPlant.execute();
-					}
-				}
-			}
-		})
-		.setNeutralButton("Refresh Lists", new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				ListUserDefinedCategory userCategory = new ListUserDefinedCategory(HelperSettings.this);
-				
-				HelperSharedPreference pref = new HelperSharedPreference(HelperSettings.this);
-				
-				double getLatitude = Double.parseDouble(pref.getPreferenceString("latitude", "0.0"));
-				double getLongitude = Double.parseDouble(pref.getPreferenceString("longitude", "0.0"));
-				
-				ListItems lItem = new ListItems(getLatitude, getLongitude);
-				userCategory.execute(lItem);
-			}
-		})
-		.show();
+		ListItems lItem = new ListItems(getLatitude, getLongitude);
+		userCategory.execute(lItem);	
 	}
 	
 	@Override

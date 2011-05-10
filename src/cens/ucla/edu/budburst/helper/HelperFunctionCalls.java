@@ -579,9 +579,8 @@ public class HelperFunctionCalls {
 	    else if(category >= HelperValues.USER_DEFINED_TREE_LISTS) {
 	    	OneTimeDBHelper onetime = new OneTimeDBHelper(context);
 	    	
-	    	//int imageID = onetime.getUserDefinedImageID(context, scienceName, category);
-	    	
-	    	//Log.i("K", "ImageID: " + imageID + ", scienceName:" + scienceName);
+	    	int imageID = onetime.getUserDefinedImageID(context, scienceName, category);
+	    	Log.i("K", "ImageID: " + imageID + ", scienceName:" + scienceName);
 	    	
     		String imagePath = HelperValues.TREE_PATH + speciesID + ".jpg";
     		HelperFunctionCalls helper = new HelperFunctionCalls();

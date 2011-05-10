@@ -117,7 +117,7 @@ public class PBBChangeMyPosition extends MapActivity {
 											MapView.LayoutParams.TOP_LEFT);
 
 	    Button mapBtnZoomOut = new Button(getApplicationContext());
-	    mapBtnZoomOut.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_zoom_out));
+	    mapBtnZoomOut.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_zoom_in));
 
 	    mMapView.addView(mapBtnZoomOut, screenLP);
 		
@@ -127,7 +127,7 @@ public class PBBChangeMyPosition extends MapActivity {
 	    									MapView.LayoutParams.TOP_LEFT);
 	    // Zoom in
 	    Button mapBtnZoomIn = new Button(getApplicationContext());
-	    mapBtnZoomIn.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_zoom_in));
+	    mapBtnZoomIn.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_zoom_out));
 
 	    mMapView.addView(mapBtnZoomIn, screenLP);
 	    

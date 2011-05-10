@@ -89,6 +89,8 @@ public class OneTimeMainPage extends ListActivity {
 	
 	private PBBItems pbbItem;
 	
+	private boolean isUserDefinedListOn = true;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -130,11 +132,17 @@ public class OneTimeMainPage extends ListActivity {
 		 *  3 : Native <- temporarily not used
 		 *  4 : Poisonous
 		 *  5 : Endangered
-		 *  10 : Tree lists 
-		 *  11 : What's Blooming
+		 *  > 10 : User Defined Lists
 		 *  and more later.
 		 */
 		iItem.setHeaderText(getString(R.string.List_Official_Header));
+		iItem.setTitle(getString(R.string.List_Project_Budburst_title));
+		iItem.setImageURL("pbb_icon_main2");
+		iItem.setDescription(getString(R.string.List_Budburst));
+		listArr.add(iItem);
+		
+		iItem = new HelperListItem();
+		iItem.setHeaderText("none");
 		iItem.setTitle(getString(R.string.List_USDA_PlantLists_title));
 		iItem.setImageURL("poisonous");
 		iItem.setDescription(getString(R.string.List_USDA_PlantLists_content));
@@ -143,6 +151,17 @@ public class OneTimeMainPage extends ListActivity {
 		// user defined lists - dynamically added. 
 		OneTimeDBHelper oDBH = new OneTimeDBHelper(this);
 		mArr = oDBH.getListGroupItem(this);
+		
+		if(mArr.size() == 0) {
+			iItem = new HelperListItem();
+			iItem.setHeaderText(getString(R.string.List_User_Plant_Header));
+			iItem.setTitle("No list yet");
+			iItem.setImageURL("yellow_triangle_exclamation50");
+			iItem.setDescription("Please download the user defined lists. Menu->Settings->Download User Defined List");
+			listArr.add(iItem);
+			
+			isUserDefinedListOn = false;
+		}
 		
 		for(int i = 0 ; i < mArr.size() ; i++) {
 			String header = "none";
@@ -176,16 +195,40 @@ public class OneTimeMainPage extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id){
 	
 		if(position == 0) {
+			if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
+				Intent intent = new Intent(OneTimeMainPage.this, PBBAddPlant.class);
+				pbbItem.setCategory(HelperValues.LOCAL_BUDBURST_LIST);
+				
+				intent.putExtra("pbbItem", pbbItem);
+				startActivity(intent);
+			} 
+			// else from Quick_Capture...
+			else {
+				Intent intent = new Intent(OneTimeMainPage.this, OneTimePBBLists.class);
+				pbbItem.setCategory(HelperValues.LOCAL_BUDBURST_LIST);
+				intent.putExtra("pbbItem", pbbItem);
+				intent.putExtra("from", mPreviousActivity);
+				startActivity(intent);
+			}
+		}
+		else if(position == 1) {
 			showLocalListDialog();
 		}
 		// if user defined lists selected.
 		else {
-			Intent intent = new Intent(OneTimeMainPage.this, ListUserDefinedSpecies.class);
-			PBBItems pbbItem = new PBBItems();			
-			pbbItem.setCategory(mArr.get(position-1).getCategoryID());
-			intent.putExtra("pbbItem", pbbItem);
-			intent.putExtra("from", 0);
-			startActivity(intent);
+			if(isUserDefinedListOn) {
+				Intent intent = new Intent(OneTimeMainPage.this, ListUserDefinedSpecies.class);
+				PBBItems pbbItem = new PBBItems();			
+				pbbItem.setCategory(mArr.get(position-2).getCategoryID());
+				intent.putExtra("pbbItem", pbbItem);
+				intent.putExtra("from", mPreviousActivity);
+				startActivity(intent);
+			}
+			else {
+				Intent intent = new Intent(OneTimeMainPage.this, HelperSettings.class);
+				intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
+				startActivity(intent);
+			}
 		}
 	}
 	
@@ -198,9 +241,11 @@ public class OneTimeMainPage extends ListActivity {
 				
 				switch(which) {
 				case 0:
-					if(mPref.getPreferenceBoolean("localbudburst")) {
-						Intent intent = new Intent(OneTimeMainPage.this, ListSubCategory.class);
-						intent.putExtra("category", HelperValues.LOCAL_BUDBURST_LIST);
+					if(mPref.getPreferenceBoolean("localwhatsinvasive")) {
+						Intent intent = new Intent(OneTimeMainPage.this, OneTimeAddMyPlant.class);
+						pbbItem.setCategory(HelperValues.LOCAL_WHATSINVASIVE_LIST);
+						intent.putExtra("pbbItem", pbbItem);
+					    intent.putExtra("from", mPreviousActivity);
 						startActivity(intent);
 					}
 					else {
@@ -209,34 +254,27 @@ public class OneTimeMainPage extends ListActivity {
 					break;
 					
 				case 1:
-					if(mPref.getPreferenceBoolean("localwhatsinvasive")) {
-						Intent intent = new Intent(OneTimeMainPage.this, ListSubCategory.class);
-						intent.putExtra("category", HelperValues.LOCAL_WHATSINVASIVE_LIST);
+					// Poisonous Plants
+					if(mPref.getPreferenceBoolean("localpoisonous")) {
+						Intent intent = new Intent(OneTimeMainPage.this, OneTimeAddMyPlant.class);
+						pbbItem.setCategory(HelperValues.LOCAL_POISONOUS_LIST);
+						intent.putExtra("pbbItem", pbbItem);
+						intent.putExtra("from", mPreviousActivity);
 						startActivity(intent);
 					}
 					else {
 						Toast.makeText(OneTimeMainPage.this, getString(R.string.go_to_settings_page), Toast.LENGTH_SHORT).show();
 					}
+					
 					break;
 					
 				case 2:
-					// Poisonous Plants
-					if(mPref.getPreferenceBoolean("localpoisonous")) {
-						Intent intent = new Intent(OneTimeMainPage.this, ListSubCategory.class);
-						intent.putExtra("category", HelperValues.LOCAL_POISONOUS_LIST);
-						startActivity(intent);
-					}
-					else {
-						Toast.makeText(OneTimeMainPage.this, getString(R.string.go_to_settings_page), Toast.LENGTH_SHORT).show();
-					}
-					
-					break;
-					
-				case 3:
 					// Endangered Plants
 					if(mPref.getPreferenceBoolean("localendangered")) {
-						Intent intent = new Intent(OneTimeMainPage.this, ListSubCategory.class);
-						intent.putExtra("category", HelperValues.LOCAL_THREATENED_ENDANGERED_LIST);
+						Intent intent = new Intent(OneTimeMainPage.this, OneTimeAddMyPlant.class);
+						pbbItem.setCategory(HelperValues.LOCAL_THREATENED_ENDANGERED_LIST);
+						intent.putExtra("pbbItem", pbbItem);
+						intent.putExtra("from", mPreviousActivity);
 						startActivity(intent);
 					}
 					else {

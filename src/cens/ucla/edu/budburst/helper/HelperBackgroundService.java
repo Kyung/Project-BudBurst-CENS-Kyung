@@ -34,9 +34,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -55,6 +57,9 @@ public class HelperBackgroundService extends Service{
 	private boolean mNetworkEnabled = false;
 	private int SIMPLE_NOTFICATION_ID = 1234567890;
 	private Handler mHandler = new Handler();
+	private Handler mTimerHandler = new Handler();
+	
+	private long mStartTime;
 	
 	private boolean mQuit = false;
 	private boolean mStopDownload = false;
@@ -69,7 +74,7 @@ public class HelperBackgroundService extends Service{
 			
 			if(mQuit) {
 				mLocManager.removeUpdates(this);
-				stopSelf();
+				//stopSelf();
 			}
 			if(loc != null) {
 				/*
@@ -109,7 +114,7 @@ public class HelperBackgroundService extends Service{
 			// TODO Auto-generated method stub
 			if(mQuit) {
 				mLocManager.removeUpdates(this);
-				stopSelf();
+				//stopSelf();
 			}
 			if(loc != null) {
 				/*
@@ -132,6 +137,77 @@ public class HelperBackgroundService extends Service{
 			// TODO Auto-generated method stub
 		}	
 	};
+	
+	private Runnable mUpdateTimeTask = new Runnable() {
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+			//final long start = mStartTime;
+			
+			
+			final long start = mStartTime;
+		       
+			long millis = SystemClock.uptimeMillis() - start;
+		    int seconds = (int) (millis / 1000);
+		       
+		    int minutes = seconds / 60;
+		       
+		    seconds     = seconds % 60;
+
+		    Log.i("K", "" + minutes + ":0" + seconds);
+
+		    new checkVersion().execute();
+		    
+		    mTimerHandler.postAtTime(this, start + (((minutes * 60) + seconds + 1) * 1000));
+		}
+		
+	};
+	
+	private class checkVersion extends AsyncTask <Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... Void) {
+			// TODO Auto-generated method stub
+			String getResponse = getRequest("http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/checkUpdates.php?version=" 
+		    		+ mPref.getPreferenceString("version", "1.5.0"));			
+			
+			if(getResponse.toString().equals("NEEDUPDATES")) {
+				mPref.setPreferencesBoolean("needUpdate", true);
+				Log.i("K", "Needs updates");
+			}
+			else {
+				mPref.setPreferencesBoolean("needUpdate", false);
+			}
+			return null;
+		}
+	}
+	
+	private String getRequest(String getUrl) {
+		
+		String getResponse = "";
+		
+		Log.i("K", "getUrl : " + getUrl);
+		
+		try {
+			HttpClient client = new DefaultHttpClient();
+			HttpGet getHttp = new HttpGet(getUrl);
+			HttpResponse responseGet = client.execute(getHttp);
+			HttpEntity resEntityGet = responseGet.getEntity();
+			
+			if(resEntityGet != null) {
+				getResponse = EntityUtils.toString(resEntityGet);
+			}
+		}
+		catch(Exception e) {
+			Log.i("K", "Exception in HttpRequest");
+		}
+		
+		Log.i("K", "getResponse: " + getResponse);
+		
+		return getResponse;
+	}
 	
 	@Override
 	public void onCreate() {
@@ -176,6 +252,14 @@ public class HelperBackgroundService extends Service{
 
 	    mTimer = new Timer();
 		mTimer.schedule(new GetLastLocation(), 30 * 1000);
+		
+		
+		// reference : http://developer.android.com/resources/articles/timed-ui-updates.html
+		if(mStartTime == 0L) {
+			mStartTime = System.currentTimeMillis();
+			mTimerHandler.removeCallbacks(mUpdateTimeTask);
+			mTimerHandler.postDelayed(mUpdateTimeTask, 5 * 1000);
+		}
 	}
 	
 	class GetLastLocation extends TimerTask {
@@ -245,6 +329,8 @@ public class HelperBackgroundService extends Service{
 			mLocManager = null;
 		}
 		
+		mTimerHandler.removeCallbacks(mUpdateTimeTask);
+		
 		super.onDestroy();
 		mQuit = true;
 		mTimer.cancel();
@@ -261,27 +347,6 @@ public class HelperBackgroundService extends Service{
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	public String getRequest(String getUrl) {
-		
-		String getResponse = "";
-		
-		try {
-			HttpClient client = new DefaultHttpClient();
-			HttpGet getHttp = new HttpGet(getUrl);
-			HttpResponse responseGet = client.execute(getHttp);
-			HttpEntity resEntityGet = responseGet.getEntity();
-			
-			if(resEntityGet != null) {
-				getResponse = EntityUtils.toString(resEntityGet);
-			}
-		}
-		catch(Exception e) {
-			Log.i("K", "Exception in HttpRequest");
-		}
-		
-		return getResponse;
 	}
 	
 	public void downloadingDataFromServer(Location loc) {

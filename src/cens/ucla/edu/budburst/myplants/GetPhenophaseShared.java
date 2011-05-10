@@ -110,8 +110,8 @@ public class GetPhenophaseShared extends ListActivity {
 	    if(mScienceName.equals("Unknown Plant")) {
 	    	mScienceName = "";
 	    }
-	    common_name.setText(mCommonName);
-	    science_name.setText(mScienceName);
+	    common_name.setText(mCommonName + " ");
+	    science_name.setText(mScienceName + " ");
 	    
 		myTitleText = (TextView) findViewById(R.id.my_title);
 		myTitleText.setText(" " + mCommonName + " > Phenophase");

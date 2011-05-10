@@ -27,7 +27,6 @@
 		<item>Delete Species</item>
 	</string-array>
 	<string-array name="plantcategory">
-		<item>Local Budburst</item>
 		<item>Local Invasive</item>
 		<item>Local Poisonous</item>
 		<item>Local Endangered</item>

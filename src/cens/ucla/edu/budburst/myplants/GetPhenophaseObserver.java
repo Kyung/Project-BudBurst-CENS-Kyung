@@ -118,8 +118,8 @@ public class GetPhenophaseObserver extends ListActivity {
 	    
 	    common_name = (TextView) findViewById(R.id.common_name);
 	    science_name = (TextView) findViewById(R.id.science_name);
-	    common_name.setText(mCommonName);
-	    science_name.setText(mScienceName);
+	    common_name.setText(mCommonName + " ");
+	    science_name.setText(mScienceName + " ");
 	    
 	    mHelper = new HelperFunctionCalls();
 	    mHelper.showSpeciesThumbNailObserver(this, mCategory, mSpeciesID, mScienceName, species_image);

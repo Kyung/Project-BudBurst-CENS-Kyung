@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -19,7 +20,9 @@ import org.json.JSONObject;
 
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.HelperSettings;
 import cens.ucla.edu.budburst.helper.HelperValues;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,6 +38,9 @@ public class ListUserDefinedCategory extends AsyncTask<ListItems, Void, Void>{
 
 	private Context mContext;
 	private ProgressDialog mDialog;
+	private boolean[] mSelect;
+	private String[] mGroupName;
+	private ArrayList<ListGroupItem> mArr;
 	
 	public ListUserDefinedCategory(Context context) {
 		mContext = context;
@@ -176,6 +182,57 @@ public class ListUserDefinedCategory extends AsyncTask<ListItems, Void, Void>{
 	@Override
 	protected void onPostExecute(Void Void) {
 		Log.i("K", "Download complete - userDefinedGroup");
+		
 		mDialog.dismiss();
+		
+		showUserDefinedLists();
+	}
+	
+	private void showUserDefinedLists() {
+		// call user defined lists
+		OneTimeDBHelper oDBH = new OneTimeDBHelper(mContext);
+		mArr = new ArrayList<ListGroupItem>();
+		mArr = oDBH.getListGroupItem(mContext);
+		
+		int groupCnt = mArr.size();
+		mGroupName = new String[groupCnt];
+		mSelect = new boolean[groupCnt];
+		
+		for(int i = 0 ; i < groupCnt ; i++) {
+			mGroupName[i] = mArr.get(i).getCategoryName();
+			mSelect[i] = false;
+		}
+		
+		new AlertDialog.Builder(mContext)
+		.setTitle("Select User Defined Lists")
+		.setSingleChoiceItems(mGroupName, -1, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				mSelect[which] = true;
+			}
+		})
+		.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				for(int i = 0 ; i < mSelect.length ; i++) {
+					if(mSelect[i]) {
+						ListUserDefinedSpeciesDownload userPlant = new ListUserDefinedSpeciesDownload(mContext
+								, mArr.get(i).getCategoryID());
+						userPlant.execute();
+					}
+				}
+			}
+		})
+		.setNeutralButton(mContext.getString(R.string.Button_back), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+			}
+		})
+		.show();
 	}
 }

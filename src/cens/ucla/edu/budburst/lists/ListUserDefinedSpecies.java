@@ -215,18 +215,24 @@ public class ListUserDefinedSpecies extends ListActivity {
 		new AlertDialog.Builder(ListUserDefinedSpecies.this)
 		.setTitle(getString(R.string.AddPlant_SelectCategory))
 		.setIcon(android.R.drawable.ic_menu_more)
-		.setItems(R.array.category_only_trees, new DialogInterface.OnClickListener() {
+		.setItems(R.array.category, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				String[] category = getResources().getStringArray(R.array.category_only_trees);
+				String[] category = getResources().getStringArray(R.array.category);
 				
-				if(category[which].equals("Deciduous Trees and Shrubs")) {
+				if(category[which].equals("Wild Flowers and Herbs")) {
+					mProtocolID = HelperValues.WILD_FLOWERS;
+				}
+				else if(category[which].equals("Grass")) {
+					mProtocolID = HelperValues.GRASSES;
+				}
+				else if(category[which].equals("Deciduous Trees and Shrubs")) {
 					mProtocolID = HelperValues.DECIDUOUS_TREES;
 				}
 				else if(category[which].equals("Evergreen Trees and Shrubs")) {
 					mProtocolID = HelperValues.EVERGREEN_TREES;
 				}
 				else {
-					
+					mProtocolID = HelperValues.CONIFERS;
 				}
 				
 				/*
