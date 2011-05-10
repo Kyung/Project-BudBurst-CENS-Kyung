@@ -47,7 +47,7 @@ public class DetailPlantInfo extends Activity {
 	private String mCommonName;
 	private String mScienceName;
 	
-    private ImageView image;
+    private ImageView speciesImage;
     private TextView snameTxt;
     private TextView cnameTxt;
     private TextView notesTxt;
@@ -87,7 +87,8 @@ public class DetailPlantInfo extends Activity {
 				",Sname:" + mScienceName);
 		
 	    // set the layout
-	    image = (ImageView) findViewById(R.id.species_image);
+		speciesImage = (ImageView) findViewById(R.id.species_image);
+		speciesImage.setBackgroundResource(R.drawable.shapedrawable);
 	    snameTxt = (TextView) findViewById(R.id.science_name);
 	    cnameTxt = (TextView) findViewById(R.id.common_name);
 	    notesTxt = (TextView) findViewById(R.id.text);
@@ -138,7 +139,7 @@ public class DetailPlantInfo extends Activity {
 	    	Bitmap icon = null;
 	    	icon = mHelper.getUserDefinedListImageFromSDCard(DetailPlantInfo.this, cursor.getInt(0), icon);
 	    	
-	    	image.setImageBitmap(icon);
+	    	speciesImage.setImageBitmap(icon);
 	    }
 	    
 	    cursor.close();
@@ -156,7 +157,7 @@ public class DetailPlantInfo extends Activity {
 	    	cnameTxt.setText(" " + cursor.getString(2) + " ");
 	    	notesTxt.setText("" + cursor.getString(3) + " ");
 			int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s"+mSpeciesID, null, null);
-			image.setImageResource(resID);
+			speciesImage.setImageResource(resID);
 	    }
 	    
 	    cursor.close();
@@ -179,11 +180,11 @@ public class DetailPlantInfo extends Activity {
 		    	Bitmap icon = null;
 		    	icon = mHelper.getImageFromSDCard(DetailPlantInfo.this, pItem.ImageID, icon);
 		    	
-		    	image.setImageBitmap(icon);
+		    	speciesImage.setImageBitmap(icon);
 		    }
 		    else if(category == HelperValues.USER_DEFINED_TREE_LISTS) {
 	    		String imagePath = HelperValues.TREE_PATH + mSpeciesID + ".jpg";
-	    		image.setImageBitmap(mHelper.showImage(DetailPlantInfo.this, imagePath));
+	    		speciesImage.setImageBitmap(mHelper.showImage(DetailPlantInfo.this, imagePath));
 		    }
 		}
 	}

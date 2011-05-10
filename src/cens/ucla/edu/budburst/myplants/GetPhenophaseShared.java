@@ -134,12 +134,12 @@ public class GetPhenophaseShared extends ListActivity {
 			}
 		});
 
+		getPhenophaseLists();
 	    // TODO Auto-generated method stub
 	}
 	
 	public void onResume() {
 		super.onResume();
-		getPhenophaseLists();
 	}
 	
 	private void getPhenophaseLists() {

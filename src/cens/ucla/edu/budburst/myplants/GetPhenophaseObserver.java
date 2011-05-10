@@ -101,11 +101,11 @@ public class GetPhenophaseObserver extends ListActivity {
 		mScienceName = pbbItem.getScienceName();
 		mProtocolID = pbbItem.getProtocolID();
 		mCategory = pbbItem.getCategory();
+		
+		getPhenophaseList();
 	}
 	
-	public void onResume() {
-		super.onResume();
-
+	private void getPhenophaseList() {
 		sDBH = new SyncDBHelper(this);
 		mNote = sDBH.getNote(this, mSpeciesID, mSiteID);
 		pbbItem.setNote(mNote);
@@ -115,6 +115,7 @@ public class GetPhenophaseObserver extends ListActivity {
 		// setting layout
 	    LinearLayout add_species_name = (LinearLayout)findViewById(R.id.add_species_name);
 	    species_image = (ImageView) findViewById(R.id.species_image);
+	    species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    
 	    common_name = (TextView) findViewById(R.id.common_name);
 	    science_name = (TextView) findViewById(R.id.science_name);
@@ -208,6 +209,11 @@ public class GetPhenophaseObserver extends ListActivity {
 		sDB.close();
 		sDBH.close();
 		syncDB.close();
+	}
+	
+	public void onResume() {
+		super.onResume();
+
 	}
 	
 	@Override

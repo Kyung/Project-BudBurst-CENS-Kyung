@@ -56,7 +56,8 @@ public class PBBPhenophaseInfo extends Activity {
 		previous_activity = intent.getExtras().getInt("from");
 	    
 	    // set the layout
-	    ImageView image = (ImageView) findViewById(R.id.species_image);
+	    ImageView phenoImage = (ImageView) findViewById(R.id.species_image);
+	    phenoImage.setBackgroundResource(R.drawable.shapedrawable);
 	    TextView phenoName = (TextView) findViewById(R.id.common_name);
 	    TextView phenoDescription = (TextView) findViewById(R.id.text);
 	    
@@ -77,7 +78,7 @@ public class PBBPhenophaseInfo extends Activity {
 		    	phenoName.setText(" " + cursor.getString(0) + " ");
 		    	phenoDescription.setText("" + cursor.getString(1) + " ");
 				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p"+cursor.getInt(2), null, null);
-				image.setImageResource(resID);
+				phenoImage.setImageResource(resID);
 			}
 		    
 		    cursor.close();
@@ -89,7 +90,7 @@ public class PBBPhenophaseInfo extends Activity {
 		    	phenoName.setText(" " + cursor.getString(0) + " ");
 		    	phenoDescription.setText("" + cursor.getString(1) + " ");
 				int resID = getResources().getIdentifier("cens.ucla.edu.budburst:drawable/p" + cursor.getInt(2), null, null);
-				image.setImageResource(resID);
+				phenoImage.setImageResource(resID);
 			}
 		    cursor.close();
 	    }

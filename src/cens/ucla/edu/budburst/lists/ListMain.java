@@ -83,6 +83,8 @@ public class ListMain extends ListActivity {
 	
 	private void getLists() {
 		
+		isUserDefinedListOn = true;
+		
 		ArrayList<HelperListItem> listArr = new ArrayList<HelperListItem>();
 		HelperListItem iItem = new HelperListItem();
 		

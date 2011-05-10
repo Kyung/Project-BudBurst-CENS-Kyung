@@ -238,6 +238,7 @@ public class PBBObservationPage extends Activity {
 		/*
 		 * When click species image, move to the detail view.
 		 */
+		species_image.setBackgroundResource(R.drawable.shapedrawable);
 	    species_image.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
