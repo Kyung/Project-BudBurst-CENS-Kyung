@@ -9,7 +9,6 @@ import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.PBBSync;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.adapter.MyListAdapterFloracache;
-import cens.ucla.edu.budburst.artools.ARManager;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.HelperGpsHandler;
 import cens.ucla.edu.budburst.helper.HelperListItem;

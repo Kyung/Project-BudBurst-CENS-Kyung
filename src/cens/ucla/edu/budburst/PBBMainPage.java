@@ -3,7 +3,6 @@ package cens.ucla.edu.budburst;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import cens.ucla.edu.budburst.artools.ARManager;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.StaticDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
@@ -282,8 +281,6 @@ public class PBBMainPage extends Activity {
 		menu.add(0, 3, 0, getString(R.string.Menu_about)).setIcon(android.R.drawable.ic_menu_info_details);
 		//menu.add(0, 4, 0, getString(R.string.Menu_logout)).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		menu.add(0, 4, 0, getString(R.string.Menu_settings)).setIcon(android.R.drawable.ic_menu_preferences);
-		//menu.add(0, 5, 0, "ARTools").setIcon(android.R.drawable.ic_menu_preferences);
-		
 			
 		return true;
 	}
@@ -319,10 +316,6 @@ public class PBBMainPage extends Activity {
 				startActivity(intent);
 				finish();
 				return true;
-			case 5:
-				startActivity(new Intent(PBBMainPage.this, ARManager.class));
-				return true;
-					
 		}
 		return false;
 	}
