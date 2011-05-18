@@ -146,7 +146,7 @@
 			android:id="@+id/simpleGM_map"
 			android:layout_width="fill_parent"
 			android:layout_height="100dp"
-			android:apiKey="0sHE5gbJFVzskUklE5x2R6NlOslfS1HgDfLpA7g"
+			android:apiKey="@string/mapKey"
 			android:clickable="true"
 			android:layout_marginTop="10dp"
 			android:layout_marginBottom="5dp"

@@ -18,10 +18,10 @@
 		android:clickable="true" />
 </RelativeLayout>
 <!-- mapKeyDeveloper -->
-<!-- android:apiKey="0sHE5gbJFVzskUklE5x2R6NlOslfS1HgDfLpA7g" -->
+<!-- android:apiKey="@string/mapKey" -->
 
 
 <!-- 0s7Km0gbaIiKBYVtiNAMqhcQ-GxiIzQLk9hfMVw -->
 
 <!-- 0s7Km0gbaIiLZMleKkk70IIETcEve_rUT-kVErw -->
-<!-- android:apiKey="0sHE5gbJFVzskUklE5x2R6NlOslfS1HgDfLpA7g" -->
+<!-- android:apiKey="@string/mapKey" -->
