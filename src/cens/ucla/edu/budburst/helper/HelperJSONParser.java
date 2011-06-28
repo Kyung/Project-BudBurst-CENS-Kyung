@@ -7,6 +7,11 @@ import org.json.JSONTokener;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+/**
+ * Parse JSON Object
+ * @author kyunghan
+ *
+ */
 public class HelperJSONParser {
 	private JSONObject jObj = null;
 	

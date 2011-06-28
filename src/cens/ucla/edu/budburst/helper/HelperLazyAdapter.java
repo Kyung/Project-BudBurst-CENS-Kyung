@@ -18,6 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Lazy Adapter
+ * @author kyunghan
+ *
+ */
 public class HelperLazyAdapter extends BaseAdapter {
 
     private Context context;
@@ -80,25 +85,6 @@ public class HelperLazyAdapter extends BaseAdapter {
         holder.image.setTag(localArray.get(position).getImageURL());
         imageLoader.DisplayImage(localArray.get(position).getImageURL(), context, holder.image);
         
-        /*
-        holder.thumbnail.setTag(localArray.get(position));
-        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				HelperPlantItem pi = (HelperPlantItem)v.getTag();
-
-				Intent intent = new Intent(context, ListDetail.class);
-				intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
-				intent.putExtra("category", pi.Category);
-				intent.putExtra("science_name", pi.SpeciesName);
-				intent.putExtra("show_footer", false);
-				context.startActivity(intent);
-			}
-		});
-		*/
-		
         return vi;
 	}
 }

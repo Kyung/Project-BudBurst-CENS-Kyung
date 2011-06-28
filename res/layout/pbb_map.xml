@@ -9,7 +9,7 @@
 		android:padding="2dp"
 		android:textStyle="bold"
 	/>
-	<com.google.android.maps.MapView
+	<cens.ucla.edu.budburst.mapview.MapCustomView
 		android:layout_below="@+id/myloc_accuracy" 
 		android:id="@+id/map"
 		android:layout_width="fill_parent"

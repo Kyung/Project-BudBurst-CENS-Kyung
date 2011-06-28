@@ -59,6 +59,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
+/**
+ * The detail information on the list
+ * @author kyunghan
+ *
+ */
 public class ListDetail extends Activity {
 
 	private static final int COMPLETE = 0;
@@ -114,7 +119,9 @@ public class ListDetail extends Activity {
 		mProtocolID = pbbItem.getProtocolID();
 		mPreviousActivity = bundle.getInt("from");
 		
-    	
+		Log.i("K", "mCategory : " + mCategory);
+		
+		
     	// Show footer or not.
     	if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
     		LinearLayout footer = (LinearLayout)findViewById(R.id.lower);
@@ -260,8 +267,8 @@ public class ListDetail extends Activity {
 				/*
 				 *  Load image from the server
 				 */
-				HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-				dm.fetchDrawableOnThread(image_url, speciesImage);
+				HelperDrawableManager dm = new HelperDrawableManager(ListDetail.this, mSpinner, speciesImage);
+				dm.fetchDrawableOnThread(image_url);
 			}
 	
 	    	
@@ -300,6 +307,7 @@ public class ListDetail extends Activity {
 					Log.i("K", "ListDeatil(speciesID) : " + mSpeciesID);
 					
 					if(mSpeciesID == 0) { 
+						
 						new AlertDialog.Builder(ListDetail.this)
 						.setTitle(getString(R.string.AddPlant_SelectCategory))
 						.setIcon(android.R.drawable.ic_menu_more)
@@ -312,7 +320,7 @@ public class ListDetail extends Activity {
 								 * 		<item>Trees and Shrubs</item>
 										<item>Wild Flowers</item>
 										<item>Grasses</item> 
-								 */
+								*/ 
 								
 								if(category[which].equals("Trees and Shrubs")) {
 									mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
@@ -374,46 +382,12 @@ public class ListDetail extends Activity {
 			db.close();
 			cursor.close();
 			
-			HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
+			HelperDrawableManager dm = new HelperDrawableManager(ListDetail.this, mSpinner, speciesImage);
 			dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) 
-					+ mSpeciesID + ".jpg", speciesImage);
+					+ mSpeciesID + ".jpg");
 			
-			/*
-			 *  Load image from the server
-			 */
-
-			/*
-			URL urls = null;
-			HttpURLConnection conn = null;
-			try {
-				urls = new URL(getString(R.string.get_user_defined_tree_large_image) + mSpeciesID + "_thumb.jpg");
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				conn = (HttpURLConnection)urls.openConnection();
-				conn.connect();
-				
-				
-				//ResponseCode 404, means there is no photo related to the corresponding id
-				//So in this case, we alternatively link to basic tree photo. (100_thumb.jpg)
-				 
-				if(conn.getResponseCode() == 404) {
-					speciesImage.setImageResource(getResources().getIdentifier("cens.ucla.edu.budburst:drawable/s1000", null, null));
-				}
-				else {
-					HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-					dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) 
-							+ mSpeciesID + ".jpg", speciesImage);
-				}
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			*/
-			
+			Log.i("K", "imageURL : " + getString(R.string.get_user_defined_tree_large_image) 
+					+ mSpeciesID + ".jpg");
 			
 			
 			myplantBtn.setOnClickListener(new View.OnClickListener() {
@@ -442,19 +416,17 @@ public class ListDetail extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// TODO Auto-generated method stub
-							
-							
 							/*
 							 * Move to QuickCapture
 							 */
 							Intent intent = new Intent(ListDetail.this, QuickCapture.class);
 							
-							intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
+							pbbItem.setProtocolID(mHelper.toSharedProtocol(mProtocolID));
+							
 							intent.putExtra("pbbItem", pbbItem);
+							intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
 							
 							startActivity(intent);
-							
-
 						}
 					})
 					.setNeutralButton(getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
@@ -469,6 +441,7 @@ public class ListDetail extends Activity {
 							Intent intent = new Intent(ListDetail.this, OneTimePhenophase.class);
 							
 							pbbItem.setLocalImageName("");
+							pbbItem.setProtocolID(mHelper.toSharedProtocol(mProtocolID));
 							
 							intent.putExtra("pbbItem", pbbItem);
 							intent.putExtra("from", HelperValues.FROM_USER_DEFINED_LISTS);
@@ -508,8 +481,8 @@ public class ListDetail extends Activity {
 			/*
 			 *  Load image from the server
 			 */
-			HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-			dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) + mSpeciesID + ".jpg", speciesImage);
+			HelperDrawableManager dm = new HelperDrawableManager(ListDetail.this, mSpinner, speciesImage);
+			dm.fetchDrawableOnThread(getString(R.string.get_user_defined_tree_large_image) + mSpeciesID + ".jpg");
 	    	
 	    	
 	    	LinearLayout footer = (LinearLayout)findViewById(R.id.lower);
@@ -520,8 +493,6 @@ public class ListDetail extends Activity {
 	
 	@Override
 	public void onResume() {
-		
-		
 	    // TODO Auto-generated method stub
 		super.onResume();
 	}
@@ -557,9 +528,8 @@ public class ListDetail extends Activity {
 				 * Move to QuickCapture
 				 */
 				Intent intent = new Intent(ListDetail.this, QuickCapture.class);
-				
 				pbbItem.setProtocolID(mProtocolID);
-				
+
 				intent.putExtra("pbbItem", pbbItem);
 				intent.putExtra("image_id", mImageID);
 				intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
@@ -601,64 +571,66 @@ public class ListDetail extends Activity {
 	
 	private void showProtocolDialog() {
 		
-		if(mCategory == HelperValues.USER_DEFINED_TREE_LISTS) {
-			itemArray = getResources().getStringArray(R.array.category_only_trees);
+		if(mCategory >= HelperValues.USER_DEFINED_TREE_LISTS) {
+			//itemArray = getResources().getStringArray(R.array.category_only_trees);
+			popupDialog();
 		}
 		else {
 			itemArray = getResources().getStringArray(R.array.category);
-		}
-		
-		new AlertDialog.Builder(ListDetail.this)
-		.setTitle(getString(R.string.AddPlant_SelectCategory))
-		.setIcon(android.R.drawable.ic_menu_more)
-		.setItems(itemArray, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				String[] category = itemArray;
-				StaticDBHelper staticDBHelper = new StaticDBHelper(ListDetail.this);
-				SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase(); 
-				
-				Cursor cursor = null;
-				
-				/*
-				 * Choose category and set the protocol_id based on that. 
-				 */
-				
-				if(category[which].equals("Wild Flowers and Herbs")) {
-					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.WILD_FLOWERS + " ORDER BY common_name;",null);
-					myTitleText.setText(" " + getString(R.string.AddPlant_addFlowers));
-					mProtocolID = HelperValues.WILD_FLOWERS;
-				}
-				else if(category[which].equals("Grass")) {
-					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.GRASSES + " ORDER BY common_name;",null);
-					myTitleText.setText(" " + getString(R.string.AddPlant_addGrass));
-					mProtocolID = HelperValues.GRASSES;
-				}
-				else if(category[which].equals("Deciduous Trees and Shrubs")) {
-					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.DECIDUOUS_TREES + " ORDER BY common_name;",null);
-					myTitleText.setText(" " + getString(R.string.AddPlant_addDecid));
-					mProtocolID = HelperValues.DECIDUOUS_TREES;
-				}
-				else if(category[which].equals("Evergreen Trees and Shrubs")) {
-					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.EVERGREEN_TREES + " ORDER BY common_name;",null);
-					myTitleText.setText(" " + getString(R.string.AddPlant_addEvergreen));
-					mProtocolID = HelperValues.EVERGREEN_TREES;
-				}
-				else if(category[which].equals("Conifer")) {
-					cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.CONIFERS + " ORDER BY common_name;",null);
-					myTitleText.setText(" " + getString(R.string.AddPlant_addConifer));
-					mProtocolID = HelperValues.CONIFERS;
-				}
-				else {
+			
+			
+			new AlertDialog.Builder(ListDetail.this)
+			.setTitle(getString(R.string.AddPlant_SelectCategory))
+			.setIcon(android.R.drawable.ic_menu_more)
+			.setItems(itemArray, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					String[] category = itemArray;
+					StaticDBHelper staticDBHelper = new StaticDBHelper(ListDetail.this);
+					SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase(); 
+					
+					Cursor cursor = null;
+					
+					/*
+					 * Choose category and set the protocol_id based on that. 
+					 */
+					
+					if(category[which].equals("Wild Flowers and Herbs")) {
+						cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.WILD_FLOWERS + " ORDER BY common_name;",null);
+						myTitleText.setText(" " + getString(R.string.AddPlant_addFlowers));
+						mProtocolID = HelperValues.WILD_FLOWERS;
+					}
+					else if(category[which].equals("Grass")) {
+						cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.GRASSES + " ORDER BY common_name;",null);
+						myTitleText.setText(" " + getString(R.string.AddPlant_addGrass));
+						mProtocolID = HelperValues.GRASSES;
+					}
+					else if(category[which].equals("Deciduous Trees and Shrubs")) {
+						cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.DECIDUOUS_TREES + " ORDER BY common_name;",null);
+						myTitleText.setText(" " + getString(R.string.AddPlant_addDecid));
+						mProtocolID = HelperValues.DECIDUOUS_TREES;
+					}
+					else if(category[which].equals("Evergreen Trees and Shrubs")) {
+						cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.EVERGREEN_TREES + " ORDER BY common_name;",null);
+						myTitleText.setText(" " + getString(R.string.AddPlant_addEvergreen));
+						mProtocolID = HelperValues.EVERGREEN_TREES;
+					}
+					else if(category[which].equals("Conifer")) {
+						cursor = staticDB.rawQuery("SELECT _id, species_name, common_name, protocol_id FROM species WHERE protocol_id=" + HelperValues.CONIFERS + " ORDER BY common_name;",null);
+						myTitleText.setText(" " + getString(R.string.AddPlant_addConifer));
+						mProtocolID = HelperValues.CONIFERS;
+					}
+					else {
+						
+					}
+					
+					cursor.close();
+					staticDB.close();
+					
+					popupDialog();
 					
 				}
-				
-				cursor.close();
-				staticDB.close();
-				
-				popupDialog();
-				
-			}
-		}).show();
+			}).show();
+		}
 	}
 	
 	private void popupDialog() {

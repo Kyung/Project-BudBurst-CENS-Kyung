@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+ 
+	<ScrollView
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/phenophase_bar">
+
+	<LinearLayout 
+		android:id="@+id/observation_linear_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent"
+		android:layout_marginTop="5dp"
+		android:layout_marginBottom="5dp" 
+		android:layout_below="@+id/phenophase_bar"
+		android:gravity="center"
+		android:paddingLeft="7dp"
+		android:paddingRight="7dp"
+		android:orientation="vertical"
+		android:background="@drawable/box_drawable_yellow">
+		
+		<TextView
+			android:id="@+id/common_name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20sp" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="center"
+			android:textStyle="italic|bold" 
+			android:layout_marginTop="10dp"
+			/>
+		<TextView
+			android:id="@+id/science_name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20sp" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="center"
+			android:textStyle="italic|bold" 
+			/>		
+
+		<LinearLayout
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:gravity="center"
+		android:padding="0dp"
+		android:layout_marginBottom="5dp"
+		android:orientation="horizontal">
+		
+			<TextView
+				android:id="@+id/timestamp_label"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="18sp" 
+				android:textColor="@drawable/black" 
+				android:layout_gravity="left"
+				android:textStyle="italic" 
+				/>
+				
+			<TextView
+				android:id="@+id/timestamp_text"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="18sp" 
+				android:textColor="@drawable/black" 
+				android:textStyle="italic"
+				android:layout_gravity="left" />
+		</LinearLayout>
+		
+	
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+		<TextView
+			android:paddingTop="1dp"
+			android:layout_width="110dp" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="Image"
+			android:textSize="16sp"
+			android:background="@drawable/bg_line_top"
+			/>		
+		<TextView
+			android:paddingTop="1dp"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="Location"
+			android:textSize="16sp"
+			android:background="@drawable/bg_line_top"
+			/>
+
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+
+		<ImageView
+			android:scaleType="fitCenter"
+			android:layout_marginBottom="5dp"
+			android:layout_width="100dp" 
+			android:layout_height="100dp" 
+			android:id="@+id/phone_image" 
+			android:adjustViewBounds="true"
+			/>
+	
+		<com.google.android.maps.MapView 
+			android:id="@+id/simpleGM_map"
+			android:layout_width="fill_parent"
+			android:layout_height="100dp"
+			android:apiKey="0s7Km0gbaIiJVJtsfbW3fd7IP0UBLh833HEAtYw"
+			android:clickable="true"
+			android:layout_marginBottom="5dp"
+			android:layout_marginLeft="5dp"
+		/>
+					
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+
+		<TextView
+			android:paddingTop="1dp"
+			android:layout_width="100dp" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="Phenophase"
+			android:textSize="16sp"
+			android:background="@drawable/bg_line_top"
+			android:focusable="true"
+			android:focusableInTouchMode="true"
+			/>	
+
+		<TextView
+			android:paddingTop="1dp"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text="   Notes"
+			android:textSize="16sp"
+			android:background="@drawable/bg_line_top"
+			/>				
+
+		</LinearLayout>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+		>
+		<ImageView
+			android:paddingTop="1dp"
+			android:layout_width="60dp" 
+			android:layout_height="60dp"
+			android:layout_marginLeft="17dp" 
+			android:id="@+id/pheno_image" 
+			android:adjustViewBounds="true"
+			android:layout_marginBottom="5dp"
+		/>
+		<EditText
+			android:id="@+id/mynotes"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="15dp"
+			android:textColor="@color/black"
+			android:width="0dp"
+			android:gravity="top" 
+			android:textSize="17sp"
+			android:layout_marginLeft="27dp"
+			android:lines="4"
+		/>
+		</LinearLayout>
+		<LinearLayout
+			android:paddingTop="10dp" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:paddingBottom="10dp"
+			android:orientation="horizontal"
+			android:background="@drawable/bg_line_top">
+			<!-- 	
+			<Button
+				android:id="@+id/edit" 
+				android:textColor="@drawable/black"
+				android:layout_width="120px" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16dp"
+				android:text="Edit"
+				android:focusable="true"
+				/>
+			 -->
+			<Button
+				android:id="@+id/save" 
+				android:textColor="@drawable/black"
+				android:layout_width="200dp" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16sp"
+				android:text="Save"
+				android:focusable="true"
+				/>
+		</LinearLayout>
+	</LinearLayout>
+	</ScrollView>
+</RelativeLayout>
+

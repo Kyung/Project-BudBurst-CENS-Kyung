@@ -37,8 +37,8 @@
 		<item>Grasses</item>
 	</string-array>
 	<string-array name="floracache_level">
-		<item>Easy</item>
-		<item>Medium</item>
-		<item>Hard</item>
+		<item>Map</item>
+		<item>Direction</item>
+		<item>Description</item>
 	</string-array>
 </resources>

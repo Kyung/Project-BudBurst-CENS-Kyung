@@ -1,0 +1,7 @@
+<resources>
+	<!-- These are the attributes that we want to retrieve from the theme 
+		in utils/ImageViewPreference.java -->
+	<declare-styleable name="IconPreferenceScreen">
+    	<attr name="icon" format="reference"/>
+    </declare-styleable>
+</resources>

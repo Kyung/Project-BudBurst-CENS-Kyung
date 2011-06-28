@@ -18,6 +18,13 @@ import cens.ucla.edu.budburst.lists.ListItems;
 import cens.ucla.edu.budburst.lists.ListLocalDownload;
 import cens.ucla.edu.budburst.lists.ListUserDefinedSpeciesDownload;
 
+/**
+ * This class is for announcing my location to the server.
+ * Once the server receives the location values from the phone,
+ * it will start searching the local lists with Flickr species.
+ * @author kyunghan
+ *
+ */
 public class HelperAnnounceMyLocation extends AsyncTask<Void, Void, Void>{
 	
 	private double mLatitude;
@@ -35,19 +42,17 @@ public class HelperAnnounceMyLocation extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... Void) {
 		// TODO Auto-generated method stub
 		
-		Log.i("K", "URL : " + "http://networkednaturalist.org/python_scripts/cens-dylan/announce.py?lat=" 
+		Log.i("K", "Announce my location / URL : " + "http://networkednaturalist.org/python_scripts/cens-dylan/announce.py?lat=" 
 				+ mLatitude + "&lon=" + mLongitude);
 		
-		String getResponse = getRequest("http://networkednaturalist.org/python_scripts/cens-dylan/announce.py?lat=" 
+		String getResponse = getRequest("http://networkednaturalist.org/python_scripts/cens-dylan/announce.py" + "?lat=" 
 				+ mLatitude + "&lon=" + mLongitude);
 		
 		Log.i("K", "Response Message(Early announcement) : " + getResponse.toString());
 		
 		if(getResponse.toString().equals("OK")) {
-			Log.i("K", "Early announcement with the server - SUCCESS");
 		}
 		else {
-			Log.i("K", "Early announcement with the server - ERROR");
 		}
 		
 		return null;

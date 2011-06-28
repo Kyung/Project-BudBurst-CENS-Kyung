@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PBBcustomTheme" parent="android:Theme"> 
+        <item name="android:windowTitleBackgroundStyle">@style/PBBTitleBackground</item>   
+    </style>
+    <style name="FloracustomTheme" parent="android:Theme"> 
+        <item name="android:windowTitleBackgroundStyle">@style/FloraTitleBackground</item>   
+    </style>  
+</resources>

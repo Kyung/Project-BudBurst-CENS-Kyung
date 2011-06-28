@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/plant_pressed_warning" 
+         android:state_focused="true" android:state_pressed="true" />
+    <item android:drawable="@drawable/plant_pressed_warning" 
+         android:state_focused="false" android:state_pressed="true" />
+    <item android:drawable="@drawable/plant_selected_warning" android:state_focused="true" />
+    <item android:drawable="@drawable/plant_default_warning" android:state_enabled="false" />
+    <item android:drawable="@drawable/plant_default_warning" />
+</selector>

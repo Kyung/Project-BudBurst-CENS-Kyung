@@ -33,17 +33,23 @@ import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.database.SyncDBHelper;
 import cens.ucla.edu.budburst.database.SyncNetworkHelper;
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperShowAll;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.myplants.PBBPlantList;
 
+/**
+ * 
+ * Sync is the most complicated class in this project.
+ * This is not using Asynctask, but using thread with a handler. Each handler calls the next one, 
+ * and uses the progressive bar to indicate the sync is working.
+ *  
+ */
 public class PBBSync extends Activity{
 	
-	private String TAG = new String("SYNC");
-	
-	private String username;
-	private String password;
-	private SharedPreferences pref;
+	private String mUsername;
+	private String mPassword;
+	private HelperSharedPreference mPref;
 	
 	//MENU constants
 	final private int MENU_SYNC = 1;
@@ -75,29 +81,29 @@ public class PBBSync extends Activity{
 	public static int SERVER_ERROR = -99;
 	public static int NETWORK_ERROR = 0;
 	
-	private int previous_activity = 0;
+	private int mPreviousActivity = 0;
 	
-	int mValue;
-	TextView mText;
-	ProgressDialog mProgress;
-	boolean mQuit = false;
-	doSyncThread mSyncThread;
+	private int mValue;
+	private TextView mText;
+	private ProgressDialog mProgress;
+	private boolean mQuit = false;
+	private doSyncThread mSyncThread;
 		
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.helloscr);
-		pref = getSharedPreferences("userinfo",0);
-		username = pref.getString("Username","");
-		password = pref.getString("Password","");
+		mPref = new HelperSharedPreference(this);
+		mUsername = mPref.getPreferenceString("Username", "");
+		mPassword = mPref.getPreferenceString("Password", "");
 		
 		//Display instruction message
 		TextView textViewHello = (TextView)findViewById(R.id.hello_textview);
-		textViewHello.setText(getString(R.string.hello) + " " + username + "!" + getString(R.string.instruction));
+		textViewHello.setText(getString(R.string.hello) + " " + mUsername + "!" + getString(R.string.instruction));
 		
 		
 			
-		if(username.equals("test10")) {
+		if(mUsername.equals(HelperValues.PREVIEW_ID)) {
 			textViewHello.setText(getString(R.string.hello) + " Preview" + "!" + getString(R.string.instruction));
 			
 			OneTimeDBHelper otHelper = new OneTimeDBHelper(PBBSync.this);
@@ -130,8 +136,8 @@ public class PBBSync extends Activity{
 	
 		//If the previous activity is not plant list, then start sync instantly.  
 		Intent parent_intent = getIntent();
-		previous_activity = parent_intent.getExtras().getInt("from");
-		if(previous_activity == HelperValues.FROM_PLANT_LIST || previous_activity == HelperValues.FROM_MAIN_PAGE) {
+		mPreviousActivity = parent_intent.getExtras().getInt("from");
+		if(mPreviousActivity == HelperValues.FROM_PLANT_LIST || mPreviousActivity == HelperValues.FROM_MAIN_PAGE) {
 			textViewHello.setText(getString(R.string.instruction2));
 		}
 		
@@ -144,9 +150,7 @@ public class PBBSync extends Activity{
 	void doSync(){
 		mQuit = false;
 		
-		SharedPreferences.Editor edit = pref.edit();				
-		edit.putString("Synced","true");
-		edit.commit();
+		mPref.setPreferencesBoolean("getSynced", true);
 		
 		mSyncThread = new doSyncThread(mainMsgHandler, PBBSync.this);
 		mSyncThread.setDaemon(true);
@@ -248,10 +252,8 @@ public class PBBSync extends Activity{
 					{
 						mProgress.dismiss();
 						// set Username and Password to empty, ""
-						SharedPreferences.Editor edit = pref.edit();				
-						edit.putString("Username","");
-						edit.putString("Password","");
-						edit.commit();
+						mPref.setPreferencesString("Username", "");
+						mPref.setPreferencesString("Password", "");
 						
 						// show alert message saying there is something wrong with username & password
 						new AlertDialog.Builder(PBBSync.this)
@@ -262,11 +264,9 @@ public class PBBSync extends Activity{
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								// TODO Auto-generated method stub
-								SharedPreferences.Editor edit = pref.edit();
-								edit.putString("Username", "");
-								edit.putString("Password", "");
-								edit.putString("Synced","false");
-								edit.commit();
+								mPref.setPreferencesString("Username", "");
+								mPref.setPreferencesString("Password", "");
+								mPref.setPreferencesBoolean("getSynced", false);
 								
 								Intent intent = new Intent(PBBSync.this, firstActivity.class);
 								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -289,18 +289,14 @@ public class PBBSync extends Activity{
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// TODO Auto-generated method stub
-							SharedPreferences.Editor edit = pref.edit();
-							//edit.putString("Username", "");
-							//edit.putString("Password", "");
-							edit.putString("Synced","false");
-							edit.commit();
+							mPref.setPreferencesBoolean("getSynced", false);
 							
 							Intent intent;
 							
-							if(previous_activity == HelperValues.FROM_PLANT_LIST) {
+							if(mPreviousActivity == HelperValues.FROM_PLANT_LIST) {
 								intent = new Intent(PBBSync.this, PBBPlantList.class);
 							}
-							else if(previous_activity == HelperValues.FROM_MAIN_PAGE){
+							else if(mPreviousActivity == HelperValues.FROM_MAIN_PAGE){
 								intent = new Intent(PBBSync.this, PBBMainPage.class);
 							}							
 							else {
@@ -447,13 +443,13 @@ public class PBBSync extends Activity{
 				
 				//Move to plant list screen
 				
-				if(previous_activity == HelperValues.FROM_MAIN_PAGE) {
+				if(mPreviousActivity == HelperValues.FROM_MAIN_PAGE) {
 					Intent intent = new Intent(PBBSync.this, PBBMainPage.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);
 					finish();
 				}
-				else if(previous_activity == HelperValues.FROM_PLANT_LIST){
+				else if(mPreviousActivity == HelperValues.FROM_PLANT_LIST){
 					Intent intent = new Intent(PBBSync.this, PBBPlantList.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(intent);

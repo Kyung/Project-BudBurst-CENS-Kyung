@@ -1,0 +1,447 @@
+package cens.ucla.edu.budburst.weeklyplant;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
+
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.database.StaticDBHelper;
+import cens.ucla.edu.budburst.helper.HelperDrawableManager;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperValues;
+import cens.ucla.edu.budburst.lists.ListDetail;
+import cens.ucla.edu.budburst.myplants.PBBAddSite;
+import cens.ucla.edu.budburst.myplants.PBBPlantList;
+import cens.ucla.edu.budburst.onetime.OneTimePhenophase;
+import cens.ucla.edu.budburst.utils.PBBItems;
+import cens.ucla.edu.budburst.utils.QuickCapture;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.text.util.Linkify;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class WeeklyPlant extends Activity {
+
+	private int mSpeciesID = HelperValues.UNKNOWN_SPECIES;
+	private int mProtocolID = 2;
+	private int mCategory = HelperValues.LOCAL_BUDBURST_LIST;
+	private String mCommonName = "Unknown/Other";
+	private String mScienceName = "Unknown/Other";
+	private String mGetWeeklyPlant;
+	
+	private List<String> mList;
+	private ImageView mUrl;
+	private TextView mCredit;
+	private TextView mLink;
+	private TextView mSpecies;
+	private TextView mHaiku;
+	private ProgressBar mSpinner;
+	private Button myplantBtn;
+	private Button sharedplantBtn;
+	private CharSequence[] mSeqUserSite;
+	private HelperFunctionCalls mHelper;
+	private HashMap<String, Integer> mMapUserSiteNameID;
+	
+	
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    // set title bar
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		setContentView(R.layout.weeklyplant);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.pbb_title);
+		
+		ViewGroup v = (ViewGroup) findViewById(R.id.title_bar).getParent().getParent();
+		v = (ViewGroup)v.getChildAt(0);
+		v.setPadding(0, 0, 0, 0);
+
+		TextView myTitleText = (TextView) findViewById(R.id.my_title);
+		myTitleText.setText(" " + getString(R.string.WeeklyPlant));
+	    
+	    mList = new ArrayList<String>();
+	    mMapUserSiteNameID = new HashMap<String, Integer>();
+	    
+	    // setup the layout
+	    mUrl = (ImageView) findViewById(R.id.species_image);
+	    mCredit = (TextView) findViewById(R.id.credit);
+	    mLink = (TextView) findViewById(R.id.link);
+	    mSpecies = (TextView) findViewById(R.id.species_name);
+	    mHaiku = (TextView) findViewById(R.id.haiku);
+	    mSpinner = (ProgressBar) findViewById(R.id.progressbar);
+	   
+	    myplantBtn = (Button) findViewById(R.id.to_myplant);
+		sharedplantBtn = (Button) findViewById(R.id.to_shared_plant);
+	   
+		/*
+		 * Call FunctionsHelper();
+		 */
+		mHelper = new HelperFunctionCalls();
+		mMapUserSiteNameID = mHelper.getUserSiteIDMap(WeeklyPlant.this);
+		
+		if(!isNetworkAvailable()) {
+			Toast.makeText(this, "No connection. Make sure you are in the area with good connectivity.", Toast.LENGTH_SHORT).show();
+			finish();
+		}
+		else {
+			/*
+			 * Download weekly plant information from the server.
+			 */
+		    DownloadWeeklyPlant weeklyPlant = new DownloadWeeklyPlant(this);
+		    weeklyPlant.execute();
+		}
+		
+	    // TODO Auto-generated method stub
+	}
+	
+	private boolean isNetworkAvailable() {
+		ConnectivityManager cManager = 
+			(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		
+		NetworkInfo nInfo = cManager.getActiveNetworkInfo();
+		
+		if(nInfo == null) {
+			return false;
+		}
+		
+		Log.i("K", "info : " + nInfo.isConnectedOrConnecting());
+		
+		return nInfo.isConnectedOrConnecting();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		/*
+		 * Retreive user sites from database.
+		 */
+		mSeqUserSite = mHelper.getUserSite(WeeklyPlant.this);
+		
+		myplantBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				StaticDBHelper staticDBHelper = new StaticDBHelper(WeeklyPlant.this);
+				SQLiteDatabase staticDB = staticDBHelper.getReadableDatabase();
+				Cursor c = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id = " + mSpeciesID, null);
+				while(c.moveToNext()) {
+					mProtocolID = c.getInt(0);
+				}
+				c.close();
+				staticDB.close();
+				
+				popupDialog();
+			}
+		});	
+		
+		sharedplantBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				/*
+				 * We already know the Shared Plant category if we choose species from official budburst lists.
+				 * - hardcoded mProtocolID
+				 */
+				int getProtocolID = 2; // temporary set to 2
+				
+				StaticDBHelper staticDBH = new StaticDBHelper(WeeklyPlant.this);
+				SQLiteDatabase staticDB = staticDBH.getReadableDatabase();
+				
+				Cursor cursor = staticDB.rawQuery("SELECT protocol_id FROM species WHERE _id=" + mSpeciesID + ";", null);
+				while(cursor.moveToNext()) {
+					getProtocolID = cursor.getInt(0);
+				}
+				
+				switch(getProtocolID) {
+				case HelperValues.WILD_FLOWERS:
+					mProtocolID = HelperValues.QUICK_WILD_FLOWERS; 
+					break;
+				case HelperValues.DECIDUOUS_TREES:
+					mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
+					break;
+				case HelperValues.EVERGREEN_TREES:
+					mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
+					break;
+				case HelperValues.CONIFERS:
+					mProtocolID = HelperValues.QUICK_TREES_AND_SHRUBS;
+					break;
+				case HelperValues.GRASSES:
+					mProtocolID = HelperValues.QUICK_GRASSES;
+					break;
+				}
+				
+				cursor.close();
+				staticDB.close();
+				
+				/*
+				 * Ask users if they are ready to take a photo.
+				 */
+				new AlertDialog.Builder(WeeklyPlant.this)
+				.setTitle(getString(R.string.Menu_addQCPlant))
+				.setMessage(getString(R.string.Start_Shared_Plant))
+				.setPositiveButton(getString(R.string.Button_Photo), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						/*
+						 * Move to QuickCapture
+						 */
+						
+						Intent intent = new Intent(WeeklyPlant.this, QuickCapture.class);
+						PBBItems pbbItem = new PBBItems();
+						pbbItem.setCommonName(mCommonName);
+						pbbItem.setScienceName(mScienceName);
+						pbbItem.setProtocolID(mProtocolID);
+						pbbItem.setSpeciesID(mSpeciesID);
+						pbbItem.setCategory(mCategory);
+					
+						intent.putExtra("pbbItem", pbbItem);
+						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
+						startActivity(intent);
+						
+					}
+				})
+				.setNeutralButton(getString(R.string.Button_NoPhoto), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						
+						/*
+						 * Move to Getphenophase without a photo.
+						 */
+						Intent intent = new Intent(WeeklyPlant.this, OneTimePhenophase.class);
+						PBBItems pbbItem = new PBBItems();
+						pbbItem.setCommonName(mCommonName);
+						pbbItem.setScienceName(mScienceName);
+						pbbItem.setProtocolID(mProtocolID);
+						pbbItem.setSpeciesID(mSpeciesID);
+						pbbItem.setCategory(mCategory);
+						pbbItem.setLocalImageName("");
+						
+						intent.putExtra("pbbItem", pbbItem);
+						intent.putExtra("from", HelperValues.FROM_LOCAL_PLANT_LISTS);
+						startActivity(intent);
+
+					}
+				})
+				.setNegativeButton(getString(R.string.Button_Cancel), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+					}
+				})
+				.show();
+				
+			}
+		});
+	    
+	}
+	
+	private void popupDialog() {
+		/*
+		 * Pop up choose site dialog box
+		 */
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.AddPlant_chooseSite))
+		.setCancelable(true)
+		.setItems(mSeqUserSite, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+			
+				int new_plant_site_id = mMapUserSiteNameID.get(mSeqUserSite[which].toString());
+				String new_plant_site_name = mSeqUserSite[which].toString();
+				
+				if(new_plant_site_name == "Add New Site") {
+					Intent intent = new Intent(WeeklyPlant.this, PBBAddSite.class);
+					PBBItems pbbItem = new PBBItems();
+					pbbItem.setSpeciesID(mSpeciesID);
+					pbbItem.setCommonName(mCommonName);
+					pbbItem.setScienceName(mScienceName);
+					pbbItem.setProtocolID(mProtocolID);
+					pbbItem.setCategory(mCategory);
+					
+					intent.putExtra("pbbItem", pbbItem);
+					intent.putExtra("from", HelperValues.FROM_PLANT_LIST);
+					startActivity(intent);
+				}
+				else {
+					if(mHelper.checkIfNewPlantAlreadyExists(mSpeciesID, new_plant_site_id, WeeklyPlant.this)){
+						Toast.makeText(WeeklyPlant.this, getString(R.string.AddPlant_alreadyExists), Toast.LENGTH_LONG).show();
+					}else{
+
+						if(mHelper.insertNewMyPlantToDB(WeeklyPlant.this, mSpeciesID, mCommonName, 
+								new_plant_site_id, new_plant_site_name, mProtocolID, HelperValues.LOCAL_BUDBURST_LIST)){
+							Intent intent = new Intent(WeeklyPlant.this, PBBPlantList.class);
+							Toast.makeText(WeeklyPlant.this, getString(R.string.AddPlant_newAdded), Toast.LENGTH_SHORT).show();
+							
+							/*
+							 * Clear all stacked activities.
+							 */
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
+							finish();
+						}else{
+							Toast.makeText(WeeklyPlant.this, getString(R.string.Alert_dbError), Toast.LENGTH_SHORT).show();
+						}
+					}
+				}
+			}
+		})
+		.setNegativeButton(getString(R.string.Button_cancel), null)
+		.show();
+	}
+	
+	/*
+	 * Receive the weekly plant from the server in json format
+	 */
+	public class DownloadWeeklyPlant extends AsyncTask<Void, Void, Void>{
+
+		private Context mContext;
+		private ProgressDialog mDialog;
+		private List<String> mList;
+		private String getUrl;
+		private String getCredit;
+		private String getLink;
+		private String getSpecies;
+		private String getHaiku;
+		
+		// getSpeciesInfo[0] = Science Name
+		// getSpeciesInfo[1] = Species Info
+		private String []getSpeciesInfo; 
+		
+		public DownloadWeeklyPlant(Context context) {
+			mContext = context;
+			
+			mList = new ArrayList<String>();
+		}
+
+		@Override
+		protected void onPreExecute() {
+			
+			mDialog = ProgressDialog.show(mContext, getString(R.string.Alert_pleaseWait), 
+					getString(R.string.Weekly_Plant_Text), true);
+			mDialog.setCancelable(true);
+			
+			mGetWeeklyPlant = getString(R.string.plant_of_week);
+		}
+
+		@Override
+		protected Void doInBackground(Void... unused) {
+			// TODO Auto-generated method stub
+		
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost(mGetWeeklyPlant);
+			
+			String result = "";
+				
+			try {
+				HttpResponse response = httpClient.execute(httpPost);
+				
+				if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+					BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+					
+					StringBuilder result_str = new StringBuilder();
+					String line = "";
+					
+					while((line = br.readLine()) != null){
+						result_str.append(line);
+					}
+					
+					result = result_str.toString();
+					
+					JSONObject jsonObj = new JSONObject(result);
+					
+					getUrl = jsonObj.getString("url");
+					getCredit = jsonObj.getString("credit");
+					getLink = jsonObj.getString("link");
+					getSpecies = jsonObj.getString("species");
+					getHaiku = jsonObj.getString("haiku");
+					
+					StaticDBHelper staticDBHelper = new StaticDBHelper(WeeklyPlant.this);
+					OneTimeDBHelper onetimeDBHelper = new OneTimeDBHelper(WeeklyPlant.this);
+					
+					mSpeciesID = staticDBHelper.getSpeciesID(WeeklyPlant.this, getSpecies);
+					getSpeciesInfo = staticDBHelper.getSpeciesName(WeeklyPlant.this, mSpeciesID);
+					mScienceName = getSpeciesInfo[0];
+					mCommonName = getSpecies;
+					
+					Log.i("K", "Week of plant, SpeciesID: " + mSpeciesID + 
+							" ScienceName: " + mScienceName);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				finish();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				finish();
+			}
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void unused) {
+			mDialog.dismiss();
+		
+		    mCredit.setText(getCredit);
+		    mLink.setText(getSpeciesInfo[1]);
+		    mSpecies.setText(getSpecies);
+		    mHaiku.setText(getHaiku);
+		    
+		    //Linkify.addLinks(mLink, Linkify.WEB_URLS);
+		    
+		    HelperDrawableManager dm = new HelperDrawableManager(WeeklyPlant.this, mSpinner, mUrl);
+			dm.fetchDrawableOnThread(getUrl);
+			
+		}
+		
+		public List<String> onGetResults() {
+			return mList;
+		}
+	}
+}

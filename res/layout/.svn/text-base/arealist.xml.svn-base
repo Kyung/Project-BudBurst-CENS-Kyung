@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content">
+  <LinearLayout
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:gravity="center"
+  	android:id="@+id/title_part"
+  	android:orientation="vertical"
+  />
+  <LinearLayout
+  	android:layout_width="fill_parent"
+  	android:layout_height="60px"
+  	android:background="@drawable/bg_line"
+  	android:id="@+id/header_box"
+  	android:layout_below="@+id/title_part"
+  	android:orientation="vertical">
+  	<TextView
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+		android:textSize="20dip"
+		android:textColor="#000000"
+		android:paddingTop="5dip"
+		android:paddingLeft="5dip"
+		android:id="@+id/title"
+  	android:text="@string/WI_Area"/>
+  	<TextView
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+		android:textSize="16dip"
+		android:textColor="@drawable/gray"
+		android:paddingLeft="5dip"
+  	android:text="@string/WI_parks"/>
+  </LinearLayout>
+  
+  	<ListView
+		android:id="@android:id/list"
+		android:layout_marginTop="10dip"
+		android:layout_below="@+id/header_box"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+  	/>
+</RelativeLayout>

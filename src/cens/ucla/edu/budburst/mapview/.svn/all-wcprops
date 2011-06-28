@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview
+END
+SpeciesMapOverlay.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/SpeciesMapOverlay.java
+END
+SpeciesDetailMap.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/5/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/SpeciesDetailMap.java
+END
+BalloonItemizedOverlay.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/6/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/BalloonItemizedOverlay.java
+END
+MyLocOverlay.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/MyLocOverlay.java
+END
+SpeciesOthersFromServer.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/6/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/SpeciesOthersFromServer.java
+END
+MapViewMain.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/5/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/MapViewMain.java
+END
+PopupPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/PopupPanel.java
+END
+SpeciesOverlayItem.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/SpeciesOverlayItem.java
+END
+CompassView.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/6/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/CompassView.java
+END
+BalloonOverlayView.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/5/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/BalloonOverlayView.java
+END
+SitesOverlay.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/SitesOverlay.java
+END
+MapCustomView.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/MapCustomView.java
+END
+SpeciesItemizedOverlay.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/mapview/SpeciesItemizedOverlay.java
+END

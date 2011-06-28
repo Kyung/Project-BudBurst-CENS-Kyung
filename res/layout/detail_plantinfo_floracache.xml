@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"	>
+		
+		<LinearLayout 
+			android:id="@+id/observation_linear_layout"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:gravity="center"
+			android:paddingLeft="7dp"
+			android:paddingRight="7dp"
+			android:orientation="vertical">
+	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="7dp"
+				android:orientation="horizontal"
+			>
+			<ImageView 
+				android:scaleType="fitCenter"
+				android:paddingLeft="5dp"
+				android:paddingRight="5dp"
+				android:layout_width="90dp" 
+				android:layout_height="90dp" 
+				android:id="@+id/species_image" 
+				android:adjustViewBounds="true"
+				/>		
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="7dp"
+				android:orientation="vertical"
+			>
+				<TextView
+					android:id="@+id/common_name"
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content"
+					android:textSize="18sp" 
+					android:textColor="@drawable/black"
+					android:gravity="center"
+					android:layout_gravity="center"
+					android:textStyle="italic|bold" 
+					android:layout_marginTop="7dp"
+					/>			
+			
+				<TextView
+					android:id="@+id/science_name"
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content"
+					android:textSize="16sp" 
+					android:textColor="@drawable/black" 
+					android:gravity="center"
+					android:layout_gravity="center"
+					android:textStyle="italic|bold" 
+					/>
+			</LinearLayout>
+		</LinearLayout>
+		<TextView
+			android:layout_marginTop="7dp"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:text="@string/No_Info_Species_Detail"
+			android:textSize="16sp"
+			android:id="@+id/text"
+		/>
+		<TextView
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_marginTop="7dp"
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:text="Floracache"
+			android:textSize="17sp"
+			android:textStyle="bold"
+			android:id="@+id/floracache_level"
+		/>
+		<TextView
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textSize="16sp"
+			android:id="@+id/num_others_floracache"
+		/>
+		<ListView
+	        android:id="@+id/listview"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"/>					
+		</LinearLayout>
+	
+</RelativeLayout>
+

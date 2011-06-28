@@ -1,7 +1,15 @@
 package cens.ucla.edu.budburst.helper;
 
+/**
+ * All global values to be used in the application.
+ * @author kyunghan
+ *
+ */
 public class HelperValues {
 	// this class is to define the frequently used values...
+	
+	public static final String PREVIEW_ID = "test10";
+	public static final String PREVIEW_PW = "test10";
 	
 	// return from where?
 	public static final int RETURN_FROM_PLANT_INFORMATION = 0;
@@ -69,7 +77,6 @@ public class HelperValues {
 	// LocalList
 	// type=1 BudBurst  
 	// type=2 WhatsInvasive
-	// type=3 WhatsNative
 	// type=3 WhatsPoisonous
 	// type=4 WhatsEndangered
 	public static final int LOCAL_BUDBURST_LIST = 1;

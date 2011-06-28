@@ -18,6 +18,7 @@ import cens.ucla.edu.budburst.helper.HelperBackgroundService;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperJSONParser;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 import cens.ucla.edu.budburst.onetime.OneTimeAddMyPlant;
 import android.app.Activity;
@@ -45,12 +46,12 @@ import android.widget.Toast;
 public class PBBLogin extends Activity{
 	
 	private ProgressDialog mDialog = null;
-	private EditText textUsername;
-	private EditText textPassword;
+	private EditText mTextUsername;
+	private EditText mTextPassword;
 	private int mPreviousActivity;
 	private String mUsername;
 	private String mPassword;
-	private SharedPreferences mPref;
+	private HelperSharedPreference mPref;
 	private boolean mLoginValid = false;
 	
 	@Override
@@ -58,8 +59,8 @@ public class PBBLogin extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 		
-		textUsername = (EditText)findViewById(R.id.username_text);
-		textPassword = (EditText)findViewById(R.id.password_text);
+		mTextUsername = (EditText)findViewById(R.id.username_text);
+		mTextPassword = (EditText)findViewById(R.id.password_text);
 		
 		Intent previousIntent = getIntent();
 		mPreviousActivity = previousIntent.getExtras().getInt("from");
@@ -67,18 +68,15 @@ public class PBBLogin extends Activity{
 		if(mPreviousActivity != HelperValues.FROM_SETTINGS) {
 			// When user logout and come to login page. The app will not download species list.
 			// Only user first login, the background service is working.
-			
-			// Start service
-		    //Intent service = new Intent(PBBLogin.this, HelperBackgroundService.class);
-		    //startService(service);
 		}
 		
 		OneTimeDBHelper onetime = new OneTimeDBHelper(PBBLogin.this);
 		
 		//Define Preferences to store username and password
-		mPref = getSharedPreferences("userinfo", 0);
+		mPref = new HelperSharedPreference(this);
 		
-		if(	!(mPref.getString("Username","").equals("")) && !(mPref.getString("Password","").equals(""))){
+		if(	!(mPref.getPreferenceString("Username", "").equals("")) 
+				&& !(mPref.getPreferenceString("Password", "").equals(""))){
 			Intent intent = new Intent(PBBLogin.this, PBBSync.class);
 			intent.putExtra("from", 0);
 			PBBLogin.this.startActivity(intent);
@@ -89,8 +87,8 @@ public class PBBLogin extends Activity{
 		Button buttonLogin = (Button)findViewById(R.id.login_button);
 		buttonLogin.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View v){
-				mUsername = textUsername.getText().toString().trim();
-				mPassword = textPassword.getText().toString().trim();
+				mUsername = mTextUsername.getText().toString().trim();
+				mPassword = mTextPassword.getText().toString().trim();
 				
 				if(mUsername.equals("") || mPassword.equals("")){
 					Toast.makeText(PBBLogin.this, getString(R.string.Alert_wrongUserPass),Toast.LENGTH_SHORT).show();	
@@ -145,12 +143,10 @@ public class PBBLogin extends Activity{
 				// TODO Auto-generated method stub
 				
 				//Set id/pwd as test10/test10, which is 'preview'
-				SharedPreferences.Editor edit = mPref.edit();				
-				edit.putString("Username","test10");
-				edit.putString("Password","test10");
-				edit.putBoolean("Preview", true);
-				edit.commit();
-
+				mPref.setPreferencesString("Username", HelperValues.PREVIEW_ID);
+				mPref.setPreferencesString("Password", HelperValues.PREVIEW_PW);
+				mPref.setPreferencesBoolean("Preview", true);
+				
 				Intent intent = new Intent(PBBLogin.this, PBBSync.class);
 				intent.putExtra("from", 0);
 				startActivity(intent);
@@ -168,10 +164,14 @@ public class PBBLogin extends Activity{
 		.show();
 	}	
 	
+	/**
+	 * Async class for the login process
+	 */
 	class AsyncLogin extends AsyncTask<String, Integer, Void> {
 		
 		protected void onPreExecute() {
-			mDialog = ProgressDialog.show(PBBLogin.this, "Loading...", "Logging in", true);
+			mDialog = ProgressDialog.show(PBBLogin.this, getString(R.string.Alert_loading), 
+					getString(R.string.Alert_Logging_in), true);
 		}
 		@Override
 		protected Void doInBackground(String... url) {
@@ -201,11 +201,9 @@ public class PBBLogin extends Activity{
 					}
 					else {
 						mLoginValid = true;
-						SharedPreferences.Editor edit = mPref.edit();				
-						edit.putString("Username",mUsername.trim());
-						edit.putString("Password",mPassword.trim());
-						edit.commit();
-						
+						mPref.setPreferencesString("Username", mUsername.trim());
+						mPref.setPreferencesString("Password", mPassword.trim());
+			
 						Intent intent = new Intent(PBBLogin.this, PBBSync.class);
 						intent.putExtra("from", 0);
 						PBBLogin.this.startActivity(intent);

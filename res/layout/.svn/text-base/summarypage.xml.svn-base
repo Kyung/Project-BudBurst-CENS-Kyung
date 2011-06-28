@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:layout_margin="5dp"
+  android:orientation="vertical">
+  
+  <TextView
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:text="@string/Menu_addPlant"
+  	android:textSize="19dp"
+  	android:textColor="@color/White"
+  	android:textStyle="bold"
+  	android:layout_marginLeft="7dp"
+  />
+  <TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:id="@+id/num_monitored_plants"
+	android:layout_marginLeft="20dp"
+	android:textSize="17dp"
+	android:textColor="@color/White"
+  />
+  <TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:id="@+id/num_monitored_observations"
+	android:layout_marginLeft="20dp"
+	android:textSize="17dp"
+	android:textColor="@color/White"
+  />
+  <TextView
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:text="@string/Menu_addQCPlant"
+  	android:textSize="19dp"
+  	android:textColor="@color/White"
+  	android:textStyle="bold"
+  	android:layout_marginLeft="7dp"
+  	android:layout_marginTop="15dp"
+  />
+  <TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:id="@+id/num_qc_plants"
+	android:layout_marginLeft="20dp"
+	android:textSize="17dp"
+	android:textColor="@color/White"
+  />
+  <TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:id="@+id/num_qc_observations"
+	android:layout_marginLeft="20dp"
+	android:textSize="17dp"
+	android:textColor="@color/White"
+  />  
+  
+</LinearLayout>

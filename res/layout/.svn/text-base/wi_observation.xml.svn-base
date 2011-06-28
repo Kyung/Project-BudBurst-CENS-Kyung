@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+  <LinearLayout
+    android:id="@+id/header_part"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:orientation="horizontal"
+  	android:paddingTop="7dp"
+  	android:paddingLeft="7dp"
+  	android:paddingRight="7dp"
+  	android:paddingBottom="12dp"
+  	android:background="@drawable/bg_line"
+  	android:weightSum="1"
+  	>
+	<ImageView
+		android:paddingTop="3dp"
+		android:layout_width="60dp" 
+		android:layout_height="60dp"
+		android:id="@+id/species_image" 
+		android:adjustViewBounds="true"
+	/>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:paddingTop="3dp"
+			android:paddingLeft="6dp"
+			android:orientation="vertical"
+			android:id="@+id/text_description"
+			>
+			<TextView
+				android:id="@+id/common_name"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="17sp" 
+				android:textColor="@drawable/black" 
+				android:textStyle="italic|bold" 
+				/>
+			<TextView
+				android:id="@+id/science_name"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content"
+				android:textSize="17sp"
+				android:textColor="@drawable/black" 
+				android:textStyle="italic|bold"
+				/>
+		</LinearLayout>
+	</LinearLayout>
+ 
+	<ScrollView
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:layout_marginTop="5dp"
+		android:layout_marginLeft="5dp"
+		android:layout_marginRight="5dp" 
+		android:layout_below="@+id/header_part">
+
+	<LinearLayout 
+		android:id="@+id/observation_linear_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/header_part"
+		android:gravity="center"
+		android:paddingLeft="7dp"
+		android:paddingRight="7dp"
+		android:orientation="vertical"
+		android:background="@drawable/box_drawable_yellow">
+				
+				
+		<TextView
+  			android:layout_width="fill_parent"
+  			android:layout_height="wrap_content"
+  			android:text="Make your observation"
+  			android:textSize="18sp"
+  			android:textStyle="bold"
+  			android:gravity="center"
+  			android:layout_marginTop="5dp"
+  			android:layout_marginBottom="5dp"
+  			android:focusable="true"
+  			android:focusableInTouchMode="true"
+  			android:id="@+id/title_text"
+  		/>
+
+		<TextView
+			android:paddingTop="1dp"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text=" Take a Photo"
+			android:background="@drawable/bg_line_top"
+			android:textSize="16sp"
+			/>
+			
+		<ImageButton 
+			android:scaleType="fitCenter"
+			android:paddingTop="3dp"
+			android:paddingLeft="13dp"
+			android:paddingRight="13dp"
+			android:layout_width="110dp" 
+			android:layout_height="110dp" 
+			android:id="@+id/image" 
+			android:adjustViewBounds="true"
+			/>
+			
+		<LinearLayout 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:paddingTop="7dp"
+			android:paddingBottom="15dp"
+			android:gravity="center"
+			android:orientation="horizontal">
+
+			<LinearLayout
+				android:id="@+id/take_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dp"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/take_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:layout_gravity="bottom"
+					android:text="Take Photo" 
+					/>
+					
+				<ImageView
+					android:layout_width="wrap_content"			
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_camera_icon" 
+					/>
+				
+			</LinearLayout>
+		
+			<LinearLayout
+				android:id="@+id/replace_photo" 
+				android:layout_width="wrap_content" 
+				android:layout_height="40dp"
+				android:background="@layout/button_field"
+				android:clickable="true"
+				android:gravity="center"
+				android:focusable="true">
+				
+				<TextView
+					android:id="@+id/replace_photo_text" 
+					android:textColor="@drawable/black"
+					android:layout_width="fill_parent" 
+					android:layout_height="fill_parent"
+					android:layout_gravity="bottom"
+					android:text="Replace Photo" />
+					
+				<ImageView
+					android:layout_width="wrap_content" 
+					android:layout_height="fill_parent"
+					android:src="@drawable/ic_menu_camera_icon" 
+					/>
+				
+			</LinearLayout>
+					
+		</LinearLayout>
+		
+		<TextView
+			android:paddingTop="3dp"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textStyle="bold" 
+			android:text=" Add Notes"
+			android:textSize="16sp"
+			android:background="@drawable/bg_line_top"
+			/>	
+
+		<EditText
+			android:id="@+id/notes"
+			android:paddingTop="3dp"
+			android:imeOptions="actionDone"
+			android:layout_width="250dp" 
+			android:layout_height="wrap_content"
+			android:width="0dp"
+			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
+			android:gravity="top" 
+			android:hint="Input note here"
+			android:lines="4"
+			android:paddingBottom="10dp"
+			/>
+			
+		<LinearLayout
+			android:paddingTop="3dp" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:paddingBottom="10dp">
+				
+			<Button
+				android:id="@+id/save" 
+				android:textColor="@drawable/black"
+				android:layout_width="250dp" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textStyle="bold"
+				android:textSize="16sp"
+				android:text="See Summary"
+				android:focusable="true"
+			/>
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>
+</RelativeLayout>
+

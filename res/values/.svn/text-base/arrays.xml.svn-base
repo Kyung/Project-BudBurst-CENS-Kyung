@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="category">
+		<item>Wild Flowers and Herbs</item>
+		<item>Grass</item>
+		<item>Deciduous Trees and Shrubs</item>
+		<item>Evergreen Trees and Shrubs</item>
+		<item>Conifer</item>
+	</string-array>
+	<string-array name="category_only_trees">
+		<item>Deciduous Trees and Shrubs</item>
+		<item>Evergreen Trees and Shrubs</item>
+	</string-array>
+	<string-array name="recommend">
+		<item>"What's Blooming"</item>
+		<item>"What's Invasive"</item>
+		<item>"What's Native"</item>
+		<item>"What's Popular"</item>
+	</string-array>
+	<string-array name="myphoto">
+		<item>See Detail</item>
+		<item>Delete</item>
+	</string-array>
+	<string-array name="plantlist">
+		<item>Edit Species</item>
+		<item>Add Same Species</item>
+		<item>Delete Species</item>
+	</string-array>
+	<string-array name="plantcategory">
+		<item>Local Invasive</item>
+		<item>Local Poisonous</item>
+		<item>Local Endangered</item>
+	</string-array>
+	<string-array name="quick_capture_phenophase_category">
+		<item>Trees and Shrubs</item>
+		<item>Wild Flowers</item>
+		<item>Grasses</item>
+	</string-array>
+	<string-array name="floracache_level">
+		<item>Easy - Map</item>
+		<item>Medium - Direction</item>
+		<item>Hard - Description</item>
+	</string-array>
+</resources>

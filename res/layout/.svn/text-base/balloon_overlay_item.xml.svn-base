@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content">
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<TextView android:layout_height="wrap_content"
+			android:layout_width="80dp" 
+			android:id="@+id/balloon_item_line1"
+			android:text="" 
+			android:paddingLeft="15dip"
+			android:textSize="12dip"
+			android:gravity="right">
+		</TextView>
+		<TextView android:layout_height="wrap_content"
+			android:layout_width="wrap_content" 
+			android:id="@+id/balloon_item_line2"
+			android:text=" - " 
+			android:layout_toRightOf="@+id/balloon_item_line1"
+			android:textSize="12dip"
+			android:gravity="center">
+		</TextView>
+		<TextView android:layout_height="wrap_content"
+			android:layout_width="57dp" 
+			android:id="@+id/balloon_item_line3"
+			android:text="" 
+			android:layout_toRightOf="@+id/balloon_item_line2"
+			android:textSize="12dip"
+			android:gravity="left">
+		</TextView>
+	</RelativeLayout>
+</LinearLayout>

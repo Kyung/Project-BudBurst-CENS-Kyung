@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+		xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent"  
+	   	android:background="@color/BudBurstBackground"
+		>
+	<LinearLayout 
+	    android:orientation="vertical" 
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent" 
+	> 
+
+			<ImageView 
+				android:id="@+id/logo" 
+				android:layout_height="wrap_content" 
+				android:layout_centerHorizontal = "true"
+				android:src="@drawable/header_small_modified"
+				android:focusableInTouchMode="true"
+				android:layout_gravity="center" android:layout_width="wrap_content" android:paddingBottom="10dp" android:paddingTop="20dp">
+			</ImageView>
+			
+			<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:textColor="@color/black" android:text="@string/Title_text" android:textSize="16dp" android:typeface="normal" android:textStyle="bold" android:id="@+id/title_text" android:gravity="center" android:layout_marginLeft="5dp" android:layout_marginBottom="15dp" android:layout_marginRight="5dp"></TextView><LinearLayout 
+				android:id="@+id/login_interact_area"
+				android:orientation="vertical" 
+				android:background="@layout/white_bg_rounded_corners"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" 
+				android:layout_gravity = "center"
+				android:layout_marginBottom = "8dp" android:padding="7dp">
+				<EditText android:id="@+id/username_text"
+					android:background="@layout/text_edit_field"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal"
+					android:layout_marginBottom="5dp"
+					android:focusable="true" android:layout_width="200dp" android:hint="@string/username">
+				</EditText>
+				<EditText android:id="@+id/password_text"
+					android:password="true"
+					android:background="@layout/text_edit_field"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal"
+					android:layout_marginBottom="5dp"
+					android:focusable="true" android:hint="@string/password">
+				</EditText>
+				<Button android:id="@+id/login_button" 
+					android:background="@layout/button_field"
+					android:textColor="@drawable/app_gray"
+					android:layout_height="wrap_content" 
+					android:focusable="true" android:layout_width="wrap_content" android:layout_gravity="left" android:layout_marginTop="5dp" android:typeface="normal" android:textStyle="bold" android:text="@string/login">
+				</Button>
+				
+				
+			
+
+</LinearLayout><LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:layout_marginTop="10dp"><Button android:id="@+id/test_login_button" android:layout_width="fill_parent" android:background="@layout/button_field" android:textColor="@drawable/app_gray" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginBottom="5dp" android:focusable="true" android:layout_marginTop="20dp" android:text="@string/preview_mode" android:layout_marginRight="2dp" android:textStyle="bold">
+				</Button><Button android:id="@+id/signup_button" android:background="@layout/button_field" android:textColor="@drawable/app_gray" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:focusable="true" android:text="@string/sign_up" android:textStyle="bold">
+				</Button></LinearLayout>
+	</LinearLayout>
+</ScrollView>
+	

@@ -1,0 +1,252 @@
+package cens.ucla.edu.budburst.lists;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.DialogInterface.OnCancelListener;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.ListView;
+import android.widget.Toast;
+import cens.ucla.edu.budburst.R;
+import cens.ucla.edu.budburst.database.OneTimeDBHelper;
+import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
+import cens.ucla.edu.budburst.helper.HelperPlantItem;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
+import cens.ucla.edu.budburst.helper.HelperValues;
+
+public class ListLocalDownload extends AsyncTask<ListItems, Integer, Void>{
+	
+	private HelperSharedPreference mPref;
+	private Context mContext;
+	private int mCategory;
+	private OneTimeDBHelper mOtDBH;
+	private SQLiteDatabase mOtDB;
+	private String mCounty;
+	private String mState;
+	
+	public ListLocalDownload(Context context, int category) {
+		mContext = context;
+		mCategory = category;
+	}
+	
+	@Override
+	protected void onPreExecute() {
+		File f = new File(HelperValues.LOCAL_LIST_PATH);
+		if(!f.exists()) {
+			f.mkdir();
+		}
+	}
+	
+	@Override
+	protected Void doInBackground(ListItems... item) {
+		// TODO Auto-generated method stub
+		/*
+		 * Change the boolean value of the category to TRUE
+		 */
+		// type=1 Local BudBurst  
+		// type=2 Local WhatsInvasive
+		// type=3 Local WhatsPoisonous
+		// type=4 Local WhatsEndangered
+		
+		mPref = new HelperSharedPreference(mContext);
+		
+		// setting the url.
+		String url =  mContext.getString(R.string.get_local_usda_plant_list)+ "?lat=" 
+			+ item[0].latitude
+			+ "&lon=" + item[0].longitude 
+			+ "&type=" + mCategory;
+			
+		Log.i("K", "URL : " + url);
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpPost httpPost = new HttpPost(url);
+		String result = "";
+		
+		try {
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				
+				StringBuilder result_str = new StringBuilder();
+				String line = "";
+				
+				while((line = br.readLine()) != null){
+					result_str.append(line);
+				}
+				
+				result = result_str.toString();
+				
+				JSONObject jsonObj = new JSONObject(result);
+				mCounty = jsonObj.getString("county");
+				mState = jsonObj.getString("state");
+				
+				/*
+				 * Save state and county values into SharedPreferences.
+				 */
+				mPref.setPreferencesString("state", mState);
+				mPref.setPreferencesString("county", mCounty);
+				
+				JSONArray jsonAry = jsonObj.getJSONArray("results");
+				
+				mOtDBH = new OneTimeDBHelper(mContext);
+				// Delete the list first - by category
+				mOtDB = mOtDBH.getWritableDatabase();
+				mOtDBH.clearLocalListsByCategory(mContext, mCategory);
+				//mOtDB.execSQL("DELETE FROM localPlantLists WHERE category=" + mCategory + ";");
+				
+				getJsonData(jsonAry);
+					
+				// DB close
+				mOtDB.close();
+				mOtDBH.close();
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/*
+	 * Open OneTime Database and delete the list first - by category
+	 * After that, reINSERT the values into the database
+	 */
+	synchronized private void getJsonData(JSONArray jsonAry) throws JSONException {
+		// ReINSERT the values
+		for(int i = 0 ; i < jsonAry.length() ; i++) {
+			
+			try {
+				/*
+				 * Set the first char to upper case.
+				 */
+				String commonName = jsonAry.getJSONObject(i).getString("common");
+				
+				/*
+				 * If there's a common name, change the first char to upper case.
+				 */
+				if(!commonName.equals("")) {
+					commonName = commonName.substring(0,1).toUpperCase() + commonName.substring(1);
+				}
+				else {
+					commonName = "Unknown/Other";
+				}
+
+				int imageID = Integer.parseInt(jsonAry.getJSONObject(i).getString("id"));
+				
+				mOtDB.execSQL("INSERT INTO localPlantLists VALUES(" +
+						mCategory + ",\"" +
+						commonName + "\",\"" +
+						jsonAry.getJSONObject(i).getString("scientific") + "\",\"" +
+						mCounty + "\",\"" +
+						mState + "\",\"" +
+						jsonAry.getJSONObject(i).getString("usda_url") + "\",\"" +
+						jsonAry.getJSONObject(i).getString("image_url") + "\",\"" +
+						jsonAry.getJSONObject(i).getString("image_copyright").replace("&amp;copy;", "") + "\"," +
+						Integer.parseInt(jsonAry.getJSONObject(i).getString("id")) + ");"
+					);
+				
+				// don't need to download budburst photos 
+				// we are using our local budburst image for this.
+				if(mCategory != 1) {
+					File checkFileExist = new File(HelperValues.LOCAL_LIST_PATH + imageID + ".jpg");
+					
+					if(checkFileExist.exists()) {
+						checkFileExist.delete();
+						Log.i("K", "Delete the image from the SDcard.");
+					}
+					
+					Log.i("K", "Download the the image from the SDcard.");
+					downloadImages(jsonAry.getJSONObject(i).getString("image_url"), imageID);
+				}
+			}
+			catch(SQLiteException ex) {
+				ex.printStackTrace();
+			}			
+		}
+	}
+	
+	private void downloadImages(String imageUrl, int imageID) {
+		
+		int read;
+		try {
+			
+			Log.i("K", "ImageDownload : " + imageUrl);
+			
+			URL urls = new URL(imageUrl);
+			
+			Object getContent = urls.getContent();
+			
+			Log.i("K", "getContent : " + getContent);
+			HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
+			conn.connect();
+			
+			int len = conn.getContentLength();
+			
+			byte[] buffer = new byte[len];
+			InputStream is = conn.getInputStream();
+			FileOutputStream fos = new FileOutputStream(HelperValues.LOCAL_LIST_PATH + imageID + ".jpg");
+			
+			while ((read = is.read(buffer)) > 0) {
+				fos.write(buffer, 0, read);
+			}
+			fos.close();
+			is.close();
+		}
+		catch(Exception e) {
+		
+		}
+	}
+	
+	@Override
+	protected void onPostExecute(Void unused) {
+		
+		Log.i("K", "Downloading complete - category : " + mCategory);
+		
+		switch(mCategory) {
+		case 1:
+			mPref.setPreferencesBoolean("localbudburst", true);
+			break;
+		case 2:
+			mPref.setPreferencesBoolean("localwhatsinvasive", true);
+			break;
+		case 3:
+			mPref.setPreferencesBoolean("localpoisonous", true);
+			break;
+		case 4:
+			mPref.setPreferencesBoolean("localendangered", true);
+			break;
+		}
+	}
+}

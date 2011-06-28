@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <!-- header -->
+    <LinearLayout  
+    	android:id="@+id/logo_layout"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="63dp"
+	    android:gravity="center"
+	    android:orientation="horizontal"
+	    android:background="@color/BudBurstBackground">
+	    <ImageView 
+	    	android:id="@+id/logo"
+	     	android:layout_width="wrap_content"
+		 	android:layout_height="wrap_content"
+	     	android:src="@drawable/header" 
+	     	android:paddingTop="5dp"
+	     	android:layout_centerInParent="true"
+	     	android:layout_gravity="center" 
+	     	android:layout_centerVertical="true" />
+	</LinearLayout>        
+	
+	<!-- Body -->
+	<LinearLayout
+		android:id="@+id/body"
+		android:layout_below="@+id/logo_layout"
+		android:layout_above="@+id/lower"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+	>
+	<ScrollView
+		android:id="@+id/HelloScroll"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+		android:paddingTop="15dp"
+		
+		>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+		>
+		<TextView
+			android:id="@+id/hello_textview"
+			android:layout_height="fill_parent"
+			android:layout_width="wrap_content"
+			android:paddingLeft="20dp"
+			android:paddingRight="20dp"
+			android:textSize="18sp"
+			/>
+			
+
+		</LinearLayout>			
+	</ScrollView>
+	</LinearLayout>
+	
+	<!-- footer -->
+	<LinearLayout
+	  	android:id="@+id/lower"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:gravity="center"
+		android:background="@color/darkgray">
+		<Button
+			android:id="@+id/sync"
+			android:textColor="@drawable/black"
+			android:layout_height="fill_parent"
+			android:layout_width="200dp"
+			android:layout_marginTop="3dp"
+			android:textSize="16sp"
+			android:focusable="true"
+			android:layout_gravity="center"
+			android:text="@string/Button_synchronize" />		
+	</LinearLayout>		
+</RelativeLayout>

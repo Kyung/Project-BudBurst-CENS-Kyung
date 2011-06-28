@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/myloc_accuracy"
+		android:padding="2dp"
+		android:textStyle="bold"
+	/>
+	<com.google.android.maps.MapView
+		android:layout_below="@+id/myloc_accuracy" 
+		android:id="@+id/map"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:apiKey="@string/mapKey"
+		android:clickable="true" />
+</RelativeLayout>
+<!-- mapKeyDeveloper -->
+<!-- android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ" -->
+
+
+<!-- 0s7Km0gbaIiKBYVtiNAMqhcQ-GxiIzQLk9hfMVw -->
+
+<!-- 0s7Km0gbaIiLZMleKkk70IIETcEve_rUT-kVErw -->
+<!-- android:apiKey="0s7Km0gbaIiJ5QnnGVk44JcWzXBhN-Ww1t1TxuQ" -->

@@ -10,6 +10,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.os.AsyncTask;
 
+/**
+ * This AsyncTask performs downloading the four kinds of local lists 
+ * (Local budburst, Local Invasive, Local Endangered, Local Poisonous)
+ * @author kyunghan
+ *
+ */
 public class HelperRefreshPlantLists extends AsyncTask<Void, Void, Void>{
 
 	private Context mContext;
@@ -17,8 +23,6 @@ public class HelperRefreshPlantLists extends AsyncTask<Void, Void, Void>{
 	private NotificationManager notificationMgr = null;
 	private Notification noti = null;
 	private int SIMPLE_NOTFICATION_ID = HelperValues.NOTIFI_LOCAL_LISTS;
-	
-	private ListUserDefinedSpeciesDownload userPlant;
 	
 	public HelperRefreshPlantLists(Context context) {
 		mContext = context;
@@ -35,16 +39,11 @@ public class HelperRefreshPlantLists extends AsyncTask<Void, Void, Void>{
 		noti.setLatestEventInfo(mContext, mContext.getString(R.string.List_Project_Budburst_title), mContext.getString(R.string.Downloading_PlantList), contentIntent);
 		
 		notificationMgr.notify(SIMPLE_NOTFICATION_ID, noti);
-		
-		userPlant = new ListUserDefinedSpeciesDownload(mContext, HelperValues.USER_DEFINED_TREE_LISTS);
 	}
 	
 	@Override
 	protected Void doInBackground(Void... Void) {
 		// TODO Auto-generated method stub
-		
-		userPlant.downloadUserDefinedList();
-		
 		
 		HelperSharedPreference hPref = new HelperSharedPreference(mContext);
 		
@@ -69,8 +68,6 @@ public class HelperRefreshPlantLists extends AsyncTask<Void, Void, Void>{
 	
 	@Override
 	protected void onPostExecute(Void unused) {
-		
-		userPlant.setPreference();
 		
 		noti = new Notification(R.drawable.pbb_icon_small, mContext.getString(R.string.Down_Downloading_All_Lists), System.currentTimeMillis());
 		noti.flags |= Notification.FLAG_AUTO_CANCEL;
