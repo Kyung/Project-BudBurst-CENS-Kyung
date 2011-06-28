@@ -3,6 +3,12 @@ package cens.ucla.edu.budburst.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * Make a general class for SharedPreferences
+ * Easier to put and extract the data by using this class.
+ * @author kyunghan
+ *
+ */
 public class HelperSharedPreference {
 	
 	private Context mContext;

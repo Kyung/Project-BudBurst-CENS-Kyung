@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight" >
+    <TextView
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:id="@+id/list_header"
+    	android:background="#DDD"
+    	android:textSize="16px"
+    	android:visibility="gone"
+    />
+    <LinearLayout
+      	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:paddingTop="3dp"
+    	android:paddingRight="10dp"
+    	android:paddingLeft="6dp"
+    >
+	<RelativeLayout
+    	android:layout_width="70dp"
+    	android:layout_height="70dp"
+    	android:id="@+id/wrap_icon"
+    >
+    <ProgressBar
+    	android:id="@+id/spinner"
+    	android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="11dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="fitCenter"
+    />
+   	<ImageView android:id="@+id/icon"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="fitCenter"/>
+     </RelativeLayout>
+     <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp" >   
+   
+    <TextView
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_marginTop="1dp"
+    	android:id="@+id/list_name"
+    	android:textSize="16sp"
+    	android:textStyle="bold"
+    	android:textColor="@drawable/black"
+    />
+	<TextView android:id="@+id/list_name_detail"
+		android:layout_marginTop="-4dp"
+		android:layout_gravity="center_vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceSmall" 
+		android:textColor="@drawable/gray"
+		android:textStyle="italic"
+		android:textSize="16sp"
+	/>
+	</LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+

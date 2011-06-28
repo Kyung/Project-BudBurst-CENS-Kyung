@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/Users/kyunghan/Kyung/Projects/CENS/pbbmobilelibraryfile/apache-mime4j-0.5.jar"/>
+	<classpathentry kind="lib" path="/Users/kyunghan/Kyung/Projects/CENS/pbbmobilelibraryfile/httpcore-4.0-beta3.jar"/>
+	<classpathentry kind="lib" path="/Users/kyunghan/Kyung/Projects/CENS/pbbmobilelibraryfile/httpmime-4.0-beta2.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

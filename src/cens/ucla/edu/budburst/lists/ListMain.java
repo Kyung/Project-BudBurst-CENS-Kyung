@@ -55,6 +55,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * The first page of the List
+ * @author kyunghan
+ *
+ */
 public class ListMain extends ListActivity {
 	
 	private TextView myTitleText = null;
@@ -117,9 +122,9 @@ public class ListMain extends ListActivity {
 		if(mArr.size() == 0) {
 			iItem = new HelperListItem();
 			iItem.setHeaderText(getString(R.string.List_User_Plant_Header));
-			iItem.setTitle("No list yet");
+			iItem.setTitle(getString(R.string.No_Lists_Title));
 			iItem.setImageURL("yellow_triangle_exclamation50");
-			iItem.setDescription("Please download the user defined lists. Menu->Settings->Download User Defined List");
+			iItem.setDescription(getString(R.string.No_Lists_Text));
 			listArr.add(iItem);
 			
 			isUserDefinedListOn = false;
@@ -164,9 +169,8 @@ public class ListMain extends ListActivity {
 		/*
 		 *  1 : Project Budburst
 		 *  2 : What's Invasive
-		 *  3 : Native <- temporarily not used
-		 *  4 : Poisonous
-		 *  5 : Endangered
+		 *  3 : Poisonous
+		 *  4 : Endangered
 		 *  > 10 : User Defined Lists
 		 *  and more later.
 		 */

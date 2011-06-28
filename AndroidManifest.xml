@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="cens.ucla.edu.budburst"
-      android:versionCode="85" android:versionName="1.10.1">
+      android:versionCode="99" android:versionName="1.10.2">
       
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -40,7 +40,8 @@
 <activity android:name=".myplants.UpdatePlantInfo" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".myplants.PBBObservationPage" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 <activity android:name=".myplants.PBBPhenophaseInfo" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".myplants.PBBChangeMyPosition" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity> 
+<activity android:name=".myplants.PBBChangeMyPosition" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.DetailPlantInfoFloracache" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity> 
 
  <!-- cens.ucla.edu.budburst package -->
 <activity android:label="PBBHelloscr" android:name="PBBHelloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
@@ -75,7 +76,7 @@
 
 
 <!-- cens.ucla.edu.budburst.mapview package -->
-<activity android:name=".mapview.PBBMapMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:process=":PBBMapMain"></activity>
+<activity android:name=".mapview.PBBMapMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:process=":PBBMapMain" android:screenOrientation="portrait"></activity>
 <activity android:name=".mapview.SpeciesDetailMap" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:process=":SpeciesDetail"></activity>
 <activity android:name=".mapview.MapViewMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
 
@@ -91,12 +92,21 @@
 
 <!-- cens.ucla.edu.budburst.floracaching package -->
 <activity android:name=".floracaching.FloraCacheMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".floracaching.FloraCacheEasyLevel" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".floracaching.FloraCacheMidLevel" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
-<activity android:name=".floracaching.FloraCacheHardLevel" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".floracaching.FloraCacheEasyLevel" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloraCacheMedLevel" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloraCacheMedLevelContent" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloraCacheHardLevel" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
 <activity android:name=".floracaching.FloracacheDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
 
 <uses-library android:name="com.google.android.maps"></uses-library>
+
+<receiver android:name=".utils.PBBWidget" >
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data android:name="android.appwidget.provider"
+               android:resource="@xml/example_appwidget_info" />
+</receiver>
 
 </application>
     <uses-sdk android:minSdkVersion="3" />

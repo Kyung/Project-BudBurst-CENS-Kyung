@@ -32,12 +32,18 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
+import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.database.OneTimeDBHelper;
 import cens.ucla.edu.budburst.helper.HelperFunctionCalls;
 import cens.ucla.edu.budburst.helper.HelperPlantItem;
 import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import cens.ucla.edu.budburst.helper.HelperValues;
 
+/**
+ * Download the local lists from the server.
+ * @author kyunghan
+ *
+ */
 public class ListLocalDownload extends AsyncTask<ListItems, Integer, Void>{
 	
 	private HelperSharedPreference mPref;
@@ -64,17 +70,18 @@ public class ListLocalDownload extends AsyncTask<ListItems, Integer, Void>{
 	@Override
 	protected Void doInBackground(ListItems... item) {
 		// TODO Auto-generated method stub
-		/*
+		/**
 		 * Change the boolean value of the category to TRUE
 		 */
-		// type=1 BudBurst  
-		// type=2 WhatsInvasive
-		// type=3 WhatsPoisonous
-		// type=4 WhatsEndangered
+		// type=1 Local BudBurst  
+		// type=2 Local WhatsInvasive
+		// type=3 Local WhatsPoisonous
+		// type=4 Local WhatsEndangered
 		
 		mPref = new HelperSharedPreference(mContext);
 		
-		String url = "http://networkednaturalist.org/python_scripts/cens-dylan/list.py?lat=" 
+		// setting the url.
+		String url =  mContext.getString(R.string.get_local_usda_plant_list)+ "?lat=" 
 			+ item[0].latitude
 			+ "&lon=" + item[0].longitude 
 			+ "&type=" + mCategory;
@@ -150,7 +157,6 @@ public class ListLocalDownload extends AsyncTask<ListItems, Integer, Void>{
 				 * Set the first char to upper case.
 				 */
 				String commonName = jsonAry.getJSONObject(i).getString("common");
-				//Log.i("K", "commonName : " + commonName);
 				
 				/*
 				 * If there's a common name, change the first char to upper case.
@@ -180,10 +186,14 @@ public class ListLocalDownload extends AsyncTask<ListItems, Integer, Void>{
 				// we are using our local budburst image for this.
 				if(mCategory != 1) {
 					File checkFileExist = new File(HelperValues.LOCAL_LIST_PATH + imageID + ".jpg");
-					if(!checkFileExist.exists()) {
-						Log.i("K", "Need to download the local species");
-						downloadImages(jsonAry.getJSONObject(i).getString("image_url"), imageID);
+					
+					if(checkFileExist.exists()) {
+						checkFileExist.delete();
+						Log.i("K", "Delete the image from the SDcard.");
 					}
+					
+					Log.i("K", "Download the the image from the SDcard.");
+					downloadImages(jsonAry.getJSONObject(i).getString("image_url"), imageID);
 				}
 			}
 			catch(SQLiteException ex) {

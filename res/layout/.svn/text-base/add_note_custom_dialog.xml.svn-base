@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+ 	android:layout_width="fill_parent" 
+ 	android:layout_height="wrap_content"
+ 	android:paddingLeft="5dp"
+ 	android:paddingRight="5dp">
+ 
+ 	<EditText
+ 		android:layout_marginTop="5dp"
+ 		android:hint="Add Notes Here"
+ 		android:id="@+id/custom_notes"
+ 		android:layout_width="fill_parent"
+ 		android:layout_height="wrap_content"
+ 		android:lines="10"
+ 	/>
+ 	<Button 
+ 		android:id="@+id/custom_done" 
+ 		android:layout_below="@+id/custom_notes"
+ 		android:layout_marginTop="3dp"
+ 		android:layout_width="fill_parent" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_centerHorizontal="true" 
+ 		android:text="Done" />
+</RelativeLayout>

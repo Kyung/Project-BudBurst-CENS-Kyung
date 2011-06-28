@@ -29,13 +29,16 @@ import cens.ucla.edu.budburst.lists.ListMain;
 import cens.ucla.edu.budburst.lists.ListUserDefinedCategory;
 import cens.ucla.edu.budburst.lists.ListUserDefinedSpeciesDownload;
 import cens.ucla.edu.budburst.onetime.OneTimeMainPage;
+import cens.ucla.edu.budburst.utils.ImageViewPreference;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -49,6 +52,20 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Setting class
+ * All downloading processes are done in this activity
+ * Since the amount of time to download the lists varies depending on the connectivity level.
+ * and especially, the user defined lists are pretty huge to download, therefore, the application
+ * expects the user to be in the good connectivity area.
+ * 1. Downloading Local Lists
+ * 2. Downloading User Defined Lists
+ * 3. Downloading Floracache Lists
+ * 4. Check the version
+ * 5. Logout
+ * @author kyunghan
+ *
+ */
 public class HelperSettings extends PreferenceActivity {
 
 	private HelperSharedPreference mPref;
@@ -69,6 +86,10 @@ public class HelperSettings extends PreferenceActivity {
 	    
 	    mPref = new HelperSharedPreference(this);
 	    Intent pIntent = getIntent();
+	 
+	    // get the intent named as 'from'
+	    // since only the previous activity from main_page.java enables the logout button,
+	    // otherwise, gets disabled.
 	    mPreviousActivity = pIntent.getExtras().getInt("from");
 	    
 	    addPreferencesFromResource(R.xml.preferences);
@@ -163,26 +184,28 @@ public class HelperSettings extends PreferenceActivity {
 	    if(mUsername.equals("test10")){
 	    	mUsername = "Preview";
 	    }
-	    
-	    Preference updatePref = (Preference) findPreference("update");
+
+	    //Preference updatePref = (Preference) findPreference("update");
+	    ImageViewPreference imagePref = (ImageViewPreference) findPreference("key1");
+	    Resources res = getResources();
 	    if(mPref.getPreferenceBoolean("needUpdate")) {
-	    	updatePref.setTitle("Need to update");
-		    updatePref.setSummary("Please update the application");
+		    Drawable icon = res.getDrawable(R.drawable.upload_icon);
+		    imagePref.setComponent(icon, getString(R.string.Upgrade_Needed_Text));
 	    }
 	    else {
-	    	updatePref.setTitle("No need to update");
-		    updatePref.setSummary("The most recent version");
+	    	Drawable icon = res.getDrawable(R.drawable.pbb_icon_main2);
+		    imagePref.setComponent(icon, getString(R.string.No_Upgrade_Needed_2));
 	    }
 	    
-	    updatePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+	    imagePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 			@Override
 			public boolean onPreferenceClick(Preference arg0) {
 				// TODO Auto-generated method stub
 				if(mPref.getPreferenceBoolean("needUpdate")) {
 					new AlertDialog.Builder(HelperSettings.this)
-					.setTitle("Upgrade the app")
-					.setMessage("Move to the market, you may uninstall and reinstall the app.")
+					.setTitle(getString(R.string.Upgrade_app_text))
+					.setMessage(getString(R.string.Move_to_the_market_Text))
 					.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
 
 						@Override
@@ -205,12 +228,11 @@ public class HelperSettings extends PreferenceActivity {
 					//startActivityForResult(unInstall, UNINSTALL_REQUEST);
 				}
 				else {
-					Toast.makeText(HelperSettings.this, "No need to update", Toast.LENGTH_SHORT).show();
+					Toast.makeText(HelperSettings.this, getString(R.string.No_Upgrade_Needed), Toast.LENGTH_SHORT).show();
 				}
 				return false;
 			}
 	    });
-	    
 	    
 	    Preference logoutPref = (Preference) findPreference("userlogout");
 	    if(mPreviousActivity != HelperValues.FROM_MAIN_PAGE) {
@@ -231,9 +253,10 @@ public class HelperSettings extends PreferenceActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
 						
+						// initialize the preference values
 						mPref.setPreferencesString("Username", "");
 						mPref.setPreferencesString("Password", "");
-						mPref.setPreferencesString("synced", "false");
+						mPref.setPreferencesBoolean("getSynced", false);
 						mPref.setPreferencesBoolean("getTreeLists", false);
 						mPref.setPreferencesBoolean("Update", false);
 						mPref.setPreferencesBoolean("localbudburst", false);
@@ -291,6 +314,7 @@ public class HelperSettings extends PreferenceActivity {
         }
     }
 	
+	// always do check network connectivity first
 	private void checkConnectivity() {
 		new AlertDialog.Builder(HelperSettings.this)
 		.setTitle(getString(R.string.DownLoad_Tree_Lists))
@@ -315,14 +339,13 @@ public class HelperSettings extends PreferenceActivity {
 
 	}
 	
+	
 	private void downloadGroupList() {
 
 		ListUserDefinedCategory userCategory = new ListUserDefinedCategory(HelperSettings.this);
 		
-		HelperSharedPreference pref = new HelperSharedPreference(HelperSettings.this);
-		
-		double getLatitude = Double.parseDouble(pref.getPreferenceString("latitude", "0.0"));
-		double getLongitude = Double.parseDouble(pref.getPreferenceString("longitude", "0.0"));
+		double getLatitude = Double.parseDouble(mPref.getPreferenceString("latitude", "0.0"));
+		double getLongitude = Double.parseDouble(mPref.getPreferenceString("longitude", "0.0"));
 		
 		ListItems lItem = new ListItems(getLatitude, getLongitude);
 		userCategory.execute(lItem);	

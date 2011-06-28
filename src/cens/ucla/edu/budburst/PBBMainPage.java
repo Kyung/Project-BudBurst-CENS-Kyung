@@ -53,7 +53,7 @@ public class PBBMainPage extends Activity {
 	private Button weeklyBtn = null;
 	private Button floraBtn = null;
 	private TextView mUserInfo = null;
-	private SharedPreferences pref;
+	private HelperSharedPreference mPref;
 	private String mUsername;
 	/** Called when the activity is first created. */
 	@Override
@@ -61,18 +61,18 @@ public class PBBMainPage extends Activity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.mainpage);
 	    
-	    pref = getSharedPreferences("userinfo",0);
+	    mPref = new HelperSharedPreference(this);
 	    
-	    mUsername = pref.getString("Username", "");
+	    mUsername = mPref.getPreferenceString("Username", "");
 	    if(mUsername.equals("test10")){
 	    	mUsername = "Preview";
 	    }
-	    SharedPreferences.Editor edit = pref.edit();	
-	    edit.putBoolean("new", false);
-		edit.putString("visited","false");
-		edit.commit();
-		
+	    
+	    mPref.setPreferencesBoolean("new", false);
+	    mPref.setPreferencesBoolean("visited", false);
+	    
 		LinearLayout ll = (LinearLayout) findViewById(R.id.header);
+		
 		ll.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -84,8 +84,7 @@ public class PBBMainPage extends Activity {
 			}
 		});
 		
-		
-		
+
 		// check sync
 		int synced = checkSync();
 	    
@@ -208,22 +207,30 @@ public class PBBMainPage extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == event.KEYCODE_BACK) {
-			boolean flag = false;
-			if(event.getRepeatCount() == 3) {
 
-				/*
-				 * Stop the service if it is still working
-				 */
-				Intent service = new Intent(PBBMainPage.this, HelperBackgroundService.class);
-			    stopService(service);
-			    
-				finish();
-				return true;
-			}
-			else if(event.getRepeatCount() == 0 && flag == false){
-				Toast.makeText(PBBMainPage.this, getString(R.string.Alert_holdBackExit), Toast.LENGTH_SHORT).show();
-				flag = true;
-			}
+			new AlertDialog.Builder(PBBMainPage.this)
+			.setTitle(getString(R.string.Exit_Application_title))
+			.setIcon(R.drawable.pbb_icon_small)
+			.setMessage(getString(R.string.Exit_Application))
+			.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					
+					Intent service = new Intent(PBBMainPage.this, HelperBackgroundService.class);
+				    stopService(service);
+				    
+					finish();
+				}
+			})
+			.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					// nothing to do
+				}
+			})
+			.show();
 		}
 		
 		return false;

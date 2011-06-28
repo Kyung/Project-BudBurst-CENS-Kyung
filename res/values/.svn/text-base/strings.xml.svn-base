@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Project Budburst</string>
+    <string name="signupURL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/register_mobile</string>
+    <string name="get_my_species_in_my_station_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_species_in_my_station</string>
+    <string name="get_my_sites_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_sites</string>
+    <string name="get_onetime_plant_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_plant_download.php</string>
+    <string name="get_onetime_observation_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_observation_download.php</string>
+    <string name="get_observation_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?get_my_obs</string>
+    <string name="get_onetimeob_others">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_onetime_otherusers_observation.php</string>
+    <string name="authentication_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?authentication</string>
+    <string name="authentication">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_authorization</string>
+    <string name="get_floracaching_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracaching_list.php</string>
+    <string name="get_floracaching_plant_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracaching_plant_lists.php</string>
+    <string name="user_plant_lists_image">http://networkednaturalist.org/User_Plant_Lists_Images/</string>
+    <string name="get_user_defined_species_lists">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_tree_lists.php</string>
+    <string name="add_site_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/register.php</string>
+    <string name="download_obs_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/view.php</string>
+    <string name="download_onetime_image_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/onetime.php</string>
+    <string name="add_plant_URL">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/phone_service.php?add_plant</string>
+    <string name="upload_ot_observation">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/onetime_ob_service</string>
+    <string name="request_to_kickoff_background_search">http://networkednaturalist.org/python_scripts/cens-dylan/announce.py</string>
+    <string name="request_to_get_result">http://networkednaturalist.org/python_scripts/cens-dylan/search.py</string>
+    <string name="check_version_number">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/checkUpdates.php</string>
+    <string name="plant_of_week">http://networkednaturalist.org/python_scripts/plant_of_the_week_scrape.py</string>
+    <string name="get_floracache_detail_info">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_floracache_detail.php?floracache_id</string>
+    <string name="get_user_defined_tree_large_image">http://networkednaturalist.org/User_Plant_Lists_Images/</string>    
+    <string name="submit_question">You have unsubmitted observations. Do you want to submit them?</string>
+    <string name="get_user_defined_group">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/phone/get_user_defined_group.php</string>
+    <string name="get_floracache_species_image">http://cens.solidnetdns.com/~kshan/PBB/PBsite_CENS/upload_images/onetime.php?image_id=</string>
+    <string name="get_local_usda_plant_list">http://networkednaturalist.org/python_scripts/cens-dylan/list.py</string>
+    <string name="no_site_no_species_instruction">\nNo sites or plants were found! If this is your first login, please follow the steps below.\n\n (1) Add a monitored BudBurst Observer plant. \nClick MENU-&gt;ADD-&gt;Add Observer Plant \n\n (2) Share an Occasional Observer plant. \nClick MENU-&gt;ADD-&gt;Share Occasional Plant\n\n\n If you already have observed species, then click MENU-&gt;SYNCHRONIZE\n\n</string>
+    <string name="Floracache_Easy_Success">Great! You are very close to the species. Proceed to make an observation?</string>
+    <string name="instruction_old">You have no plants yet, or you need to synchronize your phone.\n\n (1) Synchronize your phone. \n\n If you just logged in\n\n (2) Start by adding a plant to an existing site (MENU &gt; Add Plant). \n\n (3) Please synchronize your phone with the database (Menu &gt; Synchronize).  If this fails, you may have connectivity problems.</string>
+    <string name="instruction">\n\nYou have just logged in and now need to synchronize your phone with the Project Budburst database.\n\nPlease click the Synchronize button if you have connectivity.\n\nYou can find Synchronize button at any page by clicking the MENU button.</string>
+    <string name="instruction2">\n\nYou have reached the synchronize page again. If you have some network problem while synchronization, please press Synchronize button again.</string>
+    <string-array name="state">
+       <item>AL</item> 
+       <item>AK</item> 
+       <item>AZ</item> 
+       <item>AR</item> 
+       <item>CA</item> 
+       <item>CO</item> 
+       <item>CT</item> 
+       <item>DE</item> 
+       <item>DC</item> 
+       <item>FL</item> 
+       <item>GA</item> 
+       <item>ID</item> 
+       <item>IL</item> 
+       <item>IN</item> 
+       <item>IA</item> 
+       <item>KS</item> 
+       <item>KY</item> 
+       <item>LA</item> 
+       <item>ME</item> 
+       <item>MD</item> 
+       <item>MA</item> 
+       <item>MI</item> 
+       <item>MN</item> 
+       <item>MS</item> 
+       <item>MO</item> 
+       <item>MT</item> 
+       <item>NE</item> 
+       <item>NV</item> 
+       <item>NH</item> 
+       <item>NJ</item> 
+       <item>NM</item> 
+       <item>NY</item> 
+       <item>NC</item> 
+       <item>ND</item> 
+       <item>OH</item> 
+       <item>OK</item> 
+       <item>OR</item> 
+       <item>PA</item> 
+       <item>RI</item> 
+       <item>SC</item> 
+       <item>SD</item> 
+       <item>TN</item> 
+       <item>TX</item> 
+       <item>UT</item> 
+       <item>VT</item> 
+       <item>VA</item> 
+       <item>WA</item> 
+       <item>WV</item> 
+       <item>WI</item> 
+       <item>WY</item> 
+    </string-array>
+<string name="OneTimeMain_Header">Species Lists</string>
+<string name="AddNotes">Add Notes</string>
+<string name="Title_text">A National Phenology and\nClimate Change Campaign\nfor Citizen Scientists!</string>
+<string name="sign_up">Sign Up!</string>
+<string name="preview_mode">Preview Mode</string>
+<string name="login">Log In</string>
+<string name="hello">Hello</string>
+<string name="budburst_arrow">Bud\nBurst</string>
+<string name="Flora_arrow">Flora\nObs</string>
+<string name="splash_text">Collect Climate Change Data While Sharing Your Plant Observations</string>
+<string name="spalsh_text_2">Timing is Everything!</string>
+<string name="AddPlant_top10">Project BudBurst Plants: Top 10</string>
+<string name="AddPlant_all">Project BudBurst Plants: All</string>
+<string name="AddPlant_local">Project BudBurst Plants: Local</string>
+<string name="AddPlant_SelectCategory">Select Category</string>
+<string name="AddPlant_addFlowers">Project BudBurst Plants: Flowers</string>
+<string name="AddPlant_addGrass">Project BudBurst Plants: Grass</string>
+<string name="AddPlant_addDecid">Project BudBurst Plants: Deciduous</string>
+<string name="AddPlant_addEvergreen">Project BudBurst Plants: Evergreen</string>
+<string name="AddPlant_addConifer">Project BudBurst Plants: Conifer</string>
+<string name="AddPlant_chooseSite">Choose site</string>
+<string name="Button_back">Back</string>
+<string name="Button_select">Select</string>
+<string name="AddPlant_pleaseSelectSite">Please select site.</string>
+<string name="AddPlant_alreadyExists">The selected plant already exists in the site, please create a new site.</string>
+<string name="AddPlant_newAdded">New Plant Added!</string>
+<string name="Alert_dbError">Database error.</string>
+<string name="Button_cancel">Cancel</string>
+<string name="AddSite_addSite">Add Site</string>
+<string name="AddSite_checkSiteName">Please check your site name</string>
+<string name="AddSite_alreadyExists">The site name is already in your site list.  Please type another name.</string>
+<string name="AddSite_newAdded">New Site Added!</string>
+<string name="AddSite_note1">Please note that the new site will be shown on the list after you add a plant.</string>
+<string name="Button_OK">OK</string>
+<string name="Message_locationDisabled">Your location service is disabled.  Please enable your wireless networks and/or GPS to identify your location.</string>
+<string name="Button_enable">Enable</string>
+<string name="AddSite_gotGPS">Got your location. \nTurning GPS off.</string>
+<string name="Alert_gettingGPS">Getting your location...</string>
+<string name="AddSite_disabledGPS">GPS disabled</string>
+<string name="AddSite_enabledGPS">GPS enabled</string>
+<string name="GetPhenophase_choose">Choose Phenophase</string>
+<string name="GetPhenophase_noPhoto">(No Photo)</string>
+<string name="Menu_addPlant">Add Monitored Plant</string>
+<string name="Menu_addQCPlant">Add Occasional Plant</string>
+<string name="Menu_addSite">Add Site</string>
+<string name="Alert_titleQuestion">Question</string>
+<string name="Start_Shared_Plant">Proceed to next step?</string>
+<string name="Alert_logout">You might lose your unsynchronized data if you log out.  Are you sure you want to log out?</string>
+<string name="Button_yes">Yes</string>
+<string name="Button_no">No</string>
+<string name="Alert_checkConnectivity">Please check your network connectivity and try again.</string>
+<string name="Alert_uploadingPlants">Uploading plants...</string>
+<string name="Alert_uploadingObs">Uploading observations...</string>
+<string name="Alert_uploadingObs_Observations">Uploading observations...</string>
+<string name="Alert_errorSpecies">An error occurred while downloading species.  Please try again.</string>
+<string name="Alert_downloadingPlants">Downloading plants...</string>
+<string name="Alert_downloadingObs">Downloading observations...</string>
+<string name="Alert_wrongUserPass">Username and/or password not recognized. Please check and try again.</string>
+<string name="Alert_messageServer">Message from server:\n</string>
+<string name="Alert_downloadComplete">Download completed.</string>
+<string name="Alert_synchronizing">Synchronizing</string>
+<string name="Alert_pleaseWait">Please wait...</string>
+<string name="Alert_errorDownload">An error occurred while downloading. Please synchronize again when you have connectivity.</string>
+<string name="Alert_comingSoon">Coming Soon!</string>
+<string name="Alert_thanks">Thank you!</string>
+<string name="Alert_holdBackExit">Hold the Back Button to exit.</string>
+<string name="Weekly_Plant_Text">Plant of the week!</string>
+<string name="Menu_help">Help</string>
+<string name="Menu_settings">Settings</string>
+<string name="Menu_Satellite">Change view</string>
+<string name="Menu_logout">Log out</string>
+<string name="Menu_about">About</string>
+<string name="PBBMap_title">Project Budburst Map View</string>
+<string name="Message_locationDisabledTurnOn">Your location service is disabled.  Would you like to go to the setting page?</string>
+<string name="Message_Save_GPS">Save your location?</string>
+<string name="PBBMapMenu_myLocation">My Location</string>
+<string name="PBBMapMenu_changeView">Change View</string>
+<string name="PBBMapMenu_seeLists">List View</string>
+<string name="PBBMapMenu_refresh">Refresh</string>
+<string name="Alert_loading">Loading...</string>
+<string name="Alert_Logging_in">Logging in...</string>
+<string name="PBBMap_loadingComponents">Loading map components...</string>
+<string name="PBBMap_DownloadingOthersLists">Downloading observations...If it takes some time, please cancel the operation and come back later. You will get the other\'s observation and flickr images</string>
+<string name="PBBMap_touchMarker">Touch the marker to see details.</string>
+<string name="PBBMap_phenophase">Phenophase : </string>
+<string name="PBBMap_date">Date: </string>
+<string name="PBBMap_currentLocation">Current Location : </string>
+<string name="PlantInfo_makeObs">Make an Observation</string>
+<string name="Floracache_makeObs">Make a Floracache Observation</string>
+<string name="Alert_errorCheckSD">Error: Please check your sdcard</string>
+<string name="QuickCapture_Added">Quick Share Plant Added</string>
+<string name="PlantInfo_successAdded">Successfully Added</string>
+<string name="PlantInfo_successUpdate">Successfully Updated</string>
+<string name="PlantInfo_photoAdded">Photo added!</string>
+<string name="PlantInfo_editObs">Edit Observation</string>
+<string name="Alert_synchronized">Synchronized phone with server.</string>
+<string name="Alert_saveWithoutGeoData">Save the site information without latitide/longitude?  Or please wait while the GPS establishes a location.</string>
+<string name="Alert_dbUpdated">Database successfully updated.</string>
+<string name="AddPlant_addPlant">Add Plant</string>
+<string name="AddSite_HumanDisturbance">Disturbance</string>
+<string name="AddSite_Shading">Shading</string>
+<string name="AddSite_Irrigation">Irrigation</string>
+<string name="AddSite_Habitat">Habitat</string>
+<string name="SpeciesDetail_info">Species Information</string>
+<string name="PhenophaseDetail_info">Phenophase Information</string>
+<string name="Menu_sync">Synchronize</string>
+<string name="Menu_AddPlant">Add Plant</string>
+<string name="Alert_addSite">Add Site</string>
+<string name="Alert_uploadingSites">Uploading sites...</string>
+<string name="Alert_uploadingOneTimeOB">Uploading Quick Share...</string>
+<string name="Alert_downloadingOneTimeOB">Downloading Quick Share...</string>
+<string name="Alert_downloadingSites">Downloading sites...</string>
+<string name="Alert_downloadingImages">Downloading images...</string>
+<string name="AddSite_intro">Describe the site</string>
+<string name="AddSite_siteName">Site Name (required)</string>
+<string name="AddSite_latlong">Current Latitude/Longitude</string>
+<string name="AddSite_gettingLatLong">Getting lat/long from GPS...</string>
+<string name="AddSite_address">Address</string>
+<string name="AddSite_lookingAddress">Looking up address...</string>
+<string name="AddSite_description">Site Description</string>
+<string name="AddSite_optional">Site Note (optional)</string>
+<string name="Button_save">Done</string>
+<string name="Button_update_GPS">Update GPS</string>
+<string name="Button_switch_to_map">Map View</string>
+<string name="WI_Area">Areas with official invasive species lists</string>
+<string name="WI_parks">The seven nearest parks</string>
+<string name="BBList">Project BudBurst Plants</string>
+<string name="BBList_top10">Top 10</string>
+<string name="BBList_all">All</string>
+<string name="BBList_group">Groups</string>
+<string name="BBList_local">Local</string>
+<string name="BBList_leaves">Leaves</string>
+<string name="BBList_flowers">Flowers</string>
+<string name="BBList_fruits">Fruits</string>
+<string name="PlantInfo_addPhoto">Add a photo</string>
+<string name="Button_addPhoto">Add Photo</string>
+<string name="Button_replacePhoto">Replace</string>
+<string name="PlantInfo_addNotes">Add notes</string>
+<string name="Button_synchronize">Synchronize</string>
+<string name="username">Username</string>
+<string name="password">Password</string>
+<string name="Main_myPlants">My Plants</string>
+<string name="Main_plantLists">Browse Lists</string>
+<string name="Main_plantMaps">Plant Maps</string>
+<string name="Main_news">News</string>
+<string name="Main_weekly">Weekly Plant</string>
+<string name="Button_saveChanges">Save Changes</string>
+<string name="PlantList_phenosObserved">phenophases observed</string>
+<string name="Button_editObs">Edit Observation</string>
+<string name="Button_Detail">Detail</string>
+<string-array name="AddSite_hDistance">
+	<item>Urban/Highly Modified</item>
+	<item>Suburban</item>
+	<item>Rural</item>
+	<item>Wildland or natural area</item>
+</string-array>
+<string name="AddSite_Urban_Highly_Modified">Urban/Highly Modified</string>
+<string name="AddSite_Suburban">Suburban</string>	
+<string name="AddSite_Rural">Rural</string>
+<string name="AddSite_Wildland_or_natural_area">Wildland or natural area</string>
+<string name="AddSite_Open">Open</string>
+<string name="AddSite_Partially_Shaded">Partially Shaded</string>
+<string name="AddSite_Shaded">Shaded</string>
+<string name="AddSite_Irrigated_Regualarly">Irrigated Regularly</string>
+<string name="AddSite_Not_Irrigated">Not Irrigated</string>
+<string name="AddSite_Field_or_grassland">Field or grassland</string>
+<string name="AddSite_Vegetable_or_flower_garden">Vegetable or flower garden</string>
+<string name="AddSite_Lawn">Lawn</string>
+<string name="AddSite_Pavement_over_50_of_area">Pavement over 50% of area</string>
+<string name="AddSite_Desert_or_dunes">Desert or dunes (little vegetation)</string>
+<string name="AddSite_Shrub_thicket">Shrub thicket</string>
+<string name="AddSite_Forest_or_woodland">Forest or woodland</string>
+<string name="AddSite_Edge_of_forest_or_woodland">Edge of forest or woodland</string>
+<string name="AddSite_Stream_lake_pond_edge">Stream/lake/pond edge</string>
+<string name="GetPhenophase_PBB_not_defined">Not Defined - add names</string>
+<string name="GetPhenophase_PBB_message">Enter Species Name</string>
+<string name="GetPhenophase_PBB_update_name">Species Name Updated</string>
+<string name="Button_SiteInfo1">Add Site Information</string>
+<string name="Button_SiteInfo2">Site Information (Done)</string>
+<string name="OneTime_category">Select Category</string>
+<string name="Wild_Flowers">Wild Flowers and Herbs</string>
+<string name="Grass">Grass</string>
+<string name="Deciduous_Trees_and_Shrubs">Deciduous Trees and Shrubs</string>
+<string name="Evergreen_Trees_and_Shrubs">Evergreen Trees and Shrubs</string>
+<string name="Conifer">Conifer</string>
+<string name="Unknown_Plant_Text_1">Add plant name from a list below or skip if unknown.</string>
+<string name="Unknown_Plant_Text_2">Add optional site description and select Done.</string>
+<string name="Unknown_Plant_Text_3">Add notes to your observation or Skip to the site description.</string>
+<string name="Unknown_Plant_Text_4">Add site name and optional description, then select Done.</string>
+<string name="Floracache_Mid_Level_Text">Find floracache species.</string>
+<string name="Submit">Submit</string>
+<string name="Cannot_Change">You cannot change the name of this species</string>
+<string name="DoSyncFirst_For_UnknownPlant">Please synchronize first if you have unofficial species</string>
+<string name="Monitor_Plant">Project Budburst Observer Plants</string>
+<string name="Quick_Plant">Occasional Observer, Shared Plants</string>
+<string name="Done">Quit</string>
+<string name="Item_deleted">Item deleted</string>
+<string name="Not_Finish_GPS">Still getting GPS data...</string>
+<string name="Observation_Summary"> Observation Summary</string>
+<string name="Best_Phenophase">Choose \"Best Fit\" Phenophase</string>
+<string name="PBB_MAP_toast">If there are no markers on the map, please refresh the map.</string>
+<string name="Go_BackTo_Login">Please check your username and password again.\n\nRestart Project Budburst.</string>
+<string name="No_Notes">(no notes)</string>
+<string name="Add_Notes">Notes</string>
+<string name="Move_To_Site">Site</string>
+<string name="Help_About_this_project">About this Project</string>
+<string name="Help_About_Version">Version 1.0</string>
+<string name="Help_About_para1">Project BudBurst is a citizen science campaign for the study of the timing of life cycle events in plants as they relate to the environment.  With the help of volunteers, we wish to understand what \&quot;calendar\&quot; plants use to begin flowering, leafing or reproducing.</string>
+<string name="Help_About_budburst_link">http://BudBurst.org</string>
+<string name="Help_About_para2">This mobile app is a partnership between the National Environmental Observatory Network (NEON) and the Center for Embedded Networked Sensing (CENS) at UCLA.</string>
+<string name="Help_About_cens_link">http://cens.ucla.edu</string>
+<string name="Help_About_para3">If you would like to comment on this app, if you find any bugs, or would like to offer suggestions, please send us a message:</string>
+<string name="Help_About_netnat_link">mobile@NetworkedNaturalist.org</string>
+<string name="Help_About_para4">Some of the people who have contributed to this mobile project include:</string>
+<string name="Help_About_para5">Project BudBurst is a proud member of the USA National Phenology Network and as such, providing data to scientists studying phenology is one of our main goals.</string>
+<string name="Help_About_people">Jameel Al-Aziz\nDeborah Estrin\nLisa Gardiner\nEric Graham\nKyung Han\nSandra Henderson\nJinha Kang\nKeith Mayoral\nDylan Vassallo\nDennis Ward\nEric Yuen\n</string>
+<string name="Help_About_npn_link">http://usanpn.org</string>
+<string name="Help_Main">Main Page Help</string>
+<string name="Help_Main_para1">Main Page Icons are the links to the main functions of the Project BudBurst Mobile app:</string>
+<string name="Help_Main_My_BudBurst_List">My BudBurst List:  A record of all your observe plants.  From this page, you can review your BudBurst Observer and Occasional Observer plants, add new plants, and make new observations.</string>
+<string name="Help_Main_Warning">A warning sign will appear when you have plant observations waiting to be sent to the Project BudBurst database (your phone needs to synchronize).</string>
+<string name="Help_Main_QC">Quick Share:  Share one-time, Occasional Observer captures of any plant anywhere and sent it to BudBurst!</string>
+<string name="Help_Main_Local_Lists">Local Lists:  Browse lists of plants that are identified as being in your area and make observations.</string>
+<string name="Help_Main_Local_Maps">Local Maps:  Browse a map of all BudBurst (and other) plant observations made by citizen scientists.  Make repeat observations on community plants!</string>
+<string name="Help_Main_News">News:  A list of current news items about plant phenology research, climate, and the environment.</string>
+<string name="Help_Main_PotW">Plant of the Week:  A new plant is featured every week with pictures and interesting. fun facts!</string>
+<string name="Help_MyList">My BudBurst List Help</string>
+<string name="Help_MyList_para1">The List displays your Monitored, Project Budburst Observer plants, your \"Quick Share\" (Occasional Observer) captures, and your progress for observing all plant phenophases.</string>
+<string name="Help_MyList_para2">The List is sorted alphabetically within sites and the number of observations you have made are listed with each plant.</string>
+<string name="Help_MyList_para3">Touch the Plant Thumbnail Image on the left of the list to see a larger image and a description of your plant.</string>
+<string name="Help_MyList_para4">Touch the Plant Name to make a NEW phenophase observation.</string>
+<string name="Help_MyList_para5">To Add a Plant to your List, choose the MENU button on the phone, then one of the two options for either adding a Monitored (regular BudBurst Observer) plant:</string>
+<string name="Help_MyList_para10">Or a Shared (Occasional Observer) plant:</string>
+<string name="Help_MyList_para6">You will then be asked to choose a plant from the Project BudBurst List or from any of the other available plant lists.</string>
+<string name="Help_MyList_para7">You may choose \"Unknown/Other\" for a plant and write-in the plant name or leave blank to be listed as unknown.  Any photos of this plant that you submit may be placed on a public web page for help in identification.</string>
+<string name="Help_MyList_para8">To Upload Your Observations, choose the MENU button on the phone then:</string>
+<string name="Help_MyList_Sync">Synchronize</string>
+<string name="Help_MyList_para9">This will start sending your observations to the database and also retrieve any observations that you have made on the website and synchronize your phone.</string>
+<string name="Help_MyList_warning">This symbol will appear when you have plant observations waiting to be sent to the database (your phone needs to synchronized with the server).</string>
+<string name="Help_MyList_1">(1)</string>
+<string name="Help_MyList_2">(2)</string>
+<string name="Help_PlantLists">Plant Lists Help</string>
+<string name="Help_PlantLists_para1">Plant Lists allow you to browse and pick the name of a plant from one of several lists.  When adding to your Monitored, BudBurst Observer plants or during a Quick Share, Occasional Observation, these lists are also used to insert the correct species name for your observation.</string>
+<string name="Help_PlantLists_para2">By choosing \"Unknown/Other\" you can write-in the name of a plant not found on a list, or leave blank to allow other BudBurst users to help identify the plant.</string>
+<string name="Help_PlantLists_PBB">The Project BudBurst List</string>
+<string name="Help_PlantLists_PBB_para1">This list displays the recommended plants that the BudBurst experts would like you to observe.  You can sort the plants by:\n</string>
+<string name="Help_PlantLists_PBB_para2">\"Top Ten\" plants that are most common and best to observe for BudBurst.\n</string>
+<string name="Help_PlantLists_PBB_para3">\"Groups\", to show only grasses (for example) within all the BudBurst plants.\n</string>
+<string name="Help_PlantLists_PBB_para4">\"All\", to see the entire BudBurst list of recommended plants to observe.\n</string>
+<string name="Help_PlantLists_PBB_para5">\"Local\", to see the subset of recommended plants in your area.\n</string>
+<string name="Help_PlantLists_para3">The lists below are created based on your location, so if the GPS on your pone is turned off you may not see the correct list of weeds, natives, or blooming plants in your area.</string>
+<string name="Help_PlantLists_WI">The Local Invasives List</string>
+<string name="Help_PlantLists_WI_para1">This list is for local weeds in your area.  Any observations you make on plants in the Local Invasives list will also be sent to the \"What\'s Invasive!\" database to help conservation managers and the National Park Service combat invasive plants.  Please visit the What\'s Invasive! website for more information:</string>
+<string name="Help_PlantLists_WI_URL">http://WhatsInvasive.com</string>
+<string name="Help_PlantsLists_WB">The Local Blooming List</string>
+<string name="Help_PlantsLists_WB_para1">This list is for plants that are blooming in your area.  The list is created with the help of the National Park Service and the U.S. Department of Agriculture PLANTS database.</string>
+<string name="Help_PlantLists_LNL">The Local Native List</string>
+<string name="Help_PlantLists_LNL_para1">This list is for native plants in your area. The list is also created with the help of the NPS and the USDA PLANTS database.\n</string>
+<string name="Help_PlantLists_User">Lists that occur below these official lists are regional, locally-created lists by people who want to target specific types of plants or for community data collection events.  Check them out!</string>
+<string name="Preview_Mode">Preview Mode</string>
+<string name="Preview_Mode_Description">In the preview mode, you can see the plant list and make observations, but are not able to upload them to the server.</string>
+<string name="Preview_Mode_Done">Done</string>
+<string name="Done_Quick_Capture">Done Quick Capture</string>
+<string name="AddSite_Finish_GPS">Finish GPS</string>
+<string name="Help_About_NEON_url">http://www.neoninc.org</string>
+<string name="Help_About_para0">Please note: data collected using this mobile app is being temporarily sent to a different location than the official Project BudBurst site!\n\nIf you would like to manage and download your collected data, please visit this link:</string>
+<string name="Help_About_para0_url">http://bit.ly/mobilePBB</string>
+<string name="InValid_ID_PW">Incorrect Username/Password. Please try again.</string>
+<string name="Menu_Lists">Plant Lists</string>
+<string name="Menu_Maps">Map View</string>
+<string name="Menu_Floracaching">Floracache Group Lists</string>
+<string name="Menu_Refresh">Refresh the lists</string>
+<string name="Menu_Refresh_User_Group">Refresh groups</string>
+<string name="Local_BudBurst">Local plants</string>
+<string name="Local_Invasive">Local plants</string>
+<string name="Local_Native">Local plants</string>
+<string name="Help_Main_Floracaching">Floracaching: A set of games designed around your Quick Share, Occasional Observer plants.</string>
+<string name="Skip">Skip</string>
+<string name="Button_GPS">GPS</string>
+<string name="Button_Marker">Marker</string>
+<string name="Button_Cancel">Cancel</string>
+<string name="Button_Photo">Photo</string>
+<string name="Button_NoPhoto">No Photo</string>
+<string name="Start_Downloading_All_Lists">Start downloading local plant lists</string>
+<string name="Down_Downloading_All_Lists">Download complete - plant lists</string>
+<string name="Success_Downloading_All_Lists">Successfully download plant lists</string>
+<string name="Start_Downloading">Start downloading local species</string>
+<string name="Still_Downloading">Still Downloading the lists</string>
+<string name="Download_complete_local">Successfully download local plant lists</string>
+<string name="Title_User_Defined_List">User Defined Lists</string>
+<string name="Start_Downloading_UCLA_Tree_Lists">Start Downloading user defined lists</string>
+<string name="Start_Downloading_Floracache_Lists">Start Downloading floracache lists</string>
+<string name="Downloading_User_Defined_Lists">Downloading user plant lists</string>
+<string name="List_USDA_PlantLists_title">Local Species</string>
+<string name="List_USDA_PlantLists_content">County-wide species from the USDA</string>
+<string name="List_Budburst">Local BudBurst plants</string>
+<string name="List_Whatsinvasive">Help locate local invasives</string>
+<string name="List_Whats_endangered">Local endangered species from the USDA</string>
+<string name="List_Whats_poisonous">Local poisonous plants from the USDA</string>
+<string name="List_Whats_native">Local native plants from the USDA</string>
+<string name="List_User_Plant_UCLA_trees">Tree species on campus</string>
+<string name="List_User_Plant_SAMO">Santa Monica blooming plants</string>
+<string name="List_Official_Header">Local plants from the USDA</string>
+<string name="List_User_Plant_Header">Local plants from user-created lists</string>
+<string name="List_Project_Budburst_title">Project BudBurst</string>
+<string name="List_Whatsinvasive_title">Local Invasives</string>
+<string name="List_Native_title">Local Native</string>
+<string name="List_Whatsendangered_title">Local Endangered</string>
+<string name="List_Whatspoisonous_title">Local Poisonous</string>
+<string name="List_Whatsblooming_title">What\'s Blooming</string>
+<string name="My_Plant_Summary">My Plant Summary</string>
+<string name="Map_Getting_GPS_Signal">Getting GPS signal...</string>
+<string name="WeeklyPlant"> Weekly Plant</string>
+<string name="mapKeyDeveloper">0s7Km0gbaIiKBYVtiNAMqhcQ-GxiIzQLk9hfMVw</string>
+<string name="mapKey">0s7Km0gbaIiLZMleKkk70IIETcEve_rUT-kVErw</string>
+<string name="otherCategoryMap">Choose a list</string>
+<string name="Floracache_Level">Choose a difficulty</string>
+<string name="List_ask_connectivity">Make sure you have a good connectivity. Proceed?</string>
+<string name="DownLoad_Tree_Lists">Download user defined lists</string>
+<string name="List_Download_Title">Download local species</string>
+<string name="Downloading_PlantList">Downloading plant lists</string>
+<string name="No_Info_Species_Detail">This species has no other information or has not been downloaded yet. Please download the local/user plant lists to see the thumbnail.</string>
+<string name="Update_Database_Table">Please turn on GPS to use this system. Press Redirect button to move to the settings page.</string>
+<string name="Pref_Category1">Download Species Lists</string>
+<string name="Pref_Category2">Download Local Lists</string>
+<string name="Pref_Category3">Download User Defined Lists</string>
+<string name="Pref_Category4">Download Floracache Lists</string>
+<string name="Pref_Category5">User Account</string>
+<string name="Pref_Category6">Logout</string>
+<string name="Pref_Category7">System Updates</string>
+<string name="Pref_Category8">System</string>
+<string name="Floracache_Game">Floracache</string>
+<string name="Floracache_Hard_Refresh">Refresh the list</string>
+<string name="go_to_settings_page">Please download the species list first.\nTo download the lists, Go to the \'Settings\' page</string>
+<string name="cateogory_text">Category</string>
+<string name="User_Defined_Lists_Group">Select User Defined Lists</string>
+<string name="Alt_User_Defined_Group">Refresh the user defined groups...</string>
+<string name="Floracache_List_Download_Text">Start downloading - Floracache Lists</string>
+<string name="Floracache_List_Downloading">Downloading floracache lists</string>
+<string name="Floracache_List_Download_Success">Successfully download floracache lists</string>
+<string name="Floracache_List_Download_Success2">Download complete - Floracache Lists</string>
+<string name="Move_to_the_market_Text">Move to the market, you may uninstall and reinstall the app.</string>
+<string name="Upgrade_app_text">Upgrade the app</string>
+<string name="No_Upgrade_Needed">No need to update</string>
+<string name="Upgrade_Needed_Text">Please update the application</string>
+<string name="Upgrade_the_application_Text">Please updates budburst. App might crash if you use the old version.</string>
+<string name="Upgrade_the_application_Title">Budburst needs updates</string>
+<string name="No_Upgrade_Needed_2">The most recent version</string>
+<string name="User_Defined_Lists_Download_Complete">Download complete - user plant lists</string>
+<string name="User_Defined_Lists_Download_Complete2">Successfully download user plant lists</string>
+<string name="No_Lists_Title">No lists</string>
+<string name="No_Lists_Text">Please download the lists. Menu->Settings->Download User Defined Lists</string>
+<string name="Turn_on_GPS">Turn on GPS</string>
+<string name="Redirect">Redirect</string>
+<string name="Updates_Text">Updates</string>
+<string name="Mapview_Refresh_Species_Lists">Refresh</string>
+<string name="Mapview_Refresh_Species_Lists_Message">Refresh the species lists?</string>
+<string name="Floracache_Refresh_Button">Refresh the lists</string>
+<string name="Low_GPS_Signal">Low GPS signal, make sure you are in the good connectivity area</string>
+<item type="id" name="app_notification_id"/>
+</resources>

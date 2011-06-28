@@ -41,6 +41,12 @@ import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
 
+/**
+ * This class is for refreshing the list on the page. by pressing "Menu"->"Refresh"
+ * So it decides which list is requested by the category(integer) parameter.
+ * @author kyunghan
+ *
+ */
 public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 
 	private Context context;
@@ -103,12 +109,9 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 			cancelCategoryString = "localwhatsinvasive";
 			break;
 		case 3:
-			cancelCategoryString = "localnative";
-			break;
-		case 4:
 			cancelCategoryString = "localpoisonous";
 			break;
-		case 5:
+		case 4:
 			cancelCategoryString = "localendangered";
 			break;
 		}
@@ -365,12 +368,9 @@ public class ListDownloadFromServer extends AsyncTask<ListItems, Integer, Void>{
 			doneCategoryString = "localwhatsinvasive";
 			break;
 		case 3:
-			doneCategoryString = "localnative";
-			break;
-		case 4:
 			doneCategoryString = "localpoisonous";
 			break;
-		case 5:
+		case 4:
 			doneCategoryString = "localendangered";
 			break;
 		}

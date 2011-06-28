@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight" >
+    <TextView
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:id="@+id/list_header"
+    	android:background="#DDD"
+    	android:textSize="16px"
+    	android:visibility="gone"
+    />
+    <LinearLayout
+      	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:paddingTop="5dp"
+    	android:paddingBottom="5dp"
+    	android:paddingRight="10dp"
+    	android:paddingLeft="6dp"
+    >
+   <ImageView android:id="@+id/icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="11dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="fitCenter"/>
+     <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >   
+   
+    <TextView
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:id="@+id/list_name"
+    	android:layout_marginTop="7dp"
+    	android:textSize="18sp"
+    	android:textStyle="bold"
+    	android:textColor="@drawable/black"
+    />
+	<TextView android:id="@+id/list_name_detail"
+		android:layout_marginTop="-4dp"
+		android:layout_gravity="center_vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceSmall" 
+		android:textColor="@drawable/gray"
+		android:textStyle="italic"
+		android:textSize="17sp"
+	/>
+	</LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+

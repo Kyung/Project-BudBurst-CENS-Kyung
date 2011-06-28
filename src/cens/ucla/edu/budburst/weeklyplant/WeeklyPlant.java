@@ -53,6 +53,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Class for weekly plant
+ * @author kyunghan
+ *
+ */
 public class WeeklyPlant extends Activity {
 
 	private int mSpeciesID = HelperValues.UNKNOWN_SPECIES;
@@ -435,8 +440,8 @@ public class WeeklyPlant extends Activity {
 		    
 		    //Linkify.addLinks(mLink, Linkify.WEB_URLS);
 		    
-		    HelperDrawableManager dm = new HelperDrawableManager(mSpinner);
-			dm.fetchDrawableOnThread(getUrl, mUrl);
+		    HelperDrawableManager dm = new HelperDrawableManager(WeeklyPlant.this, mSpinner, mUrl);
+			dm.fetchDrawableOnThread(getUrl);
 			
 		}
 		

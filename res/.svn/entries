@@ -1,0 +1,59 @@
+10
+
+dir
+3
+https://project-budburst.googlecode.com/svn/ProjectBudburst/res
+https://project-budburst.googlecode.com/svn
+
+
+
+2011-05-18T18:30:41.069010Z
+3
+zenithhan@gmail.com
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+8213365b-aeae-c35b-b7ba-ace1d528df43
+
+
+
+
+
+
+0
+
+anim
+dir
+
+drawable
+dir
+
+drawable-hdpi
+dir
+
+drawable-ldpi
+dir
+
+drawable-mdpi
+dir
+
+layout
+dir
+
+values
+dir
+
+xml
+dir
+

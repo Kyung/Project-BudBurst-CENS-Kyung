@@ -4,6 +4,8 @@ import cens.ucla.edu.budburst.PBBMainPage;
 import cens.ucla.edu.budburst.R;
 import cens.ucla.edu.budburst.PBBSplash;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,11 +54,6 @@ public class HelperShowAll extends Activity implements OnClickListener{
         slideRightIn = AnimationUtils.loadAnimation(this, R.anim.slide_right_in);
         slideRightOut = AnimationUtils.loadAnimation(this, R.anim.slide_right_out);
 	    
-	    
-	    
-	    //previous.setEnabled(false);
-	    
-	    
 	    gestureDetector = new GestureDetector(new MyGestureDetector(this, vf));
         gestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
@@ -71,11 +68,8 @@ public class HelperShowAll extends Activity implements OnClickListener{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (gestureDetector.onTouchEvent(event)) {
-        	Log.i("K", "TOUCHED");
-        	
         	return true;
         }
-	        
 	    else
 	    	return false;
     }
@@ -102,59 +96,44 @@ public class HelperShowAll extends Activity implements OnClickListener{
         	vf.setInAnimation(slideLeftIn);
         	vf.setOutAnimation(slideLeftOut);
         	vf.showNext();
-        	/*
-			if(page_num == 0) {
-				previous.setEnabled(false);
-				next.setEnabled(true);
-			}
-			if(page_num == 1) {
-				previous.setEnabled(true);
-				next.setEnabled(true);
-			}
-			if(page_num == 2) {
-				previous.setEnabled(true);
-				next.setEnabled(true);
-			}
-			if(page_num == 3) {
-				previous.setEnabled(true);
-				next.setEnabled(false);
-			}
-			*/
-			//vf.setAnimation(AnimationHelper.inFromRightAnimation());
-			//vf.setAnimation(AnimationHelper.outToLeftAnimation());
-			
 		}
 		if(v == previous) {
 			page_num--;
         	vf.setInAnimation(slideRightIn);
         	vf.setOutAnimation(slideRightOut);
         	vf.showPrevious();
-        	/*
-			if(page_num == 0) {
-				previous.setEnabled(false);
-				next.setEnabled(true);
-			}
-			if(page_num == 1) {
-				previous.setEnabled(true);
-				next.setEnabled(true);
-			}
-			if(page_num == 2) {
-				previous.setEnabled(true);
-				next.setEnabled(true);
-			}
-			if(page_num == 3) {
-				previous.setEnabled(true);
-				next.setEnabled(false);
-			}
-			*/
-			//vf.setAnimation(AnimationHelper.inFromLeftAnimation());
-			//vf.setAnimation(AnimationHelper.outToRightAnimation());
-
 		}
 		if(v == done) {
-			Intent intent = new Intent(HelperShowAll.this, PBBMainPage.class);
-			startActivity(intent);
-			finish();
+			new AlertDialog.Builder(HelperShowAll.this)
+			.setTitle(getString(R.string.Move_to_Settings_title))
+			.setIcon(R.drawable.pbb_icon_small)
+			.setMessage(getString(R.string.Move_to_Settings))
+			.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					// move to settings page
+					Intent intent = new Intent(HelperShowAll.this, HelperSettings.class);
+					intent.putExtra("from", HelperValues.FROM_MAIN_PAGE);
+					startActivity(intent);
+					
+					finish();
+				}
+			})
+			.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					// move to main page
+					Intent intent = new Intent(HelperShowAll.this, PBBMainPage.class);
+					startActivity(intent);
+					finish();
+				}
+			})
+			.show();
+			
+			
 		}
 	}
 	
@@ -163,7 +142,6 @@ public class HelperShowAll extends Activity implements OnClickListener{
 		if(keyCode == event.KEYCODE_BACK) {
 			boolean flag = false;
 			if(event.getRepeatCount() == 3) {
-
 				/*
 				 * Stop the service if it is still working
 				 */

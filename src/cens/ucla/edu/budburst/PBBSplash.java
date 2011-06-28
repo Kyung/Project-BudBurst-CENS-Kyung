@@ -1,6 +1,7 @@
 package cens.ucla.edu.budburst;
 
 import cens.ucla.edu.budburst.helper.HelperBackgroundService;
+import cens.ucla.edu.budburst.helper.HelperSharedPreference;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,17 +12,26 @@ import android.widget.Toast;
 
 public class PBBSplash extends Activity {
 
+	private HelperSharedPreference mPref;
+	private boolean mSynced;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    
-		SharedPreferences pref = getSharedPreferences("userinfo",0);
-		String synced = pref.getString("Synced", "false");
+	    mPref = new HelperSharedPreference(this);
+	    /**
+	     * mSync value is to check if the synchronization has been done.
+	     * if not, the app will show the sync page
+	     * if so, the app will show the main page.
+	     */
+		mSynced = mPref.getPreferenceBoolean("getSynced");
 		
 		//Check login
-		if(	!(pref.getString("Username","").equals("")) && !(pref.getString("Password","").equals(""))){
-			if(synced.equals("true")){
+		if(!(mPref.getPreferenceString("Username", "").equals("")) 
+				&& !(mPref.getPreferenceString("Password", "").equals(""))){
+			if(mSynced){
 				Intent intent = new Intent(PBBSplash.this, PBBMainPage.class);
 				startActivity(intent);
 				finish();

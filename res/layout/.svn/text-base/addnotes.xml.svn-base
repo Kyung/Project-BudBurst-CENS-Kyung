@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  
+  <!-- header view -->
+  	<LinearLayout
+		android:id="@+id/header_item"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:padding="3dp"
+		android:weightSum="1"
+		android:background="@drawable/bg_line"
+	>
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="0.2"
+			android:text="@string/Unknown_Plant_Text_3"
+			android:textSize="15dp"
+			android:paddingTop="10dp"
+			android:paddingLeft="5dp"
+			android:layout_marginBottom="7dp"
+		/>
+		<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/skip"
+			android:text="@string/Skip"
+			android:layout_weight="0.8"
+			android:layout_marginTop="6dp"
+			android:layout_marginBottom="7dp"
+		/>
+	</LinearLayout>
+  
+  	<!-- end header view -->
+  
+	<RelativeLayout
+		android:layout_below="@+id/header_item"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:gravity="center"
+	>
+	<EditText
+		android:id="@+id/notes"
+		android:layout_below="@+id/header_item"
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:layout_marginTop="20dp"
+		android:layout_marginLeft="10dp"
+		android:layout_marginRight="10dp"
+		android:layout_marginBottom="20dp"
+		android:imeOptions="actionDone"
+		android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
+		android:saveEnabled="true"
+		android:gravity="top" 
+		android:layout_gravity="center"
+		android:lines="8"
+		android:hint="@string/PlantInfo_addNotes"
+	/>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:background="@color/darkgray"
+		>
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:paddingTop="2dp"
+			>
+			<Button 
+				android:id="@+id/notes_done" 
+				android:layout_height="wrap_content" 
+				android:text="Add Notes" 
+				android:layout_width="200dp"/>
+			</LinearLayout>
+	  	</LinearLayout>
+  	</RelativeLayout>
+</RelativeLayout>

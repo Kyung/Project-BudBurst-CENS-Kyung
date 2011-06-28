@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+ 
+	<ScrollView
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/phenophase_bar">
+
+	<LinearLayout 
+		android:id="@+id/observation_linear_layout"
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 
+		android:layout_below="@+id/phenophase_bar"
+		android:gravity="center"
+		android:paddingLeft="7dp"
+		android:paddingRight="7dp"
+		android:orientation="vertical">
+
+		<ImageView 
+			android:scaleType="fitCenter"
+			android:paddingLeft="5dp"
+			android:paddingRight="5dp"
+			android:layout_width="300dp" 
+			android:layout_height="300dp" 
+			android:id="@+id/species_image" 
+			android:adjustViewBounds="true"
+			/>		
+			
+		<TextView
+			android:id="@+id/science_name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20sp" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="center"
+			android:textStyle="italic|bold" 
+			android:layout_marginTop="5dp"
+			/>			
+	
+		<TextView
+			android:id="@+id/common_name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="18sp" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="center"
+			android:textStyle="italic|bold" 
+			/>
+		<TextView
+			android:id="@+id/dt_taken"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="14sp" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="center"
+			android:textStyle="italic|bold" 
+			/>
+		<TextView
+			android:id="@+id/geodata"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="14sp" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="center"
+			android:textStyle="italic|bold" 
+			/>
+			
+		<com.google.android.maps.MapView 
+			android:id="@+id/simpleGM_map"
+			android:layout_width="fill_parent"
+			android:layout_height="200dp"
+			android:apiKey="0s7Km0gbaIiJp9iTKU9Kr_LXtcrFz3sd_vNZZYQ"
+			android:clickable="true"
+		/>	
+								
+
+		<TextView
+			android:layout_marginTop="10dp"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:textColor="@drawable/black" 
+			android:layout_gravity="left"
+			android:textSize="17sp"
+			android:id="@+id/comment"
+			/>
+
+		<EditText
+			android:id="@+id/mycomment"
+			android:layout_marginTop="10dp"
+			android:imeOptions="actionDone"
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:inputType="textAutoCorrect|textMultiLine|textImeMultiLine"
+			android:gravity="top" 
+			android:hint="Input comment here"
+			android:lines="3"
+			android:focusable="true"
+			/>
+		<Button
+			android:id="@+id/addcomment"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Add Comment!"
+			android:layout_marginTop="5dp"
+		/>
+	</LinearLayout>
+	</ScrollView>
+</RelativeLayout>
+

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="cens.ucla.edu.budburst"
+      android:versionCode="98" android:versionName="1.10.2">
+      
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+	<uses-permission android:name="android.permission.CONTROL_LOCATION_UPDATES" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+	<uses-permission android:name="android.permission.VIBRATE" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"></uses-permission>
+      
+<application android:label="@string/app_name" android:debuggable="true" android:icon="@drawable/pbb_icon_main2">
+ 
+ 	<activity android:name="firstActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait">
+ 		<intent-filter>
+    		<action android:name="android.intent.action.MAIN"/>
+    		<category android:name="android.intent.category.LAUNCHER"/>
+    	</intent-filter>
+ 	</activity>
+ 
+<!-- cens.ucla.edu.budburst.myplants package -->
+<activity android:name=".myplants.PBBPlantList" android:label="PlantList" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBAddPlant" android:label="AddPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBAddSite" android:theme="@android:style/Theme.Light" android:label="AddSite" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBAddNotes" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:windowSoftInputMode="adjustResize"></activity>
+<activity android:name=".myplants.DetailPlantInfo" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.GetPhenophaseObserver" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.GetPhenophaseShared" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBObservationSummary" android:label="OneTimeMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:process=":SummaryPlantInfo"></activity>
+<activity android:name=".myplants.UpdatePlantInfo" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBObservationPage" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBPhenophaseInfo" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.PBBChangeMyPosition" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".myplants.DetailPlantInfoFloracache" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity> 
+
+ <!-- cens.ucla.edu.budburst package -->
+<activity android:label="PBBHelloscr" android:name="PBBHelloscr" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PBBSync" android:label="Sync" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PBBLogin" android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar" android:windowSoftInputMode="adjustResize" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PBBMainPage" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name="PBBHelpPage" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name="PBBSplash" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+<!-- cens.ucla.edu.budburst.lists package -->
+<activity android:name=".lists.ListUserDefinedSpecies" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.ListMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.ListDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".lists.ListSubCategory" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+
+<!-- cens.ucla.edu.budburst.helper package -->
+<activity android:name=".helper.HelperSettings" android:noHistory="true" android:clearTaskOnLaunch="true"></activity>
+<activity android:name=".helper.LazyAdapter"></activity>
+<activity android:name=".helper.HelperShowAll" android:theme="@android:style/Theme.Light.NoTitleBar" android:screenOrientation="portrait"></activity>
+<service android:name=".helper.GetDataAsBackground"></service>
+<service android:name=".helper.HelperBackgroundService" android:enabled="true">
+	<intent-filter>
+		<action android:name="cens.ucla.edu.budburst.helper.HelperBackgroundService.SERVICE"/>
+	</intent-filter>
+</service>
+<service android:name=".helper.HelperGpsHandler">
+	<intent-filter>
+		<action android:name="cens.ucla.edu.budburst.helper.HelperGpsHandler.SERVICE"/>
+	</intent-filter>
+</service>
+
+
+<!-- cens.ucla.edu.budburst.mapview package -->
+<activity android:name=".mapview.PBBMapMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:process=":PBBMapMain"></activity>
+<activity android:name=".mapview.SpeciesDetailMap" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:process=":SpeciesDetail"></activity>
+<activity android:name=".mapview.MapViewMain" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden"></activity>
+
+<!-- cens.ucla.edu.budburst.onetime package -->
+<activity android:name=".utils.QuickCapture" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.OneTimePBBLists" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.OneTimeMainPage" android:label="OneTimeMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".onetime.OneTimePhenophase" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" ></activity>
+<activity android:name=".onetime.OneTimeAddMyPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+<!-- cens.ucla.edu.budburst.weeklyplant package -->
+<activity android:name=".weeklyplant.WeeklyPlant" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+<!-- cens.ucla.edu.budburst.floracaching package -->
+<activity android:name=".floracaching.FloraCacheMain" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+<activity android:name=".floracaching.FloraCacheEasyLevel" android:theme="@android:style/Theme.Light.NoTitleBar" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloraCacheMedLevel" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloraCacheMedLevelContent" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloraCacheHardLevel" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden" android:screenOrientation="portrait"></activity>
+<activity android:name=".floracaching.FloracacheDetail" android:theme="@android:style/Theme.Light" android:configChanges="orientation|keyboardHidden"></activity>
+
+<uses-library android:name="com.google.android.maps"></uses-library>
+
+<receiver android:name=".utils.PBBWidget" >
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data android:name="android.appwidget.provider"
+               android:resource="@xml/example_appwidget_info" />
+</receiver>
+
+</application>
+    <uses-sdk android:minSdkVersion="3" />
+</manifest> 

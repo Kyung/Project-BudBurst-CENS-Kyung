@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/database
+END
+OneTimeDBHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/6/ProjectBudburst/src/cens/ucla/edu/budburst/database/OneTimeDBHelper.java
+END
+StaticDBHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/database/StaticDBHelper.java
+END
+SyncDBHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/database/SyncDBHelper.java
+END
+SyncNetworkHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/3/ProjectBudburst/src/cens/ucla/edu/budburst/database/SyncNetworkHelper.java
+END

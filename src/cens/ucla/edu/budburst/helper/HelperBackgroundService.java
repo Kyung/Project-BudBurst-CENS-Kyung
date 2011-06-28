@@ -88,19 +88,16 @@ public class HelperBackgroundService extends Service{
 		@Override
 		public void onProviderDisabled(String provider) {
 			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void onProviderEnabled(String provider) {
 			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 			// TODO Auto-generated method stub
-			
 		}
 	};
 	
@@ -143,26 +140,19 @@ public class HelperBackgroundService extends Service{
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			
-			//final long start = mStartTime;
-			
-			
 			final long start = mStartTime;
 		       
 			long millis = SystemClock.uptimeMillis() - start;
 		    int seconds = (int) (millis / 1000);
 		       
 		    int minutes = seconds / 60;
-		       
 		    seconds     = seconds % 60;
 
 		    Log.i("K", "" + minutes + ":0" + seconds);
 
 		    new checkVersion().execute();
-		    
 		    mTimerHandler.postAtTime(this, start + (((minutes * 60) + seconds + 1) * 1000));
 		}
-		
 	};
 	
 	private class checkVersion extends AsyncTask <Void, Void, Void> {
@@ -250,6 +240,7 @@ public class HelperBackgroundService extends Service{
 	    	mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTimeBetweenUpdatesms, minDistanceBetweenUpdatesMeters, mNetworkListener);
 	    }
 
+	    // after 30 secs run GetLastLocation()
 	    mTimer = new Timer();
 		mTimer.schedule(new GetLastLocation(), 30 * 1000);
 		
@@ -263,7 +254,6 @@ public class HelperBackgroundService extends Service{
 	}
 	
 	class GetLastLocation extends TimerTask {
-
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
@@ -354,11 +344,6 @@ public class HelperBackgroundService extends Service{
 		mLatitude = loc.getLatitude();
 		mLongitude = loc.getLongitude();
 		mAccuracy = loc.getAccuracy();
-		
-		//ListItems item = new ListItems(loc.getLatitude(), loc.getLongitude());
-		
-		//ListUserDefinedCategory listGroup = new ListUserDefinedCategory(mContext);
-		//listGroup.execute(item);
 		
 		/*
 		 * When the app receives my location, it will send my location information to the server.

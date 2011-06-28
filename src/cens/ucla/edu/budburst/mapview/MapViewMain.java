@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -64,7 +65,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -78,10 +81,14 @@ import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -93,7 +100,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MapViewMain extends MapActivity{ //implements LocationListener {
+/**
+ * Map View Main class
+ * @author kyunghan
+ *
+ */
+public class MapViewMain extends MapActivity{
 	
 	private HelperGpsHandler gpsHandler;
 	private boolean mIsBound;
@@ -105,9 +117,11 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	
 	// Map related variables
 	private LocationManager mLocManager = null;
-	private MapView mMapView = null;
+	private MapCustomView mMapView = null;
 	private MyLocationOverlay mMyOverLay = null;
 	private MapController mMapController = null;
+	private Geocoder mGeocoder;
+	private List<Address> mAddr;
 	
 	// Dialog
 	private ProgressDialog mDialog;
@@ -120,6 +134,7 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	private boolean mHandlerDone	= false;
 	private int mType = 100;
 	
+	private static final int GET_OTHERS_OBSERVATION = 1;
 	private static final int GET_GPS_SIGNAL = 10;
 	private static final int GET_MY_OBSERVED_LISTS = 11;
 	private boolean viewFlag = false;
@@ -136,9 +151,12 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	// timer variables
 	private Timer timer;
 	
+	private TextView titleBar;
+	
 	//
 	private boolean firstResume = true;
 	
+	// set the handler
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
@@ -146,7 +164,7 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			switch(msg.what) {
 			case GET_GPS_SIGNAL:
 				Log.i("K", "get GET_GPS_SIGNAL");
-				showSpeciesOnMap(true);
+				showBudburstSpeciesOnMap(true);
 				break;
 			case GET_MY_OBSERVED_LISTS:
 				Log.i("K", "get GET_MY_OBSERVED_LISTS");
@@ -154,7 +172,6 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			}
 		}
 	};
-	
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -169,14 +186,11 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	};
 	
 	private void doBindService() {
-		
 		Log.i("K", "BindService");
 		
 		bindService(new Intent(MapViewMain.this, HelperGpsHandler.class), mConnection,
 				Context.BIND_AUTO_CREATE);
-		mIsBound = true;
-		//Toast.makeText(PBBMapMain.this, "bindService", Toast.LENGTH_SHORT).show();
-	
+		mIsBound = true;	
 	}
 	
 	private void doUnbindService() {
@@ -187,8 +201,6 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			if(mConnection != null) {
 				
 			}
-			
-			//Toast.makeText(PBBMapMain.this, "UnbindService", Toast.LENGTH_SHORT).show();
 			unbindService(mConnection);
 			mIsBound = false;
 		}
@@ -199,13 +211,19 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 		Log.i("K", "PBBMapMain - onCreate");
 		
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.pbb_map);
 		
 		mLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		// Set MapView
-		mMapView = (MapView)findViewById(R.id.map);
+		
+		// Set MapView and the longPressListener
+		mMapView = (MapCustomView)findViewById(R.id.map);
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.setSatellite(false);
+
+		// set long press listener
+		longPressListener();
+	
 		// Set mapController
 		mMapController = mMapView.getController();
 		mMapController.setZoom(12);
@@ -215,9 +233,8 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 		mMyOverLay.enableMyLocation();
 		mMyOverLay.enableCompass();
 		
-		
 		// remove view of accuracy bar
-		TextView titleBar = (TextView)findViewById(R.id.myloc_accuracy);
+		titleBar = (TextView)findViewById(R.id.myloc_accuracy);
 		titleBar.setVisibility(View.GONE);
 		
 		Intent pIntent = getIntent();
@@ -234,7 +251,81 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 		registerReceiver(gpsReceiver, inFilter);
 		Log.i("K", "Receiver Register");
 		
+		showButtonOnMap();
 		checkGpsIsOn();
+	}
+	
+	private void longPressListener() {
+		// add long press listener
+		mMapView.setOnLongpressListener(new MapCustomView.OnLongpressListener() {
+			
+			@Override
+			public void onLongpress(final MapView view, final GeoPoint longpressLocation) {
+				// TODO Auto-generated method stub
+				
+				// check if there is GPS data received
+				if(mLatitude == 0.0 || mLongitude == 0.0) {
+					Toast.makeText(MapViewMain.this, getString(R.string.Not_Finish_GPS), Toast.LENGTH_SHORT).show();
+				}
+				else {
+					runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							// animateTo the location the user pressed.
+							mMapController.animateTo(longpressLocation);
+							mGeocoder = new Geocoder(MapViewMain.this, Locale.getDefault());
+							try {
+								mAddr = mGeocoder.getFromLocation(longpressLocation.getLatitudeE6() / 1E6, longpressLocation.getLongitudeE6() / 1E6, 1);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+							if(mAddr == null) {
+								Toast.makeText(MapViewMain.this, "Unable to get the location. Please check network connectivity.", Toast.LENGTH_SHORT).show();
+							}
+							else {
+								final Address address = mAddr.get(0);
+
+								// Insert long press action here.
+								 new AlertDialog.Builder(MapViewMain.this)
+							   		.setTitle(getString(R.string.Mapview_Refresh_Species_Lists_Message))
+							   		.setMessage("[ Your clicked address ]\n\n"  + address.getAddressLine(0) + ", " + address.getLocality() + ", " + address.getCountryName())
+							   		.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
+							   			public void onClick(DialogInterface dialog, int whichButton) {
+							   				// get latitude and longitude values
+							   				double newLatitude = longpressLocation.getLatitudeE6() / 1E6;
+							   				double newLongitude = longpressLocation.getLongitudeE6() / 1E6;
+							   				
+							   				// remove all markers first
+							   				mMapView.getOverlays().clear();
+							   				
+							   				// add a flag marker
+							   				Drawable dMarker = getResources().getDrawable(R.drawable.marker_flag);
+											dMarker.setBounds(0, 0, dMarker.getIntrinsicWidth(), dMarker.getIntrinsicHeight());
+											mMapView.getOverlays().add(new ItemOverlay(dMarker, longpressLocation));
+											
+											Display display = getWindowManager().getDefaultDisplay();
+							   				// call the data from the server
+							   				SpeciesOthersFromServer getSpecies = new SpeciesOthersFromServer(MapViewMain.this, mMapView, mMyOverLay, 1, newLatitude, newLongitude);
+							   				getSpecies.execute(getString(R.string.get_onetimeob_others) + 
+							   						"?latitude=" + newLatitude + "&longitude=" + newLongitude);
+							   				
+							   			}
+							   		})
+							   		.setNegativeButton(getString(R.string.Button_no), new DialogInterface.OnClickListener() {
+							   			public void onClick(DialogInterface dialog, int whichButton) {}
+							   		})
+							   		.show();
+
+							}
+						}
+					});
+				}
+			}
+		});
 	}
 	
 	@Override
@@ -251,6 +342,47 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			mMapView.postInvalidate();
 		}
 	}
+	
+	// put a button on the map
+	private void showButtonOnMap() {
+		
+		// getting the display size
+		Display display = getWindowManager().getDefaultDisplay();
+		int width = display.getWidth();
+		int height = display.getHeight();
+		
+		MapView.LayoutParams screenLP;
+		// My Location
+	    screenLP = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
+											MapView.LayoutParams.WRAP_CONTENT,
+											width-50, 10,
+											MapView.LayoutParams.TOP_LEFT);
+
+	    Button myLocation = new Button(getApplicationContext());
+	    myLocation.setBackgroundResource(R.drawable.menu_mylocation);
+
+	    mMapView.addView(myLocation, screenLP);
+	    
+	    myLocation.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				GeoPoint currentPoint = null;
+				if(mLatitude == 0.0) {
+					Toast.makeText(MapViewMain.this, getString(R.string.Alert_gettingGPS), Toast.LENGTH_SHORT).show();
+				}
+				else {
+					currentPoint = new GeoPoint((int)(mLatitude * 1000000), (int)(mLongitude * 1000000));
+
+					mMapController = mMapView.getController();
+					mMapController.animateTo(currentPoint);
+					mMapController.setZoom(17);
+				}
+			}
+		});
+	}
+	
 
 	public void checkGpsIsOn() {
 		// check if GPS is turned on...
@@ -264,15 +396,15 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			}
 			
 			doBindService();
-			showSpeciesOnMap(false);
-			
+			//showBudburstSpeciesOnMap(false);
+			getOtherUsersListsFromServer(GET_OTHERS_OBSERVATION);
 		}
 		else {
 		   	
 		 new AlertDialog.Builder(MapViewMain.this)
 		   		.setTitle("Turn On GPS")
 		   		.setMessage(getString(R.string.Message_locationDisabledTurnOn))
-		   		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		   		.setPositiveButton(getString(R.string.Button_yes), new DialogInterface.OnClickListener() {
 		   			public void onClick(DialogInterface dialog, int whichButton) {
 		   				Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
 		   				startActivityForResult(intent, 1);
@@ -295,12 +427,12 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
         	if(resultCode == RESULT_OK) {
         		Log.i("K", "onActivityResult");
             	doBindService();
-            	showSpeciesOnMap(false);
+            	showBudburstSpeciesOnMap(false);
         	}
         }
     }
 	
-	public void showSpeciesOnMap(boolean hasHandler) {
+	public void showBudburstSpeciesOnMap(boolean hasHandler) {
 		
 		// TODO Auto-generated method stub
 		otDBH = new OneTimeDBHelper(MapViewMain.this);
@@ -311,11 +443,14 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 		mMapView.invalidate();
 		
 		if(getMyListsFromDB()) {
-			Log.i("K", "Get species lists in the database");
+			Log.i("K", "Get species lists from the database");
 			
-			//MapView mapView, Drawable marker, ArrayList<PlantItem> plantList
+			// add overlays on the map
+			mMapView.getOverlays().clear();
 			mMapView.getOverlays().add(new SpeciesMapOverlay(mMapView, mMarker, mPlantList));
 			mMapView.getOverlays().add(mMyOverLay);
+			
+			titleBar.setText("Total number of species : " + mPlantList.size());
 			
 			mMapController.setCenter(gPoint);
 			
@@ -326,25 +461,20 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			}
 		}
 		else {
+			Toast.makeText(MapViewMain.this, "Please make your own observation", Toast.LENGTH_SHORT).show();
 			Log.i("K", "No species lists in the database.");
 		}
 
 	}
 	
 	public boolean getMyListsFromDB() {
-		SyncDBHelper sDBH = new SyncDBHelper(this);
 		OneTimeDBHelper oDBH = new OneTimeDBHelper(this);
-		
-		// add myPlantList from Monitored Plants
-		// temporary stop
-		//mPlantList = sDBH.getAllMyListInformation(this);
 		
 		// add myPlantList from Shared Plants
 		mPlantList.addAll(oDBH.getAllMyListInformation(this));
 		
 		Log.i("K", "the number of mylist (size) : " + mPlantList.size());
 		
-		sDBH.close();
 		oDBH.close();
 		
 		if(mPlantList.size() > 0) {
@@ -355,7 +485,13 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	
 	
 	public void getOtherUsersListsFromServer(int category) {
-		SpeciesOthersFromServer getSpecies = new SpeciesOthersFromServer(MapViewMain.this, mMapView, mMyOverLay, category);
+		// clear overlays
+		mMapView.getOverlays().clear();
+		
+		Log.i("K", "MapViewMain(category) : " + category);
+		
+		// call the list of species based on the category.
+		SpeciesOthersFromServer getSpecies = new SpeciesOthersFromServer(MapViewMain.this, mMapView, mMyOverLay, category, mLatitude, mLongitude);
 		getSpecies.execute(getString(R.string.get_onetimeob_others) + 
 				"?latitude=" + mLatitude + "&longitude=" + mLongitude);
 	}
@@ -364,7 +500,6 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		
-		menu.add(0, 1, 0, getString(R.string.PBBMapMenu_myLocation)).setIcon(android.R.drawable.ic_menu_mylocation);
 		menu.add(0, 2, 0, getString(R.string.PBBMapMenu_changeView)).setIcon(android.R.drawable.ic_menu_mapmode);
 		menu.add(0, 3, 0, getString(R.string.PBBMapMenu_refresh)).setIcon(android.R.drawable.ic_menu_rotate);
 		menu.add(0, 4, 0, getString(R.string.otherCategoryMap)).setIcon(android.R.drawable.ic_menu_sort_by_size);
@@ -375,19 +510,6 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	//Menu option selection handling
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			case 1:
-				GeoPoint current_point = null;
-				if(mLatitude == 0.0) {
-					Toast.makeText(MapViewMain.this, getString(R.string.Alert_gettingGPS), Toast.LENGTH_SHORT).show();
-				}
-				else {
-					current_point = new GeoPoint((int)(mLatitude * 1000000), (int)(mLongitude * 1000000));
-
-					mMapController = mMapView.getController();
-					mMapController.animateTo(current_point);
-					mMapController.setZoom(17);
-				}
-				return true;
 			case 2:
 				if(!viewFlag) {
 					mMapView.setSatellite(true);
@@ -397,7 +519,6 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 					mMapView.setSatellite(false);
 					viewFlag = false;
 				}
-				
 				return true;				
 			case 3:
 				getNewGPS();
@@ -412,32 +533,24 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 	private void showCategory() {
 		mArr = new ArrayList<ListGroupItem>(); 
 		
+		// add lists except endangered list
+		// my observations
 		ListGroupItem gItem = new ListGroupItem();
+		gItem.setCategoryID(0);
+		gItem.setCategoryName("My Observation");
+		mArr.add(gItem);
+		
+		// others' observations
+		gItem = new ListGroupItem();
 		gItem.setCategoryID(1);
-		gItem.setCategoryName("Local Budburst");
+		gItem.setCategoryName("Others' Observation");
 		mArr.add(gItem);
 		
-		gItem = new ListGroupItem();
-		gItem.setCategoryID(2);
-		gItem.setCategoryName("Local Invasive");
-		mArr.add(gItem);
-		
-		gItem = new ListGroupItem();
-		gItem.setCategoryID(3);
-		gItem.setCategoryName("Local Poisonous");
-		mArr.add(gItem);
-		
-		gItem = new ListGroupItem();
-		gItem.setCategoryID(4);
-		gItem.setCategoryName("Local Endangered");
-		mArr.add(gItem);
-		
+		// add quick capture observations into the array
 		OneTimeDBHelper oDBH = new OneTimeDBHelper(MapViewMain.this);
 		mArr.addAll(oDBH.getListGroupItem(MapViewMain.this));
 		
 		int arrLength = mArr.size();
-		
-		Log.i("K", "length : " + arrLength);
 		
 		mPlantCategory = new String[arrLength];
 		mSelect = new boolean[arrLength];
@@ -464,7 +577,12 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 				// TODO Auto-generated method stub
 				for(int i = 0 ; i < mSelect.length ; i++) {
 					if(mSelect[i]) {
-						getOtherUsersListsFromServer(mArr.get(i).getCategoryID());
+						if(i == 0) {
+							showBudburstSpeciesOnMap(false);
+						}
+						else {
+							getOtherUsersListsFromServer(mArr.get(i).getCategoryID());
+						}
 					}
 				}
 			}
@@ -521,6 +639,7 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 		return false;
 	}
 	
+	// get updated GPS data by the broadcast receiver
 	private BroadcastReceiver gpsReceiver = new BroadcastReceiver() {
 
 		@Override
@@ -561,4 +680,56 @@ public class MapViewMain extends MapActivity{ //implements LocationListener {
 			}
 		}	
 	};
+	
+	// ItemOverlay class
+	class ItemOverlay extends ItemizedOverlay<OverlayItem> {
+
+		private Drawable mMarker;
+		private OverlayItem mItem;
+		private GeoPoint mGeoPoint;
+		
+		public ItemOverlay(Drawable marker, GeoPoint geoPoint) {
+			super(marker);
+			
+			//getOverlays().clear();
+			
+			mMarker = marker;
+			mGeoPoint = geoPoint;
+			mItem = new OverlayItem(geoPoint, "123", "456");
+			
+			populate();
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		protected OverlayItem createItem(int i) {
+			// TODO Auto-generated method stub
+			return mItem;
+		}
+
+		@Override
+		public int size() {
+			// TODO Auto-generated method stub
+			return 1;
+		}
+		
+		@Override
+		public void draw(Canvas canvas, MapView mapView, boolean shadow) {
+			super.draw(canvas, mapView, false);
+			boundCenter(mMarker);
+		}
+		
+		@Override
+		protected boolean onTap(int index) {
+			// nothing so far.
+			mMapController.animateTo(mGeoPoint);
+			
+			// show the addr in the toast box.
+			Address address = mAddr.get(0); 
+			Toast.makeText(MapViewMain.this, address.getAddressLine(0) + ", " + address.getLocality() + ", " + address.getCountryName(), Toast.LENGTH_LONG).show();	
+			
+			return true;
+		}
+	}
+
 }

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <!-- Header Layout -->
+    <LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal" 
+		android:gravity="center_vertical|center_horizontal"
+		android:id="@+id/header"
+		android:background="@color/BudBurstBackground">
+		
+		<ImageView 
+			android:id="@+id/ImageView01" 
+			android:layout_width="wrap_content" 
+			android:layout_height="60dp" 
+			android:src="@drawable/header">
+		</ImageView>
+	</LinearLayout>
+	<!-- End Header Layout -->
+	
+	
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="20dp"
+		android:layout_below="@+id/header"
+		android:id="@+id/header2"
+		android:background="@color/BudBurstLightBackground"
+	></LinearLayout>	
+
+	<!-- Start Body Layout -->
+	<LinearLayout
+		android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_below="@+id/header2"
+	   	android:layout_above="@+id/footer_item"
+	   	android:id="@+id/body"
+	   	android:background="@color/BudBurstLightBackground"
+	>
+	    
+		<LinearLayout 
+		   	android:id="@+id/two_button"
+		   	android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:weightSum="1" 
+		    android:orientation="vertical" 
+		   	android:background="@color/BudBurstLightBackground"
+		   	android:paddingLeft="13dp"
+		   	android:paddingRight="13dp">
+		   	
+		<!-- 1st horizontal -->
+		   	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:orientation="horizontal"
+				android:layout_weight="0.34"
+				android:weightSum="1">
+				
+				<!-- My Plant -->
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"			
+					android:layout_weight="0.5"
+					android:orientation="vertical"
+					android:id="@+id/my_plant_sync"
+					android:gravity="center"
+				>
+					<ImageButton
+						android:layout_width="75dp"
+						android:layout_height="75dp"
+						android:background="@drawable/icon_myplants"
+						android:id="@+id/my_plant"/>
+						
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:gravity="center"
+						android:text="My Plants"
+						android:textColor="@color/main_text"
+						android:textStyle="bold"
+						android:textSize="17sp"
+						android:paddingBottom="12dp"
+					/>	
+				</LinearLayout>
+			
+			<!-- My Plant Unsynced -->
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"	
+					android:layout_weight="0.5"
+					android:gravity="center"
+					android:orientation="vertical"
+					android:visibility="gone"
+					android:id="@+id/my_plant_unsync"
+				>
+					<ImageButton
+						android:layout_width="75dp"
+						android:layout_height="75dp"
+						android:background="@drawable/icon_myplant_unsync"
+						android:id="@+id/unsync_my_plant"
+					/>
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:gravity="center"
+						android:text="My Plants"
+						android:textColor="@color/main_text"
+						android:textStyle="bold"
+						android:textSize="17sp"
+						android:paddingBottom="12dp"
+					/>
+			</LinearLayout>
+	
+			<!-- Plant Maps -->
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:layout_weight="0.5"
+				android:orientation="vertical"
+				android:gravity="center"
+			>
+				<Button
+					android:layout_width="75dp"
+					android:layout_height="75dp"
+					android:background="@drawable/icon_map"
+					android:id="@+id/map"
+				/>
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:gravity="center"
+					android:text="Plant Maps"
+					android:textColor="@color/main_text"
+					android:textStyle="bold"
+					android:textSize="17sp"
+					android:paddingBottom="12dp"
+				/>
+			</LinearLayout>
+			</LinearLayout>
+			
+			<!-- 2nd horizontal -->
+			
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:orientation="horizontal"
+				android:layout_weight="0.34"
+				android:weightSum="1">
+				
+				<!-- My Lists -->
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:layout_weight="0.5"
+					android:orientation="vertical"
+					android:gravity="center"
+				>
+					<Button
+						android:layout_width="75dp"
+						android:layout_height="75dp"
+						android:background="@drawable/icon_mylist"
+						android:id="@+id/myresults"
+					/>
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:gravity="center"
+						android:text="Local Lists"
+						android:textColor="@color/main_text"
+						android:textStyle="bold"
+						android:textSize="17sp"
+						android:paddingBottom="12dp"
+					/>
+				</LinearLayout>
+				
+				<!-- Weekly Plant -->
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"		
+					android:layout_weight="0.5"
+					android:orientation="vertical"
+					android:gravity="center"
+				>
+					<Button 
+						android:layout_width="75dp"
+						android:layout_height="75dp" 
+						android:background="@drawable/icon_weekly" 
+						android:id="@+id/weekly" 
+					/>
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:gravity="center"
+						android:text="@string/Main_weekly"
+						android:textColor="@color/main_text"
+						android:textStyle="bold"
+						android:textSize="17sp"
+						android:paddingBottom="12dp"
+					/>
+				</LinearLayout>
+			</LinearLayout>
+				
+		<!-- 3rd horizontal layout -->
+	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:orientation="horizontal"
+				android:layout_weight="0.33"
+				android:weightSum="1">
+				
+				<!-- News -->
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"	
+					android:layout_weight="0.5"
+					android:orientation="vertical"
+					android:gravity="center"
+				>
+					<Button
+						android:layout_width="75dp"
+						android:layout_height="75dp"
+						android:background="@drawable/icon_news"
+						android:id="@+id/news"
+					/>
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:layout_weight="0.7"
+						android:gravity="center"
+						android:text="Plant News"
+						android:textColor="@color/main_text"
+						android:textStyle="bold"
+						android:textSize="17sp"
+						android:paddingBottom="12dp"
+					/>
+				</LinearLayout>
+				
+				<!-- Floracaching -->
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"		
+					android:layout_weight="0.5"
+					android:orientation="vertical"
+					android:gravity="center"
+				>
+					<Button
+						android:layout_width="75dp"
+						android:layout_height="75dp"
+						android:background="@drawable/icon_compass"
+						android:id="@+id/flora"
+					/>
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:gravity="center"
+						android:text="Floracaching"
+						android:textColor="@color/main_text"
+						android:textStyle="bold"
+						android:textSize="17sp"
+						android:paddingBottom="12dp"
+					/>
+				</LinearLayout>
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+	
+	<!-- Done Button -->
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/footer_item"
+		android:layout_alignParentBottom="true"
+		android:background="@color/BudBurstBackground"
+	>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:paddingTop="2dp"
+		>
+			<TextView 
+				android:id="@+id/user_info"
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content" 
+				android:gravity="center"
+				android:text="@string/Button_save"
+				android:textColor="@android:color/white" 
+				android:textStyle="bold"
+				android:textSize="17sp"/>
+		</LinearLayout>
+	</LinearLayout>
+	<!-- End Done Button -->
+	
+	
+</RelativeLayout>

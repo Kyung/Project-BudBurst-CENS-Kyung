@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <!-- Head View -->
+    <LinearLayout
+		android:id="@+id/header_item"
+		android:layout_width="fill_parent"
+		android:layout_height="60dp"
+		android:orientation="vertical"
+		android:paddingTop="10dp"
+		android:paddingBottom="5dp"
+		android:paddingLeft="5dp"
+		android:paddingRight="5dp"
+		android:background="@drawable/bg_line"
+	>
+		<TextView
+			android:layout_marginLeft="2dp"
+			android:layout_marginBottom="3dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Unknown_Plant_Text_4"
+			android:textSize="15sp"
+			android:id="@+id/add_site_text"
+		/>
+	</LinearLayout>
+	<!-- End Head View -->
+	
+	<!-- Start Body View -->
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_below="@+id/header_item"
+		android:layout_above="@+id/footer_item"
+	>
+	<!-- Start ScrollView -->
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/body_item"
+	>
+	
+	<!-- ScrollView base layout -->
+		<LinearLayout
+			android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical"
+		>
+	
+		<TextView
+			android:id="@+id/instruction"
+			android:layout_below="@+id/header_item"
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:layout_marginTop="10dp"
+			android:layout_marginBottom="10dp"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			android:textSize="17sp"
+			android:textStyle="bold"
+			android:focusableInTouchMode="true"
+			android:focusable="true"
+			android:text="@string/AddSite_intro" 
+			android:gravity="center_horizontal">
+		</TextView>
+
+		<EditText 
+			android:id="@+id/sitename"
+			android:layout_below="@+id/instruction"
+			android:layout_marginLeft="25dp"
+			android:layout_marginRight="25dp"	
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:hint="@string/AddSite_siteName">
+		</EditText>
+		
+		<EditText 
+			android:id="@+id/geo_location"
+			android:layout_below="@+id/sitename"
+			android:layout_marginLeft="25dp"
+			android:layout_marginRight="25dp"
+			android:layout_marginTop="10dp"	
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:enabled="false"
+			android:textColor="@color/black"
+			android:textSize="16sp"
+			android:hint="@string/AddSite_gettingLatLong">
+		</EditText>
+		
+		<!-- Layout for four buttons - 1st line -->
+		<LinearLayout
+			android:layout_width="fill_parent"	
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:id="@+id/site_info"
+			android:layout_below="@+id/geo_location"
+			>
+			<LinearLayout
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:layout_marginTop="10dp"
+				android:weightSum="1"
+			>
+				<Button 
+					android:layout_weight="0.5"
+					android:id="@+id/human_distance_text"
+					android:layout_below="@+id/geo_location"
+					android:textSize="16sp"
+					android:layout_marginLeft="25dp"
+					android:layout_marginRight="10dp"	
+					android:layout_height="wrap_content"
+					android:layout_width="105dp"
+					android:textColor="@color/black"
+					android:singleLine="true"
+					android:text="@string/AddSite_HumanDisturbance">
+				</Button>
+				<Button 
+					android:layout_weight="0.5"
+					android:id="@+id/shading_text"
+					android:textSize="16sp"
+					android:layout_marginLeft="10dp"
+					android:layout_marginRight="25dp"	
+					android:layout_height="wrap_content"
+					android:layout_width="105dp"
+					android:textColor="@color/black"
+					android:singleLine="true"
+					android:text="@string/AddSite_Shading">
+				</Button>
+			</LinearLayout>
+			
+			<!-- Layout for four buttons - 2nd line -->
+			
+			<LinearLayout
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:layout_marginTop="10dp"
+				android:weightSum="1"
+			>		
+				<Button 
+					android:layout_weight="0.5"
+					android:id="@+id/irrigation_text"
+					android:textSize="16sp"
+					android:layout_marginLeft="25dp"
+					android:layout_marginRight="10dp"	
+					android:layout_height="wrap_content"
+					android:layout_width="105dp"
+					android:textColor="@color/black"
+					android:singleLine="true"
+					android:text="@string/AddSite_Irrigation">
+				</Button>
+				<Button 
+					android:layout_weight="0.5"
+					android:id="@+id/habitat_text"
+					android:textSize="16sp"
+					android:layout_marginLeft="10dp"
+					android:layout_marginRight="25dp"	
+					android:layout_height="wrap_content"
+					android:layout_width="105dp"
+					android:textColor="@color/black"
+					android:singleLine="true"
+					android:text="@string/AddSite_Habitat">
+				</Button>
+			</LinearLayout>
+		</LinearLayout>
+		
+		<EditText 
+			android:id="@+id/comment"
+			android:layout_below="@+id/site_info"
+			android:gravity="top"
+			android:layout_marginLeft="25dp"
+			android:layout_marginRight="25dp"
+			android:layout_marginTop="10dp"
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:maxLines="2"
+			android:hint="@string/AddSite_optional">
+		</EditText>
+		
+		<!-- for the layout : MapView & Update GPS -->
+		
+			<LinearLayout
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:layout_below="@+id/comment"
+				android:id="@+id/two_buttons"
+				android:weightSum="1"
+				android:layout_marginTop="10dp"
+			>
+				<Button
+					android:layout_weight="0.5"
+					android:id="@+id/switch_to_mapview"
+					android:textColor="@drawable/black"
+					android:layout_width="105dp"
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="25dp"
+					android:layout_marginRight="10dp"
+					android:layout_marginBottom="20dp"
+					android:textSize="16sp"
+					android:focusable="true"
+					android:text="@string/Button_switch_to_map"/>
+				
+				<Button
+					android:layout_weight="0.5"
+					android:id="@+id/update_gps"
+					android:textColor="@drawable/black"
+					android:layout_width="105dp"
+					android:layout_height="wrap_content"
+					android:layout_centerHorizontal="true"
+					android:gravity="center" 
+					android:layout_marginLeft="10dp"
+					android:layout_marginRight="25dp"
+					android:layout_marginBottom="20dp"
+					android:textSize="16sp"
+					android:focusable="true"
+					android:text="@string/Button_update_GPS"/>
+			</LinearLayout>
+		</LinearLayout>
+	</ScrollView>
+	</LinearLayout>
+	<!-- End Body View -->
+	
+	<!-- Done Button -->
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/body_item"
+		android:id="@+id/footer_item"
+		android:layout_alignParentBottom="true"
+		android:background="@color/darkgray"
+	>
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:paddingTop="2dp"
+		>
+			<Button 
+				android:id="@+id/save"
+				android:layout_width="200dp" 
+				android:layout_height="wrap_content" 
+				android:text="@string/Button_save" 
+				android:textSize="16sp"/>
+		</LinearLayout>
+	</LinearLayout>
+	<!-- End Done Button -->
+
+</RelativeLayout>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal"
+    android:paddingRight="6dp"
+    android:paddingLeft="6dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:gravity="center_vertical"
+    android:weightSum="1"
+    >
+
+    <ImageView android:id="@+id/myimage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="11dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="fitCenter"
+        android:layout_weight="0.1"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_weight="0.8" >
+        
+        <TextView android:id="@+id/commonname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:layout_marginBottom="2dp" />
+        <TextView android:id="@+id/speciesname"
+            android:layout_marginTop="-4dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall" 
+            android:textStyle="italic"
+            />
+        <TextView android:id="@+id/dt_taken"
+            android:layout_marginTop="-4dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall" 
+            android:textColor="@drawable/gray"
+            />
+            
+    </LinearLayout>
+    <ImageView
+   		android:id="@+id/pheno"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="11dp"
+        android:paddingBottom="15dp"
+        android:layout_weight="0.1"
+    />
+</LinearLayout>
+

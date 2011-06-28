@@ -134,14 +134,14 @@ public class FloraCacheMain extends ListActivity {
 				String[] category = getResources().getStringArray(R.array.floracache_level);
 				
 				// easy
-				if(category[which].equals("Easy")) {
+				if(category[which].equals("Map")) {
 					Intent intent = new Intent(FloraCacheMain.this, FloraCacheEasyLevel.class);
 					intent.putExtra("group_id", mListArr.get(selectedPosition).getGroupID());
 					startActivity(intent);
 				}
 				// medium
-				else if(category[which].equals("Medium")) {
-					Intent intent = new Intent(FloraCacheMain.this, FloraCacheMidLevel.class);
+				else if(category[which].equals("Direction")) {
+					Intent intent = new Intent(FloraCacheMain.this, FloraCacheMedLevel.class);
 					intent.putExtra("group_id", mListArr.get(selectedPosition).getGroupID());
 					startActivity(intent);
 					//Toast.makeText(FloraCacheMain.this, getString(R.string.Alert_comingSoon), Toast.LENGTH_SHORT).show();
